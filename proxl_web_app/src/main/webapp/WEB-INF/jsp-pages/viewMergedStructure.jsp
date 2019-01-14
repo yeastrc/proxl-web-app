@@ -11,109 +11,109 @@
 
  <c:set var="headerAdditions">
  
-		<script type="text/javascript" src="${ contextPath }/js/libs/jquery.tablesorter_Modified.js"></script>
-		<script type="text/javascript" src="${ contextPath }/js/libs/spin.min.js"></script> 
-		<script type="text/javascript" src="${ contextPath }/js/libs/base64.js"></script> 
-		<script type="text/javascript" src="${ contextPath }/js/libs/jquery.qtip.min.js"></script>
+		<script type="text/javascript" src="js/libs/jquery.tablesorter_Modified.js"></script>
+		<script type="text/javascript" src="js/libs/spin.min.js"></script> 
+		<script type="text/javascript" src="js/libs/base64.js"></script> 
+		<script type="text/javascript" src="js/libs/jquery.qtip.min.js"></script>
 
 		<%--  Color Picker - jQuery Plugin --%>
-		<script type="text/javascript" src="${ contextPath }/js/libs/colorpicker/colorpicker.js"></script>
+		<script type="text/javascript" src="js/libs/colorpicker/colorpicker.js"></script>
 
 
 		<%--  Compression --%>
 		
-		<script type="text/javascript" src="${ contextPath }/js/libs/lz-string/lz-string.min.js"></script>
+		<script type="text/javascript" src="js/libs/lz-string/lz-string.min.js"></script>
 		
 		<%--  Non-Minified version --%>
 		<%-- 
-		<script type="text/javascript" src="${ contextPath }/js/libs/lz-string/lz-string.js"></script>
+		<script type="text/javascript" src="js/libs/lz-string/lz-string.js"></script>
 		--%>
 		
 		<%--  Used by lz-string.min.js --%>
-		<script type="text/javascript" src="${ contextPath }/js/libs/lz-string/base64-string.js"></script>
+		<script type="text/javascript" src="js/libs/lz-string/base64-string.js"></script>
 
 		
 
 		<!-- Handlebars templating library   -->
 		
 		<%--  
-		<script type="text/javascript" src="${ contextPath }/js/libs/handlebars-v2.0.0.js"></script>
+		<script type="text/javascript" src="js/libs/handlebars-v2.0.0.js"></script>
 		--%>
 		
 		<!-- use minimized version  -->
-		<script type="text/javascript" src="${ contextPath }/js/libs/handlebars-v2.0.0.min.js"></script>
+		<script type="text/javascript" src="js/libs/handlebars-v2.0.0.min.js"></script>
 
 
 		
 		
 <%--  Start of Lorikeet Core Parts --%>		
 
-		<script src="${contextPath}/js/libs/jquery-ui-1.10.4.min.js"></script>
+		<script src="js/libs/jquery-ui-1.10.4.min.js"></script>
 		
 		<%--  Only load the excanvas.min.js if it is IE 8 or lower.  IE 8 does not support HTML5 so this is a way to have HTML5 canvas support --%>
-		<!--[if lte IE 8]><script language="javascript" type="text/javascript" src="${contextPath}/js/lorikeet_google_code/excanvas.min.js"></script><![endif]-->
+		<!--[if lte IE 8]><script language="javascript" type="text/javascript" src="js/lorikeet_google_code/excanvas.min.js"></script><![endif]-->
 		
-		<script src="${contextPath}/js/lorikeet/jquery.flot.js"></script>
-		<script src="${contextPath}/js/lorikeet/jquery.flot.selection.js"></script>
+		<script src="js/lorikeet/jquery.flot.js"></script>
+		<script src="js/lorikeet/jquery.flot.selection.js"></script>
 		
-		<script src="${contextPath}/js/lorikeet/specview.js?x=${cacheBustValue}"></script>
-		<script src="${contextPath}/js/lorikeet/peptide.js?x=${cacheBustValue}"></script>
-		<script src="${contextPath}/js/lorikeet/aminoacid.js?x=${cacheBustValue}"></script>
-		<script src="${contextPath}/js/lorikeet/ion.js?x=${cacheBustValue}"></script>		
+		<script src="js/lorikeet/specview.js?x=${cacheBustValue}"></script>
+		<script src="js/lorikeet/peptide.js?x=${cacheBustValue}"></script>
+		<script src="js/lorikeet/aminoacid.js?x=${cacheBustValue}"></script>
+		<script src="js/lorikeet/ion.js?x=${cacheBustValue}"></script>		
 		
 <%--  End of Lorikeet Core Parts --%>		
 
 		
-		<script type="text/javascript" src="${ contextPath }/js/libs/snap.svg-min.js"></script> <%--  Used by lorikeetPageProcessing.js --%>
+		<script type="text/javascript" src="js/libs/snap.svg-min.js"></script> <%--  Used by lorikeetPageProcessing.js --%>
 				
 <%--  Pre Front End Build
 		 
-		<script type="text/javascript" src="${ contextPath }/js/lorikeetPageProcessing.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/lorikeetPageProcessing.js?x=${cacheBustValue}"></script>
 		
-		<script type="text/javascript" src="${ contextPath }/js/handleServicesAJAXErrors.js?x=${cacheBustValue}"></script> 
+		<script type="text/javascript" src="js/handleServicesAJAXErrors.js?x=${cacheBustValue}"></script> 
 		 
-		<script type="text/javascript" src="${ contextPath }/js/spinner.js?x=${cacheBustValue}"></script> 
+		<script type="text/javascript" src="js/spinner.js?x=${cacheBustValue}"></script> 
 		 
-		<script type="text/javascript" src="${ contextPath }/js/psmPeptideCutoffsCommon.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/psmPeptideCutoffsCommon.js?x=${cacheBustValue}"></script>
 		
-		<script type="text/javascript" src="${ contextPath }/js/psmPeptideAnnDisplayDataCommon.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/psmPeptideAnnDisplayDataCommon.js?x=${cacheBustValue}"></script>
 	
-		<script type="text/javascript" src="${ contextPath }/js/minimumPSM_Count_Filter.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/minimumPSM_Count_Filter.js?x=${cacheBustValue}"></script>
 
 
-		<script type="text/javascript" src="${ contextPath }/js/structure-viewer-pdb-upload.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="${ contextPath }/js/structure-viewer-map-protein.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="${ contextPath }/js/structure-viewer-click-element-handlers.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="${ contextPath }/js/structure-viewer-color-handler.js?x=${cacheBustValue}"></script> 
-		<script type="text/javascript" src="${ contextPath }/js/structure-viewer-page.js?x=${cacheBustValue}"></script> 
+		<script type="text/javascript" src="js/structure-viewer-pdb-upload.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/structure-viewer-map-protein.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/structure-viewer-click-element-handlers.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/structure-viewer-color-handler.js?x=${cacheBustValue}"></script> 
+		<script type="text/javascript" src="js/structure-viewer-page.js?x=${cacheBustValue}"></script> 
 
 	
 
 		Image page and Structure Page Shared
 		
-		<script type="text/javascript" src="${ contextPath }/js/nrseqProteinIdToProteinSequenceVersionIdLookup.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/nrseqProteinIdToProteinSequenceVersionIdLookup.js?x=${cacheBustValue}"></script>
 
-		<script type="text/javascript" src="${ contextPath }/js/image_structure_click_element_common.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/image_structure_click_element_common.js?x=${cacheBustValue}"></script>
 
-		<script type="text/javascript" src="${ contextPath }/js/viewLooplinkReportedPeptidesLoadedFromWebServiceTemplate.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="${ contextPath }/js/viewCrosslinkReportedPeptidesLoadedFromWebServiceTemplate.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="${ contextPath }/js/viewMonolinkReportedPeptidesLoadedFromWebServiceTemplate.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/viewLooplinkReportedPeptidesLoadedFromWebServiceTemplate.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/viewCrosslinkReportedPeptidesLoadedFromWebServiceTemplate.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/viewMonolinkReportedPeptidesLoadedFromWebServiceTemplate.js?x=${cacheBustValue}"></script>
 
-		<script type="text/javascript" src="${ contextPath }/js/viewPsmPerPeptideLoadedFromWebServiceTemplate.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="${ contextPath }/js/viewPsmsLoadedFromWebServiceTemplate.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="${ contextPath }/js/webserviceDataParamsDistribution.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/viewPsmPerPeptideLoadedFromWebServiceTemplate.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/viewPsmsLoadedFromWebServiceTemplate.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/webserviceDataParamsDistribution.js?x=${cacheBustValue}"></script>
 
-		<script type="text/javascript" src="${ contextPath }/js/sharePageURLShortener.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="${ contextPath }/js/defaultPageView.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/sharePageURLShortener.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/defaultPageView.js?x=${cacheBustValue}"></script>
 				
-		<script type="text/javascript" src="${ contextPath }/js/toggleVisibility.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/toggleVisibility.js?x=${cacheBustValue}"></script>
 		
-		<script type="text/javascript" src="${ contextPath }/js/download-string-as-file.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/download-string-as-file.js?x=${cacheBustValue}"></script>
 --%>
   
   <%--  Front End Build  --%>
   
-  		<script type="text/javascript" src="${ contextPath }/static/js_generated_bundles/data_pages/structureView-bundle.js?x=${cacheBustValue}"></script> 
+  		<script type="text/javascript" src="static/js_generated_bundles/data_pages/structureView-bundle.js?x=${cacheBustValue}"></script> 
   		
 				<%-- 
 					The Struts Action for this page must call GetProteinNamesTooltipConfigData
@@ -121,7 +121,7 @@
 					/WEB-INF/jsp-includes/proteinNameTooltipDataForJSCode.jsp
 				  --%>
 <%--  Replaced with the JS bundle listed next
-			<script type="text/javascript" src="${ contextPath }/js/createTooltipForProteinNames.js?x=${cacheBustValue}"></script>
+			<script type="text/javascript" src="js/createTooltipForProteinNames.js?x=${cacheBustValue}"></script>
   --%>
   		
 		
@@ -129,23 +129,23 @@
 
 		
 		
-		<link type="text/css" rel="stylesheet" href="${ contextPath }/css/jquery.qtip.min.css" />
+		<link type="text/css" rel="stylesheet" href="css/jquery.qtip.min.css" />
 		
-		<link rel="stylesheet" href="${ contextPath }/css/tablesorter.css" type="text/css" media="print, projection, screen" />
+		<link rel="stylesheet" href="css/tablesorter.css" type="text/css" media="print, projection, screen" />
 		
 		<%--  Color Picker --%>
 		<%--
-		<link rel="stylesheet" media="screen" type="text/css" href="${ contextPath }/css/libs/colorpicker.css" />
+		<link rel="stylesheet" media="screen" type="text/css" href="css/libs/colorpicker.css" />
 		--%>
 		
-		<link rel="stylesheet" media="screen" type="text/css" href="${ contextPath }/css/libs/colorpicker_custom_colors.css" />
+		<link rel="stylesheet" media="screen" type="text/css" href="css/libs/colorpicker_custom_colors.css" />
 		
 		
 
-		<link REL="stylesheet" TYPE="text/css" HREF="${contextPath}/css/lorikeet.css">
+		<link REL="stylesheet" TYPE="text/css" HREF="css/lorikeet.css">
 		
 	<%-- includ javascript library for glmol structure viewer --%>
-	<script type="text/javascript" src="${ contextPath }/js/libs/bio-pv.min.js"></script>
+	<script type="text/javascript" src="js/libs/bio-pv.min.js"></script>
 
 </c:set>
 

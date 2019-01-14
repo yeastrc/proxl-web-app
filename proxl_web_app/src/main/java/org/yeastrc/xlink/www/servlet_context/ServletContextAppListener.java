@@ -65,10 +65,11 @@ public class ServletContextAppListener extends HttpServlet implements ServletCon
 		//   Set   to use DBConnectionFactoryWeb;
 		DBConnectionFactoryWeb dbConnectionFactoryWeb = new DBConnectionFactoryWeb();
 		DBConnectionFactory.setDbConnectionFactoryImpl( dbConnectionFactoryWeb );
+
 		ServletContext context = event.getServletContext();
 		String contextPath = context.getContextPath();
-		context.setAttribute( WebConstants.APP_CONTEXT_CONTEXT_PATH, contextPath );
 		CurrentContext.setCurrentWebAppContext( contextPath );
+		
 		String jsCssCacheBustString = GetJsCssCacheBustString.getInstance().getJsCssCacheBustString();
 		if ( isDevEnv ) {
 			jsCssCacheBustString = "devEnv";
@@ -122,8 +123,7 @@ public class ServletContextAppListener extends HttpServlet implements ServletCon
 		} 
 		
 		log.warn( "INFO:  !!!!!!!!!!!!!!!   Start up of web app  'Proxl' complete  !!!!!!!!!!!!!!!!!!!! " );
-		log.warn( "INFO: Application context values set.  Key = " + WebConstants.APP_CONTEXT_CONTEXT_PATH + ": value = " + contextPath
-				+ "" );
+		log.warn( "INFO: Application context:" + contextPath );
 	}
 	
 	/* (non-Javadoc)

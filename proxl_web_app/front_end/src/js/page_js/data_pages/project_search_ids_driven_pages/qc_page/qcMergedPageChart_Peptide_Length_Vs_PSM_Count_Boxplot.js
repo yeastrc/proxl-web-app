@@ -247,7 +247,7 @@ var QCMergedPageChart_Peptide_Length_Vs_PSM_Count_Boxplot = function() {
 		_activeAjax =
 			$.ajax({
 				type : "POST",
-				url : contextPathJSVar + "/services/qc/dataPage/peptideLengthVsPSMCountBoxplot_Merged",
+				url : "services/qc/dataPage/peptideLengthVsPSMCountBoxplot_Merged",
 				traditional: true,  //  Force traditional serialization of the data sent
 				//   One thing this means is that arrays are sent as the object property instead of object property followed by "[]".
 				//   So project_search_ids array is passed as "project_search_ids=<value>" which is what Jersey expects

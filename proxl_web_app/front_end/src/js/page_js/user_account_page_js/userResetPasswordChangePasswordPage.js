@@ -106,7 +106,7 @@ window.resetPasswordChangePassword = function(clickThis, eventObject) {
 			resetPasswordTrackingCode : resetPasswordTrackingCode
 	};
 
-	var _URL = contextPathJSVar + "/services/user/resetPasswordUpdatePassword";
+	var _URL = "services/user/resetPasswordUpdatePassword";
 
 	// var request =
 	$.ajax({

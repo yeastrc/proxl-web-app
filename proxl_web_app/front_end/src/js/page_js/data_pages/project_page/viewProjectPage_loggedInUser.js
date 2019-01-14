@@ -20,7 +20,7 @@ window.expandAll = function() {
 		$folder_show_contents_link_jq.hide();
 		
 		$( "table.search-details" ).show();
-		$( "a.expand-link" ).html( '<img src="' + contextPathJSVar + '/images/icon-collapse-small.png">' );
+		$( "a.expand-link" ).html( '<img src="images/icon-collapse-small.png">' );
 	} catch( e ) {
 		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
 		throw e;
@@ -38,7 +38,7 @@ window.collapseAll = function() {
 		$folder_show_contents_link_jq.show();
 
 		$( "table.search-details" ).hide();
-		$( "a.expand-link" ).html( '<img src="' + contextPathJSVar + '/images/icon-expand-small.png">' );
+		$( "a.expand-link" ).html( '<img src="images/icon-expand-small.png">' );
 	} catch( e ) {
 		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
 		throw e;

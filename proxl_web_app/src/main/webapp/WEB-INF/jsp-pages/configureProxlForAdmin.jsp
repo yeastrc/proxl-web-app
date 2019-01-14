@@ -20,21 +20,21 @@
 			<!-- Handlebars templating library   -->
 			
 			<%--  
-			<script type="text/javascript" src="${ contextPath }/js/libs/handlebars-v2.0.0.js"></script>
+			<script type="text/javascript" src="js/libs/handlebars-v2.0.0.js"></script>
 			--%>
 			
 			<!-- use minimized version  -->
 <%-- 			
-			<script type="text/javascript" src="${ contextPath }/js/libs/handlebars-v2.0.0.min.js"></script>
+			<script type="text/javascript" src="js/libs/handlebars-v2.0.0.min.js"></script>
 --%>
 			
 	<script type="text/javascript" src="static/js_generated_bundles/proxl_config_page/configureProxlForAdminPage-bundle.js?x=${ cacheBustValue }"></script>
 
 <%--  Moved to Front End Build Bundles		
 	
-	<script type="text/javascript" src="${ contextPath }/js/handleServicesAJAXErrors.js?x=${cacheBustValue}"></script> 
+	<script type="text/javascript" src="js/handleServicesAJAXErrors.js?x=${cacheBustValue}"></script> 
 	
-	<script type="text/javascript" src="${ contextPath }/js/configureProxlForAdminPage.js?x=${cacheBustValue}"></script> 
+	<script type="text/javascript" src="js/configureProxlForAdminPage.js?x=${cacheBustValue}"></script> 
 --%>
 
  </c:set>
@@ -287,9 +287,9 @@
 	
 		<div  class="collapsable-link-container top-level-collapsable-link-container collapsable_link_container_jq" style="">
 			<a href="javascript:" class="top-level-collapsable-link collapsable_collapse_link_jq" style="display: none;"
-				><img  src="${ contextPath }/images/icon-collapse.png"></a>
+				><img  src="images/icon-collapse.png"></a>
 			<a href="javascript:" class="top-level-collapsable-link collapsable_expand_link_jq"
-				><img  src="${ contextPath }/images/icon-expand.png"></a>
+				><img  src="images/icon-expand.png"></a>
 		
 		</div>
 	

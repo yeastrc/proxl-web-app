@@ -16,7 +16,7 @@ function getProteinSequenceVersionIdsForNrseqProteinIds( params ) {
 
 		incrementSpinner();				// create spinner
 
-		var url = contextPathJSVar + "/services/nrseqDataMapping/getProteinSequenceVersionIdsForNrseqProteinIds";
+		var url = "services/nrseqDataMapping/getProteinSequenceVersionIdsForNrseqProteinIds";
 
 
 		var ajaxRequestData = {

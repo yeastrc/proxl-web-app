@@ -131,7 +131,7 @@ window.createAccount = function() {
 
 	var requestData = createAccountGetFormDataAndValidate();
 	
-	var _URL = contextPathJSVar + "/services/user/createAccountFromInvite";
+	var _URL = "services/user/createAccountFromInvite";
 //	var request =
 	$.ajax({
 		type : "POST",

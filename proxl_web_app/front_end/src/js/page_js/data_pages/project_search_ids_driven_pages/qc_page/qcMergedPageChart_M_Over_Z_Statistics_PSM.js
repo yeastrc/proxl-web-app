@@ -286,7 +286,7 @@ var QCMergedPageChart_M_Over_Z_Statistics_PSM = function() {
 		_activeAjax =
 			$.ajax({
 				type : "POST",
-				url : contextPathJSVar + "/services/qc/dataPage/mzForPSMsHistogramCounts_Merged",
+				url : "services/qc/dataPage/mzForPSMsHistogramCounts_Merged",
 				traditional: true,  //  Force traditional serialization of the data sent
 				//   One thing this means is that arrays are sent as the object property instead of object property followed by "[]".
 				//   So project_search_ids array is passed as "project_search_ids=<value>" which is what Jersey expects

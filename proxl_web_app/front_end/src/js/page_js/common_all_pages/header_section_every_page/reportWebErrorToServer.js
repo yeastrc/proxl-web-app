@@ -45,7 +45,7 @@ window.ReportWebErrorToServer = function() {
 			
 			var requestData = JSON.stringify( requestObj );
 
-			var _URL = contextPathJSVar + "/services/log_error/logBrowserJavascriptError";
+			var _URL = "services/log_error/logBrowserJavascriptError";
 
 //			var request =
 			$.ajax({

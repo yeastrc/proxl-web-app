@@ -7,43 +7,48 @@
 			This is included in header_main.jsp which covers most of the pages.
 
 
+	This is not included in the <head> section of the following pages:
+	
+			(They include head_section_include_every_page_light.jsp directly)
+	
+			 /jsp-pages/special_redirect_pages/redirect_pre_generic_image_structure_ToGenericURL.jsp
+			 /jsp-pages/special_redirect_pages/redirect_searchIdsFromHashToQueryString.jsp
+			 
+			 /jsp-pages/proxl-external-viewer.jsp
+
  --%>
-  	
-  	<%--  Make all relative URLs start after the context path request.getContextPath() --%>
-	<base href="<%= request.getContextPath() %>/">  <%-- The trailing '/' in the href is required --%>
-	
-	
-	
-    <link rel="icon" href="${ contextPath }/images/favicon.ico" />
  
-	<script type="text/javascript" src="${contextPath}/js/libs/modernizr.v2.7.1__custom.39924_min.js"></script>
+ 	<%--  Include file that is really included into <head> of every page --%>
+  	
+  	<%@ include file="/WEB-INF/jsp-includes/head_section_include_every_page_light.jsp" %>
+  	
+	
+    <link rel="icon" href="images/favicon.ico" />
+ 
+	<script type="text/javascript" src="js/libs/modernizr.v2.7.1__custom.39924_min.js"></script>
 	
 	<%--
-	<script type="text/javascript" src="${contextPath}/js/libs/modernizr.v2.7.1__custom.39924.js"></script>
+	<script type="text/javascript" src="js/libs/modernizr.v2.7.1__custom.39924.js"></script>
 	--%>
 
-	<script type="text/javascript" src="${ contextPath }/js/libs/jquery-1.11.0.min.js"></script>
+	<script type="text/javascript" src="js/libs/jquery-1.11.0.min.js"></script>
 <%-- 
 	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.js"></script>
 --%>	
 
-	<script type="text/javascript" src="${ contextPath }/js/libs/jquery.qtip.min.js"></script>
+	<script type="text/javascript" src="js/libs/jquery.qtip.min.js"></script>
 
 
 	<script type="text/javascript" src="static/js_generated_bundles/header_section_every_page/header_section_every_page-bundle.js?x=${ cacheBustValue }"></script>
 
 <%--  Moved to Front End Build Bundles		
 	
-	<script type="text/javascript" src="${ contextPath }/js/reportWebErrorToServer.js?x=${cacheBustValue}"></script>
+	<script type="text/javascript" src="js/reportWebErrorToServer.js?x=${cacheBustValue}"></script>
 	
-	<script type="text/javascript" src="${ contextPath }/js/genericToolTip.js?x=${cacheBustValue}"></script>
+	<script type="text/javascript" src="js/genericToolTip.js?x=${cacheBustValue}"></script>
 --%>	
 	
-	
-	<%--  Store the context path of the web app in a javascript variable named contextPathJSVar --%>
-
 	<script type="text/javascript" >
-	  var contextPathJSVar = "${contextPath}";
 	  
 	  var _PROXL_DEFAULT_FONT_COLOR = "#545454";
 	  
@@ -173,9 +178,9 @@ if (!Array.prototype.forEach) {
 	
 <%--  Moved to Front End Build Bundles		
 	
-	<script type="text/javascript" src="${contextPath}/js/crosslinks_constants_every_page.js?x=${cacheBustValue}"></script>
+	<script type="text/javascript" src="js/crosslinks_constants_every_page.js?x=${cacheBustValue}"></script>
 	
-	<script type="text/javascript" src="${contextPath}/js/showHideErrorMessage.js?x=${cacheBustValue}"></script>
+	<script type="text/javascript" src="js/showHideErrorMessage.js?x=${cacheBustValue}"></script>
 --%>	
 	
 	

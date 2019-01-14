@@ -13,15 +13,15 @@
 		<!-- Handlebars templating library   -->
 		
 		<%--  
-		<script type="text/javascript" src="${ contextPath }/js/libs/handlebars-v2.0.0.js"></script>
+		<script type="text/javascript" src="js/libs/handlebars-v2.0.0.js"></script>
 		--%>
 		
 		<!-- use minimized version  -->
-		<script type="text/javascript" src="${ contextPath }/js/libs/handlebars-v2.0.0.min.js"></script>
+		<script type="text/javascript" src="js/libs/handlebars-v2.0.0.min.js"></script>
 
 		
-		<script type="text/javascript" src="${ contextPath }/js/libs/jquery.tablesorter_Modified.js"></script> 
-		<script type="text/javascript" src="${ contextPath }/js/libs/jquery.qtip.min.js"></script>
+		<script type="text/javascript" src="js/libs/jquery.tablesorter_Modified.js"></script> 
+		<script type="text/javascript" src="js/libs/jquery.qtip.min.js"></script>
 
 				<%-- 
 					The Struts Action for this page must call GetProteinNamesTooltipConfigData
@@ -29,7 +29,7 @@
 					/WEB-INF/jsp-includes/proteinNameTooltipDataForJSCode.jsp
 				  --%>
 <%--  Replaced with the JS bundle listed next
-			<script type="text/javascript" src="${ contextPath }/js/createTooltipForProteinNames.js?x=${cacheBustValue}"></script>
+			<script type="text/javascript" src="js/createTooltipForProteinNames.js?x=${cacheBustValue}"></script>
   --%>
   		
 
@@ -38,29 +38,29 @@
 		
 <%--  Replaced with the JS bundle listed next
 			 	
-		<script type="text/javascript" src="${ contextPath }/js/defaultPageView.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="${ contextPath }/js/sharePageURLShortener.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/defaultPageView.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/sharePageURLShortener.js?x=${cacheBustValue}"></script>
 
-		<script type="text/javascript" src="${ contextPath }/js/handleServicesAJAXErrors.js?x=${cacheBustValue}"></script> 
+		<script type="text/javascript" src="js/handleServicesAJAXErrors.js?x=${cacheBustValue}"></script> 
 		
-		<script type="text/javascript" src="${ contextPath }/js/toggleVisibility.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/toggleVisibility.js?x=${cacheBustValue}"></script>
 		
-		<script type="text/javascript" src="${ contextPath }/js/psmPeptideCutoffsCommon.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="${ contextPath }/js/psmPeptideAnnDisplayDataCommon.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="${ contextPath }/js/minimumPSM_Count_Filter.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/psmPeptideCutoffsCommon.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/psmPeptideAnnDisplayDataCommon.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/minimumPSM_Count_Filter.js?x=${cacheBustValue}"></script>
 
-		<script type="text/javascript" src="${ contextPath }/js/webserviceDataParamsDistribution.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="${ contextPath }/js/viewProteinPageCommonCrosslinkLooplinkCoverageSearchMerged.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/webserviceDataParamsDistribution.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/viewProteinPageCommonCrosslinkLooplinkCoverageSearchMerged.js?x=${cacheBustValue}"></script>
 		
-		<script type="text/javascript" src="${ contextPath }/js/viewProteinCoverageReport.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/viewProteinCoverageReport.js?x=${cacheBustValue}"></script>
 --%>
 	
 		<%--  Bundle version of core page JS --%>
-		<script type="text/javascript" src="${ contextPath }/static/js_generated_bundles/data_pages/proteinCoverageReportView-bundle.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="static/js_generated_bundles/data_pages/proteinCoverageReportView-bundle.js?x=${cacheBustValue}"></script>
 	
 	
-		<link rel="stylesheet" href="${ contextPath }/css/tablesorter.css" type="text/css" media="print, projection, screen" />
-		<link type="text/css" rel="stylesheet" href="${ contextPath }/css/jquery.qtip.min.css" />
+		<link rel="stylesheet" href="css/tablesorter.css" type="text/css" media="print, projection, screen" />
+		<link type="text/css" rel="stylesheet" href="css/jquery.qtip.min.css" />
 
 
 
@@ -111,9 +111,9 @@
 				
 				<%@ include file="/WEB-INF/jsp-includes/qc_NavLinks.jsp" %>
 										
-				[<a class="tool_tip_attached_jq" data-tooltip="View peptides" href="${ contextPath }/${ peptideNav }.do?<bean:write name="queryString" />">Peptide View</a>]
+				[<a class="tool_tip_attached_jq" data-tooltip="View peptides" href="${ peptideNav }.do?<bean:write name="queryString" />">Peptide View</a>]
 		
-				[<a class="tool_tip_attached_jq" data-tooltip="View proteins" href="${ contextPath }/${ proteinNav }.do?<bean:write name="queryString" />">Protein View</a>]
+				[<a class="tool_tip_attached_jq" data-tooltip="View proteins" href="${ proteinNav }.do?<bean:write name="queryString" />">Protein View</a>]
 				
 				<%-- Navigation links to Merged Image and Merged Structure --%>
 				
@@ -252,7 +252,7 @@
 			<h3 style="display:inline;">Protein Coverage Report:</h3>
 
 			<div style="display:inline;">
-				[<a class="tool_tip_attached_jq" data-tooltip="Download as tab-delimited text" href="${ contextPath }/downloadProteinCoverageReport.do?<bean:write name="queryString" />">Download Coverage Report</a>]
+				[<a class="tool_tip_attached_jq" data-tooltip="Download as tab-delimited text" href="downloadProteinCoverageReport.do?<bean:write name="queryString" />">Download Coverage Report</a>]
 			</div>
 
 			<c:set var="coveragePageForAnnDispMgmt" value="${ true }"/>

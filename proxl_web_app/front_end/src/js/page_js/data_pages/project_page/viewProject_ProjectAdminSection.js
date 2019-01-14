@@ -130,7 +130,7 @@ var updateProjectTitle = function(clickThis, eventObject) {
 			title : title,
 			projectId : adminGlobals.project_id
 	};
-	var _URL = contextPathJSVar + "/services/project/updateTitle";
+	var _URL = "services/project/updateTitle";
 	// var request =
 	$.ajax({
 		type : "POST",
@@ -197,7 +197,7 @@ var updateProjectAbstract = function(clickThis, eventObject) {
 			abstractText : abstractText,
 			projectId : adminGlobals.project_id
 	};
-	var _URL = contextPathJSVar + "/services/project/updateAbstract";
+	var _URL = "services/project/updateAbstract";
 	// var request =
 	$.ajax({
 		type : "POST",
@@ -292,7 +292,7 @@ var addProjectNote = function(clickThis, eventObject) {
 			noteText : note,
 			projectId : adminGlobals.project_id
 	};
-	var _URL = contextPathJSVar + "/services/project/addNote";
+	var _URL = "services/project/addNote";
 	// var request =
 	$.ajax({
 		type : "POST",
@@ -426,7 +426,7 @@ var updateProjectNote = function(clickThis, eventObject) {
 			noteText : note,
 			noteId : noteId
 	};
-	var _URL = contextPathJSVar + "/services/project/updateNote";
+	var _URL = "services/project/updateNote";
 	// var request =
 	$.ajax({
 		type : "POST",
@@ -531,7 +531,7 @@ var deleteProjectNoteConfirmed = function(clickThis, eventObject) {
 	var requestData = {
 			noteId : noteId
 	};
-	var _URL = contextPathJSVar + "/services/project/deleteNote";
+	var _URL = "services/project/deleteNote";
 //	var request =
 	$.ajax({
 		type : "POST",
@@ -654,7 +654,7 @@ var populateOtherProjectsForCopySearchesOverlay = function( params ) {
 			projectId : adminGlobals.project_id,
 			projectSearchIdBeingCopied : searchesToCopyToOtherProject
 	};
-	var _URL = contextPathJSVar + "/services/project/listOtherProjectsForProjectIdExcludingProjectSearchIds";
+	var _URL = "services/project/listOtherProjectsForProjectIdExcludingProjectSearchIds";
 //	var request =
 	$.ajax({
 		type : "GET",
@@ -789,7 +789,7 @@ var copySearchesCheckForSearchIdsInOtherProject = function() {
 			projectId : copyToProjectId,
 			projectSearchids: searchesToCopyToOtherProject
 	};
-	var _URL = contextPathJSVar + "/services/project/listProjectSearchIdsWhereSearchIdIsInProject";
+	var _URL = "services/project/listProjectSearchIdsWhereSearchIdIsInProject";
 //	var request =
 	$.ajax({
 		type : "GET",
@@ -921,7 +921,7 @@ var executeCopySearches = function( params ) {
 		requestData.copyAllSearches = false;
 	}
 	var requestDataJSON = JSON.stringify( requestData );
-	var _URL = contextPathJSVar + "/services/project/copySearches";
+	var _URL = "services/project/copySearches";
 	// var request =
 	$.ajax({
 		type : "POST",
@@ -998,7 +998,7 @@ var showProjectSearchesCopiedTo = function(clickThis, eventObject) {
 	if ( copyToProjectId === undefined || copyToProjectId === null ) {
 		throw Error( "executeCopySearches(...)  copyToProjectId === undefined || copyToProjectId === null" );
 	}
-	document.location.href= contextPathJSVar + "/viewProject.do?project_id=" + copyToProjectId;
+	document.location.href= "viewProject.do?project_id=" + copyToProjectId;
 };
 
 /////////////
@@ -1025,7 +1025,7 @@ var initInviteUserLastNameAutoComplete = function() {
 				throw Error( "Unable to find input field for id 'project_id' " );
 			}
 			$.ajax({
-				url : contextPathJSVar + "/services/user/lookupLastNameNotInProjectId",
+				url : "services/user/lookupLastNameNotInProjectId",
 				failure: function(errMsg) {
 					handleAJAXFailure( errMsg );
 				},
@@ -1089,7 +1089,7 @@ var initInviteUserEmailAutoComplete = function() {
 				throw Error( "Unable to find input field for id 'project_id' " );
 			}
 			$.ajax({
-				url : contextPathJSVar + "/services/user/lookupEmailNotInProjectId",
+				url : "services/user/lookupEmailNotInProjectId",
 				failure: function(errMsg) {
 					handleAJAXFailure( errMsg );
 				},
@@ -1254,7 +1254,7 @@ var inviteUserToProject = function(clickThis) {
 		requestData.invite_user_email = invite_user_email;
 	}
 	requestData.ajaxParams = ajaxParams;
-	var _URL = contextPathJSVar + "/services/user/invite";
+	var _URL = "services/user/invite";
 	// var request =
 	$.ajax({
 		type : "POST",
@@ -1476,7 +1476,7 @@ var loadPublicAccessControlData = function( clickParams ) {
 	var requestData = {
 			projectId : adminGlobals.project_id
 	};
-	var _URL = contextPathJSVar + "/services/project/publicAccessAdmin/getData";
+	var _URL = "services/project/publicAccessAdmin/getData";
 	// var request =
 	$.ajax({
 		type : "GET",
@@ -1630,7 +1630,7 @@ var enable_project_public_access_button = function(clickThis, eventObject) {
 			projectId : adminGlobals.project_id,
 			require_public_access_code : require_public_access_code
 	};
-	var _URL = contextPathJSVar + "/services/project/publicAccessAdmin/enable";
+	var _URL = "services/project/publicAccessAdmin/enable";
 	// var request =
 	$.ajax({
 		type : "POST",
@@ -1661,7 +1661,7 @@ var disable_project_public_access_button = function(clickThis, eventObject) {
 	var requestData = {
 			projectId : adminGlobals.project_id
 	};
-	var _URL = contextPathJSVar + "/services/project/publicAccessAdmin/disable";
+	var _URL = "services/project/publicAccessAdmin/disable";
 	// var request =
 	$.ajax({
 		type : "POST",
@@ -1723,7 +1723,7 @@ var generate_new_pub_access_code_confirm_button = function(clickThis, eventObjec
 	var requestData = {
 			projectId : adminGlobals.project_id
 	};
-	var _URL = contextPathJSVar + "/services/project/publicAccessAdmin/generateNewPublicAccessCode";
+	var _URL = "services/project/publicAccessAdmin/generateNewPublicAccessCode";
 	// var request =
 	$.ajax({
 		type : "POST",
@@ -1760,7 +1760,7 @@ var lock_project_public_access_button = function(clickThis, eventObject) {
 	var requestData = {
 			projectId : adminGlobals.project_id
 	};
-	var _URL = contextPathJSVar + "/services/project/publicAccessAdmin/lock";
+	var _URL = "services/project/publicAccessAdmin/lock";
 //	var request =
 	$.ajax({
 		type : "POST",
@@ -1791,7 +1791,7 @@ var unlock_project_public_access_button = function(clickThis, eventObject) {
 	var requestData = {
 			projectId : adminGlobals.project_id
 	};
-	var _URL = contextPathJSVar + "/services/project/publicAccessAdmin/unlock";
+	var _URL = "services/project/publicAccessAdmin/unlock";
 //	var request =
 	$.ajax({
 		type : "POST",
@@ -1848,7 +1848,7 @@ var getInvitedPeople = function() {
 	var requestData = {
 			projectId : adminGlobals.project_id
 	};
-	var _URL = contextPathJSVar + "/services/user/listInvitedPeopleForProjectId";
+	var _URL = "services/user/listInvitedPeopleForProjectId";
 	// var request =
 	$.ajax({
 		type : "GET",
@@ -2021,7 +2021,7 @@ var updateInvitedPersonAccessLevel = function(params) {
 	if (adminGlobals.project_id === null) {
 		throw Error( "Unable to find input field for id 'project_id' " );
 	}
-	var _URL = contextPathJSVar + "/services/user/updateInviteAccessLevel";
+	var _URL = "services/user/updateInviteAccessLevel";
 	var ajaxParams = {
 			inviteId : invited_person_entry_user_id,
 			personAccessLevel : newAccessLevel, // invited_person_entry_access_level_entry,
@@ -2079,7 +2079,7 @@ var resendPersonInviteEmail = function(params) {
 	if (adminGlobals.project_id === null) {
 		throw Error( "Unable to find input field for id 'project_id' " );
 	}
-	var _URL = contextPathJSVar + "/services/user/resendInviteEmail";
+	var _URL = "services/user/resendInviteEmail";
 	var ajaxParams = {
 			inviteId : invited_person_entry_user_id,
 			projectId : adminGlobals.project_id
@@ -2192,7 +2192,7 @@ var revokePersonInviteConfirmed = function(clickThis, eventObject) {
 			inviteId : inviteId,
 			projectId : adminGlobals.project_id
 	};
-	var _URL = contextPathJSVar + "/services/user/revokeInvite";
+	var _URL = "services/user/revokeInvite";
 	// var request =
 	$.ajax({
 		type : "POST",
@@ -2238,7 +2238,7 @@ var getCurrentUserAccess = function() {
 	var requestData = {
 			projectId : adminGlobals.project_id
 	};
-	var _URL = contextPathJSVar + "/services/user/listForProjectId";
+	var _URL = "services/user/listForProjectId";
 	// var request =
 	$.ajax({
 		type : "GET",
@@ -2421,7 +2421,7 @@ var updateUserAccessLevel = function(params) {
 	if (adminGlobals.project_id === null) {
 		throw Error( "Unable to find input field for id 'project_id' " );
 	}
-	var _URL = contextPathJSVar + "/services/user/updateAccessToProject";
+	var _URL = "services/user/updateAccessToProject";
 	var ajaxParams = {
 			personId : current_user_entry_user_id,
 			personAccessLevel : newAccessLevel, // current_user_entry_access_level_entry,
@@ -2528,7 +2528,7 @@ var removeUserAccessConfirmed = function(clickThis, eventObject) {
 	if (adminGlobals.project_id === null) {
 		throw Error( "Unable to find input field for id 'project_id' " );
 	}
-	var _URL = contextPathJSVar + "/services/user/removeAccessToProject";
+	var _URL = "services/user/removeAccessToProject";
 	var ajaxParams = {
 			personId : userId,
 			projectId : adminGlobals.project_id

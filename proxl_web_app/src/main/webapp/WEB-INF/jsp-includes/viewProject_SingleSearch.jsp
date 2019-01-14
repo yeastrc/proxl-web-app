@@ -25,21 +25,21 @@
 			<td>
 			  <div style="float: right;" >
 				[<a data-tooltip="<%= PageLinkTextAndTooltipConstants.QC_LINK_TOOLTIP %>" class="tool_tip_attached_jq" 
-					href="${ contextPath }/qc.do?projectSearchId=<bean:write name="search" property="projectSearchId" />"
+					href="qc.do?projectSearchId=<bean:write name="search" property="projectSearchId" />"
 						><%= PageLinkTextAndTooltipConstants.QC_LINK_TEXT %></a>]
 				[<a data-tooltip="View peptides found in search" class="tool_tip_attached_jq" 
-					href="${ contextPath }/<proxl:defaultPageUrl pageName="/peptide" projectSearchId="${ search.projectSearchId }">peptide.do?projectSearchId=<bean:write name="search" property="projectSearchId" /></proxl:defaultPageUrl>"
+					href="<proxl:defaultPageUrl pageName="/peptide" projectSearchId="${ search.projectSearchId }">peptide.do?projectSearchId=<bean:write name="search" property="projectSearchId" /></proxl:defaultPageUrl>"
 						>Peptides</a>]
 				[<a data-tooltip="View proteins found in search" class="tool_tip_attached_jq" 
-					href="${ contextPath }/<proxl:defaultPageUrl pageName="/crosslinkProtein" projectSearchId="${ search.projectSearchId }">crosslinkProtein.do?projectSearchId=<bean:write name="search" property="projectSearchId" /></proxl:defaultPageUrl>"
+					href="<proxl:defaultPageUrl pageName="/crosslinkProtein" projectSearchId="${ search.projectSearchId }">crosslinkProtein.do?projectSearchId=<bean:write name="search" property="projectSearchId" /></proxl:defaultPageUrl>"
 						>Proteins</a>]
 				[<a data-tooltip="Graphical view of links between proteins" class="tool_tip_attached_jq" 
-					href="${ contextPath }/<proxl:defaultPageUrl pageName="/image" projectSearchId="${ search.projectSearchId }">image.do?projectSearchId=<bean:write name="search" property="projectSearchId" /></proxl:defaultPageUrl>"
+					href="<proxl:defaultPageUrl pageName="/image" projectSearchId="${ search.projectSearchId }">image.do?projectSearchId=<bean:write name="search" property="projectSearchId" /></proxl:defaultPageUrl>"
 						>Image</a>]
 				<c:choose>
 				 <c:when test="${ showStructureLink }">
 					[<a data-tooltip="View data on 3D structures" class="tool_tip_attached_jq" 
-						href="${ contextPath }/<proxl:defaultPageUrl pageName="/structure" projectSearchId="${ search.projectSearchId }">structure.do?projectSearchId=<bean:write name="search" property="projectSearchId" /></proxl:defaultPageUrl>"
+						href="<proxl:defaultPageUrl pageName="/structure" projectSearchId="${ search.projectSearchId }">structure.do?projectSearchId=<bean:write name="search" property="projectSearchId" /></proxl:defaultPageUrl>"
 							>Structure</a>]
 				 </c:when>
 				 <c:otherwise>
@@ -49,7 +49,7 @@
 				<c:if test="${authAccessLevel.searchDeleteAllowed}" >
 					<a href="javascript:" data-tooltip="Delete search" class="tool_tip_attached_jq delete_search_link_jq"
 					 		<%-- WAS  href="javascript:confirmDelete(<bean:write name="search" property="projectSearchId" />)"  --%>
-						><img src="${ contextPath }/images/icon-delete-small.png" ></a>
+						><img src="images/icon-delete-small.png" ></a>
 				</c:if>
 			  </div>
 			  <div>
@@ -57,7 +57,7 @@
 					id="search-details-link-<bean:write name="search" property="projectSearchId" />" 
 					style="font-size:80%;color:#4900d4;text-decoration:none;" 
 					href="javascript:showSearchDetails(<bean:write name="search" property="projectSearchId" />)"
-					><img src="${ contextPath }/images/icon-expand-small.png" <%-- This image src is changed in the Javascript --%>
+					><img src="images/icon-expand-small.png" <%-- This image src is changed in the Javascript --%>
 					></a>
 				<span id="search-name-normal-<bean:write name="search" property="projectSearchId" />"
 					><span class="search-name-display  search_name_display_jq" 
@@ -68,7 +68,7 @@
 					 			><c:if test="${authAccessLevel.writeAllowed}" 
 					 				><a class="tool_tip_attached_jq" data-tooltip="Edit name of search" 
 					 					href="javascript:showSearchNameForm(<bean:write name="search" property="projectSearchId" />)"
-										><img class="edit-icon" src="${ contextPath }/images/icon-edit-small.png" 
+										><img class="edit-icon" src="images/icon-edit-small.png" 
 											></a></c:if></span>
 				<span style="display:none;" id="search-name-edit-<bean:write name="search" property="projectSearchId" />"
 					><input id="search-name-value-<bean:write name="search" property="projectSearchId" />" 
@@ -187,7 +187,7 @@
 											class="tool_tip_attached_jq delete_search_webLink_link_jq"
 											data-tooltip="Delete link to RAW file"
 											href="javascript:"
-												><img src="${ contextPath }/images/icon-delete-small.png"></a>
+												><img src="images/icon-delete-small.png"></a>
 									</c:if>
 									<a  target="_blank" href="<bean:write name="webLink" property="linkUrl" />" 
 										><bean:write name="webLink" property="linkLabel" /></a>
@@ -231,7 +231,7 @@
 											class="tool_tip_attached_jq delete_search_webLink_link_jq"
 											data-tooltip="Delete link to RAW file"
 											href="javascript:"
-												><img src="${ contextPath }/images/icon-delete-small.png"></a>
+												><img src="images/icon-delete-small.png"></a>
 									</c:if>
 									<a  target="_blank" href="{{linkUrl}}" >{{linkLabel}}</a>
 								</div>
@@ -255,7 +255,7 @@
 							  </a>
 							  <c:if test="${authAccessLevel.projectOwnerAllowed}"> 
 									<a class="tool_tip_attached_jq" data-tooltip="Edit name" href="javascript:" onclick="showSearchFilenameForm( this )"
-										><img class="edit-icon" src="${ contextPath }/images/icon-edit-small.png" 
+										><img class="edit-icon" src="images/icon-edit-small.png" 
 											></a>
 							  </c:if>
 							 </div>
@@ -289,14 +289,14 @@
 										<a class="tool_tip_attached_jq" data-tooltip="Delete comment" style="color:#d40000;font-size:80%;" 
 											onclick="deleteSearchCommentClickHandler(this);return false;" 
 											href="javascript:"
-												><img src="${ contextPath }/images/icon-delete-small.png"></a>
+												><img src="images/icon-delete-small.png"></a>
 									</c:if>
 									<span class=" search_comment_string_jq "
 										><bean:write name="comment" property="comment" 
 									/></span>
 									<c:if test="${authAccessLevel.writeAllowed}" >
 									  <a class="tool_tip_attached_jq" data-tooltip="Edit comment"  onclick="showSearchCommentEditForm( this ); return false;" href="javascript:" >
-										<img class="edit-icon" src="${ contextPath }/images/icon-edit-small.png">
+										<img class="edit-icon" src="images/icon-edit-small.png">
 									  </a> 
 									</c:if>
 									(<span class=" search_comment_date_jq "
@@ -326,13 +326,13 @@
 											<a class="tool_tip_attached_jq" data-tooltip="Delete comment" style="color:#d40000;font-size:80%;" 
 												onclick="deleteSearchCommentClickHandler(this);return false;" 
 												href="javascript:"
-													><img src="${ contextPath }/images/icon-delete-small.png"></a>
+													><img src="images/icon-delete-small.png"></a>
 										</c:if>
 										<span class=" search_comment_string_jq "
 											>{{comment}}</span>
 										<c:if test="${authAccessLevel.writeAllowed}" >
 										  <a class="tool_tip_attached_jq" data-tooltip="Edit comment" onclick="showSearchCommentEditForm( this ); return false;" href="javascript:" >
-											<img class="edit-icon" src="${ contextPath }/images/icon-edit-small.png">
+											<img class="edit-icon" src="images/icon-edit-small.png">
 										  </a> 
 										</c:if>
 										(<span class=" search_comment_date_jq "

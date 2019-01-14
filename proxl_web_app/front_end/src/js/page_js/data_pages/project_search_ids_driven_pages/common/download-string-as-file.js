@@ -17,7 +17,7 @@ var downloadStringAsFile = function( filename, mimetype, content ) {
 		$( form ).hide();
 
 		form.setAttribute( "method", "post" );
-		form.setAttribute( "action", contextPathJSVar + "/downloadStringAsFile.do" );
+		form.setAttribute( "action", "downloadStringAsFile.do" );
 		// form.setAttribute( "target", "_blank" );
 
 		var filenameField = document.createElement( "input" );

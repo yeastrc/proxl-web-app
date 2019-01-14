@@ -15,19 +15,19 @@
 			<!-- Handlebars templating library   -->
 			
 			<%--  
-			<script type="text/javascript" src="${ contextPath }/js/libs/handlebars-v2.0.0.js"></script>
+			<script type="text/javascript" src="js/libs/handlebars-v2.0.0.js"></script>
 			--%>
 			
 			<!-- use minimized version  -->
-			<script type="text/javascript" src="${ contextPath }/js/libs/handlebars-v2.0.0.min.js"></script>
+			<script type="text/javascript" src="js/libs/handlebars-v2.0.0.min.js"></script>
 			
 
 	<script type="text/javascript" src="static/js_generated_bundles/user_pages/manageUsersPage-bundle.js?x=${ cacheBustValue }"></script>
 
 <%--  Moved to Front End Build Bundles		
 	
-	<script type="text/javascript" src="${ contextPath }/js/handleServicesAJAXErrors.js?x=${cacheBustValue}"></script> 
-	<script type="text/javascript" src="${ contextPath }/js/user_account/manageUsersPage.js?x=${cacheBustValue}"></script> 
+	<script type="text/javascript" src="js/handleServicesAJAXErrors.js?x=${cacheBustValue}"></script> 
+	<script type="text/javascript" src="js/user_account/manageUsersPage.js?x=${cacheBustValue}"></script> 
 --%>
 
  </c:set>
@@ -65,7 +65,7 @@
 
 			<div style="float: left; padding-left: 3px; padding-right: 10px;">
 			  <a href="javascript:" class="invite_user_expand_link_jq">
-				<img src="${ contextPath }/images/icon-add-user.png">
+				<img src="images/icon-add-user.png">
 			  </a>
 			</div>
 			<div style="padding-top: 2px; ">
@@ -107,7 +107,7 @@
 	
 			<div style="float: left; padding-left: 3px; padding-right: 10px;">
 		  	  	<a href="javascript:"  class="invite_user_cancel_button_jq">
-					<img src="${ contextPath }/images/icon-circle-x.png" title="Cancel User Invite">
+					<img src="images/icon-circle-x.png" title="Cancel User Invite">
 			  	</a>
 		  	</div>
 
@@ -135,7 +135,7 @@
 
 			<div style="float: left; padding-left: 3px; padding-right: 10px;">
 			  <a href="javascript:" class="create_user_expand_link_jq">
-				<img src="${ contextPath }/images/icon-add-user.png">
+				<img src="images/icon-add-user.png">
 			  </a>
 			</div>
 			<div style="padding-top: 2px; ">
@@ -295,7 +295,7 @@
 		
 			<div style="visibility: hidden;  float: left; padding-left: 3px; padding-right: 10px;">
 			  <a href="javascript:" class="invite_user_expand_link_jq">
-				<img src="${ contextPath }/images/icon-add-user.png">
+				<img src="images/icon-add-user.png">
 			  </a>
 			</div>
 
@@ -370,7 +370,7 @@
 
 	  <tr class="invited_person_entry_root_div_jq update_remove_access_div_jq" inviteId="{{inviteId}}" >
 	   <td nowrap  style="padding-right: 5px;">
-		<input type="image" src="${ contextPath }/images/icon-circle-x.png" class="invited_person_entry_access_level_remove_button_jq"
+		<input type="image" src="images/icon-circle-x.png" class="invited_person_entry_access_level_remove_button_jq"
 			title="Cancel User Invite" />
 	   </td>
 	   <td nowrap>
@@ -384,12 +384,12 @@
 		 <td nowrap style="padding-left: 5px; padding-right: 5px;">
 		 	<!-- One of these spans will be shown  -->
 			<span class="access_level_administrator_jq" style="display: none;">
-				<input type="image" src="${ contextPath }/images/icon-arrow-down.png" 
+				<input type="image" src="images/icon-arrow-down.png" 
 					title="Decrease User Access Level"
 					class="invited_person_entry_access_level_update_button_jq" inviteId="{{inviteId}}" style="display: none;" />
 			</span>		
 			<span class="access_level_user_jq" style="display: none;">
-				<input type="image" src="${ contextPath }/images/icon-arrow-up.png" 
+				<input type="image" src="images/icon-arrow-up.png" 
 					title="Increase User Access Level"
 					class="invited_person_entry_access_level_update_button_jq" inviteId="{{inviteId}}" style="display: none;" />
 			</span>
@@ -412,7 +412,7 @@
 
 	   <td nowrap class="invited-person-invite-date-block" >
 	   	Invited 
-	   	<span class="invited_to_project_text_jq" style="display: none;">to <a href="${ contextPath }/viewProject.do?project_id={{projectId}}">project</a></span> 
+	   	<span class="invited_to_project_text_jq" style="display: none;">to <a href="viewProject.do?project_id={{projectId}}">project</a></span> 
 	   	<span class="invited_to_project_text__no_project_id_jq" style="display: none;">to project</span> 
 	   	on {{inviteDate}}
 	   </td> 
@@ -437,9 +437,9 @@
 		
 		 <td nowrap  style="padding-right: 5px;">
 		 		 	<!-- One of these inputs will be shown  -->
-		 	<input type="image" src="${ contextPath }/images/icon-circle-x.png" class="user_disable_button_jq"  
+		 	<input type="image" src="images/icon-circle-x.png" class="user_disable_button_jq"  
 		 		title="Disable User" userId="{{authUser.id}}"  style="display: none;" />
-		 	<input type="image" src="${ contextPath }/images/icon-circle-plus.png" class="user_enable_button_jq"  
+		 	<input type="image" src="images/icon-circle-plus.png" class="user_enable_button_jq"  
 		 		title="Enable User" userId="{{authUser.id}}"  style="display: none;"/>
 		 </td>
 		 <td nowrap>
@@ -450,17 +450,17 @@
 		 <td nowrap style="padding-left: 5px; padding-right: 5px;">
 		 	<!-- One of these spans will be shown  -->
 			<span class="access_level_administrator_jq" style="display: none;">
-				<input type="image" src="${ contextPath }/images/icon-arrow-down.png" 
+				<input type="image" src="images/icon-arrow-down.png" 
 					title="Decrease User Access Level"
 					class="user_entry_access_level_update_button_jq" userId="{{authUser.id}}"  />
 			</span>		
 			<span class="access_level_user_jq" style="display: none;">
-				<input type="image" src="${ contextPath }/images/icon-arrow-up.png" 
+				<input type="image" src="images/icon-arrow-up.png" 
 					title="Increase User Access Level"
 					class="user_entry_access_level_update_button_jq" userId="{{authUser.id}}"  />
 			</span>
 			<span class="user_disabled_jq" style="display: none; visibility: hidden;">
-				<input type="image" src="${ contextPath }/images/icon-arrow-up.png" 
+				<input type="image" src="images/icon-arrow-up.png" 
 					class="" userId="{{authUser.id}}"  />
 			</span>			
 		 </td>

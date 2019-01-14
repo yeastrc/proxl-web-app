@@ -8,6 +8,12 @@
 
 
 //  Import to make available on the page
+
+
+//Import header_main.js and children to ensure on the page
+import { header_mainVariable } from 'page_js/common_all_pages/header_section_main_pages/header_main.js';
+
+
 import { searchesChangeDisplayOrder } from 'page_js/data_pages/project_search_ids_driven_pages/common/searchesChangeDisplayOrder.js';
 import { searchesForPageChooser } from 'page_js/data_pages/project_search_ids_driven_pages/common/searchesForPageChooser.js';
 import { sharePageURLShortener  } from 'page_js/data_pages/project_search_ids_driven_pages/common/sharePageURLShortener.js';

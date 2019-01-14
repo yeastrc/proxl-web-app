@@ -14,7 +14,11 @@
 	//      so they could be called directly from the HTML
 
 
-	
+
+//Import header_main.js and children to ensure on the page
+import { header_mainVariable } from 'page_js/common_all_pages/header_section_main_pages/header_main.js';
+
+
 //  Import to make available on the page
 import { searchesChangeDisplayOrder } from 'page_js/data_pages/project_search_ids_driven_pages/common/searchesChangeDisplayOrder.js';
 import { searchesForPageChooser } from 'page_js/data_pages/project_search_ids_driven_pages/common/searchesForPageChooser.js';
@@ -1178,7 +1182,7 @@ var StructurePagePrimaryRootCodeClass = function() {
 				
 				incrementSpinner();				// create spinner
 				
-				var url = contextPathJSVar + "/services/sequenceCoverage/getDataForProtein";
+				var url = "services/sequenceCoverage/getDataForProtein";
 				url += buildQueryStringFromHash();
 				url += "&proteinSequenceVersionId=" + protein;
 				
@@ -1232,7 +1236,7 @@ var StructurePagePrimaryRootCodeClass = function() {
 		
 				incrementSpinner();				// create spinner
 				
-				var url = contextPathJSVar + "/services/imageViewer/getCrosslinkData";
+				var url = "services/imageViewer/getCrosslinkData";
 				url += buildQueryStringFromHash();
 				
 				$.ajax({
@@ -1318,7 +1322,7 @@ var StructurePagePrimaryRootCodeClass = function() {
 		
 				incrementSpinner();				// create spinner
 				
-				var url = contextPathJSVar + "/services/imageViewer/getMultPsmUDRData";
+				var url = "services/imageViewer/getMultPsmUDRData";
 				//url += buildQueryStringFromHash();
 				
 				var requestData = JSON.stringify( requestObject );
@@ -1669,7 +1673,7 @@ var StructurePagePrimaryRootCodeClass = function() {
 		
 				incrementSpinner();				// create spinner
 				
-				var url = contextPathJSVar + "/services/imageViewer/getUDRData";
+				var url = "services/imageViewer/getUDRData";
 				url += buildQueryStringFromHash();
 				
 				$.ajax({
@@ -1719,7 +1723,7 @@ var StructurePagePrimaryRootCodeClass = function() {
 		
 				incrementSpinner();				// create spinner
 				
-				var url = contextPathJSVar + "/services/imageViewer/getCrosslinkPSMCounts";
+				var url = "services/imageViewer/getCrosslinkPSMCounts";
 				url += buildQueryStringFromHash();
 				
 				$.ajax({
@@ -1763,7 +1767,7 @@ var StructurePagePrimaryRootCodeClass = function() {
 		
 				incrementSpinner();				// create spinner
 				
-				var url = contextPathJSVar + "/services/imageViewer/getLooplinkData";
+				var url = "services/imageViewer/getLooplinkData";
 				url += buildQueryStringFromHash();
 				
 				$.ajax({
@@ -1805,7 +1809,7 @@ var StructurePagePrimaryRootCodeClass = function() {
 		
 				incrementSpinner();				// create spinner
 				
-				var url = contextPathJSVar + "/services/imageViewer/getLooplinkPSMCounts";
+				var url = "services/imageViewer/getLooplinkPSMCounts";
 				url += buildQueryStringFromHash();
 				
 				$.ajax({
@@ -1849,7 +1853,7 @@ var StructurePagePrimaryRootCodeClass = function() {
 		
 				incrementSpinner();				// create spinner
 				
-				var url = contextPathJSVar + "/services/imageViewer/getMonolinkData";
+				var url = "services/imageViewer/getMonolinkData";
 				url += buildQueryStringFromHash();
 				
 				$.ajax({
@@ -1891,7 +1895,7 @@ var StructurePagePrimaryRootCodeClass = function() {
 		
 				incrementSpinner();				// create spinner
 				
-				var url = contextPathJSVar + "/services/imageViewer/getMonolinkPSMCounts";
+				var url = "services/imageViewer/getMonolinkPSMCounts";
 				url += buildQueryStringFromHash();
 				
 				$.ajax({
@@ -1933,7 +1937,7 @@ var StructurePagePrimaryRootCodeClass = function() {
 
 		incrementSpinner();				// create spinner
 		
-		var url = contextPathJSVar + "/services/proteinSequence/getDataForProtein";
+		var url = "services/proteinSequence/getDataForProtein";
 
 		var project_id = $("#project_id").val();
 		
@@ -2008,7 +2012,7 @@ var StructurePagePrimaryRootCodeClass = function() {
 		
 		incrementSpinner();				// create spinner
 		
-		var url = contextPathJSVar + "/services/imageViewer/getProteinData";
+		var url = "services/imageViewer/getProteinData";
 		url += buildQueryStringFromHash();
 		
 		$.ajax({
@@ -2181,7 +2185,7 @@ var StructurePagePrimaryRootCodeClass = function() {
 		var qc_page_link_tooltip = $("#qc_page_link_tooltip").html();
 		
 		var qcNavHTML = "<span class=\"tool_tip_attached_jq\" data-tooltip=\"" + qc_page_link_tooltip + "\" " +
-		"style=\"white-space:nowrap;\" >[<a href=\"" + contextPathJSVar + "/";
+		"style=\"white-space:nowrap;\" >[<a href=\"";
 		var qcQueryString = "?";
 		for ( var j = 0; j < _projectSearchIds.length; j++ ) {
 			if ( j > 0 ) {
@@ -2205,14 +2209,14 @@ var StructurePagePrimaryRootCodeClass = function() {
 		html += qcNavHTML;
 
 		if ( _searches.length > 1 ) {
-			html += " <span class=\"tool_tip_attached_jq\" data-tooltip=\"View peptides\" style=\"white-space:nowrap;\" >[<a href=\"" + contextPathJSVar + "/mergedPeptide.do" + queryString + "\">Peptide View</a>]</span>";
-			html += " <span class=\"tool_tip_attached_jq\" data-tooltip=\"View proteins\" style=\"white-space:nowrap;\" >[<a href=\"" + contextPathJSVar + "/mergedCrosslinkProtein.do" + queryString + "\">Protein View</a>]</span>";
+			html += " <span class=\"tool_tip_attached_jq\" data-tooltip=\"View peptides\" style=\"white-space:nowrap;\" >[<a href=\"mergedPeptide.do" + queryString + "\">Peptide View</a>]</span>";
+			html += " <span class=\"tool_tip_attached_jq\" data-tooltip=\"View proteins\" style=\"white-space:nowrap;\" >[<a href=\"mergedCrosslinkProtein.do" + queryString + "\">Protein View</a>]</span>";
 			
-			html += " <span class=\"tool_tip_attached_jq\" data-tooltip=\"View protein coverage report\" style=\"white-space:nowrap;\" >[<a href=\"" + contextPathJSVar + "/mergedProteinCoverageReport.do" + queryString + "\">Coverage Report</a>]</span>";
+			html += " <span class=\"tool_tip_attached_jq\" data-tooltip=\"View protein coverage report\" style=\"white-space:nowrap;\" >[<a href=\"mergedProteinCoverageReport.do" + queryString + "\">Coverage Report</a>]</span>";
 		} else {
 			
 			//  Add Peptide Link
-			html += " [<a class=\"tool_tip_attached_jq\" data-tooltip=\"View peptides\" href='" + contextPathJSVar + "/";
+			html += " [<a class=\"tool_tip_attached_jq\" data-tooltip=\"View peptides\" href='";
 			var viewSearchPeptideDefaultPageUrl = $("#viewSearchPeptideDefaultPageUrl").val();
 			if ( viewSearchPeptideDefaultPageUrl === undefined || viewSearchPeptideDefaultPageUrl === "" ) {
 				html += "peptide.do" + queryString;
@@ -2221,7 +2225,7 @@ var StructurePagePrimaryRootCodeClass = function() {
 			}
 			html += "'>Peptide View</a>]";
 			//  Add Protein View Link
-			html += " [<a class=\"tool_tip_attached_jq\" data-tooltip=\"View proteins\" href='" + contextPathJSVar + "/";
+			html += " [<a class=\"tool_tip_attached_jq\" data-tooltip=\"View proteins\" href='";
 			var viewSearchCrosslinkProteinDefaultPageUrl = $("#viewSearchCrosslinkProteinDefaultPageUrl").val();
 			if ( viewSearchCrosslinkProteinDefaultPageUrl === undefined || viewSearchCrosslinkProteinDefaultPageUrl === "" ) {
 				html += "crosslinkProtein.do" + queryString;
@@ -2230,7 +2234,7 @@ var StructurePagePrimaryRootCodeClass = function() {
 			}
 			html += "'>Protein View</a>]";
 			//  Add Coverage Report Link
-			html += " [<a class=\"tool_tip_attached_jq\" data-tooltip=\"View protein coverage report\" href='" + contextPathJSVar + "/";
+			html += " [<a class=\"tool_tip_attached_jq\" data-tooltip=\"View protein coverage report\" href='";
 			var viewProteinCoverageReportDefaultPageUrl = $("#viewProteinCoverageReportDefaultPageUrl").val();
 			if ( viewProteinCoverageReportDefaultPageUrl === undefined || viewProteinCoverageReportDefaultPageUrl === "" ) {
 				html += "proteinCoverageReport.do" + queryString;
@@ -2248,7 +2252,7 @@ var StructurePagePrimaryRootCodeClass = function() {
 		
 		//  Add Merged Image Link
 		var imageNavHTML = "<span class=\"tool_tip_attached_jq\" data-tooltip=\"Graphical view of links between proteins\" " + 
-			"style=\"white-space:nowrap;\" >[<a href=\"" + contextPathJSVar + "/";
+			"style=\"white-space:nowrap;\" >[<a href=\"";
 
 		var $viewMergedImageDefaultPageUrl = $("#viewMergedImageDefaultPageUrl");
 		var viewMergedImageDefaultPageUrl = $viewMergedImageDefaultPageUrl.val();
@@ -2437,7 +2441,7 @@ var StructurePagePrimaryRootCodeClass = function() {
 		
 		var projectId = $("#project_id" ).val();
 		
-		var url = contextPathJSVar + "/services/pdb/listPDBFiles?projectId=" + projectId;
+		var url = "services/pdb/listPDBFiles?projectId=" + projectId;
 		
 		$.ajax({
 				type: "GET",
@@ -2566,7 +2570,7 @@ var StructurePagePrimaryRootCodeClass = function() {
 		$("#glmol-div").empty();
 
 		
-		var url = contextPathJSVar + "/services/pdb/getContentForPDBFile";
+		var url = "services/pdb/getContentForPDBFile";
 		url += "?pdbFileId=" + pdbFile.id;
 		
 		$.ajax({
@@ -2685,7 +2689,7 @@ var StructurePagePrimaryRootCodeClass = function() {
 		$("#glmol-div").empty();
 		$("#popout-link-span").html( "<a href=\"javascript:\" onclick=\"window.structurePagePrimaryRootCodeObject.closePopout()\">[Popin Viewer]</a>" );
 		
-		_NEW_WINDOW = window.open(contextPathJSVar + "/proxlExternalViewer.do", "proxlWindow", "width=800, height=800, resizable=yes" );
+		_NEW_WINDOW = window.open("proxlExternalViewer.do", "proxlWindow", "width=800, height=800, resizable=yes" );
 
 	}
 
@@ -2735,7 +2739,7 @@ var StructurePagePrimaryRootCodeClass = function() {
 			return;
 		}
 		
-		var url = contextPathJSVar + "/services/psa/getAlignmentsForPDBFile";
+		var url = "services/psa/getAlignmentsForPDBFile";
 		url += "?pdbFileId=" + pdbFile.id;
 
 		incrementSpinner();
@@ -3199,7 +3203,7 @@ var StructurePagePrimaryRootCodeClass = function() {
 			
 		incrementSpinner();				// create spinner
 		
-		var url = contextPathJSVar + "/services/linkablePositions/getLinkablePositionsBetweenProteins";
+		var url = "services/linkablePositions/getLinkablePositionsBetweenProteins";
 		
 		var requestData = {
 			linkers : getLinkerStringsAsArray(),
@@ -4075,12 +4079,12 @@ var StructurePagePrimaryRootCodeClass = function() {
 		var html = "<h2 style=\"display:inline;font-size:14pt;\">PDB File: " + pdbFile.name + "</h2>\n";
 			
 		if( _PDB_FILES[ pdbFile.id ][ 'canEdit' ] ) {
-			html += " <span style=\"font-size:10pt;\"><a href=\"javascript:\" onclick=\"window.structurePagePrimaryRootCodeObject.confirmPDBFileDelete( this, " + pdbFile.id + ")\"><img id=\"delete-pdb-icon\" style=\"border-width:0px;margin-left:2px;max-width:15px;\" src=\"" + contextPathJSVar + "/images/icon-delete-small.png\" /></a>\n";
+			html += " <span style=\"font-size:10pt;\"><a href=\"javascript:\" onclick=\"window.structurePagePrimaryRootCodeObject.confirmPDBFileDelete( this, " + pdbFile.id + ")\"><img id=\"delete-pdb-icon\" style=\"border-width:0px;margin-left:2px;max-width:15px;\" src=\"images/icon-delete-small.png\" /></a>\n";
 		}
 		
-		html += " <span style=\"font-size:10pt;\"><a href=\"" +  contextPathJSVar + "/downloadPDBFile.do?id=" + pdbFile.id + "\" target=\"download_pdb_file\"><img id=\"download-pdb-icon\" style=\"border-width:0px;margin-left:2px;max-width:15px;\" src=\"" + contextPathJSVar + "/images/icon-download-small.png\" /></a>\n";
-		html += " <span style=\"font-size:10pt;\"><a href=\"javascript:\" onClick=\"window.structurePagePrimaryRootCodeObject.downloadChimeraScript()\" target=\"download_pdb_file\"><img id=\"chimera-icon\" style=\"border-width:0px;margin-left:2px;max-width:12px;\" src=\"" + contextPathJSVar + "/images/chimera-logo.png\" /></a>\n";
-		html += " <span style=\"font-size:10pt;\"><a href=\"javascript:\" onClick=\"window.structurePagePrimaryRootCodeObject.downloadPymolScript()\" target=\"download_pdb_file\"><img id=\"pymol-icon\" style=\"border-width:0px;margin-left:2px;max-width:12px;\" src=\"" + contextPathJSVar + "/images/pymol-logo.png\" /></a>\n";
+		html += " <span style=\"font-size:10pt;\"><a href=\"downloadPDBFile.do?id=" + pdbFile.id + "\" target=\"download_pdb_file\"><img id=\"download-pdb-icon\" style=\"border-width:0px;margin-left:2px;max-width:15px;\" src=\"images/icon-download-small.png\" /></a>\n";
+		html += " <span style=\"font-size:10pt;\"><a href=\"javascript:\" onClick=\"window.structurePagePrimaryRootCodeObject.downloadChimeraScript()\" target=\"download_pdb_file\"><img id=\"chimera-icon\" style=\"border-width:0px;margin-left:2px;max-width:12px;\" src=\"images/chimera-logo.png\" /></a>\n";
+		html += " <span style=\"font-size:10pt;\"><a href=\"javascript:\" onClick=\"window.structurePagePrimaryRootCodeObject.downloadPymolScript()\" target=\"download_pdb_file\"><img id=\"pymol-icon\" style=\"border-width:0px;margin-left:2px;max-width:12px;\" src=\"images/pymol-logo.png\" /></a>\n";
 
 		html += "<script type=\"text/javascript\">\
 					$(\"#chimera-icon\").qtip({ \
@@ -4160,13 +4164,13 @@ var StructurePagePrimaryRootCodeClass = function() {
 						html += "data-chain=\"" + chains[ i ].name() + "\" onchange=\"proteinClicked()\" id=\"protein-checkbox-" + proteinId + "\" type=\"checkbox\" data-tooltip=\"Check to include the mapping of this protein to this chain of the PDB when rendering links\" class=\"tool_tip_attached_jq protein-checkbox\" value=\"" + proteinId + "\">" + _proteinNames[ proteinId ] + "</input>";
 
 						if( _PDB_FILES[ pdbFile.id ][ 'canEdit' ] ) {
-							html += "<img data-tooltip=\"Edit or view alignment of this protein's sequence from the FASTA file to the PDB chain sequence\" style=\"margin-left:2px;max-width:15px;\" src=\"" + contextPathJSVar + "/images/icon-edit-small.png\" class='tool_tip_attached_jq clickable' onclick=\"window.structurePagePrimaryRootCodeObject.editAlignment('" + chains[ i ].name() + "'," + k + ")\" />";
+							html += "<img data-tooltip=\"Edit or view alignment of this protein's sequence from the FASTA file to the PDB chain sequence\" style=\"margin-left:2px;max-width:15px;\" src=\"images/icon-edit-small.png\" class='tool_tip_attached_jq clickable' onclick=\"window.structurePagePrimaryRootCodeObject.editAlignment('" + chains[ i ].name() + "'," + k + ")\" />";
 						} else {
-							html += "<img data-tooltip=\"View alignment of this protein's sequence from the FASTA file to the PDB chain sequence\" style=\"margin-left:2px;max-width:15px;\" src=\"" + contextPathJSVar + "/images/icon-view-small.png\" class='tool_tip_attached_jq clickable' onclick=\"window.structurePagePrimaryRootCodeObject.editAlignment('" + chains[ i ].name() + "'," + k + ")\" />";
+							html += "<img data-tooltip=\"View alignment of this protein's sequence from the FASTA file to the PDB chain sequence\" style=\"margin-left:2px;max-width:15px;\" src=\"images/icon-view-small.png\" class='tool_tip_attached_jq clickable' onclick=\"window.structurePagePrimaryRootCodeObject.editAlignment('" + chains[ i ].name() + "'," + k + ")\" />";
 						}
 						
 						if( _PDB_FILES[ pdbFile.id ][ 'canEdit' ] ) {
-							html += "<img data-tooltip=\"Remove the alignment of this protein from this chain of the PDB\" style=\"margin-left:2px;max-width:15px;\" src=\"" + contextPathJSVar + "/images/icon-delete-small.png\" class='tool_tip_attached_jq clickable' onclick=\"window.structurePagePrimaryRootCodeObject.deleteAlignment( this, " + _ALIGNMENTS[ chains[ i ].name() ][ k ][ 'id' ] + ")\" />";
+							html += "<img data-tooltip=\"Remove the alignment of this protein from this chain of the PDB\" style=\"margin-left:2px;max-width:15px;\" src=\"images/icon-delete-small.png\" class='tool_tip_attached_jq clickable' onclick=\"window.structurePagePrimaryRootCodeObject.deleteAlignment( this, " + _ALIGNMENTS[ chains[ i ].name() ][ k ][ 'id' ] + ")\" />";
 						}
 						
 						html += "</span>\n";
@@ -5954,7 +5958,7 @@ var StructurePagePrimaryRootCodeClass = function() {
 
 		incrementSpinner();
 
-		var url = contextPathJSVar + "/services/psa/deleteAlignment";
+		var url = "services/psa/deleteAlignment";
 
 		var requestData = {
 				alignmentId : alignmentId
@@ -6085,7 +6089,7 @@ var StructurePagePrimaryRootCodeClass = function() {
 
 			incrementSpinner();
 			
-			var url = contextPathJSVar + "/services/pdb/deletePDBFile";
+			var url = "services/pdb/deletePDBFile";
 			
 			var requestData = {
 					pdbFileId : pdbFileId

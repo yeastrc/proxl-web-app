@@ -77,11 +77,11 @@
 			class=" folder_hide_contents_link_jq tool_tip_attached_jq " 
 			style="display: none;"
 			data-tooltip="Close folder"
-			><img  src="${ contextPath }/images/icon-folder-click-to-close.png"></a>
+			><img  src="images/icon-folder-click-to-close.png"></a>
 		<a href="javascript:" 
 			class=" folder_show_contents_link_jq tool_tip_attached_jq "
 			data-tooltip="Open folder"
-			><img  src="${ contextPath }/images/icon-folder-click-to-open.png"></a>
+			><img  src="images/icon-folder-click-to-open.png"></a>
 	</div>
 	<div >
 		<span class=" folder-name-display folder_name_jq "

@@ -40,11 +40,11 @@
 			href="javascript:"
 			>{{ data.numPsms }}<%-- << actual data in the cell --%><span class="toggle_visibility_expansion_span_jq" 
 						style="" 
-					><img src="${contextPath}/images/icon-expand-small.png" 
+					><img src="images/icon-expand-small.png" 
 						class=" icon-expand-contract-in-data-table "
 						></span><span class="toggle_visibility_contraction_span_jq" 
 							style="display: none; " 
-							><img src="${contextPath}/images/icon-collapse-small.png"
+							><img src="images/icon-collapse-small.png"
 								class=" icon-expand-contract-in-data-table "
 								></span>
 		</a>

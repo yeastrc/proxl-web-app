@@ -392,7 +392,7 @@ window.saveEditedAlignment = function( alignment ) {
 
 window.saveAlignment = function( alignment ) {
 	
-	var _URL = contextPathJSVar + "/services/psa/saveAlignment";
+	var _URL = "services/psa/saveAlignment";
 
 	$.ajax({
 	        type: "POST",
@@ -426,7 +426,7 @@ window.submitProteinForAlignment = function( chainId ) {
 	var proteinId = $("#pdb-map-protein-overlay-protein-select").val();
 	var pdbFileId = window.structurePagePrimaryRootCodeObject.call__getSelectedPDBFile().id;
 	
-	var url = contextPathJSVar + "/services/psa/alignSequences";
+	var url = "services/psa/alignSequences";
 	url += "?pdbFileId=" + pdbFileId;
 	url += "&chain=" + chainId;
 	url += "&proteinId=" + proteinId;

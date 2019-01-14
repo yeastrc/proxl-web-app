@@ -78,7 +78,7 @@ var QC_Pages_Single_Merged_Common = function() {
 //		$( form ).hide();
 //
 //		form.setAttribute( "method", "post" );
-//		form.setAttribute( "action", contextPathJSVar + "/" + downloadStrutsActionDotDo );
+//		form.setAttribute( "action", downloadStrutsActionDotDo );
 //		// form.setAttribute( "target", "_blank" );
 //
 //		projectSearchIds.forEach(function( element_ProjectSearchId, index, array ) {

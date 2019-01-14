@@ -14,10 +14,17 @@
 
 ///////////////
 
-$(document).ready(function() {
+if ( ! window.crosslinksCollapsible_js_Initialized ) {
 
-	addCollapsableEventHandlers();  // Run with no parameter
-});
+	$(document).ready(function() {
+	
+		addCollapsableEventHandlers();  // Run with no parameter
+	});
+	
+	window.crosslinksCollapsible_js_Initialized = true;
+}
+
+/////
 
 window.addCollapsableEventHandlers = function( $searchRoot ) {
 	

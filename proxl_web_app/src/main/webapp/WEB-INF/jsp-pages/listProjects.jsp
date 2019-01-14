@@ -15,19 +15,19 @@
 	<!-- Handlebars templating library   -->
 	
 	<%--  
-	<script type="text/javascript" src="${ contextPath }/js/libs/handlebars-v2.0.0.js"></script>
+	<script type="text/javascript" src="js/libs/handlebars-v2.0.0.js"></script>
 	--%>
 	
 	<!-- use minimized version  -->
-	<script type="text/javascript" src="${ contextPath }/js/libs/handlebars-v2.0.0.min.js"></script>
+	<script type="text/javascript" src="js/libs/handlebars-v2.0.0.min.js"></script>
 
 	<script type="text/javascript" src="static/js_generated_bundles/data_pages/projectsListPage-bundle.js?x=${ cacheBustValue }"></script>
 
 <%--  Moved to Front End Build Bundles		
 	
-		<script type="text/javascript" src="${ contextPath }/js/handleServicesAJAXErrors.js"></script> 
+		<script type="text/javascript" src="js/handleServicesAJAXErrors.js"></script> 
 	
-	<script type="text/javascript" src="${ contextPath }/js/listProjectsPage.js?x=${cacheBustValue}"></script>
+	<script type="text/javascript" src="js/listProjectsPage.js?x=${cacheBustValue}"></script>
 --%>
 
  </c:set>
@@ -49,9 +49,9 @@
 		 
 		  <td valign="top" style="width: 1px;"> <!-- Width will expand to fully display the icon -->
 			<a href="javascript:" class="new_project_expand_jq tool_tip_attached_jq" id="new_project_expand_link"
-				title="New Project" data-tooltip="Add new project"><img src="${ contextPath }/images/icon-circle-plus.png"></a>
+				title="New Project" data-tooltip="Add new project"><img src="images/icon-circle-plus.png"></a>
 			<a href="javascript:"  class="new_project_cancel_jq tool_tip_attached_jq"  id="new_project_cancel_link"
-				title="Close New Project" style="display: none;" data-tooltip="Cancel adding new project"><img src="${ contextPath }/images/icon-circle-x.png" ></a>
+				title="Close New Project" style="display: none;" data-tooltip="Cancel adding new project"><img src="images/icon-circle-x.png" ></a>
 		  </td>
 		  <td>
 
@@ -115,10 +115,10 @@
 		 	{{#if canDelete}}
 				<a class="delete_project_link_jq tool_tip_attached_jq" href="javascript:" title="Delete Project"
 						project_id="{{project.id}}"
-						data-tooltip="Delete project"><img src="${ contextPath }/images/icon-circle-x.png" ></a>
+						data-tooltip="Delete project"><img src="images/icon-circle-x.png" ></a>
 			{{/if}}
 			{{#if project.projectLocked}}
-				<img class="tool_tip_attached_jq" data-tooltip="Project is locked" src="${ contextPath }/images/icon-locked-small.png" >
+				<img class="tool_tip_attached_jq" data-tooltip="Project is locked" src="images/icon-locked-small.png" >
 			{{/if}}
 		</td>
 		<td>			

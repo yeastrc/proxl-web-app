@@ -324,7 +324,7 @@ var QCPageChart_Error_Vs_RetentionTime_PSM = function() {
 		//  Set to returned jQuery XMLHttpRequest (jqXHR) object
 		_activeAjax[selectedLinkType] = $.ajax({
 			//				cache : false,
-			url : contextPathJSVar + "/services/qc/dataPage/ppmErrorVsRetentionTime", // ppmErrorVsRetentionTime
+			url : "services/qc/dataPage/ppmErrorVsRetentionTime", // ppmErrorVsRetentionTime
 			traditional : true, //  Force traditional serialization of the data sent
 			//   One thing this means is that arrays are sent as the object property instead of object property followed by "[]".
 			//   So project_search_ids array is passed as "project_search_ids=<value>" which is what Jersey expects

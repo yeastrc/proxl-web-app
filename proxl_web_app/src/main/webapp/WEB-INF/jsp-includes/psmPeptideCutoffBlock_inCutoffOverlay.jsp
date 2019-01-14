@@ -20,7 +20,7 @@
 		  <span style=" cursor: pointer;" class="tool_tip_attached_jq" data-tooltip="Edit filter values" 
 		  	onclick="cutoffProcessingCommonCode.openCutoffOverlay( { clickedThis : this } )" >
 			${ filterTypeDisplay } Filters:
-			<img src="${contextPath}/images/icon-edit-small.png" onclick="cutoffProcessingCommonCode.openCutoffOverlay( { clickedThis : this } )" >
+			<img src="images/icon-edit-small.png" onclick="cutoffProcessingCommonCode.openCutoffOverlay( { clickedThis : this } )" >
 		  </span>
 		</td>
 		<td style=" line-height: 1.3em; <c:if test="${ not singleSearch }" > <%-- padding-top: 3px; padding-bottom: 3px; --%> </c:if>">

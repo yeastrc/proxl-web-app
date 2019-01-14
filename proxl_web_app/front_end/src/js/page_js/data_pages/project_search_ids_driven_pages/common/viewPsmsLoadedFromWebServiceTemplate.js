@@ -142,7 +142,7 @@ var ViewPsmsLoadedFromWebServiceTemplate = function() {
 				excludeLinksWith_Root : excludeLinksWith_Root_JSONString
 		};
 		$.ajax({
-			url : contextPathJSVar + "/services/data/getPsms",
+			url : "services/data/getPsms",
 //			traditional: true,  //  Force traditional serialization of the data sent
 //			//   One thing this means is that arrays are sent as the object property instead of object property followed by "[]".
 //			//   So searchIds array is passed as "searchIds=<value>" which is what Jersey expects
@@ -791,7 +791,7 @@ var ViewPsmsLoadedFromWebServiceTemplate = function() {
 			var form = document.createElement( "form" );
 			$( form ).hide();
 			form.setAttribute( "method", "post" );
-			form.setAttribute( "action", contextPathJSVar + "/convertAndDownloadSVG.do" );
+			form.setAttribute( "action", "convertAndDownloadSVG.do" );
 
 			var svgStringField = document.createElement( "input" );
 			svgStringField.setAttribute("name", "svgString");
@@ -805,8 +805,6 @@ var ViewPsmsLoadedFromWebServiceTemplate = function() {
 			form.submit();
 			document.body.removeChild( form );
 
-			var getSVGContentsAsStringResult = getSVGContentsAsString( $psm_qc_either_chart_outer_container_jq );
-			var svgString = getSVGContentsAsStringResult.fullSVG_String;
 		} catch( e ) {
 			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
 			throw e;

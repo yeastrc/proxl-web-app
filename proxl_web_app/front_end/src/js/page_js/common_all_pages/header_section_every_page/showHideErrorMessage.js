@@ -35,6 +35,18 @@ var ERROR_MESSAGE_CONSTANTS = {
 		
 };
 
+///////////////
+
+if ( ! window.showHideErrorMessage_js_Initialized ) {
+	
+	$(document).ready(function() {
+	
+		window.initShowHideErrorMessage();
+	
+	});
+	
+	window.showHideErrorMessage_js_Initialized = true;
+}
 
 ////////////
 
@@ -153,14 +165,6 @@ window.initShowHideErrorMessageSpecificElements = function( $elements ) {
 	});
 	
 }
-
-///////////////
-
-$(document).ready(function() {
-
-	initShowHideErrorMessage();
-
-});
 
 
 export { showErrorMsg, hideAllErrorMessages, clearErrorMsg, initShowHideErrorMessage, initShowHideErrorMessageSpecificElements }

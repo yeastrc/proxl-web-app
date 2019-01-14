@@ -580,7 +580,7 @@ var QCPageChart_PSM_Score_Vs_Score_PSM = function() {
 		// TODO  Hard code taking first project search id
 		var projectSearchId = _project_search_ids[ 0 ];	
 		
-		var _URL = contextPathJSVar + "/services/annotationTypes/getAnnotationTypesPsmFilterableForProjectSearchId";
+		var _URL = "services/annotationTypes/getAnnotationTypesPsmFilterableForProjectSearchId";
 		var requestData = {
 				projectSearchId : projectSearchId
 		};
@@ -900,7 +900,7 @@ var QCPageChart_PSM_Score_Vs_Score_PSM = function() {
 			requestData.scanFileId = [ scanFileId ];
 		}
 		
-		var _URL = contextPathJSVar + "/services/qcplot/getPsmScoreVsScore";
+		var _URL = "services/qcplot/getPsmScoreVsScore";
 
 //		var request =
 		$.ajax({

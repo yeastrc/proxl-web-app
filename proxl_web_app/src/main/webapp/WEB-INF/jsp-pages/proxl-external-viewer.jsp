@@ -2,9 +2,16 @@
 <html>
 
 	<head>
+	
+		
+	 	<%--  Include file that is really included into <head> of every page --%>
+	  	
+	  	<%@ include file="/WEB-INF/jsp-includes/head_section_include_every_page_light.jsp" %>
+	  	
+		
 		<title>Proxl External Viewer</title>
 		
-		<script type="text/javascript" src="${ contextPath }/js/libs/jquery-1.11.0.min.js"></script>
+		<script type="text/javascript" src="js/libs/jquery-1.11.0.min.js"></script>
 		
 
 		

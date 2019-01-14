@@ -148,7 +148,7 @@ var CreateMergedSearchesLinkCountsVennDiagram = function() {
 			var form = document.createElement( "form" );
 			$( form ).hide();
 			form.setAttribute( "method", "post" );
-			form.setAttribute( "action", contextPathJSVar + "/convertAndDownloadSVG.do" );
+			form.setAttribute( "action", "convertAndDownloadSVG.do" );
 
 			var svgStringField = document.createElement( "input" );
 			svgStringField.setAttribute("name", "svgString");

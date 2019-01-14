@@ -61,7 +61,7 @@ response.addHeader("Cache-control", "max-age=0"); // stale right away
 	<title>proxl - <c:out value="${ pageTitle }" ></c:out></title>
 
 	<%--  Loaded in head_section_include_every_page.jsp   --%>
-	<%-- <script type="text/javascript" src="${ contextPath }/js/jquery-1.11.0.min.js"></script>  --%>
+	<%-- <script type="text/javascript" src="js/jquery-1.11.0.min.js"></script>  --%>
 	 
 	
 	
@@ -71,16 +71,16 @@ response.addHeader("Cache-control", "max-age=0"); // stale right away
 	<script type="text/javascript" src="static/js_generated_bundles/header_section_main_pages/header_section_main_pages-bundle.js?x=${ cacheBustValue }"></script>
 
 <%--  Moved to Front End Build Bundles		
-	<script type="text/javascript" src="${ contextPath }/js/crosslinksCollapsible.js?x=${cacheBustValue}"></script>
+	<script type="text/javascript" src="js/crosslinksCollapsible.js?x=${cacheBustValue}"></script>
 		
-	<script type="text/javascript" src="${ contextPath }/js/header_main.js?x=${cacheBustValue}"></script>
+	<script type="text/javascript" src="js/header_main.js?x=${cacheBustValue}"></script>
 --%>
 	
 	<style >
 	
 		/* This depends on the JQueryUI ui-lightness theme being included in the web app  */
 		/*
-		body.crosslinks-page-main .modal-dialog-overlay-background { background: #666 url(${ contextPath }/css/jquery-ui-1.10.2-Themes/ui-lightness/images/ui-bg_diagonals-thick_20_666666_40x40.png) 50% 50% repeat; }
+		body.crosslinks-page-main .modal-dialog-overlay-background { background: #666 url(css/jquery-ui-1.10.2-Themes/ui-lightness/images/ui-bg_diagonals-thick_20_666666_40x40.png) 50% 50% repeat; }
 		*/ 	
 	</style>
 
@@ -88,8 +88,8 @@ response.addHeader("Cache-control", "max-age=0"); // stale right away
 	<c:out value="${ headerAdditions }" escapeXml="false" ></c:out>
 
 
-	<link rel="stylesheet" href="${ contextPath }/css/jquery.qtip.min.css" type="text/css" media="print, projection, screen" />
-	<link rel="stylesheet" href="${ contextPath }/css/global.css?x=${cacheBustValue}" type="text/css" media="print, projection, screen" />
+	<link rel="stylesheet" href="css/jquery.qtip.min.css" type="text/css" media="print, projection, screen" />
+	<link rel="stylesheet" href="css/global.css?x=${cacheBustValue}" type="text/css" media="print, projection, screen" />
 
 	<%--  For Google Chart API import:
 	
@@ -210,11 +210,11 @@ response.addHeader("Cache-control", "max-age=0"); // stale right away
   	   <div class="header-right-icons" style="position: relative;">
 	  	    
 	  		<a href="http://proxl-web-app.readthedocs.io/${ helpURLExtensionForSpecificPage }"  target="_help_window" id="help_header_link" 
-	  			><img src="${ contextPath }/images/icon-help.png" 
+	  			><img src="images/icon-help.png" 
 	  		></a>
 	  		
-	  		<a href="${ contextPath }/user_loginPage.do?useDefaultURL=yes"  id="signin_header_link" 
-	  			><img src="${ contextPath }/images/icon-login.png" 
+	  		<a href="user_loginPage.do?useDefaultURL=yes"  id="signin_header_link" 
+	  			><img src="images/icon-login.png" 
 	  		></a>
 	   </div>  	  
 	  	<%--  Simulated tool tips, absolutely positioned divs --%>
@@ -235,24 +235,24 @@ response.addHeader("Cache-control", "max-age=0"); // stale right away
   	   <div class="header-right-icons" style="position: relative;">
 
 	  		<a href="http://proxl-web-app.readthedocs.io/${ helpURLExtensionForSpecificPage }"  target="_help_window" id="help_header_link" 
-	  			><img src="${ contextPath }/images/icon-help.png" 
+	  			><img src="images/icon-help.png" 
 	  		></a>
 	  	    
-	  		<a href="${ contextPath }/accountPage.do"  id="account_settings_header_link" 
-	  			><img src="${ contextPath }/images/icon-user-settings.png" 
+	  		<a href="accountPage.do"  id="account_settings_header_link" 
+	  			><img src="images/icon-user-settings.png" 
 	  		></a>
 	  		
 		  <c:if test="${headerUserIsAdmin}" >
-	  		<a href="${ contextPath }/manageUsersPage.do" id="manage_users_header_link" 
-		  		><img src="${ contextPath }/images/icon-users.png" 
+	  		<a href="manageUsersPage.do" id="manage_users_header_link" 
+		  		><img src="images/icon-users.png" 
 	  		></a>
-	  		<a href="${ contextPath }/manageConfiguration.do"  id="manage_proxl_settings_header_link" 
-	  			><img src="${ contextPath }/images/icon-proxl-config.png" 
+	  		<a href="manageConfiguration.do"  id="manage_proxl_settings_header_link" 
+	  			><img src="images/icon-proxl-config.png" 
 	  		></a>
 	  	  </c:if>
 	  		
-	  		<a href="${ contextPath }/user_logout.do" id="sign_out_header_link" 
-	  			><img src="${ contextPath }/images/icon-logout.png" class="header-logout-image" 
+	  		<a href="user_logout.do" id="sign_out_header_link" 
+	  			><img src="images/icon-logout.png" class="header-logout-image" 
 	  		></a>
 	  		
 		  	<%--  Simulated tool tips, absolutely positioned divs --%>
@@ -277,7 +277,7 @@ response.addHeader("Cache-control", "max-age=0"); // stale right away
   	   </div>
   	     	  
   	   <div  class="header-user-name-container"> 
-		<a href="${ contextPath }/accountPage.do" class="overide-text-color-to-base-color"
+		<a href="accountPage.do" class="overide-text-color-to-base-color"
 	  		><span class="header-user-name">
 	  			<span id="header-user-first-name"><c:out value="${ headerUser.firstName }"></c:out></span> 
 	  			<span id="header-user-last-name"><c:out value="${ headerUser.lastName }"></c:out></span>
@@ -300,13 +300,13 @@ response.addHeader("Cache-control", "max-age=0"); // stale right away
 	   <a href="listProjects.do" >
 	  </c:when>
 	  <c:when test="${ not empty headerProject }">
-	   <a href="${ contextPath }/viewProject.do?<%= WebConstants.PARAMETER_PROJECT_ID %>=<c:out value="${ headerProject.projectTblData.id }" ></c:out>">
+	   <a href="viewProject.do?<%= WebConstants.PARAMETER_PROJECT_ID %>=<c:out value="${ headerProject.projectTblData.id }" ></c:out>">
 	  </c:when>
 	  <c:otherwise>
 	  	
 	  </c:otherwise>
 	 </c:choose>
-		<img src="${ contextPath }/images/proxl-logo-23px.png" >
+		<img src="images/proxl-logo-23px.png" >
 	 <c:choose>
 	  <c:when test="${ not empty headerUser }">
 	   </a>
@@ -323,7 +323,7 @@ response.addHeader("Cache-control", "max-age=0"); // stale right away
  	
 	  <div class="header-pointer-right">
 		<span style="padding-left: 5px; padding-right: 5px;"> 
-			<img src="${ contextPath }/images/pointer-right.png">
+			<img src="images/pointer-right.png">
 		</span>
 	  </div>
 
@@ -332,7 +332,7 @@ response.addHeader("Cache-control", "max-age=0"); // stale right away
 	  
 		<a href="listProjects.do" class="header-projects-label" id="header_projects_link">
 			<span class="header-projects-label">Projects</span>
-			<img src="${ contextPath }/images/pointer-down.png">
+			<img src="images/pointer-down.png">
 		</a>
 		
 		<div class="header-projects-list-container" id="header_projects_list_container">
@@ -353,7 +353,7 @@ response.addHeader("Cache-control", "max-age=0"); // stale right away
 				</c:if>
 
 				<div  class="project-text-div" >
-					<a href="${ contextPath }/viewProject.do?<%= WebConstants.PARAMETER_PROJECT_ID %>=<c:out value="${ projectItem.projectTblData.id }" ></c:out>"
+					<a href="viewProject.do?<%= WebConstants.PARAMETER_PROJECT_ID %>=<c:out value="${ projectItem.projectTblData.id }" ></c:out>"
 						class="project-text-link" 
 						><span id="${ header_current_project_in_drop_down_list }"  <%-- << use EL ${  } to drop in the value set just above --%>
 							><c:out value="${ projectItem.titleHeaderDisplay }" ></c:out
@@ -371,13 +371,13 @@ response.addHeader("Cache-control", "max-age=0"); // stale right away
 	 <c:if test="${ not empty headerProject }">
 
 	  <div class="header-projects-pointer-right--right-of-projects">
-		<img src="${ contextPath }/images/pointer-right.png" >
+		<img src="images/pointer-right.png" >
 	  </div>
 
 	  <div class="header-current-project-label-div">
 	  
 	  
-		<a href="${ contextPath }/viewProject.do?<%= WebConstants.PARAMETER_PROJECT_ID %>=<c:out value="${ headerProject.projectTblData.id }" ></c:out>"  
+		<a href="viewProject.do?<%= WebConstants.PARAMETER_PROJECT_ID %>=<c:out value="${ headerProject.projectTblData.id }" ></c:out>"  
 				class="header-project-title"  id="header_project_title_link" 
 				<c:if test="${ headerProject.projectTblData.title ne  headerProject.titleHeaderDisplay }">
 				
@@ -394,7 +394,7 @@ response.addHeader("Cache-control", "max-age=0"); // stale right away
 				<%--  Show only for locked projects and not for public access --%>
 				
 				<c:if test="${ not empty headerUser }">
-					<img src="${ contextPath }/images/icon-locked-small.png" 
+					<img src="images/icon-locked-small.png" 
 							style="<c:if test="${ not headerProject.projectTblData.projectLocked }">display:none;</c:if>" 
 							id="header_project_locked_icon">
 				</c:if>

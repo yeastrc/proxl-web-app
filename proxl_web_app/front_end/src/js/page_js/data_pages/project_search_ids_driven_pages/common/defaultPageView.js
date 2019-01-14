@@ -72,7 +72,7 @@ var DefaultPageView = function() {
 			
 			var requestData = { projectSearchId: projectSearchId, pageUrl: pageUrl, pageQueryJSON : pageQueryJSONString };
 			
-			var _URL = contextPathJSVar + "/services/defaultPageView/saveOrUpdateDefaultPageView";
+			var _URL = "services/defaultPageView/saveOrUpdateDefaultPageView";
 			
 			$.ajax({
 				type: "POST",

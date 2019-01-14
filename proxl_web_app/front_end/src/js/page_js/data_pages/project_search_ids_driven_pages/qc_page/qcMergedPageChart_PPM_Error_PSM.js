@@ -317,7 +317,7 @@ var QCMergedPageChart_PPM_Error_PSM = function() {
 		
 		var projectSearchIdsForQueryString = projectSearchIdsForQueryStringArray.join( "&" );
 		
-		var url = contextPathJSVar + "/services/qc/dataPage/ppmError_Merged?" + projectSearchIdsForQueryString;
+		var url = "services/qc/dataPage/ppmError_Merged?" + projectSearchIdsForQueryString;
 
 		if ( _activeAjax && 
 				_activeAjax[ selectedLinkType ] ) {

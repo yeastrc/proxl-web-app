@@ -26,7 +26,7 @@ window.updateFirstName = function(clickThis, eventObject) {
 	var requestData = {
 			firstName : firstName
 	};
-	var _URL = contextPathJSVar + "/services/user/changeFirstName";
+	var _URL = "services/user/changeFirstName";
 	// var request =
 	$.ajax({
 		type : "POST",
@@ -90,7 +90,7 @@ window.updateLastName = function(clickThis, eventObject) {
 	var requestData = {
 			lastName : lastName
 	};
-	var _URL = contextPathJSVar + "/services/user/changeLastName";
+	var _URL = "services/user/changeLastName";
 //	var request =
 	$.ajax({
 		type : "POST",
@@ -153,7 +153,7 @@ window.updateOrganization = function(clickThis, eventObject) {
 	var requestData = {
 			organization : organization
 	};
-	var _URL = contextPathJSVar + "/services/user/changeOrganization";
+	var _URL = "services/user/changeOrganization";
 //	var request =
 	$.ajax({
 		type : "POST",
@@ -215,7 +215,7 @@ window.updateEmail = function(clickThis, eventObject) {
 	var requestData = {
 			email : email
 	};
-	var _URL = contextPathJSVar + "/services/user/changeEmail";
+	var _URL = "services/user/changeEmail";
 //	var request =
 	$.ajax({
 		type : "POST",
@@ -283,7 +283,7 @@ window.updateUsername = function(clickThis, eventObject) {
 	var requestData = {
 			username : username
 	};
-	var _URL = contextPathJSVar + "/services/user/changeUsername";
+	var _URL = "services/user/changeUsername";
 //	var request =
 	$.ajax({
 		type : "POST",
@@ -379,7 +379,7 @@ window.updatePassword = function(clickThis, eventObject) {
 			password : password,
 			old_password : oldPassword
 	};
-	var _URL = contextPathJSVar + "/services/user/changePassword";
+	var _URL = "services/user/changePassword";
 //	var request =
 	$.ajax({
 		type : "POST",

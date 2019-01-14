@@ -287,7 +287,7 @@ var QCMergedPageChartSummaryStatistics = function() {
 		
 		var projectSearchIdsForQueryString = projectSearchIdsForQueryStringArray.join( "&" );
 		
-		var url = contextPathJSVar + "/services/qc/dataPage/summaryStatistics_Merged?" + projectSearchIdsForQueryString;
+		var url = "services/qc/dataPage/summaryStatistics_Merged?" + projectSearchIdsForQueryString;
 
 
 		if ( _activeAjax ) {

@@ -29,7 +29,7 @@ window.updateInvitedPeopleCurrentUsersLists = function() {
 window.getInvitedPeople = function() {
 	var requestData = {
 	};
-	var _URL = contextPathJSVar + "/services/user/listInvitedPeople";
+	var _URL = "services/user/listInvitedPeople";
 //	var request =
 	$.ajax({
 		type : "GET",
@@ -239,7 +239,7 @@ window.updateInvitedPersonAccessLevel = function(params) {
 //	var invited_person_entry_access_level_entry = $invited_person_entry_access_level_entry_field_jq
 //	.val();
 	var invited_person_entry_user_id = $invited_person_entry_root_div_jq.attr("inviteId");
-	var _URL = contextPathJSVar + "/services/user/updateInviteAccessLevel";
+	var _URL = "services/user/updateInviteAccessLevel";
 	var requestData = {
 			inviteId : invited_person_entry_user_id,
 			personAccessLevel : newAccessLevel
@@ -320,7 +320,7 @@ window.revokePersonInviteConfirmed = function(clickThis, eventObject) {
 //
 //	var inviteId = $invited_person_entry_root_div_jq.attr("inviteId");
 	var inviteId = $clickThis.data("inviteId");
-	var _URL = contextPathJSVar + "/services/user/revokeInvite";
+	var _URL = "services/user/revokeInvite";
 	var ajaxParams = {
 			inviteId : inviteId
 	};
@@ -360,7 +360,7 @@ window.revokePersonInviteResponse = function(params) {
 window.getCurrentUserAccess = function() {
 	var requestData = {
 	};
-	var _URL = contextPathJSVar + "/services/user/listAll";
+	var _URL = "services/user/listAll";
 	// var request =
 	$.ajax({
 		type : "GET",
@@ -566,7 +566,7 @@ window.updateUserAccessLevel = function(params) {
 			.closest(".current_user_entry_root_div_jq");
 	var current_user_entry_user_id = $current_user_entry_root_div_jq
 			.attr("userId");
-	var _URL = contextPathJSVar + "/services/user/updateGlobalAccess";
+	var _URL = "services/user/updateGlobalAccess";
 	var ajaxParams = {
 		personId : current_user_entry_user_id,
 		personAccessLevel : newAccessLevel
@@ -621,7 +621,7 @@ window.enableDisableUser = function(params) {
 //	get root div for this current user entry
 	var $current_user_entry_root_div_jq = $clickThis.closest(".current_user_entry_root_div_jq");
 	var current_user_entry_user_id = $current_user_entry_root_div_jq.attr("userId");
-	var _URL = contextPathJSVar + "/services/user/updateEnabledFlag";
+	var _URL = "services/user/updateEnabledFlag";
 	var ajaxParams = {
 			personId : current_user_entry_user_id,
 			personEnabledFlag : enabled
@@ -681,7 +681,7 @@ window.invitePerson = function(clickThis, eventObject) {
 		invitedPersonEmail : invitedPersonEmail,
 		invitedPersonAccessLevel : invitedPersonAccessLevel
 	};
-	var _URL = contextPathJSVar + "/services/user/invite";
+	var _URL = "services/user/invite";
 	// var request =
 	$.ajax({
 		type : "POST",
@@ -821,7 +821,7 @@ window.createAccountFormSubmit = function() {
 		return;  //  EARLY EXIT
 	}
 
-	var _URL = contextPathJSVar + "/services/user/createAccountUsingAdminUserAccount";
+	var _URL = "services/user/createAccountUsingAdminUserAccount";
 //	var request =
 	$.ajax({
 		type : "POST",

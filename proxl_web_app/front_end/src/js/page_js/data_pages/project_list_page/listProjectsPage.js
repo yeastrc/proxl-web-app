@@ -11,6 +11,9 @@
 "use strict";
 
 
+import { header_mainVariable } from 'page_js/common_all_pages/header_section_main_pages/header_main.js';
+
+
 //var PAGE_CONSTANTS = {
 //		
 //		ERROR_MESSAGE_VERTICAL_MOVEMENT : 50 // number of pixels for moving error message when showing it. 
@@ -22,7 +25,7 @@
 
 var getProjectList = function() {
 
-	var _URL = contextPathJSVar + "/services/project/listForCurrentUser";
+	var _URL = "services/project/listForCurrentUser";
 	
 	var requestData = {};
 
@@ -252,7 +255,7 @@ var markProjectForDeletionConfirmed = function(clickThis, eventObject) {
 	};
 	
 
-	var _URL = contextPathJSVar + "/services/project/markForDeletion";
+	var _URL = "services/project/markForDeletion";
 
 //	var request =
 	$.ajax({
@@ -366,7 +369,7 @@ var addProject = function(clickThis, eventObject) {
 			projectAbstract : new_project_abstract
 	};
 
-	var _URL = contextPathJSVar + "/services/project/create";
+	var _URL = "services/project/create";
 
 	// var request =
 	$.ajax({

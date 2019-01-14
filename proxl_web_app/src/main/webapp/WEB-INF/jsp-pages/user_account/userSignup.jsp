@@ -20,17 +20,17 @@
 
  	<title>ProXL DB</title>
  
-	 <link REL="stylesheet" TYPE="text/css" HREF="${ contextPath }/css/global.css?x=${cacheBustValue}">
+	 <link REL="stylesheet" TYPE="text/css" HREF="css/global.css?x=${cacheBustValue}">
 
 	<%--  Loaded in head_section_include_every_page.jsp   --%>
-	<%-- <script type="text/javascript" src="${ contextPath }/js/jquery-1.11.0.min.js"></script>  --%>
+	<%-- <script type="text/javascript" src="js/jquery-1.11.0.min.js"></script>  --%>
 	
 
 	<script type="text/javascript" src="static/js_generated_bundles/user_pages/userSignup-bundle.js?x=${ cacheBustValue }"></script>
 
 <%--  Moved to Front End Build Bundles		
 	
-		<script type="text/javascript" src="${ contextPath }/js/user_account/userSignup.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/user_account/userSignup.js?x=${cacheBustValue}"></script>
 --%>
 		
 		<c:if test="${ configSystemValues.googleRecaptchaConfigured }">
@@ -107,7 +107,7 @@
   <div class="page-content" >	
 
 	<div class="logo-large-container" >
-		<img src="${ contextPath }/images/logo-large.png" />
+		<img src="images/logo-large.png" />
 	</div>
 
   	<div  style="position: relative;" class="page-label">
@@ -242,7 +242,7 @@
 
 			  	
 	<%-- submitted by the javascript if the account is successfully created --%>
-	<form action="${ contextPath }/listProjects.do" id="list_projects_form" >
+	<form action="listProjects.do" id="list_projects_form" >
 	</form>
 
 

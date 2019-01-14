@@ -85,7 +85,7 @@ var ViewPsmPerPeptideLoadedFromWebServiceTemplate = function() {
 				project_search_id : project_search_id
 		};
 		$.ajax({
-			url : contextPathJSVar + "/services/data/getPsmPerPeptide",
+			url : "services/data/getPsmPerPeptide",
 //			traditional: true,  //  Force traditional serialization of the data sent
 //			//   One thing this means is that arrays are sent as the object property instead of object property followed by "[]".
 //			//   So searchIds array is passed as "searchIds=<value>" which is what Jersey expects
@@ -639,7 +639,7 @@ var ViewPsmPerPeptideLoadedFromWebServiceTemplate = function() {
 			var form = document.createElement( "form" );
 			$( form ).hide();
 			form.setAttribute( "method", "post" );
-			form.setAttribute( "action", contextPathJSVar + "/convertAndDownloadSVG.do" );
+			form.setAttribute( "action", "convertAndDownloadSVG.do" );
 
 			var svgStringField = document.createElement( "input" );
 			svgStringField.setAttribute("name", "svgString");

@@ -14,11 +14,9 @@
 
 // /////////////////////////////////////////
 
-// contextPathJSVar is set in the head of every page
-
 var LORIKEET_PAGE_PROCESSING_CONSTANTS = {
 		
-		serviceURL_lorikeetSpectrum_getData : contextPathJSVar + "/services/lorikeetSpectrum/getData",
+		serviceURL_lorikeetSpectrum_getData : "services/lorikeetSpectrum/getData",
 
 		LORIKEET_VIEWER_HEIGHT_PARAM : 500,
 		

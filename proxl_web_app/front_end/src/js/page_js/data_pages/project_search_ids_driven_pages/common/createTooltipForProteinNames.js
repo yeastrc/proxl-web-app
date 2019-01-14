@@ -8,7 +8,7 @@
 //   Search for this JS filename for companion Java class that must be called for every Action for pages that
 //   this JS file is included on.
  
-//		<script type="text/javascript" src="${ contextPath }/js/createTooltipForProteinNames.js"></script>
+//		<script type="text/javascript" src="js/createTooltipForProteinNames.js"></script>
 
 //////////////////////////////////
 // JavaScript directive:   all variables have to be declared with "var", maybe other things
@@ -133,7 +133,7 @@ window.addSingleTooltipForProteinName = function( params ) {
                 						searchId : _searchIds_protein_listing,
                 						proteinSequenceVersionId : proteinIdString
                 				};
-                			  var _URL = contextPathJSVar + "/services/proteinNameForTooltip/getData";
+                			  var _URL = "services/proteinNameForTooltip/getData";
                 			  $.ajax({
                 					type : "GET",
                 					url : _URL,

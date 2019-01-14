@@ -562,7 +562,7 @@ customRegionManager.prototype.getCustomRegionDataForProteinViaAjax = function( p
 
 	var project_id = this.getProjectId();
 
-	var _URL = contextPathJSVar + "/services/customRegionAnnotation/queryDataForProtein";
+	var _URL = "services/customRegionAnnotation/queryDataForProtein";
 	var requestData = {
             proteinId : proteinId,
             projectId : project_id
@@ -606,7 +606,7 @@ customRegionManager.prototype.getCustomRegionDataForProteinsViaAjaxForViewerDisp
 
 	var project_id = this.getProjectId();
 
-	var _URL = contextPathJSVar + "/services/customRegionAnnotation/queryDataForProteins";
+	var _URL = "services/customRegionAnnotation/queryDataForProteins";
 	var requestData = {
             proteinIds : proteinIds,
             projectId : project_id
@@ -678,7 +678,7 @@ customRegionManager.prototype.validateAndSaveRegionsToDatabase = function( param
     this.showInfo( "Saving to database..." );
 
 
-	var _URL = contextPathJSVar + "/services/customRegionAnnotation/saveDataForProtein";
+	var _URL = "services/customRegionAnnotation/saveDataForProtein";
 	var requestData = {
             proteinId : proteinId,
             projectId : projectId,
@@ -724,7 +724,7 @@ customRegionManager.prototype.validateAndSaveRegionsToDatabase = function( param
  */
 customRegionManager.prototype.loadProteinSequenceDataForProtein = function( params, callback ) {
 
-	var url = contextPathJSVar + "/services/proteinSequence/getDataForProtein";
+	var url = "services/proteinSequence/getDataForProtein";
     var project_id = this.getProjectId();
     
 	var ajaxRequestData = {

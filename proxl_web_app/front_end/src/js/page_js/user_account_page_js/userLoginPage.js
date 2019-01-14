@@ -64,7 +64,7 @@ window.loginPerson = function( params ) {
 			tos_key : tosKeyToServer,
 			inviteTrackingCode : inviteTrackingCode
 	};
-	var _URL = contextPathJSVar + "/services/user/login";
+	var _URL = "services/user/login";
 	// var request =
 	$.ajax({
 		type : "POST",

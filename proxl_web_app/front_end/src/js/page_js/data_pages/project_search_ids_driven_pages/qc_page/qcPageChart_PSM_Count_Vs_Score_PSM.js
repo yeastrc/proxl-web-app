@@ -478,7 +478,7 @@ var QCPageChart_PSM_Count_Vs_Score_PSM = function() {
 		// TODO  Hard code taking first project search id
 		var projectSearchId = _project_search_ids[ 0 ];	
 		
-		var _URL = contextPathJSVar + "/services/annotationTypes/getAnnotationTypesPsmFilterableForProjectSearchId";
+		var _URL = "services/annotationTypes/getAnnotationTypesPsmFilterableForProjectSearchId";
 		var requestData = {
 				projectSearchId : projectSearchId
 		};
@@ -575,7 +575,7 @@ var QCPageChart_PSM_Count_Vs_Score_PSM = function() {
 		// TODO  Hard code taking first project search id
 		var projectSearchId = _project_search_ids[ 0 ];	
 		
-		var _URL = contextPathJSVar + "/services/proteinNames/getProteinNameListForProjectSearchId";
+		var _URL = "services/proteinNames/getProteinNameListForProjectSearchId";
 		var requestData = {
 				projectSearchId : projectSearchId
 		};
@@ -831,7 +831,7 @@ var QCPageChart_PSM_Count_Vs_Score_PSM = function() {
 		
 		var $psm_count_vs_score_qc_plot_chartDiv = $("#psm_count_vs_score_qc_plot_chartDiv");
 		$psm_count_vs_score_qc_plot_chartDiv.empty();
-		var _URL = contextPathJSVar + "/services/qcplot/getPsmCountsVsScore";
+		var _URL = "services/qcplot/getPsmCountsVsScore";
 		var requestData = {
 				selectedLinkTypes : selectedLinkTypes,
 				iP : includeproteinSequenceVersionIds,

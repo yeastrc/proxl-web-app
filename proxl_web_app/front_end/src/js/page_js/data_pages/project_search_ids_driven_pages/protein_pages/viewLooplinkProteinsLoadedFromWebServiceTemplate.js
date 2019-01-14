@@ -122,7 +122,7 @@ var ViewLooplinkProteinsLoadedFromWebServiceTemplate = function() {
 				protein_position_2 : protein_position_2,
 		};
 		$.ajax({
-			url : contextPathJSVar + "/services/data/getLooplinkProteinsPerSearchIdsProteinIdsPositions",
+			url : "services/data/getLooplinkProteinsPerSearchIdsProteinIdsPositions",
 			traditional: true,  //  Force traditional serialization of the data sent
 								//   One thing this means is that arrays are sent as the object property instead of object property followed by "[]".
 								//   So searchIds array is passed as "searchIds=<value>" which is what Jersey expects

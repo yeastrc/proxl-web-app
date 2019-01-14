@@ -84,7 +84,7 @@ window.resetPassword = function(clickThis, eventObject) {
 			email : email
 	};
 
-	var _URL = contextPathJSVar + "/services/user/resetPasswordGenEmail";
+	var _URL = "services/user/resetPasswordGenEmail";
 
 	// var request =
 	$.ajax({

@@ -115,7 +115,7 @@ window.enableButtons = function() {
 //   Called by "onclick" on HTML element
 window.viewMergedPeptides = function() {
 	try {
-		$( "form#viewMergedDataForm" ).attr("action", contextPathJSVar + "/mergedPeptide.do");
+		$( "form#viewMergedDataForm" ).attr("action", "mergedPeptide.do");
 		$( "form#viewMergedDataForm" ).submit();
 	} catch( e ) {
 		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
@@ -126,7 +126,7 @@ window.viewMergedPeptides = function() {
 //   Called by "onclick" on HTML element
 window.viewMergedProteins = function() {
 	try {
-		$( "form#viewMergedDataForm" ).attr("action", contextPathJSVar + "/mergedCrosslinkProtein.do");
+		$( "form#viewMergedDataForm" ).attr("action", "mergedCrosslinkProtein.do");
 		$( "form#viewMergedDataForm" ).submit();
 	} catch( e ) {
 		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
@@ -136,14 +136,14 @@ window.viewMergedProteins = function() {
 
 //   Called by "onclick" on HTML element
 window.viewMergedImage = function() {
-	$( "form#viewMergedDataForm" ).attr("action", contextPathJSVar + "/image.do");
+	$( "form#viewMergedDataForm" ).attr("action", "image.do");
 	$( "form#viewMergedDataForm" ).submit();
 }
 
 //   Called by "onclick" on HTML element
 window.viewMergedStructure = function() {
 	try {
-		$( "form#viewMergedDataForm" ).attr("action", contextPathJSVar + "/structure.do");
+		$( "form#viewMergedDataForm" ).attr("action", "structure.do");
 		$( "form#viewMergedDataForm" ).submit();
 	} catch( e ) {
 		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
@@ -154,7 +154,7 @@ window.viewMergedStructure = function() {
 //Called by "onclick" on HTML element
 window.viewMergedQCPage = function() {
 try {
-	$( "form#viewMergedDataForm" ).attr("action", contextPathJSVar + "/qc.do");
+	$( "form#viewMergedDataForm" ).attr("action", "qc.do");
 	$( "form#viewMergedDataForm" ).submit();
 } catch( e ) {
 	reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
@@ -168,11 +168,11 @@ window.showSearchDetails = function( id ) {
 		if( $( "table#search-details-" + id ).is( ":visible" ) ) {
 			$( "table#search-details-" + id ).hide();
 //			$( "a#search-details-link-" + id ).html( "[+]" );
-			$( "a#search-details-link-" + id ).html( '<img src="' + contextPathJSVar + '/images/icon-expand-small.png">' );
+			$( "a#search-details-link-" + id ).html( '<img src="images/icon-expand-small.png">' );
 		} else {
 			$( "table#search-details-" + id ).show();
 //			$( "a#search-details-link-" + id ).html( "[-]" );
-			$( "a#search-details-link-" + id ).html( '<img src="' + contextPathJSVar + '/images/icon-collapse-small.png">' );
+			$( "a#search-details-link-" + id ).html( '<img src="images/icon-collapse-small.png">' );
 		}
 	} catch( e ) {
 		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );

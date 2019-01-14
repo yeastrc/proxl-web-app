@@ -21,7 +21,7 @@
 				<span class=" sort_handle_jq  tool_tip_attached_jq" 
 					data-tooltip='<div style="margin-bottom: 3px;">Click to change protein.</div><div>Drag to re-order proteins</div>'
 					style="cursor: pointer;"
-				  ><img src="${ contextPath }/images/icon-draggable-small.png" 
+				  ><img src="images/icon-draggable-small.png" 
 				  ></span>
 			</div >
 		   <div class="text-float protein_select_text_container_jq " data-protein_id="{{proteinId}}" >
@@ -31,7 +31,7 @@
 		   <div class="delete-icon-float">
 			  <input type="image" class="protein_delete_icon_jq tool_tip_attached_jq" data-tooltip="Remove Protein" 
 					 data-protein_id="{{proteinId}}" data-uid="{{uid}}"  
-					src="${ contextPath }/images/icon-delete-small.png" >
+					src="images/icon-delete-small.png" >
 		   </div> 
 		  </div>
 

@@ -1,0 +1,13 @@
+
+Every Javascript file in this folder will be included on the page more than once (probably twice)
+
+    1)  Included in the header JSP included
+    2)  Included in the main Javascript bundle to ensure it is for sure loaded when the bundle is loaded.
+
+
+This means that these needs to only happen once:
+     registering of handlers on DOM elements 
+     $(document).ready(...) 
+
+Use window attached variables to track the loading of the file.
+   (not ideal but necessary)   

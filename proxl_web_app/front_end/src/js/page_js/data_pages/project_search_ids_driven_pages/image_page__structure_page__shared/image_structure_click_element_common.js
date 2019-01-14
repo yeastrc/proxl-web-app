@@ -59,7 +59,7 @@ function getLooplinkDataCommon( params ) {
 				protein_position_1 : requestContext.protein_position_1,
 				protein_position_2 : requestContext.protein_position_2
 		};
-		var _URL = contextPathJSVar + "/services/data/getLooplinkProteinsPerSearchIdsProteinIdsPositions";
+		var _URL = "services/data/getLooplinkProteinsPerSearchIdsProteinIdsPositions";
 		$.ajax({
 			type: "GET",
 			url: _URL,
@@ -246,7 +246,7 @@ function getCrosslinkDataCommon( params ) {
 			protein_1_position: requestContext.protein1.protein_position,
 			protein_2_position: requestContext.protein2.protein_position
 	};
-	var _URL = contextPathJSVar + "/services/data/getCrosslinkProteinsPerSearchIdsProteinIdsPositions";
+	var _URL = "services/data/getCrosslinkProteinsPerSearchIdsProteinIdsPositions";
 	$.ajax({
 		type: "GET",
 		url: _URL,
@@ -439,7 +439,7 @@ function getMonolinkDataCommon( params ) {
 			protein_id : requestContext.from_protein_id,
 			protein_position : requestContext.protein_position
 	};
-	var _URL = contextPathJSVar + "/services/data/getMonolinkProteinsPerSearchIdsProteinIdsPositions";
+	var _URL = "services/data/getMonolinkProteinsPerSearchIdsProteinIdsPositions";
 	$.ajax({
 		type: "GET",
 		url: _URL,

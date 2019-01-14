@@ -62,7 +62,7 @@
 		<span class=" sort_handle_jq  tool_tip_attached_jq" 
 			data-tooltip='<div>Drag to re-order</div>'
 			style=""
-		  ><img src="${ contextPath }/images/icon-draggable-small.png" 
+		  ><img src="images/icon-draggable-small.png" 
 		  ></span>
 	 </div >
      <div class="item-display-name search_display_name_jq tool_tip_attached_jq" 

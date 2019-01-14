@@ -138,7 +138,7 @@ window.uploadPDBFile = function() {
 //	formData.append( 'visibility', visibility );
 	
 	var xhr = new XMLHttpRequest();
-	xhr.open('POST', contextPathJSVar + '/uploadPDBFileService.do', true);
+	xhr.open('POST', 'uploadPDBFileService.do', true);
 
     xhr.onload = function() {
 

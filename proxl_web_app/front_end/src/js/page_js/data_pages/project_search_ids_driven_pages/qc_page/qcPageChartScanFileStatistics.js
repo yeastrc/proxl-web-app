@@ -435,7 +435,7 @@ var QCPageChartScanFileStatistics = function() {
 
 		this.clearScanOverallStastics();
 
-		var _URL = contextPathJSVar + "/services/qc/dataPage/getScanOverallStatistics";
+		var _URL = "services/qc/dataPage/getScanOverallStatistics";
 		var requestData = {
 				project_search_id : _project_search_ids,
 				scan_file_id : scanFileId
@@ -552,7 +552,7 @@ var QCPageChartScanFileStatistics = function() {
 
 		var hash_json_field_Contents_JSONString = JSON.stringify( _get_hash_json_Contents() );
 
-		var _URL = contextPathJSVar + "/services/qc/dataPage/ms2Counts";
+		var _URL = "services/qc/dataPage/ms2Counts";
 		var requestData = {
 				project_search_id : _project_search_ids, //  Only supported if length === 1
 				scan_file_id : scanFileId,
@@ -759,7 +759,7 @@ var QCPageChartScanFileStatistics = function() {
 		//  Set to returned jQuery XMLHttpRequest (jqXHR) object
 		_load_MS_1_IonCurrent_HistogramsActiveAjax =
 			$.ajax({
-				url : contextPathJSVar + "/services/qc/dataPage/getScan_MS_1_IonCurrent_Histograms",
+				url : "services/qc/dataPage/getScan_MS_1_IonCurrent_Histograms",
 				traditional: true,  //  Force traditional serialization of the data sent
 				//   One thing this means is that arrays are sent as the object property instead of object property followed by "[]".
 				//   So project_search_ids array is passed as "project_search_ids=<value>" which is what Jersey expects
@@ -1179,7 +1179,7 @@ var QCPageChartScanFileStatistics = function() {
 		//  Set to returned jQuery XMLHttpRequest (jqXHR) object
 		_load_MS_1_IonCurrent_HeatmapActiveAjax =
 			$.ajax({
-				url : contextPathJSVar + "/services/qc/dataPage/getScan_MS_1_IonCurrent_HeatmapHasData",
+				url : "services/qc/dataPage/getScan_MS_1_IonCurrent_HeatmapHasData",
 				traditional: true,  //  Force traditional serialization of the data sent
 				//   One thing this means is that arrays are sent as the object property instead of object property followed by "[]".
 				//   So project_search_ids array is passed as "project_search_ids=<value>" which is what Jersey expects

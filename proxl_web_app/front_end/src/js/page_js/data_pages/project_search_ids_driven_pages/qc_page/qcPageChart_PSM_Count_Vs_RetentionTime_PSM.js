@@ -587,7 +587,7 @@ var QCPageChart_PSM_Count_Vs_RetentionTime_PSM = function() {
 //		if ( ! qcRetentionTimeChartInitialized ) {
 //			throw "qcRetentionTimeChartInitialized is false"; 
 //		}
-		var _URL = contextPathJSVar + "/services/qcplot/getScanRetentionTime";
+		var _URL = "services/qcplot/getScanRetentionTime";
 
 		var hash_json_field_Contents_JSONString = JSON.stringify( hash_json_Contents );
 		var requestData = {

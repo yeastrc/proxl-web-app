@@ -28,89 +28,89 @@
  
   <c:set var="headerAdditions">
  
-		<script type="text/javascript" src="${ contextPath }/js/libs/base64.js"></script> 
+		<script type="text/javascript" src="js/libs/base64.js"></script> 
 
 		<%--  Compression --%>
 		
 		<%--  Used by lz-string.min.js --%>
-		<script type="text/javascript" src="${ contextPath }/js/libs/lz-string/base64-string.js"></script>
+		<script type="text/javascript" src="js/libs/lz-string/base64-string.js"></script>
 		
-		<script type="text/javascript" src="${ contextPath }/js/libs/lz-string/lz-string.min.js"></script>
+		<script type="text/javascript" src="js/libs/lz-string/lz-string.min.js"></script>
 		
 		<%--  Non-Minified version --%>
 		<%-- 
-		<script type="text/javascript" src="${ contextPath }/js/libs/lz-string/lz-string.js"></script>
+		<script type="text/javascript" src="js/libs/lz-string/lz-string.js"></script>
 		--%>
 		
-		<script src="${contextPath}/js/libs/jquery-ui-1.10.4.min.js"></script>
+		<script src="js/libs/jquery-ui-1.10.4.min.js"></script>
 		
 		<!-- Handlebars templating library   -->
 		
 		<%--  
-		<script type="text/javascript" src="${ contextPath }/js/libs/handlebars-v2.0.0.js"></script>
+		<script type="text/javascript" src="js/libs/handlebars-v2.0.0.js"></script>
 		--%>
 		
 		<!-- use minimized version  -->
-		<script type="text/javascript" src="${ contextPath }/js/libs/handlebars-v2.0.0.min.js"></script>
+		<script type="text/javascript" src="js/libs/handlebars-v2.0.0.min.js"></script>
 
 		
 
 <%--  Replaced with the JS bundle listed next
 
-		<script type="text/javascript" src="${ contextPath }/js/handleServicesAJAXErrors.js?x=${cacheBustValue}"></script> 
+		<script type="text/javascript" src="js/handleServicesAJAXErrors.js?x=${cacheBustValue}"></script> 
 		 
-		<script type="text/javascript" src="${ contextPath }/js/toggleVisibility.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/toggleVisibility.js?x=${cacheBustValue}"></script>
 		
-		<script type="text/javascript" src="${ contextPath }/js/spinner.js?x=${cacheBustValue}"></script> 
+		<script type="text/javascript" src="js/spinner.js?x=${cacheBustValue}"></script> 
 		
-		<script type="text/javascript" src="${ contextPath }/js/download-string-as-file.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/download-string-as-file.js?x=${cacheBustValue}"></script>
 
-		<script type="text/javascript" src="${ contextPath }/js/psmPeptideCutoffsCommon.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/psmPeptideCutoffsCommon.js?x=${cacheBustValue}"></script>
 		
-		<script type="text/javascript" src="${ contextPath }/js/psmPeptideAnnDisplayDataCommon.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/psmPeptideAnnDisplayDataCommon.js?x=${cacheBustValue}"></script>
 		
-		<script type="text/javascript" src="${ contextPath }/js/webserviceDataParamsDistribution.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/webserviceDataParamsDistribution.js?x=${cacheBustValue}"></script>
 
-		<script type="text/javascript" src="${ contextPath }/js/sharePageURLShortener.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/sharePageURLShortener.js?x=${cacheBustValue}"></script>
 		
-		<script type="text/javascript" src="${ contextPath }/js/qc_pages_Single_Merged_Common.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/qc_pages_Single_Merged_Common.js?x=${cacheBustValue}"></script>
 		
-		<script type="text/javascript" src="${ contextPath }/js/qcChart_Download_Help_HTMLBlock.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/qcChart_Download_Help_HTMLBlock.js?x=${cacheBustValue}"></script>
 	
-		<script type="text/javascript" src="${ contextPath }/js/qcPageChartSummaryStatistics.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="${ contextPath }/js/qcPageChartDigestionStatistics.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="${ contextPath }/js/qcPageChartScanFileStatistics.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/qcPageChartSummaryStatistics.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/qcPageChartDigestionStatistics.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/qcPageChartScanFileStatistics.js?x=${cacheBustValue}"></script>
 		
-		<script type="text/javascript" src="${ contextPath }/js/qcPageChart_PPM_Error_PSM.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="${ contextPath }/js/qcPageChart_Error_Vs_RetentionTime_PSM.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="${ contextPath }/js/qcPageChart_Error_Vs_M_Over_Z_PSM.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/qcPageChart_PPM_Error_PSM.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/qcPageChart_Error_Vs_RetentionTime_PSM.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/qcPageChart_Error_Vs_M_Over_Z_PSM.js?x=${cacheBustValue}"></script>
 				
-		<script type="text/javascript" src="${ contextPath }/js/qcPageChart_PSM_Count_Vs_RetentionTime_PSM.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="${ contextPath }/js/qcPageChart_PSM_Count_Vs_Score_PSM.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="${ contextPath }/js/qcPageChart_PSM_Score_Vs_Score_PSM.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/qcPageChart_PSM_Count_Vs_RetentionTime_PSM.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/qcPageChart_PSM_Count_Vs_Score_PSM.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/qcPageChart_PSM_Score_Vs_Score_PSM.js?x=${cacheBustValue}"></script>
 		
-		<script type="text/javascript" src="${ contextPath }/js/qcPageChartChargeStateStatistics.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="${ contextPath }/js/qcPageChart_M_Over_Z_Statistics_PSM.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="${ contextPath }/js/qcPageChart_Peptide_Length_Vs_PSM_Count.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="${ contextPath }/js/qcPageChart_PeptideLength_Vs_RetentionTime_PSM.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/qcPageChartChargeStateStatistics.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/qcPageChart_M_Over_Z_Statistics_PSM.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/qcPageChart_Peptide_Length_Vs_PSM_Count.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/qcPageChart_PeptideLength_Vs_RetentionTime_PSM.js?x=${cacheBustValue}"></script>
 		
-		<script type="text/javascript" src="${ contextPath }/js/qcPageChart_PSM_Per_Modification.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="${ contextPath }/js/qcPageChart_Peptide_Lengths.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/qcPageChart_PSM_Per_Modification.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/qcPageChart_Peptide_Lengths.js?x=${cacheBustValue}"></script>
 		
 		
-		<script type="text/javascript" src="${ contextPath }/js/qcPageSectionSummaryStatistics.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="${ contextPath }/js/qcPageSectionDigestionStatistics.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="${ contextPath }/js/qcPageSectionScanFileStatistics.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="${ contextPath }/js/qcPageSection_PSM_Level_Statistics.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="${ contextPath }/js/qcPageSection_PSM_Error_Estimates.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="${ contextPath }/js/qcPageSectionModificationStatistics.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="${ contextPath }/js/qcPageSection_Peptide_Level_Statistics.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/qcPageSectionSummaryStatistics.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/qcPageSectionDigestionStatistics.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/qcPageSectionScanFileStatistics.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/qcPageSection_PSM_Level_Statistics.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/qcPageSection_PSM_Error_Estimates.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/qcPageSectionModificationStatistics.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/qcPageSection_Peptide_Level_Statistics.js?x=${cacheBustValue}"></script>
 			 
-		<script type="text/javascript" src="${ contextPath }/js/qcPageMain.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/qcPageMain.js?x=${cacheBustValue}"></script>
 --%>
 	
 		<%--  Bundle version of core page JS --%>
-		<script type="text/javascript" src="${ contextPath }/static/js_generated_bundles/data_pages/qcView-bundle.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="static/js_generated_bundles/data_pages/qcView-bundle.js?x=${cacheBustValue}"></script>
 			
 				<%-- 
 					The Struts Action for this page must call GetProteinNamesTooltipConfigData
@@ -298,9 +298,9 @@
 			<div  class="collapsable-link-container top-level-collapsable-link-container" > 
 				<a id="summary_collapse_link" href="javascript:" class="top-level-collapsable-link" 
 						style="display: none;"
-					><img  src="${ contextPath }/images/icon-collapse.png"></a>
+					><img  src="images/icon-collapse.png"></a>
 				<a id="summary_expand_link" href="javascript:" class="top-level-collapsable-link" 
-					><img  src="${ contextPath }/images/icon-expand.png"></a>
+					><img  src="images/icon-expand.png"></a>
 			</div>
 			<div class="top-level-label">
 			  Summary Statistics
@@ -333,9 +333,9 @@
 			<div  class="collapsable-link-container top-level-collapsable-link-container " > 
 				<a id="digestion_collapse_link" href="javascript:" class="top-level-collapsable-link" 
 						style="display: none;"
-					><img  src="${ contextPath }/images/icon-collapse.png"></a>
+					><img  src="images/icon-collapse.png"></a>
 				<a id="digestion_expand_link" href="javascript:" class="top-level-collapsable-link " 
-					><img  src="${ contextPath }/images/icon-expand.png"></a>
+					><img  src="images/icon-expand.png"></a>
 			</div>
 			<div class="top-level-label">
 			  Digestion Statistics
@@ -391,9 +391,9 @@ The total ion current in the bin is indicated by color, as indicated by the lege
 			<div  class="collapsable-link-container top-level-collapsable-link-container " > 
 				<a id="scan_level_collapse_link" href="javascript:" class="top-level-collapsable-link " 
 						style="display: none;"
-					><img  src="${ contextPath }/images/icon-collapse.png"></a>
+					><img  src="images/icon-collapse.png"></a>
 				<a id="scan_level_expand_link" href="javascript:" class="top-level-collapsable-link " 
-					><img  src="${ contextPath }/images/icon-expand.png"></a>
+					><img  src="images/icon-expand.png"></a>
 			
 			</div>
 			<div class="top-level-label">
@@ -693,9 +693,9 @@ The color and point size indicate the number of PSMs in a given retention time b
 			<div  class="collapsable-link-container top-level-collapsable-link-container" > 
 				<a id="psm_level_collapse_link" href="javascript:" class="top-level-collapsable-link" 
 						style="display: none;"
-					><img  src="${ contextPath }/images/icon-collapse.png"></a>
+					><img  src="images/icon-collapse.png"></a>
 				<a id="psm_level_expand_link" href="javascript:" class="top-level-collapsable-link" 
-					><img  src="${ contextPath }/images/icon-expand.png"></a>
+					><img  src="images/icon-expand.png"></a>
 			</div>
 			<div class="top-level-label">
 			  PSM Level Statistics
@@ -844,9 +844,9 @@ Several isotopic compositions are compared for calculating m/z, and the minimum 
 			<div  class="collapsable-link-container top-level-collapsable-link-container" > 
 				<a id="psm_error_estimates_collapse_link" href="javascript:" class="top-level-collapsable-link" 
 						style="display: none;"
-					><img  src="${ contextPath }/images/icon-collapse.png"></a>
+					><img  src="images/icon-collapse.png"></a>
 				<a id="psm_error_estimates_expand_link" href="javascript:" class="top-level-collapsable-link" 
-					><img  src="${ contextPath }/images/icon-expand.png"></a>
+					><img  src="images/icon-expand.png"></a>
 			</div>
 			<div class="top-level-label">
 			  PSM Error Estimates
@@ -909,9 +909,9 @@ The mass modifications shown are those found in the search from all identified p
 			<div  class="collapsable-link-container top-level-collapsable-link-container" > 
 				<a id="modification_stats_collapse_link" href="javascript:" class="top-level-collapsable-link" 
 						style="display: none;"
-					><img  src="${ contextPath }/images/icon-collapse.png"></a>
+					><img  src="images/icon-collapse.png"></a>
 				<a id="modification_stats_expand_link" href="javascript:" class="top-level-collapsable-link" 
-					><img  src="${ contextPath }/images/icon-expand.png"></a>
+					><img  src="images/icon-expand.png"></a>
 			</div>
 			<div class="top-level-label">
 			  Modification Stats
@@ -955,9 +955,9 @@ This is the length of both linked peptides added together.</div>
 			<div  class="collapsable-link-container top-level-collapsable-link-container " > 
 				<a id="peptide_level_collapse_link" href="javascript:" class="top-level-collapsable-link " 
 						style="display: none;"
-					><img  src="${ contextPath }/images/icon-collapse.png"></a>
+					><img  src="images/icon-collapse.png"></a>
 				<a id="peptide_level_expand_link" href="javascript:" class="top-level-collapsable-link " 
-					><img  src="${ contextPath }/images/icon-expand.png"></a>
+					><img  src="images/icon-expand.png"></a>
 			
 			</div>
 			<div class="top-level-label">

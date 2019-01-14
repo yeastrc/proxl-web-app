@@ -21,7 +21,7 @@ window.unlockProject = function(clickThis) {
 				projectId : getProjectIdForProjectLockUnlockChange()
 		};
 
-		var _URL = contextPathJSVar + "/services/project/projectLockedAdmin/unlock";
+		var _URL = "services/project/projectLockedAdmin/unlock";
 
 //		var request =
 		$.ajax({
@@ -74,7 +74,7 @@ window.lockProject = function(clickThis) {
 				projectId : getProjectIdForProjectLockUnlockChange()
 		};
 
-		var _URL = contextPathJSVar + "/services/project/projectLockedAdmin/lock";
+		var _URL = "services/project/projectLockedAdmin/lock";
 
 //		var request =
 		$.ajax({

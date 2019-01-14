@@ -10,6 +10,20 @@
 
 "use strict";
 
+///////////////
+
+if ( ! window.toggleVisibility_js_Initialized ) {
+	
+	$(document).ready(function() {
+	
+	window.initToggleVisibility();
+	
+	});
+
+	window.toggleVisibility_js_Initialized = true;
+}
+
+
 // /////////////////////////////////////////
 
 
@@ -140,13 +154,5 @@ window.initToggleVisibility = function( ) {
 	
 	addToggleVisibilityClickHandler( $parentElement );
 }	
-
-///////////////
-
-$(document).ready(function() {
-
-	initToggleVisibility();
-
-});
 
 export { initToggleVisibility } // Export something to get this on the page

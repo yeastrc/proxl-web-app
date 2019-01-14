@@ -31,84 +31,84 @@
  
   <c:set var="headerAdditions">
  
-		<script type="text/javascript" src="${ contextPath }/js/libs/base64.js"></script> 
+		<script type="text/javascript" src="js/libs/base64.js"></script> 
 
 		<%--  Compression --%>
 		
 		<%--  Used by lz-string.min.js --%>
-		<script type="text/javascript" src="${ contextPath }/js/libs/lz-string/base64-string.js"></script>
+		<script type="text/javascript" src="js/libs/lz-string/base64-string.js"></script>
 		
-		<script type="text/javascript" src="${ contextPath }/js/libs/lz-string/lz-string.min.js"></script>
+		<script type="text/javascript" src="js/libs/lz-string/lz-string.min.js"></script>
 		
 		<%--  Non-Minified version --%>
 		<%-- 
-		<script type="text/javascript" src="${ contextPath }/js/libs/lz-string/lz-string.js"></script>
+		<script type="text/javascript" src="js/libs/lz-string/lz-string.js"></script>
 		--%>
 		
-		<script src="${contextPath}/js/libs/jquery-ui-1.10.4.min.js"></script>
+		<script src="js/libs/jquery-ui-1.10.4.min.js"></script>
 					
 		<%--  On this page Snap used by qcMergedPageMain.js for Snap.hsb2rgb(...) to get color --%>				
-		<script type="text/javascript" src="${ contextPath }/js/libs/snap.svg-min.js"></script> <%--  Used by lorikeetPageProcessing.js --%>
+		<script type="text/javascript" src="js/libs/snap.svg-min.js"></script> <%--  Used by lorikeetPageProcessing.js --%>
 		
 		<!-- Handlebars templating library   -->
 		
 		<%--  
-		<script type="text/javascript" src="${ contextPath }/js/libs/handlebars-v2.0.0.js"></script>
+		<script type="text/javascript" src="js/libs/handlebars-v2.0.0.js"></script>
 		--%>
 		
 		<!-- use minimized version  -->
-		<script type="text/javascript" src="${ contextPath }/js/libs/handlebars-v2.0.0.min.js"></script>
+		<script type="text/javascript" src="js/libs/handlebars-v2.0.0.min.js"></script>
 
 		
 		
 <%--  Replaced with the JS bundle listed next
 
-		<script type="text/javascript" src="${ contextPath }/js/handleServicesAJAXErrors.js?x=${cacheBustValue}"></script> 
+		<script type="text/javascript" src="js/handleServicesAJAXErrors.js?x=${cacheBustValue}"></script> 
 		 
-		<script type="text/javascript" src="${ contextPath }/js/toggleVisibility.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/toggleVisibility.js?x=${cacheBustValue}"></script>
 		
-		<script type="text/javascript" src="${ contextPath }/js/spinner.js?x=${cacheBustValue}"></script> 
+		<script type="text/javascript" src="js/spinner.js?x=${cacheBustValue}"></script> 
 		
-		<script type="text/javascript" src="${ contextPath }/js/download-string-as-file.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/download-string-as-file.js?x=${cacheBustValue}"></script>
 
-		<script type="text/javascript" src="${ contextPath }/js/psmPeptideCutoffsCommon.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/psmPeptideCutoffsCommon.js?x=${cacheBustValue}"></script>
 		
-		<script type="text/javascript" src="${ contextPath }/js/psmPeptideAnnDisplayDataCommon.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/psmPeptideAnnDisplayDataCommon.js?x=${cacheBustValue}"></script>
 		
-		<script type="text/javascript" src="${ contextPath }/js/webserviceDataParamsDistribution.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/webserviceDataParamsDistribution.js?x=${cacheBustValue}"></script>
 			 
-		<script type="text/javascript" src="${ contextPath }/js/qc_pages_Single_Merged_Common.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/qc_pages_Single_Merged_Common.js?x=${cacheBustValue}"></script>
 		
-		<script type="text/javascript" src="${ contextPath }/js/qcChart_Download_Help_HTMLBlock.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/qcChart_Download_Help_HTMLBlock.js?x=${cacheBustValue}"></script>
 		
-		<script type="text/javascript" src="${ contextPath }/js/sharePageURLShortener.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/sharePageURLShortener.js?x=${cacheBustValue}"></script>
 
-		<script type="text/javascript" src="${ contextPath }/js/qcMergedPageChartSummaryStatistics.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="${ contextPath }/js/qcMergedPageChartDigestionStatistics.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="${ contextPath }/js/qcMergedPageChartScanFileStatistics.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/qcMergedPageChartSummaryStatistics.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/qcMergedPageChartDigestionStatistics.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/qcMergedPageChartScanFileStatistics.js?x=${cacheBustValue}"></script>
 		
-		<script type="text/javascript" src="${ contextPath }/js/qcMergedPageChartChargeStateStatistics.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="${ contextPath }/js/qcMergedPageChart_M_Over_Z_Statistics_PSM.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="${ contextPath }/js/qcMergedPageChart_Peptide_Length_Vs_PSM_Count_Boxplot.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/qcMergedPageChartChargeStateStatistics.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/qcMergedPageChart_M_Over_Z_Statistics_PSM.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/qcMergedPageChart_Peptide_Length_Vs_PSM_Count_Boxplot.js?x=${cacheBustValue}"></script>
 		
-		<script type="text/javascript" src="${ contextPath }/js/qcMergedPageChart_PPM_Error_PSM.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="${ contextPath }/js/qcMergedPageChart_PSM_Per_Modification.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="${ contextPath }/js/qcMergedPageChart_Peptide_Lengths.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/qcMergedPageChart_PPM_Error_PSM.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/qcMergedPageChart_PSM_Per_Modification.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/qcMergedPageChart_Peptide_Lengths.js?x=${cacheBustValue}"></script>
 		
 		
-		<script type="text/javascript" src="${ contextPath }/js/qcMergedPageSectionSummaryStatistics.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="${ contextPath }/js/qcMergedPageSectionDigestionStatistics.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="${ contextPath }/js/qcMergedPageSectionScanFileStatistics.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="${ contextPath }/js/qcMergedPageSection_PSM_Level_Statistics.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="${ contextPath }/js/qcMergedPageSection_PSM_Error_Estimates.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="${ contextPath }/js/qcMergedPageSectionModificationStatistics.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="${ contextPath }/js/qcMergedPageSection_Peptide_Level_Statistics.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/qcMergedPageSectionSummaryStatistics.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/qcMergedPageSectionDigestionStatistics.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/qcMergedPageSectionScanFileStatistics.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/qcMergedPageSection_PSM_Level_Statistics.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/qcMergedPageSection_PSM_Error_Estimates.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/qcMergedPageSectionModificationStatistics.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/qcMergedPageSection_Peptide_Level_Statistics.js?x=${cacheBustValue}"></script>
 
-		<script type="text/javascript" src="${ contextPath }/js/qcMergedPageMain.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/qcMergedPageMain.js?x=${cacheBustValue}"></script>
 --%>
 	
 		<%--  Bundle version of core page JS --%>
-		<script type="text/javascript" src="${ contextPath }/static/js_generated_bundles/data_pages/qcMergedView-bundle.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="static/js_generated_bundles/data_pages/qcMergedView-bundle.js?x=${cacheBustValue}"></script>
 			
 				<%-- 
 					The Struts Action for this page must call GetProteinNamesTooltipConfigData
@@ -309,9 +309,9 @@
 			<div  class="collapsable-link-container top-level-collapsable-link-container" > 
 				<a id="summary_collapse_link" href="javascript:" class="top-level-collapsable-link" 
 						style="display: none;"
-					><img  src="${ contextPath }/images/icon-collapse.png"></a>
+					><img  src="images/icon-collapse.png"></a>
 				<a id="summary_expand_link" href="javascript:" class="top-level-collapsable-link" 
-					><img  src="${ contextPath }/images/icon-expand.png"></a>
+					><img  src="images/icon-expand.png"></a>
 			</div>
 			<div class="top-level-label">
 			  Summary Statistics
@@ -344,9 +344,9 @@
 			<div  class="collapsable-link-container top-level-collapsable-link-container " > 
 				<a id="digestion_collapse_link" href="javascript:" class="top-level-collapsable-link" 
 						style="display: none;"
-					><img  src="${ contextPath }/images/icon-collapse.png"></a>
+					><img  src="images/icon-collapse.png"></a>
 				<a id="digestion_expand_link" href="javascript:" class="top-level-collapsable-link " 
-					><img  src="${ contextPath }/images/icon-expand.png"></a>
+					><img  src="images/icon-expand.png"></a>
 			</div>
 			<div class="top-level-label">
 			  Digestion Statistics
@@ -385,9 +385,9 @@
 			<div  class="collapsable-link-container top-level-collapsable-link-container " > 
 				<a id="scan_level_collapse_link" href="javascript:" class="top-level-collapsable-link " 
 						style="display: none;"
-					><img  src="${ contextPath }/images/icon-collapse.png"></a>
+					><img  src="images/icon-collapse.png"></a>
 				<a id="scan_level_expand_link" href="javascript:" class="top-level-collapsable-link " 
-					><img  src="${ contextPath }/images/icon-expand.png"></a>
+					><img  src="images/icon-expand.png"></a>
 			
 			</div>
 			<div class="top-level-label">
@@ -589,9 +589,9 @@ This is the length of both linked peptides added together.</div>
 			<div  class="collapsable-link-container top-level-collapsable-link-container" > 
 				<a id="psm_level_collapse_link" href="javascript:" class="top-level-collapsable-link" 
 						style="display: none;"
-					><img  src="${ contextPath }/images/icon-collapse.png"></a>
+					><img  src="images/icon-collapse.png"></a>
 				<a id="psm_level_expand_link" href="javascript:" class="top-level-collapsable-link" 
-					><img  src="${ contextPath }/images/icon-expand.png"></a>
+					><img  src="images/icon-expand.png"></a>
 			</div>
 			<div class="top-level-label">
 			  PSM Level Statistics
@@ -649,9 +649,9 @@ Several isotopic compositions are compared for calculating m/z, and the minimum 
 			<div  class="collapsable-link-container top-level-collapsable-link-container" > 
 				<a id="psm_error_estimates_collapse_link" href="javascript:" class="top-level-collapsable-link" 
 						style="display: none;"
-					><img  src="${ contextPath }/images/icon-collapse.png"></a>
+					><img  src="images/icon-collapse.png"></a>
 				<a id="psm_error_estimates_expand_link" href="javascript:" class="top-level-collapsable-link" 
-					><img  src="${ contextPath }/images/icon-expand.png"></a>
+					><img  src="images/icon-expand.png"></a>
 			</div>
 			<div class="top-level-label">
 			  PSM Error Estimates
@@ -697,9 +697,9 @@ The mass modifications shown are those found in the search from all identified p
 			<div  class="collapsable-link-container top-level-collapsable-link-container" > 
 				<a id="modification_stats_collapse_link" href="javascript:" class="top-level-collapsable-link" 
 						style="display: none;"
-					><img  src="${ contextPath }/images/icon-collapse.png"></a>
+					><img  src="images/icon-collapse.png"></a>
 				<a id="modification_stats_expand_link" href="javascript:" class="top-level-collapsable-link" 
-					><img  src="${ contextPath }/images/icon-expand.png"></a>
+					><img  src="images/icon-expand.png"></a>
 			</div>
 			<div class="top-level-label">
 			  Modification Stats
@@ -742,9 +742,9 @@ This is the length of both linked peptides added together.</div>
 			<div  class="collapsable-link-container top-level-collapsable-link-container " > 
 				<a id="peptide_level_collapse_link" href="javascript:" class="top-level-collapsable-link " 
 						style="display: none;"
-					><img  src="${ contextPath }/images/icon-collapse.png"></a>
+					><img  src="images/icon-collapse.png"></a>
 				<a id="peptide_level_expand_link" href="javascript:" class="top-level-collapsable-link " 
-					><img  src="${ contextPath }/images/icon-expand.png"></a>
+					><img  src="images/icon-expand.png"></a>
 			
 			</div>
 			<div class="top-level-label">

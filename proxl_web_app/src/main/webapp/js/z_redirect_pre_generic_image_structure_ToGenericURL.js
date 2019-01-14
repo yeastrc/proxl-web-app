@@ -145,5 +145,5 @@ if ( newURL != null ) {
 	
 } else {
 	
-	window.location.href = contextPathJSVar + "/invalidRequestData.do";
+	window.location.href = "invalidRequestData.do";
 }

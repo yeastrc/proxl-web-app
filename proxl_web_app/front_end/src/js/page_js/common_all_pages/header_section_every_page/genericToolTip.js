@@ -1,5 +1,13 @@
-	
-//  Generic tool tip
+/**
+ * genericToolTip.js
+ * 
+ * Javascript for Generic tool tip  
+ * 
+ * 
+ */	
+
+
+if ( ! window.genericToolTip_js_Initialized ) {
 
 	$(document).ready(function() {
 		
@@ -13,6 +21,13 @@
 		}
 
 	});
+	
+	window.genericToolTip_js_Initialized = true;
+	
+}
+
+//  Just define these functions again and attach to window
+
 	
 	window.addToolTips = function ( $element ) {
 

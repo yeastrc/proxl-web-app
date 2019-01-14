@@ -12,7 +12,7 @@ window.getListConfiguration = function() {
 	
 	var requestData = {
 	};
-	var _URL = contextPathJSVar + "/services/config/list";
+	var _URL = "services/config/list";
 //	var request =
 	$.ajax({
 		type : "GET",
@@ -178,7 +178,7 @@ window.saveListConfiguration = function() {
 	} );
 	var requestObj = { configList : configList };
 	var requestData = JSON.stringify( requestObj );
-	var _URL = contextPathJSVar + "/services/config/save";
+	var _URL = "services/config/save";
 //	var request =
 	$.ajax({
 		type : "POST",
@@ -239,7 +239,7 @@ window.getTermsOfServiceData = function() {
 	
 	var requestData = {
 	};
-	var _URL = contextPathJSVar + "/services/config/termsOfServiceData";
+	var _URL = "services/config/termsOfServiceData";
 //	var request =
 	$.ajax({
 		type : "GET",
@@ -301,7 +301,7 @@ window.addChangeTermsOfServiceData = function( params ) {
 	termsOfServiceText = termsOfServiceText.replace(/(\r\n|\r|\n)/g, '\n');
 
 	var requestData = { termsOfServiceText : termsOfServiceText };
-	var _URL = contextPathJSVar + "/services/config/addTermsOfService";
+	var _URL = "services/config/addTermsOfService";
 //	var request =
 	$.ajax({
 		type : "POST",
@@ -361,7 +361,7 @@ window.addTermsOfServiceDataResponse = function( params ) {
 window.disableTermsOfService = function( ) {
 	
 	var requestData = { };
-	var _URL = contextPathJSVar + "/services/config/disableTermsOfService";
+	var _URL = "services/config/disableTermsOfService";
 //	var request =
 	$.ajax({
 		type : "POST",
@@ -404,7 +404,7 @@ window.disableTermsOfServiceResponse = function( params ) {
 window.enableTermsOfService = function( ) {
 	
 	var requestData = { };
-	var _URL = contextPathJSVar + "/services/config/enableTermsOfService";
+	var _URL = "services/config/enableTermsOfService";
 //	var request =
 	$.ajax({
 		type : "POST",
@@ -449,7 +449,7 @@ window.enableTermsOfServiceResponse = function( params ) {
 window.clearCachedConfigData = function() {
 
 	var requestData = { };
-	var _URL = contextPathJSVar + "/cacheDataClearConfigDataDFUIEWORU.do";
+	var _URL = "cacheDataClearConfigDataDFUIEWORU.do";
 //	var request =
 	$.ajax({
 		type : "POST",
@@ -487,7 +487,7 @@ window.clearCachedConfigData = function() {
 window.clearAllCachedData = function() {
 
 	var requestData = { };
-	var _URL = contextPathJSVar + "/cacheDataClearAllDFUIEWORU.do";
+	var _URL = "cacheDataClearAllDFUIEWORU.do";
 //	var request =
 	$.ajax({
 		type : "POST",
@@ -525,7 +525,7 @@ window.clearAllCachedData = function() {
 window.cacheDataAllLogCurrentCacheSizes = function() {
 
 	var requestData = { };
-	var _URL = contextPathJSVar + "/cacheDataAllLogCurrentCacheSizesDFUIEWORU.do";
+	var _URL = "cacheDataAllLogCurrentCacheSizesDFUIEWORU.do";
 //	var request =
 	$.ajax({
 		type : "POST",

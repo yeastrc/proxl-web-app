@@ -12,121 +12,121 @@
 
  <c:set var="headerAdditions">
  
-		<script type="text/javascript" src="${ contextPath }/js/libs/jquery.tablesorter_Modified.js"></script>
-		<script type="text/javascript" src="${ contextPath }/js/libs/spin.min.js"></script> 
-		<script type="text/javascript" src="${ contextPath }/js/libs/base64.js"></script> 
-		<script type="text/javascript" src="${ contextPath }/js/libs/jquery.qtip.min.js"></script>
+		<script type="text/javascript" src="js/libs/jquery.tablesorter_Modified.js"></script>
+		<script type="text/javascript" src="js/libs/spin.min.js"></script> 
+		<script type="text/javascript" src="js/libs/base64.js"></script> 
+		<script type="text/javascript" src="js/libs/jquery.qtip.min.js"></script>
 
 		<%--  Compression --%>
 		
-		<script type="text/javascript" src="${ contextPath }/js/libs/lz-string/lz-string.min.js"></script>
+		<script type="text/javascript" src="js/libs/lz-string/lz-string.min.js"></script>
 		
 		<%--  Non-Minified version --%>
 		<%-- 
-		<script type="text/javascript" src="${ contextPath }/js/libs/lz-string/lz-string.js"></script>
+		<script type="text/javascript" src="js/libs/lz-string/lz-string.js"></script>
 		--%>
 		
 		<%--  Used by lz-string.min.js --%>
-		<script type="text/javascript" src="${ contextPath }/js/libs/lz-string/base64-string.js"></script>
+		<script type="text/javascript" src="js/libs/lz-string/base64-string.js"></script>
 
 		
 		
 		<!-- Handlebars templating library   -->
 		
 		<%--  
-		<script type="text/javascript" src="${ contextPath }/js/libs/handlebars-v2.0.0.js"></script>
+		<script type="text/javascript" src="js/libs/handlebars-v2.0.0.js"></script>
 		--%>
 		
 		<!-- use minimized version  -->
-		<script type="text/javascript" src="${ contextPath }/js/libs/handlebars-v2.0.0.min.js"></script>
+		<script type="text/javascript" src="js/libs/handlebars-v2.0.0.min.js"></script>
 
 
 		
 		
 <%--  Start of Lorikeet Core Parts --%>		
 
-		<script src="${contextPath}/js/libs/jquery-ui-1.10.4.min.js"></script>
+		<script src="js/libs/jquery-ui-1.10.4.min.js"></script>
 		
 		<%--  Only load the excanvas.min.js if it is IE 8 or lower.  IE 8 does not support HTML5 so this is a way to have HTML5 canvas support --%>
-		<!--[if lte IE 8]><script language="javascript" type="text/javascript" src="${contextPath}/js/lorikeet_google_code/excanvas.min.js"></script><![endif]-->
+		<!--[if lte IE 8]><script language="javascript" type="text/javascript" src="js/lorikeet_google_code/excanvas.min.js"></script><![endif]-->
 		
-		<script src="${contextPath}/js/lorikeet/jquery.flot.js?x=${cacheBustValue}"></script>
-		<script src="${contextPath}/js/lorikeet/jquery.flot.selection.js?x=${cacheBustValue}"></script>
+		<script src="js/lorikeet/jquery.flot.js?x=${cacheBustValue}"></script>
+		<script src="js/lorikeet/jquery.flot.selection.js?x=${cacheBustValue}"></script>
 		
-		<script src="${contextPath}/js/lorikeet/specview.js?x=${cacheBustValue}"></script>
-		<script src="${contextPath}/js/lorikeet/peptide.js?x=${cacheBustValue}"></script>
-		<script src="${contextPath}/js/lorikeet/aminoacid.js?x=${cacheBustValue}"></script>
-		<script src="${contextPath}/js/lorikeet/ion.js?x=${cacheBustValue}"></script>		
+		<script src="js/lorikeet/specview.js?x=${cacheBustValue}"></script>
+		<script src="js/lorikeet/peptide.js?x=${cacheBustValue}"></script>
+		<script src="js/lorikeet/aminoacid.js?x=${cacheBustValue}"></script>
+		<script src="js/lorikeet/ion.js?x=${cacheBustValue}"></script>		
 		
 <%--  End of Lorikeet Core Parts --%>		
 
 		
 			<%--  On this page Snap also used by crosslink-image-viewer.js and crosslink-image-viewer-click-element-handlers.js --%>				
-		<script type="text/javascript" src="${ contextPath }/js/libs/snap.svg-min.js"></script> <%--  Used by lorikeetPageProcessing.js --%>
+		<script type="text/javascript" src="js/libs/snap.svg-min.js"></script> <%--  Used by lorikeetPageProcessing.js --%>
 				
 
 		
 
 <%--  Replaced with the JS bundle listed next
 			 
-		<script type="text/javascript" src="${ contextPath }/js/lorikeetPageProcessing.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/lorikeetPageProcessing.js?x=${cacheBustValue}"></script>
 		
-		<script type="text/javascript" src="${ contextPath }/js/handleServicesAJAXErrors.js?x=${cacheBustValue}"></script> 
+		<script type="text/javascript" src="js/handleServicesAJAXErrors.js?x=${cacheBustValue}"></script> 
 		 
-		<script type="text/javascript" src="${ contextPath }/js/spinner.js?x=${cacheBustValue}"></script> 
+		<script type="text/javascript" src="js/spinner.js?x=${cacheBustValue}"></script> 
 		
-		<script type="text/javascript" src="${ contextPath }/js/psmPeptideCutoffsCommon.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/psmPeptideCutoffsCommon.js?x=${cacheBustValue}"></script>
 
-		<script type="text/javascript" src="${ contextPath }/js/psmPeptideAnnDisplayDataCommon.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="${ contextPath }/js/minimumPSM_Count_Filter.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/psmPeptideAnnDisplayDataCommon.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/minimumPSM_Count_Filter.js?x=${cacheBustValue}"></script>
 
-		<script type="text/javascript" src="${ contextPath }/js/trypsinCutPointsForSequence.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/trypsinCutPointsForSequence.js?x=${cacheBustValue}"></script>
 
 		
-		<script type="text/javascript" src="${ contextPath }/js/crosslink-image-viewer-protein-annotation.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/crosslink-image-viewer-protein-annotation.js?x=${cacheBustValue}"></script>
 	
-		<script type="text/javascript" src="${ contextPath }/js/crosslink-image-viewer-legacy-handler.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="${ contextPath }/js/crosslink-image-viewer-index-manager.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="${ contextPath }/js/crosslink-image-viewer-custom-region-manager.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="${ contextPath }/js/crosslink-image-viewer-color-manager.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="${ contextPath }/js/crosslink-image-viewer-click-element-handlers.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/crosslink-image-viewer-legacy-handler.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/crosslink-image-viewer-index-manager.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/crosslink-image-viewer-custom-region-manager.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/crosslink-image-viewer-color-manager.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/crosslink-image-viewer-click-element-handlers.js?x=${cacheBustValue}"></script>
 
-		<script type="text/javascript" src="${ contextPath }/js/crosslink-image-viewer-per-protein-bar-data.js?x=${cacheBustValue}"></script> 
-		<script type="text/javascript" src="${ contextPath }/js/crosslink-image-viewer-region-selections.js?x=${cacheBustValue}"></script> 
+		<script type="text/javascript" src="js/crosslink-image-viewer-per-protein-bar-data.js?x=${cacheBustValue}"></script> 
+		<script type="text/javascript" src="js/crosslink-image-viewer-region-selections.js?x=${cacheBustValue}"></script> 
 
-		<script type="text/javascript" src="${ contextPath }/js/crosslink-image-viewer-link-exclusion-manager.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="${ contextPath }/js/crosslink-image-viewer-link-exclusion-selections.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/crosslink-image-viewer-link-exclusion-manager.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/crosslink-image-viewer-link-exclusion-selections.js?x=${cacheBustValue}"></script>
 		
 
-		<script type="text/javascript" src="${ contextPath }/js/circle-plot-viewer.js?x=${cacheBustValue}"></script> 
+		<script type="text/javascript" src="js/circle-plot-viewer.js?x=${cacheBustValue}"></script> 
 		
-		<script type="text/javascript" src="${ contextPath }/js/crosslink-image-viewer.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/crosslink-image-viewer.js?x=${cacheBustValue}"></script>
 		
 		
 		Image page and Structure Page Shared
 		
-		<script type="text/javascript" src="${ contextPath }/js/nrseqProteinIdToProteinSequenceVersionIdLookup.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/nrseqProteinIdToProteinSequenceVersionIdLookup.js?x=${cacheBustValue}"></script>
 
-		<script type="text/javascript" src="${ contextPath }/js/image_structure_click_element_common.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/image_structure_click_element_common.js?x=${cacheBustValue}"></script>
 
-		<script type="text/javascript" src="${ contextPath }/js/viewLooplinkReportedPeptidesLoadedFromWebServiceTemplate.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="${ contextPath }/js/viewCrosslinkReportedPeptidesLoadedFromWebServiceTemplate.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="${ contextPath }/js/viewMonolinkReportedPeptidesLoadedFromWebServiceTemplate.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/viewLooplinkReportedPeptidesLoadedFromWebServiceTemplate.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/viewCrosslinkReportedPeptidesLoadedFromWebServiceTemplate.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/viewMonolinkReportedPeptidesLoadedFromWebServiceTemplate.js?x=${cacheBustValue}"></script>
 		
-		<script type="text/javascript" src="${ contextPath }/js/viewPsmPerPeptideLoadedFromWebServiceTemplate.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="${ contextPath }/js/viewPsmsLoadedFromWebServiceTemplate.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/viewPsmPerPeptideLoadedFromWebServiceTemplate.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/viewPsmsLoadedFromWebServiceTemplate.js?x=${cacheBustValue}"></script>
 		
-		<script type="text/javascript" src="${ contextPath }/js/sharePageURLShortener.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/sharePageURLShortener.js?x=${cacheBustValue}"></script>
 		
-		<script type="text/javascript" src="${ contextPath }/js/webserviceDataParamsDistribution.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="${ contextPath }/js/defaultPageView.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/webserviceDataParamsDistribution.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/defaultPageView.js?x=${cacheBustValue}"></script>
 
-		<script type="text/javascript" src="${ contextPath }/js/toggleVisibility.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/toggleVisibility.js?x=${cacheBustValue}"></script>
 		
 --%>
 		
 		<%--  Bundle version of core page JS --%>
-		<script type="text/javascript" src="${ contextPath }/static/js_generated_bundles/data_pages/imageView-bundle.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="static/js_generated_bundles/data_pages/imageView-bundle.js?x=${cacheBustValue}"></script>
 		
 				<%-- 
 					The Struts Action for this page must call GetProteinNamesTooltipConfigData
@@ -134,7 +134,7 @@
 					/WEB-INF/jsp-includes/proteinNameTooltipDataForJSCode.jsp
 				  --%>
 <%--  Replaced with the JS bundle listed next
-			<script type="text/javascript" src="${ contextPath }/js/createTooltipForProteinNames.js?x=${cacheBustValue}"></script>
+			<script type="text/javascript" src="js/createTooltipForProteinNames.js?x=${cacheBustValue}"></script>
   --%>
   		
 		
@@ -142,17 +142,17 @@
 		
 		
 				<%--  Color Picker - jQuery Plugin --%>
-		<script type="text/javascript" src="${ contextPath }/js/libs/colorpicker/colorpicker.js"></script>
+		<script type="text/javascript" src="js/libs/colorpicker/colorpicker.js"></script>
 		
-		<link rel="stylesheet" href="${ contextPath }/css/tablesorter.css" type="text/css" media="print, projection, screen" />
-		<link type="text/css" rel="stylesheet" href="${ contextPath }/css/jquery.qtip.min.css" />
+		<link rel="stylesheet" href="css/tablesorter.css" type="text/css" media="print, projection, screen" />
+		<link type="text/css" rel="stylesheet" href="css/jquery.qtip.min.css" />
 		
 		<%--  some classes in this stylesheet collide with some in the lorikeet file since they are set to specific values for lorikeet drag and drop --%>
 		<%-- 
-		<link REL="stylesheet" TYPE="text/css" HREF="${contextPath}/css/jquery-ui-1.10.2-Themes/ui-lightness/jquery-ui.min.css">
+		<link REL="stylesheet" TYPE="text/css" HREF="css/jquery-ui-1.10.2-Themes/ui-lightness/jquery-ui.min.css">
 		--%>
-		<link REL="stylesheet" TYPE="text/css" HREF="${contextPath}/css/lorikeet.css">
-		<link rel="stylesheet" media="screen" type="text/css" href="${ contextPath }/css/libs/colorpicker_custom_colors.css" />
+		<link REL="stylesheet" TYPE="text/css" HREF="css/lorikeet.css">
+		<link rel="stylesheet" media="screen" type="text/css" href="css/libs/colorpicker_custom_colors.css" />
 		
 
 
@@ -988,7 +988,7 @@
 					<h1 id="view_protein_bar_highlighting_overlay_X_for_exit_overlay" class="view-protein-bar-highlighting-overlay-X-for-exit-overlay" >X</h1>
 					<div style="float: right; padding-right: 5px; padding-top: 10px;">
 				  		<a href="http://proxl-web-app.readthedocs.io/en/latest/using/image-bar.html"  target="_help_window" id="view_link_exclusions_overlay_X_for_exit_overlay_help_link"
-				  			><img src="${ contextPath }/images/icon-help.png" 
+				  			><img src="images/icon-help.png" 
 				  		></a>
 					</div>
 					<h1 id="view_protein_bar_highlighting_overlay_header_text" class="view-protein-bar-highlighting-overlay-header-text" 
@@ -1043,7 +1043,7 @@
 				start: <input type="text" style="width: 30px;" value="{{start}}" class=" start_jq ">  
 				End: <input type="text" style="width: 30px;" value="{{end}}" class=" end_jq ">  
 
-				<input type="image" src="${ contextPath }/images/icon-delete-small.png"  
+				<input type="image" src="images/icon-delete-small.png"  
 					class=" view_protein_bar_highlighting_region_remove_button_jq tool_tip_attached_jq" 
 					data-tooltip="Remove region" > 
 
@@ -1090,7 +1090,7 @@
 					<h1 id="view_link_exclusions_overlay_X_for_exit_overlay" class="view-link-exclusions-overlay-X-for-exit-overlay" >X</h1>
 					<div style="float: right; padding-right: 5px; padding-top: 10px;">
 				  		<a href="http://proxl-web-app.readthedocs.io/en/latest/using/image-bar.html#highlight-proteins-regions"  target="_help_window" id="view_link_exclusions_overlay_X_for_exit_overlay_help_link"
-				  			><img src="${ contextPath }/images/icon-help.png" 
+				  			><img src="images/icon-help.png" 
 				  		></a>
 					</div>
 					<h1 id="view_link_exclusions_overlay_header_text" class="view-link-exclusions-overlay-header-text" 
@@ -1169,7 +1169,7 @@
 				data-protein_uid_2="{{ proteinUID_2 }}"
 				data-region_uid_2="{{ regionUID_2 }}"
 				>
-				<input type="image" src="${ contextPath }/images/icon-delete-small.png"  
+				<input type="image" src="images/icon-delete-small.png"  
 					class=" view_link_exclusions_overlay_exclusion_remove_button_jq tool_tip_attached_jq" 
 					data-tooltip="Remove Exclusion" > 
 				{{ proteinName_1 }}{{ regionRange_1 }}&mdash;{{ proteinName_2 }}{{ regionRange_2 }}

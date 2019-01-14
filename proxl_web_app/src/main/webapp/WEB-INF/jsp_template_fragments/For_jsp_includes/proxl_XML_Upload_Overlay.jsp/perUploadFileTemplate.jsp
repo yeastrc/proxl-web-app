@@ -18,7 +18,7 @@ containing <script> id:  import_proxl_xml_file_scan_file_entry_template
    		data-file_index="{{ fileIndex }}" data-file_type="{{ fileType }}">
   <td class="column-1">
   	<%--  Remove Icon --%>
-	<input type="image" src="${ contextPath }/images/icon-circle-x.png" 
+	<input type="image" src="images/icon-circle-x.png" 
 		data-tooltip="Remove File" 
 		class="tool_tip_attached_jq  scan_file_remove_button_jq "/>
   </td>

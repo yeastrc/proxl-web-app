@@ -12,6 +12,10 @@
 //JavaScript directive:   all variables have to be declared with "var", maybe other things
 "use strict";
 
+//Import header_main.js and children to ensure on the page
+import { header_mainVariable } from 'page_js/common_all_pages/header_section_main_pages/header_main.js';
+
+
 
 //  Import to make available on the page
 import { searchesChangeDisplayOrder } from 'page_js/data_pages/project_search_ids_driven_pages/common/searchesChangeDisplayOrder.js';
@@ -492,7 +496,7 @@ var QCMergedPageMain = function() {
 		// TODO  Hard code taking first project search id
 		var projectSearchId = _project_search_ids[ 0 ];	
 				
-		var _URL = contextPathJSVar + "/services/utils/getScanFilesForProjectSearchId";
+		var _URL = "services/utils/getScanFilesForProjectSearchId";
 		var requestData = {
 				projectSearchId : projectSearchId
 		};
@@ -1187,12 +1191,12 @@ var QCMergedPageMain = function() {
 		queryString += items.join( "&" );
 		var html = "";
 		if ( _project_search_ids.length > 1 ) {
-			html += " <span class=\"tool_tip_attached_jq\" data-tooltip=\"View peptides\" style=\"white-space:nowrap;\" >[<a href=\"" + contextPathJSVar + "/mergedPeptide.do" + queryString + "\">Peptide View</a>]</span>";
-			html += " <span class=\"tool_tip_attached_jq\" data-tooltip=\"View proteins\" style=\"white-space:nowrap;\" >[<a href=\"" + contextPathJSVar + "/mergedCrosslinkProtein.do" + queryString + "\">Protein View</a>]</span>";
-			html += " <span class=\"tool_tip_attached_jq\" data-tooltip=\"View protein coverage report\" style=\"white-space:nowrap;\" >[<a href=\"" + contextPathJSVar + "/mergedProteinCoverageReport.do" + queryString + "\">Coverage Report</a>]</span>";
+			html += " <span class=\"tool_tip_attached_jq\" data-tooltip=\"View peptides\" style=\"white-space:nowrap;\" >[<a href=\"mergedPeptide.do" + queryString + "\">Peptide View</a>]</span>";
+			html += " <span class=\"tool_tip_attached_jq\" data-tooltip=\"View proteins\" style=\"white-space:nowrap;\" >[<a href=\"mergedCrosslinkProtein.do" + queryString + "\">Protein View</a>]</span>";
+			html += " <span class=\"tool_tip_attached_jq\" data-tooltip=\"View protein coverage report\" style=\"white-space:nowrap;\" >[<a href=\"mergedProteinCoverageReport.do" + queryString + "\">Coverage Report</a>]</span>";
 		} else {
 			//  Add Peptide Link
-			html += " [<a class=\"tool_tip_attached_jq\" data-tooltip=\"View peptides\" href='" + contextPathJSVar + "/";
+			html += " [<a class=\"tool_tip_attached_jq\" data-tooltip=\"View peptides\" href='";
 			var viewSearchPeptideDefaultPageUrl = $("#viewSearchPeptideDefaultPageUrl").val();
 			if ( viewSearchPeptideDefaultPageUrl === undefined || viewSearchPeptideDefaultPageUrl === "" ) {
 				html += "peptide.do" + queryString;
@@ -1201,7 +1205,7 @@ var QCMergedPageMain = function() {
 			}
 			html += "'>Peptide View</a>]";
 			//  Add Protein View Link
-			html += " [<a class=\"tool_tip_attached_jq\" data-tooltip=\"View proteins\" href='" + contextPathJSVar + "/";
+			html += " [<a class=\"tool_tip_attached_jq\" data-tooltip=\"View proteins\" href='";
 			var viewSearchCrosslinkProteinDefaultPageUrl = $("#viewSearchCrosslinkProteinDefaultPageUrl").val();
 			if ( viewSearchCrosslinkProteinDefaultPageUrl === undefined || viewSearchCrosslinkProteinDefaultPageUrl === "" ) {
 				html += "crosslinkProtein.do" + queryString;
@@ -1210,7 +1214,7 @@ var QCMergedPageMain = function() {
 			}
 			html += "'>Protein View</a>]";
 			//  Add Coverage Report Link
-			html += " [<a class=\"tool_tip_attached_jq\" data-tooltip=\"View protein coverage report\" href='" + contextPathJSVar + "/";
+			html += " [<a class=\"tool_tip_attached_jq\" data-tooltip=\"View protein coverage report\" href='";
 			var viewProteinCoverageReportDefaultPageUrl = $("#viewProteinCoverageReportDefaultPageUrl").val();
 			if ( viewProteinCoverageReportDefaultPageUrl === undefined || viewProteinCoverageReportDefaultPageUrl === "" ) {
 				html += "proteinCoverageReport.do" + queryString;
@@ -1222,7 +1226,7 @@ var QCMergedPageMain = function() {
 		}
 
 		var imageNavHTML = " <span class=\"tool_tip_attached_jq\" data-tooltip=\"Graphical view of links between proteins\" " +
-		"style=\"white-space:nowrap;\" >[<a href=\"" + contextPathJSVar + "/";
+		"style=\"white-space:nowrap;\" >[<a href=\"";
 		var viewMergedImageDefaultPageUrl = $("#viewMergedImageDefaultPageUrl").val();
 		if ( viewMergedImageDefaultPageUrl === undefined || viewMergedImageDefaultPageUrl === "" ) {
 			var imageQueryString = "?";
@@ -1261,7 +1265,7 @@ var QCMergedPageMain = function() {
 		var $structure_viewer_link_span = $("#structure_viewer_link_span");
 		if ( $structure_viewer_link_span.length > 0 ) {
 			var structureNavHTML = "<span class=\"tool_tip_attached_jq\" data-tooltip=\"View data on 3D structures\" " +
-			"style=\"white-space:nowrap;\" >[<a href=\"" + contextPathJSVar + "/";
+			"style=\"white-space:nowrap;\" >[<a href=\"";
 			var viewMergedStructureDefaultPageUrl = $("#viewMergedStructureDefaultPageUrl").val();
 			if ( viewMergedStructureDefaultPageUrl === undefined || viewMergedStructureDefaultPageUrl === "" ) {
 				var structureQueryString = "?";

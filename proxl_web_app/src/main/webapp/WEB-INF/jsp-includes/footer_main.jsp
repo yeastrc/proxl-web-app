@@ -12,7 +12,7 @@
 	<div class="footer-outer-container">
 	
 		<div class="footer-left-container">
-			<span><img src="${ contextPath }/images/proxl-logo-footer-21px.png" ></span>
+			<span><img src="images/proxl-logo-footer-21px.png" ></span>
 		</div>
 		<div class="footer-right-container">
 			© 2018 University of Washington

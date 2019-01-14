@@ -39,7 +39,7 @@
 		     	style="cursor: move; margin-bottom: 15px; font-weight: bold; font-size: 16px;"
 		     	class="tool_tip_attached_jq" data-tooltip="Drag to move Folder List" 
 		     	>
-		     	<img src="${ contextPath }/images/icon-draggable-small.png" >
+		     	<img src="images/icon-draggable-small.png" >
 		     	Folder List
 		     </div>
 		     <div class=" outer-item-container clickable folder_display_order_item_jq tool_tip_attached_jq " 

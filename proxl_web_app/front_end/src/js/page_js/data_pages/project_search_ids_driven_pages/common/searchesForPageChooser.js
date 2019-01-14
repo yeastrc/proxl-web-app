@@ -187,7 +187,7 @@ SearchesForPageChooser.prototype.loadSearchData = function( params ) {
 
 	var requestData = { project_id : project_id };
 	$.ajax({
-		url : contextPathJSVar + "/services/project/getSearchDataList",
+		url : "services/project/getSearchDataList",
 		data : requestData, // The data sent as params on the URL
 		dataType : "json",
 		success : function(data) {

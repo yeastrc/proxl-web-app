@@ -37,7 +37,7 @@
 	<%--  QC Link --%>	
 
 	[<a class="tool_tip_attached_jq" data-tooltip="<%= PageLinkTextAndTooltipConstants.QC_LINK_TOOLTIP %>" 
-		href="${ contextPath }/${ qc_PageURLFinal }"
+		href="${ qc_PageURLFinal }"
 				
 		><%= PageLinkTextAndTooltipConstants.QC_LINK_TEXT %></a>]  					
 		

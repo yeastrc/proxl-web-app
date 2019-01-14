@@ -189,7 +189,7 @@ var OrganizeSearches = function() {
 		var callback = params.callback;
 		var requestData = { project_id : adminGlobals.project_id };
 		$.ajax({
-			url : contextPathJSVar + "/services/project/organizeSearchesGetData",
+			url : "services/project/organizeSearchesGetData",
 			data : requestData, // The data sent as params on the URL
 			dataType : "json",
 			success : function(data) {
@@ -591,7 +591,7 @@ var OrganizeSearches = function() {
 					searches_not_in_any_folder : searches_not_in_any_folder
 			};
 
-			var _URL = contextPathJSVar + "/services/project/organizeSearchesSetSearchFolder";
+			var _URL = "services/project/organizeSearchesSetSearchFolder";
 
 //			var request =
 			$.ajax({
@@ -951,7 +951,7 @@ var OrganizeSearches = function() {
 					searchesInOrder: searchesInOrder
 			};
 			var requestDataJSON = JSON.stringify( requestData );
-			var _URL = contextPathJSVar + "/services/project/organizeSearchesSetSearchesOrder";
+			var _URL = "services/project/organizeSearchesSetSearchesOrder";
 			// var request =
 			$.ajax({
 				type : "POST",
@@ -1002,7 +1002,7 @@ var OrganizeSearches = function() {
 					foldersInOrder: foldersInOrder
 			};
 			var requestDataJSON = JSON.stringify( requestData );
-			var _URL = contextPathJSVar + "/services/project/folder/SetFoldersOrder";
+			var _URL = "services/project/folder/SetFoldersOrder";
 			// var request =
 			$.ajax({
 				type : "POST",
@@ -1056,7 +1056,7 @@ var OrganizeSearches = function() {
 					project_id : adminGlobals.project_id,
 					folderName: folderName
 			};
-			var _URL = contextPathJSVar + "/services/project/folder/addFolder";
+			var _URL = "services/project/folder/addFolder";
 			// var request =
 			$.ajax({
 				type : "POST",
@@ -1165,7 +1165,7 @@ var OrganizeSearches = function() {
 		if ( folderId === "" ) {
 			throw Error( ' folderId === "" ' );
 		}
-		var _URL = contextPathJSVar + "/services/project/folder/deleteFolder";
+		var _URL = "services/project/folder/deleteFolder";
 //		var request = 
 		$.ajax({
 			type: "POST",
@@ -1269,7 +1269,7 @@ var OrganizeSearches = function() {
 		if ( folderName === "" ) {
 			return;  // EARLY EXIT
 		}
-		var _URL = contextPathJSVar + "/services/project/folder/renameFolder";
+		var _URL = "services/project/folder/renameFolder";
 //		var request = 
 		$.ajax({
 			type: "POST",

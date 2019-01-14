@@ -252,7 +252,7 @@ var QCMergedPageChartScanFileStatistics = function() {
 			_activeAjax = null;
 		}
 		
-		var _URL = contextPathJSVar + "/services/qc/dataPage/getScanStatistics_Merged";
+		var _URL = "services/qc/dataPage/getScanStatistics_Merged";
 
 		_activeAjax =
 			$.ajax({

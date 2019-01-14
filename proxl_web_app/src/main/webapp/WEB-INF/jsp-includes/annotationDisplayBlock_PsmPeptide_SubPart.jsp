@@ -39,7 +39,7 @@
 			Drag the items to the order to display them in.
 		  </div>
 		  <div>
-		    Click the <img src="${ contextPath }/images/icon-delete-small.png" > to remove.
+		    Click the <img src="images/icon-delete-small.png" > to remove.
 		  </div>
 		</div>
 	</td>

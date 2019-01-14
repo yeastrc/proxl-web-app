@@ -15,10 +15,10 @@
  
  	<title>ProXL DB</title>
 
- <link REL="stylesheet" TYPE="text/css" HREF="${ contextPath }/css/global.css?x=${cacheBustValue}">
+ <link REL="stylesheet" TYPE="text/css" HREF="css/global.css?x=${cacheBustValue}">
 
 	<%--  Loaded in head_section_include_every_page.jsp   --%>
-	<%-- <script type="text/javascript" src="${ contextPath }/js/jquery-1.11.0.min.js"></script>  --%>
+	<%-- <script type="text/javascript" src="js/jquery-1.11.0.min.js"></script>  --%>
 	 
 	
 </head>
@@ -44,7 +44,7 @@
   <div class="page-content" >	
 
 	<div class="logo-large-container" >
-		<img src="${ contextPath }/images/logo-large.png" />
+		<img src="images/logo-large.png" />
 	</div>
 
    			<form action="user_loginPage.do" id="ajax_error_no_session_form" >

@@ -20,10 +20,10 @@
 
  	<title>ProXL DB</title>
  
- <link REL="stylesheet" TYPE="text/css" HREF="${ contextPath }/css/global.css?x=${cacheBustValue}">
+ <link REL="stylesheet" TYPE="text/css" HREF="css/global.css?x=${cacheBustValue}">
 
 	<%--  Loaded in head_section_include_every_page.jsp   --%>
-	<%-- <script type="text/javascript" src="${ contextPath }/js/jquery-1.11.0.min.js"></script>  --%>
+	<%-- <script type="text/javascript" src="js/jquery-1.11.0.min.js"></script>  --%>
 	
 		
 </head>
@@ -41,7 +41,7 @@
   <div class="page-content" >	
 
 	<div class="logo-large-container" >
-		<img src="${ contextPath }/images/logo-large.png" />
+		<img src="images/logo-large.png" />
 	</div>
 
 	<c:choose>
@@ -67,7 +67,7 @@
 		If you already have an account, sign in:
 	</div>
   	
-	<form action="${ contextPath }/user_loginPage.do" >
+	<form action="user_loginPage.do" >
 		<input type="hidden" name="requestedURL" value="${ intialIncomingURL }"> 
 		<input type="hidden" name="inviteTrackingCode" value="<c:out value="${ inviteCode }" ></c:out>">
 	 	<INPUT TYPE="submit" class="submit-button" VALUE="Sign In" >
@@ -77,7 +77,7 @@
 		If you do not have an account, please create one:
 	</div>
   	
-	<form action="${ contextPath }/user_inviteCreateNewUserPage.do" >
+	<form action="user_inviteCreateNewUserPage.do" >
 		<input type="hidden" name="code" value="<c:out value="${ inviteCode }" ></c:out>"> 
 	 	<INPUT TYPE="submit" class="submit-button" VALUE="Create Account" >
 	</form>

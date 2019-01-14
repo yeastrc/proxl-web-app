@@ -21,7 +21,7 @@ containing div id:  "annotation_data_display_sort_block_single_value_display_tem
 				>
 		<div class=" sort-handle-and-text " >
 			<div class=" sort-handle-float " > <%-- style="float: left;padding-top: 1px; padding-right: 3px;"  --%>
-				<img src="${ contextPath }/images/icon-draggable-small.png" 
+				<img src="images/icon-draggable-small.png" 
 					style="background-color: white; "
 					class=" drag_handle_jq tool_tip_attached_jq " <%-- drag_handle_jq for jQuery .sortable --%>
 					data-tooltip="Drag to change order of displayed data"
@@ -30,7 +30,7 @@ containing div id:  "annotation_data_display_sort_block_single_value_display_tem
 			<div class="delete-icon-float">
 			  <input type="image" class=" tool_tip_attached_jq" data-tooltip="Remove item from display"
 			  	onclick="annotationDataDisplayProcessingCommonCode.removeFromSelectedAnnotationTypeList( { clickedThis : this } )" 
-			  	 src="${ contextPath }/images/icon-delete-small.png" >
+			  	 src="images/icon-delete-small.png" >
 		    </div>
 		   	<div class="text-sortable {{#if data.description }} tool_tip_attached_jq {{/if}} "  
 				{{#if data.description }} data-tooltip="{{ data.description }}" {{/if}}

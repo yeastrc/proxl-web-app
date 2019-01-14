@@ -17,6 +17,13 @@
 
 //  Import to get onto page
 
+//  Import of header_section_every_page_root.js
+
+import { header_section_every_page_rootVariable } from 'page_js/common_all_pages/header_section_every_page/header_section_every_page_root.js';
+
+
+//  Imports for this folder
+
 import { addCollapsableEventHandlers } from "./crosslinksCollapsible.js";
 
 
@@ -35,6 +42,19 @@ window.headerMainGlobals = {
 };
 
 
+
+///////////////
+
+if ( ! window.header_main_js_Initialized ) {
+	
+	$(document).ready(function() {
+	
+		window.initHeaderMain();
+	
+	});
+	
+	window.header_main_js_Initialized = true;
+}
 
 
 ////////////////////////////
@@ -159,10 +179,7 @@ window.initHeaderMain = function() {
 
 
 
-///////////////
+const header_mainVariable = false;
 
-$(document).ready(function() {
-
-	initHeaderMain();
-
-});
+//  Dummy export
+export { header_mainVariable }

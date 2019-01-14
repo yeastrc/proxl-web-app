@@ -132,7 +132,7 @@ function validateURL(textval) {
 
 
 window.addWebLink = function( searchId ) {
-	var _URL = contextPathJSVar + "/services/searchWebLinks/add";
+	var _URL = "services/searchWebLinks/add";
 	var $linkUrlInputField = $( "input#web-links-url-input-" + searchId );
 	var linkUrl = $linkUrlInputField.val();
 	if( linkUrl === undefined || linkUrl === "" ) { return; }
@@ -235,7 +235,7 @@ window.showAddWebLink = function( id ) {
 //Called by "onclick" on HTML element
 window.saveSearchFilename = function( clickThis ) {
 	try {
-		var _URL = contextPathJSVar + "/services/search_file/updateDisplayFilename";
+		var _URL = "services/search_file/updateDisplayFilename";
 		var $clickThis = $( clickThis );
 		var $display_search_filename_outer_container_jq = $clickThis.closest(".display_search_filename_outer_container_jq");
 		var search_file_id = $display_search_filename_outer_container_jq.attr("search_file_id");
@@ -356,7 +356,7 @@ window.cancelSearchCommentEditForm = function( clickThis ) {
 //Called by "onclick" on HTML element
 window.updateSearchComment = function( clickThis ) {
 	try {
-		var _URL = contextPathJSVar + "/services/searchComment/updateText";
+		var _URL = "services/searchComment/updateText";
 		var $clickThis = $( clickThis );
 		var $search_comment_root_jq = $clickThis.closest(".search_comment_root_jq");
 		var searchCommentId = $search_comment_root_jq.attr("searchCommentId");	
@@ -401,7 +401,7 @@ window.updateSearchComment = function( clickThis ) {
 //Called by "onclick" on HTML element
 window.addComment = function( searchId ) {
 	try {
-		var _URL = contextPathJSVar + "/services/searchComment/add";
+		var _URL = "services/searchComment/add";
 		var comment = $( "input#comment-input-" + searchId ).val();
 		if( comment == undefined || comment == "" ) { return; }
 //		var request = 
@@ -533,7 +533,7 @@ window.deleteSearchConfirmed = function(clickThis, eventObject) {
 		throw Error( ' projectSearchId === "" ' );
 	}
 	var requestData = {	projectSearchId : projectSearchId };
-	var _URL = contextPathJSVar + "/services/search/delete";
+	var _URL = "services/search/delete";
 //	var request =
 	$.ajax({
 		type : "POST",
@@ -631,7 +631,7 @@ window.deleteSearchCommentConfirmed = function(clickThis, eventObject) {
 	if ( searchCommentId === "" ) {
 		throw Error( ' searchCommentId === "" ' );
 	}
-	var _URL = contextPathJSVar + "/services/searchComment/delete";
+	var _URL = "services/searchComment/delete";
 //	var request = 
 	$.ajax({
 		type: "POST",
@@ -712,7 +712,7 @@ window.deleteSearchWebLinkConfirmed = function(clickThis, eventObject) {
 	if ( searchwebLinkId === "" ) {
 		throw Error( ' searchwebLinkId === "" ' );
 	}
-	var _URL = contextPathJSVar + "/services/searchWebLinks/delete";
+	var _URL = "services/searchWebLinks/delete";
 //	var request = 
 	$.ajax({
 		type: "POST",
@@ -768,7 +768,7 @@ window.cancelNameEdit = function( id ) {
 //Called by "onclick" on HTML element
 window.saveName = function( projectSearchId ) {
 	try {
-		var _URL = contextPathJSVar + "/services/searchName/save";
+		var _URL = "services/searchName/save";
 		var name = $( "input#search-name-value-" + projectSearchId ).val();
 		if( name == undefined || name == "" ) { return; }
 //		var request = 

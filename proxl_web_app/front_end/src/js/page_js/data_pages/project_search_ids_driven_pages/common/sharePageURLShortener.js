@@ -60,7 +60,7 @@ var SharePageURLShortener = function() {
 		
 			var requestData = JSON.stringify( requestObj );
 			
-			var _URL = contextPathJSVar + "/services/sharePageShortenURL/createAndSaveShortenedURL";
+			var _URL = "services/sharePageShortenURL/createAndSaveShortenedURL";
 
 			$.ajax({
 				type: "POST",

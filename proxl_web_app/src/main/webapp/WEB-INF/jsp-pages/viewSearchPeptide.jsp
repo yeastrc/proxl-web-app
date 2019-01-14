@@ -16,24 +16,24 @@
 
  <c:set var="headerAdditions">
 
-		<script type="text/javascript" src="${ contextPath }/js/libs/jquery.tablesorter_Modified.js"></script>
+		<script type="text/javascript" src="js/libs/jquery.tablesorter_Modified.js"></script>
 		
-		<script type="text/javascript" src="${ contextPath }/js/libs/jquery.qtip.min.js"></script>
+		<script type="text/javascript" src="js/libs/jquery.qtip.min.js"></script>
 		
 <%--  Start of Lorikeet Core Parts --%>		
 
-		<script src="${contextPath}/js/libs/jquery-ui-1.10.4.min.js"></script>
+		<script src="js/libs/jquery-ui-1.10.4.min.js"></script>
 		
 		<%--  Only load the excanvas.min.js if it is IE 8 or lower.  IE 8 does not support HTML5 so this is a way to have HTML5 canvas support --%>
-		<!--[if lte IE 8]><script language="javascript" type="text/javascript" src="${contextPath}/js/lorikeet_google_code/excanvas.min.js"></script><![endif]-->
+		<!--[if lte IE 8]><script language="javascript" type="text/javascript" src="js/lorikeet_google_code/excanvas.min.js"></script><![endif]-->
 		
-		<script src="${contextPath}/js/lorikeet/jquery.flot.js"></script>
-		<script src="${contextPath}/js/lorikeet/jquery.flot.selection.js"></script>
+		<script src="js/lorikeet/jquery.flot.js"></script>
+		<script src="js/lorikeet/jquery.flot.selection.js"></script>
 		
-		<script src="${contextPath}/js/lorikeet/specview.js?x=${cacheBustValue}"></script>
-		<script src="${contextPath}/js/lorikeet/peptide.js?x=${cacheBustValue}"></script>
-		<script src="${contextPath}/js/lorikeet/aminoacid.js?x=${cacheBustValue}"></script>
-		<script src="${contextPath}/js/lorikeet/ion.js?x=${cacheBustValue}"></script>		
+		<script src="js/lorikeet/specview.js?x=${cacheBustValue}"></script>
+		<script src="js/lorikeet/peptide.js?x=${cacheBustValue}"></script>
+		<script src="js/lorikeet/aminoacid.js?x=${cacheBustValue}"></script>
+		<script src="js/lorikeet/ion.js?x=${cacheBustValue}"></script>		
 		
 <%--  End of Lorikeet Core Parts --%>		
 				
@@ -42,15 +42,15 @@
 		<!-- Handlebars templating library   -->
 		
 		<%--  
-		<script type="text/javascript" src="${ contextPath }/js/libs/handlebars-v2.0.0.js"></script>
+		<script type="text/javascript" src="js/libs/handlebars-v2.0.0.js"></script>
 		--%>
 		
 		<!-- use minimized version  -->
-		<script type="text/javascript" src="${ contextPath }/js/libs/handlebars-v2.0.0.min.js"></script>
+		<script type="text/javascript" src="js/libs/handlebars-v2.0.0.min.js"></script>
 
 		
 					
-		<script type="text/javascript" src="${ contextPath }/js/libs/snap.svg-min.js"></script> <%--  Used by lorikeetPageProcessing.js --%>
+		<script type="text/javascript" src="js/libs/snap.svg-min.js"></script> <%--  Used by lorikeetPageProcessing.js --%>
 
 				<%-- 
 					The Struts Action for this page must call GetProteinNamesTooltipConfigData
@@ -58,7 +58,7 @@
 					/WEB-INF/jsp-includes/proteinNameTooltipDataForJSCode.jsp
 				  --%>
 <%--  Replaced with the JS bundle listed next
-			<script type="text/javascript" src="${ contextPath }/js/createTooltipForProteinNames.js?x=${cacheBustValue}"></script>
+			<script type="text/javascript" src="js/createTooltipForProteinNames.js?x=${cacheBustValue}"></script>
   --%>
   		
 		
@@ -69,40 +69,40 @@
 		
 <%--  Replaced with the JS bundle listed next
 			 
-		<script type="text/javascript" src="${ contextPath }/js/lorikeetPageProcessing.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/lorikeetPageProcessing.js?x=${cacheBustValue}"></script>
 
-		<script type="text/javascript" src="${ contextPath }/js/handleServicesAJAXErrors.js?x=${cacheBustValue}"></script> 
+		<script type="text/javascript" src="js/handleServicesAJAXErrors.js?x=${cacheBustValue}"></script> 
 		
-		<script type="text/javascript" src="${ contextPath }/js/toggleVisibility.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/toggleVisibility.js?x=${cacheBustValue}"></script>
 		
-			<script type="text/javascript" src="${ contextPath }/js/defaultPageView.js?x=${cacheBustValue}"></script>
+			<script type="text/javascript" src="js/defaultPageView.js?x=${cacheBustValue}"></script>
 		
-		<script type="text/javascript" src="${ contextPath }/js/psmPeptideCutoffsCommon.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="${ contextPath }/js/psmPeptideAnnDisplayDataCommon.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="${ contextPath }/js/minimumPSM_Count_Filter.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/psmPeptideCutoffsCommon.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/psmPeptideAnnDisplayDataCommon.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/minimumPSM_Count_Filter.js?x=${cacheBustValue}"></script>
 		
-		<script type="text/javascript" src="${ contextPath }/js/webserviceDataParamsDistribution.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="${ contextPath }/js/sharePageURLShortener.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/webserviceDataParamsDistribution.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/sharePageURLShortener.js?x=${cacheBustValue}"></script>
 
-		<script type="text/javascript" src="${ contextPath }/js/viewPsmPerPeptideLoadedFromWebServiceTemplate.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="${ contextPath }/js/viewPsmsLoadedFromWebServiceTemplate.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="${ contextPath }/js/viewSearchPeptide.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/viewPsmPerPeptideLoadedFromWebServiceTemplate.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/viewPsmsLoadedFromWebServiceTemplate.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="js/viewSearchPeptide.js?x=${cacheBustValue}"></script>
 --%>
 	
 		<%--  Bundle version of core page JS --%>
-		<script type="text/javascript" src="${ contextPath }/static/js_generated_bundles/data_pages/peptideView-bundle.js?x=${cacheBustValue}"></script>
+		<script type="text/javascript" src="static/js_generated_bundles/data_pages/peptideView-bundle.js?x=${cacheBustValue}"></script>
 	
 		
-		<link rel="stylesheet" href="${ contextPath }/css/tablesorter.css" type="text/css" media="print, projection, screen" />
-		<link type="text/css" rel="stylesheet" href="${ contextPath }/css/jquery.qtip.min.css" />
+		<link rel="stylesheet" href="css/tablesorter.css" type="text/css" media="print, projection, screen" />
+		<link type="text/css" rel="stylesheet" href="css/jquery.qtip.min.css" />
 
 
 		<%--  some classes in this stylesheet collide with some in the lorikeet file since they are set to specific values for lorikeet drag and drop --%>
 		<%-- 
-		<link REL="stylesheet" TYPE="text/css" HREF="${contextPath}/css/jquery-ui-1.10.2-Themes/ui-lightness/jquery-ui.min.css">
+		<link REL="stylesheet" TYPE="text/css" HREF="css/jquery-ui-1.10.2-Themes/ui-lightness/jquery-ui.min.css">
 		--%>
 
-		<link REL="stylesheet" TYPE="text/css" HREF="${contextPath}/css/lorikeet.css">
+		<link REL="stylesheet" TYPE="text/css" HREF="css/lorikeet.css">
 
 
 
@@ -142,12 +142,12 @@
 				
 				
 				[<a class="tool_tip_attached_jq" data-tooltip="View proteins" 
-					href="${ contextPath }/<proxl:defaultPageUrl pageName="/crosslinkProtein" projectSearchId="${ viewSearchPeptidesPageDataRoot.projectSearchId }"
+					href="<proxl:defaultPageUrl pageName="/crosslinkProtein" projectSearchId="${ viewSearchPeptidesPageDataRoot.projectSearchId }"
 							>crosslinkProtein.do?<bean:write name="queryString" /></proxl:defaultPageUrl>"
 					>Protein View</a>]
 					
 				[<a class="tool_tip_attached_jq" data-tooltip="View protein coverage report" 
-					href="${ contextPath }/<proxl:defaultPageUrl pageName="/proteinCoverageReport" projectSearchId="${ viewSearchPeptidesPageDataRoot.projectSearchId }"
+					href="<proxl:defaultPageUrl pageName="/proteinCoverageReport" projectSearchId="${ viewSearchPeptidesPageDataRoot.projectSearchId }"
 							>proteinCoverageReport.do?<bean:write name="queryString" /></proxl:defaultPageUrl>"
 													
 					>Coverage Report</a>]
@@ -293,10 +293,10 @@
 								
 							<span id="data-download-options">
 								Choose file format:
-								<a data-tooltip="Download peptide results as tab-delimited text." id="download-peptide-tld" class="download-option tool_tip_attached_jq" href="${ contextPath }/downloadMergedPeptides.do?<bean:write name="queryString" />" style="margin-top:5px;">Tab-delimited peptide data</a>
-								<a data-tooltip="Download all PSMs and associated statistics." id="download-peptide-psm" class="download-option tool_tip_attached_jq" href="${ contextPath }/downloadMergedPSMsForPeptides.do?<bean:write name="queryString" />">Tab-delimited PSM data</a>
-								<a data-tooltip="Download peptide list for Skyline PRM methods (Chavez et al)." id="download-peptide-skyline" class="download-option tool_tip_attached_jq" href="${ contextPath }/downloadMergedPeptidesForSkylinePRM.do?<bean:write name="queryString" />">Peptides for Skyline PRM methods (Chavez et al)</a>
-								<a data-tooltip="Download peptide list for Skyline Quantitation (Shulman et al)." id="download-peptide-shulman" class="download-option tool_tip_attached_jq" href="${ contextPath }/downloadMergedPeptidesForSkylineShulman.do?<bean:write name="queryString" />">Peptides for Skyline Quantitation (Shulman et al)</a>
+								<a data-tooltip="Download peptide results as tab-delimited text." id="download-peptide-tld" class="download-option tool_tip_attached_jq" href="downloadMergedPeptides.do?<bean:write name="queryString" />" style="margin-top:5px;">Tab-delimited peptide data</a>
+								<a data-tooltip="Download all PSMs and associated statistics." id="download-peptide-psm" class="download-option tool_tip_attached_jq" href="downloadMergedPSMsForPeptides.do?<bean:write name="queryString" />">Tab-delimited PSM data</a>
+								<a data-tooltip="Download peptide list for Skyline PRM methods (Chavez et al)." id="download-peptide-skyline" class="download-option tool_tip_attached_jq" href="downloadMergedPeptidesForSkylinePRM.do?<bean:write name="queryString" />">Peptides for Skyline PRM methods (Chavez et al)</a>
+								<a data-tooltip="Download peptide list for Skyline Quantitation (Shulman et al)." id="download-peptide-shulman" class="download-option tool_tip_attached_jq" href="downloadMergedPeptidesForSkylineShulman.do?<bean:write name="queryString" />">Peptides for Skyline Quantitation (Shulman et al)</a>
 							</span>
 						</span>
 			</div>
@@ -443,11 +443,11 @@
 
 										><bean:write name="peptideEntry" property="numPsms" 
 											/><span class="toggle_visibility_expansion_span_jq" 
-												><img src="${contextPath}/images/icon-expand-small.png" 
+												><img src="images/icon-expand-small.png" 
 													class=" icon-expand-contract-in-data-table "
 													></span><span class="toggle_visibility_contraction_span_jq" 
 														style="display: none;" 
-														><img src="${contextPath}/images/icon-collapse-small.png"
+														><img src="images/icon-collapse-small.png"
 															class=" icon-expand-contract-in-data-table "
 															></span>
 									</a>

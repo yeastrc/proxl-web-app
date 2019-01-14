@@ -23,33 +23,33 @@
  <c:set var="headerAdditions">
  
 
-		<link REL="stylesheet" TYPE="text/css" HREF="${ contextPath }/css/jquery-ui-1.10.2-Themes/base/jquery.ui.all.css">
+		<link REL="stylesheet" TYPE="text/css" HREF="css/jquery-ui-1.10.2-Themes/base/jquery.ui.all.css">
 
 
-		<script type="text/javascript" src="${ contextPath }/js/libs/jquery-ui-1.10.4.min.js"></script>
-		<script type="text/javascript" src="${ contextPath }/js/libs/base64.js"></script> 
-		<script type="text/javascript" src="${ contextPath }/js/libs/jquery.qtip.min.js"></script>
-		<script type="text/javascript" src="${ contextPath }/js/libs/spin.min.js"></script> 
+		<script type="text/javascript" src="js/libs/jquery-ui-1.10.4.min.js"></script>
+		<script type="text/javascript" src="js/libs/base64.js"></script> 
+		<script type="text/javascript" src="js/libs/jquery.qtip.min.js"></script>
+		<script type="text/javascript" src="js/libs/spin.min.js"></script> 
 		
 
 
 		<!-- Handlebars templating library   -->
 		
 		<%--  
-		<script type="text/javascript" src="${ contextPath }/js/libs/handlebars-v2.0.0.js"></script>
+		<script type="text/javascript" src="js/libs/handlebars-v2.0.0.js"></script>
 		--%>
 		
 		<!-- use minimized version  -->
-		<script type="text/javascript" src="${ contextPath }/js/libs/handlebars-v2.0.0.min.js"></script>
+		<script type="text/javascript" src="js/libs/handlebars-v2.0.0.min.js"></script>
 		
 			
 <%--  Moved to Front End Build Bundles
 		
-		<script type="text/javascript" src="${ contextPath }/js/viewProjectPage.js?x=${cacheBustValue}"></script> 
+		<script type="text/javascript" src="js/viewProjectPage.js?x=${cacheBustValue}"></script> 
 
-		<script type="text/javascript" src="${ contextPath }/js/handleServicesAJAXErrors.js?x=${cacheBustValue}"></script> 
+		<script type="text/javascript" src="js/handleServicesAJAXErrors.js?x=${cacheBustValue}"></script> 
 		
-		<script type="text/javascript" src="${ contextPath }/js/spinner.js"></script>
+		<script type="text/javascript" src="js/spinner.js"></script>
 				
  --%>
  
@@ -80,7 +80,7 @@
 </c:choose>
  
  		
-		<link type="text/css" rel="stylesheet" href="${ contextPath }/css/jquery.qtip.min.css" />
+		<link type="text/css" rel="stylesheet" href="css/jquery.qtip.min.css" />
 		
 		
 		<%--  Project Admin Javascript is added at the bottom of the page --%>
@@ -110,9 +110,9 @@
 			
 				<div  class="collapsable-link-container top-level-collapsable-link-container collapsable_link_container_jq" style="">
 					<a href="javascript:" class="top-level-collapsable-link collapsable_collapse_link_jq"
-						><img  src="${ contextPath }/images/icon-collapse.png"></a>
+						><img  src="images/icon-collapse.png"></a>
 					<a href="javascript:" class="top-level-collapsable-link collapsable_expand_link_jq" style="display: none;"
-						><img  src="${ contextPath }/images/icon-expand.png"></a>
+						><img  src="images/icon-expand.png"></a>
 				
 				</div>
 	
@@ -138,10 +138,10 @@
 				    </c:choose>
 				  
 				  	<a href="javascript:unlockProject(this)" id="project_locked_link" class="" style="${ project_locked_link_display_control }" 
-						><img  src="${ contextPath }/images/icon-locked.png"></a>
+						><img  src="images/icon-locked.png"></a>
 
 				  	<a href="javascript:lockProject(this)" id="project_unlocked_link" class="" style="${ project_unlocked_link_display_control }" 
-						><img  src="${ contextPath }/images/icon-unlocked.png"></a>
+						><img  src="images/icon-unlocked.png"></a>
 
 
 					<script type="text/javascript">
@@ -176,7 +176,7 @@
 				   
 				    <c:choose>
 				     <c:when test="${ project.projectLocked }">
-					  	<img id="project_locked_image" src="${ contextPath }/images/icon-locked.png">
+					  	<img id="project_locked_image" src="images/icon-locked.png">
 					  	
 
 						<script type="text/javascript">
@@ -223,7 +223,7 @@
 						
 						<c:if test="${authAccessLevel.assistantProjectOwnerAllowed}" >
 							<input class="tool_tip_attached_jq" data-tooltip="Edit project title" 
-								id="maint_title_init_button" type="image" src="${ contextPath }/images/icon-edit-small.png"  
+								id="maint_title_init_button" type="image" src="images/icon-edit-small.png"  
 								value="Update">
 						</c:if>
 					</div>
@@ -254,7 +254,7 @@
 						<span id="abstract_span" ><c:out value="${project.abstractText}" ></c:out></span>
 						
 						<c:if test="${authAccessLevel.assistantProjectOwnerAllowed}" >
-							<input class="tool_tip_attached_jq" data-tooltip="Edit project abstract" id="maint_abstract_init_button" type="image" src="${ contextPath }/images/icon-edit-small.png"  value="Update">
+							<input class="tool_tip_attached_jq" data-tooltip="Edit project abstract" id="maint_abstract_init_button" type="image" src="images/icon-edit-small.png"  value="Update">
 						</c:if>
 					</div>
 					<div  id="maint_abstract_div" class="second-level-text project-info-text" style="display: none; position: relative;">
@@ -355,8 +355,8 @@
 									<span class="notes_text_jq" >{{noteText}}</span>
 									
 								  <c:if test="${authAccessLevel.assistantProjectOwnerAllowed}" >
-									<input class="notes_update_button_jq tool_tip_attached_jq" data-tooltip="Edit note" type="image" src="${ contextPath }/images/icon-edit-small.png"   value="Update">
-									<input class="notes_remove_button_jq tool_tip_attached_jq" data-tooltip="Remove note" type="image" src="${ contextPath }/images/icon-delete-small.png"  value="Remove">
+									<input class="notes_update_button_jq tool_tip_attached_jq" data-tooltip="Edit note" type="image" src="images/icon-edit-small.png"   value="Update">
+									<input class="notes_remove_button_jq tool_tip_attached_jq" data-tooltip="Remove note" type="image" src="images/icon-delete-small.png"  value="Remove">
 								  </c:if>
 								</div>
 								<div  class="note_maint_container_div_jq" style=" display: none; position: relative;">
@@ -393,8 +393,8 @@
 									<span class="notes_text_jq" ><c:out value="${ note.noteText }" ></c:out></span>
 									
 								  <c:if test="${authAccessLevel.assistantProjectOwnerAllowed}" >
-									<input class="tool_tip_attached_jq notes_update_button_jq" data-tooltip="Edit note" type="image" src="${ contextPath }/images/icon-edit-small.png" value="Update">
-									<input class="tool_tip_attached_jq notes_remove_button_jq" data-tooltip="Remove note" type="image" src="${ contextPath }/images/icon-delete-small.png" value="Remove">
+									<input class="tool_tip_attached_jq notes_update_button_jq" data-tooltip="Edit note" type="image" src="images/icon-edit-small.png" value="Update">
+									<input class="tool_tip_attached_jq notes_remove_button_jq" data-tooltip="Remove note" type="image" src="images/icon-delete-small.png" value="Remove">
 								  </c:if>
 								</div>
 
@@ -487,9 +487,9 @@
 			
 				<div  class="collapsable-link-container top-level-collapsable-link-container " style="">
 					<a href="javascript:" id="researchers_in_project_block_hide" class="top-level-collapsable-link " style="display: none;"
-						><img  src="${ contextPath }/images/icon-collapse.png"></a>
+						><img  src="images/icon-collapse.png"></a>
 					<a href="javascript:"  id="researchers_in_project_block_show" class="top-level-collapsable-link " 
-						><img  src="${ contextPath }/images/icon-expand.png"></a>
+						><img  src="images/icon-expand.png"></a>
 				
 				</div>
 			
@@ -515,7 +515,7 @@
 						 
 						 <div class="invite-user-expand-icon-container" >
 						  <a href="javascript:" data-tooltip="Invite new or existing user to project" class="tool_tip_attached_jq second-level-label overide-text-color-to-base-color invite_user_expand_link_jq">
-							<img src="${ contextPath }/images/icon-add-user.png">
+							<img src="images/icon-add-user.png">
 						  </a>
 						 </div>
 						 <div >
@@ -534,7 +534,7 @@
 						   <td nowrap>
 						  	<div class="researchers-icon">
 						  	  <a href="javascript:" title="Close Invite User" class="invite_user_cancel_button_jq">
-								<img src="${ contextPath }/images/icon-circle-x.png">
+								<img src="images/icon-circle-x.png">
 							  </a>
 								
 							</div>
@@ -660,7 +660,7 @@
 
 							<span id="invite_user_auto_complete_display" style="display: none;">
 						  	  <a href="javascript:" title="Clear chosen Last Name or Email Address" id="close_invite_user_auto_complete_display">
-								<img src="${ contextPath }/images/icon-delete-small.png">
+								<img src="images/icon-delete-small.png">
 							  </a>
 							  <span id="invite_user_auto_complete_value"></span>
 							</span>
@@ -833,7 +833,7 @@
 		
 			  <tr class="invited_person_entry_root_div_jq update_remove_access_div_jq" inviteId="{{inviteId}}" >
 			   <td nowrap  style="padding-right: 5px;">
-				<input type="image" src="${ contextPath }/images/icon-circle-x.png" data-tooltip="Revoke invitation" class="tool_tip_attached_jq invited_person_entry_access_level_remove_button_jq"/>
+				<input type="image" src="images/icon-circle-x.png" data-tooltip="Revoke invitation" class="tool_tip_attached_jq invited_person_entry_access_level_remove_button_jq"/>
 			   </td>
 			   <td nowrap>
 			   	 <span class="invited_person_entry_email_address_jq" >{{invitedUserEmail}}</span>
@@ -844,12 +844,12 @@
 				 	<!-- One of these spans will be shown  -->
 					<span class="access_level_owner_jq" style="display: none;">
 						<c:if test="${authAccessLevel.projectOwnerAllowed}" >
-							<input type="image" src="${ contextPath }/images/icon-arrow-down.png" 
+							<input type="image" src="images/icon-arrow-down.png" 
 								class="tool_tip_attached_jq invited_person_entry_access_level_update_button_jq" data-tooltip="Demote to researcher" inviteId="{{inviteId}}"  />
 						</c:if>
 					</span>		
 					<span class="access_level_researcher_jq" style="display: none;">
-						<input type="image" src="${ contextPath }/images/icon-arrow-up.png" 
+						<input type="image" src="images/icon-arrow-up.png" 
 							class="tool_tip_attached_jq invited_person_entry_access_level_update_button_jq" data-tooltip="Promote to owner" inviteId="{{inviteId}}"  />
 					</span>
 				 </td>
@@ -903,7 +903,7 @@
 				
 				<c:if test="${authAccessLevel.assistantProjectOwnerAllowed }" >
 				 <td nowrap  style="padding-right: 5px;">
-				 	<input type="image" src="${ contextPath }/images/icon-circle-x.png" data-tooltip="Remove from project" class="tool_tip_attached_jq current_user_entry_access_level_remove_button_jq"  
+				 	<input type="image" src="images/icon-circle-x.png" data-tooltip="Remove from project" class="tool_tip_attached_jq current_user_entry_access_level_remove_button_jq"  
 				 		title="Remove from project" userId="{{userId}}" />
 				 </td>
 				</c:if>
@@ -916,12 +916,12 @@
 				 	<!-- One of these spans will be shown  -->
 					<span class="access_level_owner_jq" style="display: none;">
 						<c:if test="${authAccessLevel.projectOwnerAllowed}" >
-							<input type="image" src="${ contextPath }/images/icon-arrow-down.png" 
+							<input type="image" src="images/icon-arrow-down.png" 
 								class="tool_tip_attached_jq current_user_entry_access_level_update_button_jq" data-tooltip="Demote to researcher" userId="{{userId}}"  />
 						</c:if>
 					</span>		
 					<span class="access_level_researcher_jq" style="display: none;">
-						<input type="image" src="${ contextPath }/images/icon-arrow-up.png" 
+						<input type="image" src="images/icon-arrow-up.png" 
 							class="tool_tip_attached_jq current_user_entry_access_level_update_button_jq" data-tooltip="Promote to owner" userId="{{userId}}"  />
 					</span>
 				 </td>
@@ -958,9 +958,9 @@
 			
 				<div  class="collapsable-link-container top-level-collapsable-link-container collapsable_link_container_jq" style="">
 					<a href="javascript:" id="public_access_collapse_link_jq" class="top-level-collapsable-link " style="display: none;" <%-- collapsable_collapse_link_jq --%>
-						><img  src="${ contextPath }/images/icon-collapse.png"></a>
+						><img  src="images/icon-collapse.png"></a>
 					<a href="javascript:" id="public_access_expand_link_jq" class="top-level-collapsable-link " <%-- collapsable_expand_link_jq --%>
-						><img  src="${ contextPath }/images/icon-expand.png"></a>
+						><img  src="images/icon-expand.png"></a>
 				
 				</div>
 			
@@ -1196,10 +1196,10 @@
 				<div  class="collapsable-link-container top-level-collapsable-link-container " style="">
 					<a href="javascript:" class="top-level-collapsable-link " style="display: none;"
 						id="upload_data_collapse_hide_data"
-						><img  src="${ contextPath }/images/icon-collapse.png"></a>
+						><img  src="images/icon-collapse.png"></a>
 					<a href="javascript:" class="top-level-collapsable-link " 
 						id="upload_data_expand_show_data"
-						><img  src="${ contextPath }/images/icon-expand.png"></a>
+						><img  src="images/icon-expand.png"></a>
 				
 				</div>
 					
@@ -1248,7 +1248,7 @@
 							class="tool_tip_attached_jq " 
 							data-tooltip="Show pending" 
 							style="display: none;" 
-							><img src="${ contextPath }/images/icon-expand-small.png"
+							><img src="images/icon-expand-small.png"
 								style="cursor: pointer;"
 							></a>
 
@@ -1256,7 +1256,7 @@
 							class="tool_tip_attached_jq " 
 							data-tooltip="Hide pending" 
 							style="" 
-							><img src="${ contextPath }/images/icon-collapse-small.png"
+							><img src="images/icon-collapse-small.png"
 								style="cursor: pointer;"
 							></a>
 														
@@ -1301,7 +1301,7 @@
 						<a  id="upload_data_history_items_show_link"
 							class="tool_tip_attached_jq " 
 							data-tooltip="Show history" 
-							><img src="${ contextPath }/images/icon-expand-small.png"
+							><img src="images/icon-expand-small.png"
 								style="cursor: pointer;"
 							></a>
 
@@ -1309,7 +1309,7 @@
 							class="tool_tip_attached_jq " 
 							data-tooltip="Hide history" 
 							style="display: none;" 
-							><img src="${ contextPath }/images/icon-collapse-small.png"
+							><img src="images/icon-collapse-small.png"
 								style="cursor: pointer;"
 							></a>
 								
@@ -1469,9 +1469,9 @@
 			
 				<div  class="collapsable-link-container top-level-collapsable-link-container collapsable_link_container_jq" style="">
 					<a href="javascript:" class="top-level-collapsable-link collapsable_collapse_link_jq"
-						><img  src="${ contextPath }/images/icon-collapse.png"></a>
+						><img  src="images/icon-collapse.png"></a>
 					<a href="javascript:" class="top-level-collapsable-link collapsable_expand_link_jq" style="display: none;"
-						><img  src="${ contextPath }/images/icon-expand.png"></a>
+						><img  src="images/icon-expand.png"></a>
 				
 				</div>
 					
@@ -1872,11 +1872,11 @@
 									class=" folder_hide_contents_link_jq collapsable_collapse_link_jq tool_tip_attached_jq " 
 									style="display: none;"
 									data-tooltip="Close folder"
-									><img  src="${ contextPath }/images/icon-folder-click-to-close.png"></a>
+									><img  src="images/icon-folder-click-to-close.png"></a>
 								<a href="javascript:" 
 									class=" folder_show_contents_link_jq collapsable_expand_link_jq tool_tip_attached_jq "
 									data-tooltip="Open folder"
-									><img  src="${ contextPath }/images/icon-folder-click-to-open.png"></a>
+									><img  src="images/icon-folder-click-to-open.png"></a>
 	
 							</div>
 				
@@ -1887,10 +1887,10 @@
 								<c:if test="${ authAccessLevel.projectOwnerAllowed }" >
 									<a href="javascript:" class="folder_rename_button_jq tool_tip_attached_jq" 
 										data-tooltip="Edit name of folder"
-										><img  src="${ contextPath }/images/icon-edit-small.png"></a>
+										><img  src="images/icon-edit-small.png"></a>
 									<a href="javascript:" class="folder_delete_button_jq tool_tip_attached_jq" 
 										data-tooltip="Delete folder.  Searches in it become 'Unfiled'."
-										><img  src="${ contextPath }/images/icon-delete-small.png"></a>
+										><img  src="images/icon-delete-small.png"></a>
 								</c:if>
 							</div>
 
@@ -2026,13 +2026,13 @@
 			<%@ include file="/WEB-INF/jsp-includes/proxl_XML_Upload_Overlay.jsp" %>
 
 			<%--  Moved to Front End Build Bundles	
-			<script type="text/javascript" src="${ contextPath }/js/proxlXMLFileImport.js?x=${cacheBustValue}"></script>
+			<script type="text/javascript" src="js/proxlXMLFileImport.js?x=${cacheBustValue}"></script>
 			--%>
 		
 			<%--  Separate JS for Project owner to cancel queued or remove failed import tracking item --%>
 		
 			<%--  Moved to Front End Build Bundles	
-			<script type="text/javascript" src="${ contextPath }/js/proxlXMLFileImportUserUpdates.js?x=${cacheBustValue}"></script>
+			<script type="text/javascript" src="js/proxlXMLFileImportUserUpdates.js?x=${cacheBustValue}"></script>
 			--%>
 		  </c:if>
 		  
@@ -2095,7 +2095,7 @@
 			 <!-- END:   Modal dialog for notifying user that the status has changed on one of the Proxl XML Import items -->
 			
 			<%--  Moved to Front End Build Bundles	
-			<script type="text/javascript" src="${ contextPath }/js/proxlXMLFileImportStatusDisplay.js?x=${cacheBustValue}"></script>
+			<script type="text/javascript" src="js/proxlXMLFileImportStatusDisplay.js?x=${cacheBustValue}"></script>
 			--%>
 		
 									
@@ -2108,25 +2108,25 @@
 		<%--  If Not locked and user allowed to change search data, include the Javascript for it --%>
 		<%--  Moved to Front End Build Bundles	
 		<c:if test="${authAccessLevel.assistantProjectOwnerAllowed }" >
-			<script type="text/javascript" src="${ contextPath }/js/viewProject_SearchMaint.js?x=${cacheBustValue}"></script>
+			<script type="text/javascript" src="js/viewProject_SearchMaint.js?x=${cacheBustValue}"></script>
 		</c:if> 
 		--%>
 		<%--  If admin section rendered, include the Javascript for it --%>
 		<%--  Moved to Front End Build Bundles	
 		<c:if test="${authAccessLevel.assistantProjectOwnerAllowed or authAccessLevel.assistantProjectOwnerIfProjectNotLockedAllowed}" >
-			<script type="text/javascript" src="${ contextPath }/js/viewProject_ProjectAdminSection.js?x=${cacheBustValue}"></script>
+			<script type="text/javascript" src="js/viewProject_ProjectAdminSection.js?x=${cacheBustValue}"></script>
 		</c:if> 
 		--%>
 		<%--  If project owner, include the Javascript for Project Search Order admin --%>
 		<%--  Moved to Front End Build Bundles	
 		<c:if test="${ authAccessLevel.projectOwnerAllowed }" >
-			<script type="text/javascript" src="${ contextPath }/js/viewProject_OrganizeSearchesAndFoldersAdmin.js?x=${cacheBustValue}"></script>
+			<script type="text/javascript" src="js/viewProject_OrganizeSearchesAndFoldersAdmin.js?x=${cacheBustValue}"></script>
 		</c:if>		
 		--%>
 		<%--  If project owner, include the Javascript for Project Lock admin --%>
 		<%--  Moved to Front End Build Bundles	
 		<c:if test="${authAccessLevel.projectOwnerAllowed or authAccessLevel.projectOwnerIfProjectNotLockedAllowed}" >
-			<script type="text/javascript" src="${ contextPath }/js/viewProject_ProjectLockAdmin.js?x=${cacheBustValue}"></script>
+			<script type="text/javascript" src="js/viewProject_ProjectLockAdmin.js?x=${cacheBustValue}"></script>
 		</c:if>
 		--%>
 	

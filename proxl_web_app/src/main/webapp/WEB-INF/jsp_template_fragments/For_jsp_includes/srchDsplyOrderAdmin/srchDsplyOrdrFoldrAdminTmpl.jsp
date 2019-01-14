@@ -28,7 +28,7 @@ Containing element: <script id="organize_searches_single_folder_template"  type=
 		<span class=" sort_handle_jq  tool_tip_attached_jq" 
 			data-tooltip='<div>Drag to re-order</div>'
 			style=""
-		  ><img src="${ contextPath }/images/icon-draggable-small.png" class="folder-row-icon"
+		  ><img src="images/icon-draggable-small.png" class="folder-row-icon"
 		  ></span>
 	 </div >
      <div class="item-display-name folder_display_name_jq folder_name_jq " 
@@ -36,10 +36,10 @@ Containing element: <script id="organize_searches_single_folder_template"  type=
      <div class="edit-delete-icons">
 		<a href="javascript:" class="folder_rename_button_jq tool_tip_attached_jq" 
 			data-tooltip="Edit name of folder"
-			><img  src="${ contextPath }/images/icon-edit-small.png" class="folder-row-icon"></a>
+			><img  src="images/icon-edit-small.png" class="folder-row-icon"></a>
 		<a href="javascript:" class="folder_delete_button_jq tool_tip_attached_jq" 
 			data-tooltip="Delete folder.  Searches in it will become 'Unfiled'."
-			><img  src="${ contextPath }/images/icon-delete-small.png" class="folder-row-icon"></a>
+			><img  src="images/icon-delete-small.png" class="folder-row-icon"></a>
 	 </div> 
      <div style="clear: both;"></div>
   </div>
@@ -52,7 +52,7 @@ Containing element: <script id="organize_searches_single_folder_template"  type=
 		<span class=" sort_handle_jq  tool_tip_attached_jq" 
 			data-tooltip='<div>Drag to re-order</div>'
 			style=""
-		  ><img src="${ contextPath }/images/icon-draggable-small.png" class="folder-row-icon"
+		  ><img src="images/icon-draggable-small.png" class="folder-row-icon"
 		  ></span>
 	 </div >
      <div class="item-display-name folder_display_name_jq folder_name_jq " 
@@ -60,10 +60,10 @@ Containing element: <script id="organize_searches_single_folder_template"  type=
      <div class="edit-delete-icons-float">
 		<a href="javascript:" class="folder_rename_button_jq tool_tip_attached_jq" 
 			data-tooltip="Edit name of folder"
-			><img  src="${ contextPath }/images/icon-edit-small.png" class="folder-row-icon"></a>
+			><img  src="images/icon-edit-small.png" class="folder-row-icon"></a>
 		<a href="javascript:" class="folder_delete_button_jq tool_tip_attached_jq" 
 			data-tooltip="Delete folder"
-			><img  src="${ contextPath }/images/icon-delete-small.png" class="folder-row-icon"></a>
+			><img  src="images/icon-delete-small.png" class="folder-row-icon"></a>
 	 </div> 
      <div style="clear: both;"></div>
 --%>

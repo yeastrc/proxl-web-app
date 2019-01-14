@@ -33,6 +33,12 @@
 
 
 //  Import to make available on the page
+
+
+//Import header_main.js and children to ensure on the page
+import { header_mainVariable } from 'page_js/common_all_pages/header_section_main_pages/header_main.js';
+
+
 import { searchesChangeDisplayOrder } from 'page_js/data_pages/project_search_ids_driven_pages/common/searchesChangeDisplayOrder.js';
 import { searchesForPageChooser } from 'page_js/data_pages/project_search_ids_driven_pages/common/searchesForPageChooser.js';
 import { sharePageURLShortener  } from 'page_js/data_pages/project_search_ids_driven_pages/common/sharePageURLShortener.js';
@@ -1194,7 +1200,7 @@ var ImagePagePrimaryRootCodeClass = function() {
 	 */
 	function loadSequenceCoverageDataForProtein( selProteinsForSeqCov, doDraw ) {
 		incrementSpinner();				// create spinner
-		var url = contextPathJSVar + "/services/sequenceCoverage/getDataForProtein";
+		var url = "services/sequenceCoverage/getDataForProtein";
 		url += buildQueryStringFromHash();
 		var urlAdditionproteinSequenceVersionIds = "";
 		for ( var index = 0; index < selProteinsForSeqCov.length; index++ ) {
@@ -1243,7 +1249,7 @@ var ImagePagePrimaryRootCodeClass = function() {
 	function loadProteinSequenceDataForProtein( proteinIdsToGetSequence, doDraw ) {
 		console.log( "Loading protein sequence data for proteins: " + proteinIdsToGetSequence );
 		incrementSpinner();				// create spinner
-		var url = contextPathJSVar + "/services/proteinSequence/getDataForProtein";
+		var url = "services/proteinSequence/getDataForProtein";
 		var project_id = $("#project_id").val();
 		if ( project_id === undefined || project_id === null 
 				|| project_id === "" ) {
@@ -1295,7 +1301,7 @@ var ImagePagePrimaryRootCodeClass = function() {
 	function loadProteinTaxonomyIdDataForProtein( proteinIds, doDraw ) {
 		console.log( "Loading protein taxonomy id data for proteins: " + proteinIds );
 		incrementSpinner();				// create spinner
-		var url = contextPathJSVar + "/services/proteinTaxonomyId/getDataForProtein";
+		var url = "services/proteinTaxonomyId/getDataForProtein";
 		var ajaxRequestData = {
 				projectSearchIds : _projectSearchIds,
 				proteinIds: proteinIds
@@ -1348,7 +1354,7 @@ var ImagePagePrimaryRootCodeClass = function() {
 				reportLinkDataLoadComplete( 'monolinks', doDraw );
 			} else {
 				incrementSpinner();				// create spinner
-				var url = contextPathJSVar + "/services/imageViewer/getMonolinkData";
+				var url = "services/imageViewer/getMonolinkData";
 				url += buildQueryStringFromHash();
 				// var request = 
 				$.ajax({
@@ -1390,7 +1396,7 @@ var ImagePagePrimaryRootCodeClass = function() {
 				reportLinkDataLoadComplete( 'monolinkPSMs', doDraw );
 			} else {
 				incrementSpinner();				// create spinner
-				var url = contextPathJSVar + "/services/imageViewer/getMonolinkPSMCounts";
+				var url = "services/imageViewer/getMonolinkPSMCounts";
 				url += buildQueryStringFromHash();
 				// var request = 
 				$.ajax({
@@ -1432,7 +1438,7 @@ var ImagePagePrimaryRootCodeClass = function() {
 				reportLinkDataLoadComplete( 'looplinks', doDraw );
 			} else {
 				incrementSpinner();				// create spinner
-				var url = contextPathJSVar + "/services/imageViewer/getLooplinkData";
+				var url = "services/imageViewer/getLooplinkData";
 				url += buildQueryStringFromHash();
 				// var request = 
 				$.ajax({
@@ -1474,7 +1480,7 @@ var ImagePagePrimaryRootCodeClass = function() {
 				reportLinkDataLoadComplete( 'looplinkPSMs', doDraw );
 			} else {
 				incrementSpinner();				// create spinner
-				var url = contextPathJSVar + "/services/imageViewer/getLooplinkPSMCounts";
+				var url = "services/imageViewer/getLooplinkPSMCounts";
 				url += buildQueryStringFromHash();
 				// var request = 
 				$.ajax({
@@ -1516,7 +1522,7 @@ var ImagePagePrimaryRootCodeClass = function() {
 				reportLinkDataLoadComplete( 'crosslinks', doDraw );
 			} else {
 				incrementSpinner();				// create spinner
-				var url = contextPathJSVar + "/services/imageViewer/getCrosslinkData";
+				var url = "services/imageViewer/getCrosslinkData";
 				url += buildQueryStringFromHash();
 				$.ajax({
 						type: "GET",
@@ -1557,7 +1563,7 @@ var ImagePagePrimaryRootCodeClass = function() {
 				reportLinkDataLoadComplete( 'crosslinkPSMs', doDraw );
 			} else {
 				incrementSpinner();				// create spinner
-				var url = contextPathJSVar + "/services/imageViewer/getCrosslinkPSMCounts";
+				var url = "services/imageViewer/getCrosslinkPSMCounts";
 				url += buildQueryStringFromHash();
 				// var request = 
 				$.ajax({
@@ -1872,7 +1878,7 @@ var ImagePagePrimaryRootCodeClass = function() {
 	function loadDataFromService() {
 		console.log( "Loading protein data." );
 		incrementSpinner();				// create spinner
-		var url = contextPathJSVar + "/services/imageViewer/getProteinData";
+		var url = "services/imageViewer/getProteinData";
 		url += buildQueryStringFromHash();
 		$.ajax({
 				type: "GET",
@@ -2269,7 +2275,7 @@ var ImagePagePrimaryRootCodeClass = function() {
 		var qc_page_link_tooltip = $("#qc_page_link_tooltip").html();
 		
 		var qcNavHTML = "<span class=\"tool_tip_attached_jq\" data-tooltip=\"" + qc_page_link_tooltip + "\" " +
-		"style=\"white-space:nowrap;\" >[<a href=\"" + contextPathJSVar + "/";
+		"style=\"white-space:nowrap;\" >[<a href=\"";
 
 		var qcQueryString = "?";
 		for ( var j = 0; j < _projectSearchIds.length; j++ ) {
@@ -2295,13 +2301,13 @@ var ImagePagePrimaryRootCodeClass = function() {
 		html += qcNavHTML;
 		
 		if ( _searches.length > 1 ) {
-			html += " <span class=\"tool_tip_attached_jq\" data-tooltip=\"View peptides\" style=\"white-space:nowrap;\" >[<a href=\"" + contextPathJSVar + "/mergedPeptide.do" + queryString + "\">Peptide View</a>]</span>";
-			html += " <span class=\"tool_tip_attached_jq\" data-tooltip=\"View proteins\" style=\"white-space:nowrap;\" >[<a href=\"" + contextPathJSVar + "/mergedCrosslinkProtein.do" + queryString + "\">Protein View</a>]</span>";
-			html += " <span class=\"tool_tip_attached_jq\" data-tooltip=\"View protein coverage report\" style=\"white-space:nowrap;\" >[<a href=\"" + contextPathJSVar + "/mergedProteinCoverageReport.do" + queryString + "\">Coverage Report</a>]</span>";
+			html += " <span class=\"tool_tip_attached_jq\" data-tooltip=\"View peptides\" style=\"white-space:nowrap;\" >[<a href=\"mergedPeptide.do" + queryString + "\">Peptide View</a>]</span>";
+			html += " <span class=\"tool_tip_attached_jq\" data-tooltip=\"View proteins\" style=\"white-space:nowrap;\" >[<a href=\"mergedCrosslinkProtein.do" + queryString + "\">Protein View</a>]</span>";
+			html += " <span class=\"tool_tip_attached_jq\" data-tooltip=\"View protein coverage report\" style=\"white-space:nowrap;\" >[<a href=\"mergedProteinCoverageReport.do" + queryString + "\">Coverage Report</a>]</span>";
 		} else {
 			
 			//  Add Peptide Link
-			html += " [<a class=\"tool_tip_attached_jq\" data-tooltip=\"View peptides\" href='" + contextPathJSVar + "/";
+			html += " [<a class=\"tool_tip_attached_jq\" data-tooltip=\"View peptides\" href='";
 			var viewSearchPeptideDefaultPageUrl = $("#viewSearchPeptideDefaultPageUrl").val();
 			if ( viewSearchPeptideDefaultPageUrl === undefined || viewSearchPeptideDefaultPageUrl === "" ) {
 				html += "peptide.do" + queryString;
@@ -2310,7 +2316,7 @@ var ImagePagePrimaryRootCodeClass = function() {
 			}
 			html += "'>Peptide View</a>]";
 			//  Add Protein View Link
-			html += " [<a class=\"tool_tip_attached_jq\" data-tooltip=\"View proteins\" href='" + contextPathJSVar + "/";
+			html += " [<a class=\"tool_tip_attached_jq\" data-tooltip=\"View proteins\" href='";
 			var viewSearchCrosslinkProteinDefaultPageUrl = $("#viewSearchCrosslinkProteinDefaultPageUrl").val();
 			if ( viewSearchCrosslinkProteinDefaultPageUrl === undefined || viewSearchCrosslinkProteinDefaultPageUrl === "" ) {
 				html += "crosslinkProtein.do" + queryString;
@@ -2319,7 +2325,7 @@ var ImagePagePrimaryRootCodeClass = function() {
 			}
 			html += "'>Protein View</a>]";
 			//  Add Coverage Report Link
-			html += " [<a class=\"tool_tip_attached_jq\" data-tooltip=\"View protein coverage report\" href='" + contextPathJSVar + "/";
+			html += " [<a class=\"tool_tip_attached_jq\" data-tooltip=\"View protein coverage report\" href='";
 			var viewProteinCoverageReportDefaultPageUrl = $("#viewProteinCoverageReportDefaultPageUrl").val();
 			if ( viewProteinCoverageReportDefaultPageUrl === undefined || viewProteinCoverageReportDefaultPageUrl === "" ) {
 				html += "proteinCoverageReport.do" + queryString;
@@ -2335,7 +2341,7 @@ var ImagePagePrimaryRootCodeClass = function() {
 		var $structure_viewer_link_span = $("#structure_viewer_link_span");
 		if ( $structure_viewer_link_span.length > 0 ) {
 			var structureNavHTML = "<span class=\"tool_tip_attached_jq\" data-tooltip=\"View data on 3D structures\" " +
-				"style=\"white-space:nowrap;\" >[<a href=\"" + contextPathJSVar + "/";
+				"style=\"white-space:nowrap;\" >[<a href=\"";
 			var viewMergedStructureDefaultPageUrl = $("#viewMergedStructureDefaultPageUrl").val();
 			if ( viewMergedStructureDefaultPageUrl === undefined || viewMergedStructureDefaultPageUrl === "" ) {
 				var structureQueryString = "?";
@@ -6191,7 +6197,7 @@ var ImagePagePrimaryRootCodeClass = function() {
 		var form = document.createElement( "form" );
 		$( form ).hide();
 		form.setAttribute( "method", "post" );
-		form.setAttribute( "action", contextPathJSVar + "/convertAndDownloadSVG.do" );
+		form.setAttribute( "action", "convertAndDownloadSVG.do" );
 		//form.setAttribute( "target", "_blank" );
 		var svgStringField = document.createElement( "input" );
 		svgStringField.setAttribute("name", "svgString");

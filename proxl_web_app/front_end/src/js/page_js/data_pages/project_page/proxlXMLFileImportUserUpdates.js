@@ -288,7 +288,7 @@ ProxlXMLFileImportUserUpdates.prototype.cancelQueuedItemConfirmedClicked  = func
 	var requestData = { tracking_id : tracking_id, status_id : status_id };
 
 
-	var _URL = contextPathJSVar + "/services/file_import_proxl_xml_scans/cancelQueuedImport";
+	var _URL = "services/file_import_proxl_xml_scans/cancelQueuedImport";
 
 	$.ajax({
 		type: "POST",
@@ -408,7 +408,7 @@ ProxlXMLFileImportUserUpdates.prototype.removeFailedItemConfirmedClicked  = func
 	var requestData = { tracking_id : tracking_id };
 
 
-	var _URL = contextPathJSVar + "/services/file_import_proxl_xml_scans/removeFailedImport";
+	var _URL = "services/file_import_proxl_xml_scans/removeFailedImport";
 
 	$.ajax({
 		type: "POST",
@@ -524,7 +524,7 @@ ProxlXMLFileImportUserUpdates.prototype.removeCompletedItemConfirmedClicked  = f
 	var requestData = { tracking_id : tracking_id };
 
 
-	var _URL = contextPathJSVar + "/services/file_import_proxl_xml_scans/removeCompletedImport";
+	var _URL = "services/file_import_proxl_xml_scans/removeCompletedImport";
 
 	$.ajax({
 		type: "POST",

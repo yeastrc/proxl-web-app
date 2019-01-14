@@ -127,7 +127,7 @@
 		 <tr>
 		  <td class="column-1">
 		  	<%--  Remove Icon --%>
-			<input type="image" src="${ contextPath }/images/icon-circle-x.png" 
+			<input type="image" src="images/icon-circle-x.png" 
 				data-tooltip="Remove File" 
 				id="import_proxl_xml_remove_proxl_xml_file_button"
 				class="tool_tip_attached_jq "/>

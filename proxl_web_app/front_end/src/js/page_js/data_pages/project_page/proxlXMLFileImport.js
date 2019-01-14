@@ -1249,7 +1249,7 @@ ProxlXMLFileImport.prototype.openOverlay  = function( clickThis, eventObject ) {
 	var $project_id = $("#project_id");
 	var projectId = $project_id.val();
 
-	var _URL = contextPathJSVar + "/services/file_import_proxl_xml_scans/uploadInit";
+	var _URL = "services/file_import_proxl_xml_scans/uploadInit";
 
 	var requestData = { project_id : projectId };
 
@@ -1755,7 +1755,7 @@ ProxlXMLFileImport.prototype.uploadFile  = function ( params ) {
 
 	var filenameURIEncoded = encodeURIComponent( filename );
 
-	var postURL = contextPathJSVar + "/uploadProxlXmlOrScanFileForImport.do?"
+	var postURL = "uploadProxlXmlOrScanFileForImport.do?"
 	+ "upload_key=" +  uploadKey
 	+ "&project_id=" + projectId
 	+ "&file_index=" + fileIndex
@@ -1944,7 +1944,7 @@ ProxlXMLFileImport.prototype.submitClicked  = function( clickThis, eventObject )
 	this.showSubmitInProgress();
 	
 
-	var _URL = contextPathJSVar + "/services/file_import_proxl_xml_scans/uploadSubmit";
+	var _URL = "services/file_import_proxl_xml_scans/uploadSubmit";
 
 	//  All properties put in requestObj must be accepted by the web service
 	
@@ -2143,7 +2143,7 @@ ProxlXMLFileImport.prototype.updateServerAbandonedUploadKey  = function() {
 	var $project_id = $("#project_id");
 	var projectId = $project_id.val();
 
-	var _URL = contextPathJSVar + "/services/file_import_proxl_xml_scans/removeAbandonedUploadKey";
+	var _URL = "services/file_import_proxl_xml_scans/removeAbandonedUploadKey";
 
 //	All properties put in requestObj must be accepted by the web service
 
