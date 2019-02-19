@@ -26,6 +26,8 @@ import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.www.nav_links_image_structure.PopulateRequestDataForImageAndStructureAndQC_NavLinks;
 import org.yeastrc.xlink.www.no_data_validation.ThrowExceptionOnNoDataConfig;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
+import org.yeastrc.xlink.www.objects.SearchPeptideCrosslink;
+import org.yeastrc.xlink.www.objects.SearchProteinPosition;
 import org.yeastrc.xlink.www.objects.ViewSearchPeptidesPageDataRoot;
 import org.yeastrc.xlink.www.objects.WebReportedPeptide;
 import org.yeastrc.xlink.www.objects.WebReportedPeptideWrapper;
@@ -266,7 +268,9 @@ public class ViewSearchPeptidesAction extends Action {
 			// Filter out links if requested, and Update PSM counts if "remove non-unique PSMs" selected 
 			
 			if( peptideQueryJSONRoot.getMinPSMs() != MinimumPSMsConstants.MINIMUM_PSMS_DEFAULT 
-					|| peptideQueryJSONRoot.isRemoveNonUniquePSMs() ) {
+					|| peptideQueryJSONRoot.isRemoveNonUniquePSMs()
+					|| peptideQueryJSONRoot.isRemoveIntraProteinLinks() ) {
+				
 				///////  Output Lists, Results After Filtering
 				List<WebReportedPeptideWrapper> wrappedlinksAfterFilter = new ArrayList<>( wrappedlinks.size() );
 
@@ -291,12 +295,45 @@ public class ViewSearchPeptidesAction extends Action {
 							continue;  // EARLY CONTINUE
 						}
 					}
+					// did the user request to removal of links Intra Protein Link
+					if( peptideQueryJSONRoot.isRemoveIntraProteinLinks() ) {
+						
+						SearchPeptideCrosslink searchPeptideCrosslink = webReportedPeptide.getSearchPeptideCrosslink();
+						if ( searchPeptideCrosslink != null ) {
+							
+							boolean foundPeptide_1_protein_In_Peptide_2_proteins = false;
+							
+							List<SearchProteinPosition> peptide_1_Proteins = searchPeptideCrosslink.getPeptide1ProteinPositions();
+							List<SearchProteinPosition> peptide_2_Proteins = searchPeptideCrosslink.getPeptide2ProteinPositions();
+							for ( SearchProteinPosition peptide_1_Protein : peptide_1_Proteins ) {
+							
+								for ( SearchProteinPosition peptide_2_Protein : peptide_2_Proteins ) {
+									
+									if (       peptide_1_Protein.getProtein().getProteinSequenceVersionObject().getProteinSequenceVersionId() 
+											== peptide_2_Protein.getProtein().getProteinSequenceVersionObject().getProteinSequenceVersionId() ) {
+										
+										//  Found Same ProteinSequenceVersionId in Proteins for Peptide 1 and Peptide 2
+										foundPeptide_1_protein_In_Peptide_2_proteins = true;
+										break;
+									}
+								}
+								if ( foundPeptide_1_protein_In_Peptide_2_proteins ) {
+									break;
+								}
+							}
+							if ( foundPeptide_1_protein_In_Peptide_2_proteins ) {
+								//  Skip to next entry in list, dropping this entry from output list
+								continue;  // EARLY CONTINUE
+							}
+						}
+					}
+					
 					wrappedlinksAfterFilter.add( webReportedPeptideWrapper );
 				}
 
 				wrappedlinks = wrappedlinksAfterFilter;
 			}
-			
+
 			//  If configured, throw exception if no peptides found
 			if ( ThrowExceptionOnNoDataConfig.getInstance().isThrowExceptionNoData() ) {
 				if ( wrappedlinks.isEmpty() ) {

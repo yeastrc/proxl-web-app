@@ -171,6 +171,13 @@ var ViewMergedPeptidePageCode = function() {
 		} else {
 			$("#removeNonUniquePSMs").prop('checked', false);
 		}
+		
+		//  Mark check box for chosen links to exclude: "remove Intra Protein Links"
+		if ( _query_json_field_Contents.removeIntraProteinLinks ) {
+			$("#removeIntraProteinLinks").prop('checked', true);
+		} else {
+			$("#removeIntraProteinLinks").prop('checked', false);
+		}
 	};
 	
 	///////
@@ -230,14 +237,21 @@ var ViewMergedPeptidePageCode = function() {
 			if ( $("#removeNonUniquePSMs").prop('checked') === true ) {
 				removeNonUniquePSMs = true;
 			}
-			
+
+			//  Read check boxes for chosen links to exclude:  "remove Intra Protein Links"
+			var removeIntraProteinLinks = false;
+			if ( $("#removeIntraProteinLinks").prop('checked') === true ) {
+				removeIntraProteinLinks = true;
+			}
+
 			var output_query_json_field_Contents = { 
 					cutoffs : outputCutoffs, 
 					annTypeIdDisplay : annotationTypeDisplayByProjectSearchId,
 					linkTypes : outputLinkTypes, 
 					mods : outputDynamicModMasses,
 					minPSMs : minPSMs,
-					removeNonUniquePSMs : removeNonUniquePSMs
+					removeNonUniquePSMs : removeNonUniquePSMs,
+					removeIntraProteinLinks : removeIntraProteinLinks
 			};
 			try {
 				var output_query_json_field_String = JSON.stringify( output_query_json_field_Contents );

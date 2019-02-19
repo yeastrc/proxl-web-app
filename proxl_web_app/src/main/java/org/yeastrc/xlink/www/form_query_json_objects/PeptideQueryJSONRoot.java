@@ -12,6 +12,9 @@ public class PeptideQueryJSONRoot extends A_QueryBase_JSONRoot {
 	 * null when all mods and 'No Mods' selected 
 	 */
 	private String[] mods;
+	
+	private boolean removeIntraProteinLinks;
+
 	/**
 	 * null when all mods and 'No Mods' selected
 	 * @return
@@ -31,5 +34,11 @@ public class PeptideQueryJSONRoot extends A_QueryBase_JSONRoot {
 	}
 	public void setLinkTypes(String[] linkTypes) {
 		this.linkTypes = linkTypes;
+	}
+	public boolean isRemoveIntraProteinLinks() {
+		return removeIntraProteinLinks;
+	}
+	public void setRemoveIntraProteinLinks(boolean removeIntraProteinLinks) {
+		this.removeIntraProteinLinks = removeIntraProteinLinks;
 	}
 }

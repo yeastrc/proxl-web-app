@@ -9,6 +9,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.dto.AnnotationDataBaseDTO;
@@ -39,6 +41,8 @@ import org.yeastrc.xlink.www.objects.MergedSearchPeptideCrosslink;
 import org.yeastrc.xlink.www.objects.MergedSearchPeptideDimer;
 import org.yeastrc.xlink.www.objects.MergedSearchPeptideLooplink;
 import org.yeastrc.xlink.www.objects.MergedSearchPeptideUnlinked;
+import org.yeastrc.xlink.www.objects.SearchPeptideCrosslink;
+import org.yeastrc.xlink.www.objects.SearchProteinPosition;
 import org.yeastrc.xlink.www.objects.WebMergedReportedPeptide;
 import org.yeastrc.xlink.www.objects.WebReportedPeptide;
 import org.yeastrc.xlink.www.objects.WebReportedPeptideWrapper;
@@ -267,6 +271,7 @@ public class PeptidesMergedCommonPageDownload {
 			
 			if( mergedPeptideQueryJSONRoot.getMinPSMs() != MinimumPSMsConstants.MINIMUM_PSMS_DEFAULT
 					|| mergedPeptideQueryJSONRoot.isRemoveNonUniquePSMs() ) {
+				
 				///////  Output Lists, Results After Filtering
 				List<WebReportedPeptideWrapper> wrappedlinksAfterFilter = new ArrayList<>( wrappedLinksPerForSearch.size() );
 
@@ -302,9 +307,6 @@ public class PeptidesMergedCommonPageDownload {
 				Integer unifiedReportedPeptideId = item.getWebReportedPeptide().getUnifiedReportedPeptideId();
 				Integer reportedPeptideId = item.getWebReportedPeptide().getReportedPeptideId();
 				
-			//  Map<[UnifiedPeptideId], Map<[SearchId], Map<[Reported Peptide Id], WebReportedPeptideWrapper>>>
-//				Map<Integer, Map<Integer, Map<Integer, WebReportedPeptideWrapper>>> webReportedPeptideWrapper_KeyOn_UnifiedPeptideId_SearchId_ReportedPeptideId = new HashMap<>();
-				
 				 Map<Integer, Map<Integer, WebReportedPeptideWrapper>> webReportedPeptideWrapper_KeyOn_SearchId_ReportedPeptideId =
 						 webReportedPeptideWrapper_KeyOn_UnifiedPeptideId_SearchId_ReportedPeptideId.get( unifiedReportedPeptideId );
 				if ( webReportedPeptideWrapper_KeyOn_SearchId_ReportedPeptideId == null ) {
@@ -316,12 +318,11 @@ public class PeptidesMergedCommonPageDownload {
 				if ( webReportedPeptideWrapper_KeyOn_ReportedPeptideId == null ) {
 					webReportedPeptideWrapper_KeyOn_ReportedPeptideId = new HashMap<>();
 					webReportedPeptideWrapper_KeyOn_SearchId_ReportedPeptideId.put( searchId, webReportedPeptideWrapper_KeyOn_ReportedPeptideId );
-//				} else {
-//					int z = 0;
 				}
 				webReportedPeptideWrapper_KeyOn_ReportedPeptideId.put( reportedPeptideId, item);
 			}
 		}
+		
 		
 		/////////////////////
 		//   Transfer into a list
@@ -339,6 +340,62 @@ public class PeptidesMergedCommonPageDownload {
 		
 		boolean anyReportedPeptideEntriesWereCombined = 
 				combineReportedPeptideEntriesForSameUnifiedReportedPeptideIdAndSearchId( perUnififiedReportedPeptideIdIntermediateValueHolderList, searchIds );
+
+		
+		//  Filtering Done across Searches:
+		
+		// did the user request to removal of links Intra Protein Link
+		if( mergedPeptideQueryJSONRoot.isRemoveIntraProteinLinks() ) {
+			
+			List<PerUnifiedReportedPeptideIdIntermediateValueHolder> perUnififiedReportedPeptideIdIntermediateValueHolderList_Filtered = new ArrayList<>( perUnififiedReportedPeptideIdIntermediateValueHolderList.size() );
+		
+			for ( PerUnifiedReportedPeptideIdIntermediateValueHolder perUnifiedReportedPeptideIdIntermediateValueHolder : perUnififiedReportedPeptideIdIntermediateValueHolderList ) {
+
+				//  Values across all Searches for a specific Unified Reported Peptide Id
+				Map<Integer, WebReportedPeptideWrapper> webReportedPeptideWrapper_KeyOn_SearchId = perUnifiedReportedPeptideIdIntermediateValueHolder.webReportedPeptideWrapper_KeyOn_SearchId;
+
+				Set<Integer> proteinSequenceVersionIds_Peptide_1 = new HashSet<>();
+				Set<Integer> proteinSequenceVersionIds_Peptide_2 = new HashSet<>();
+				
+				for ( Map.Entry<Integer, WebReportedPeptideWrapper> entry : webReportedPeptideWrapper_KeyOn_SearchId.entrySet() ) {
+
+					WebReportedPeptide webReportedPeptide = entry.getValue().getWebReportedPeptide();
+
+					SearchPeptideCrosslink searchPeptideCrosslink = webReportedPeptide.getSearchPeptideCrosslink();
+					if ( searchPeptideCrosslink != null ) {
+						
+						List<SearchProteinPosition> peptide_1_Proteins = searchPeptideCrosslink.getPeptide1ProteinPositions();
+						List<SearchProteinPosition> peptide_2_Proteins = searchPeptideCrosslink.getPeptide2ProteinPositions();
+						
+						for ( SearchProteinPosition peptide_Protein : peptide_1_Proteins ) {
+							proteinSequenceVersionIds_Peptide_1.add( peptide_Protein.getProtein().getProteinSequenceVersionObject().getProteinSequenceVersionId() );
+						}
+						for ( SearchProteinPosition peptide_Protein : peptide_2_Proteins ) {
+							proteinSequenceVersionIds_Peptide_2.add( peptide_Protein.getProtein().getProteinSequenceVersionObject().getProteinSequenceVersionId() );
+						}
+
+					}
+				}
+				
+				boolean foundPeptide_1_protein_In_Peptide_2_proteins = false;
+				
+				for ( Integer proteinSequenceVersionId_Peptide_1 : proteinSequenceVersionIds_Peptide_1 ) {
+					if ( proteinSequenceVersionIds_Peptide_2.contains( proteinSequenceVersionId_Peptide_1 ) ) {
+						foundPeptide_1_protein_In_Peptide_2_proteins = true;
+						break;
+					}
+				}
+				
+				if ( foundPeptide_1_protein_In_Peptide_2_proteins ) {
+					//  Skip to next entry in list, dropping this entry from output list
+					continue;  // EARLY CONTINUE
+				}
+				perUnififiedReportedPeptideIdIntermediateValueHolderList_Filtered.add( perUnifiedReportedPeptideIdIntermediateValueHolder );
+			}
+			
+			//  Copy filtered list to main list
+			perUnififiedReportedPeptideIdIntermediateValueHolderList = perUnififiedReportedPeptideIdIntermediateValueHolderList_Filtered;
+		}
 		
 		//////////  
 		//   Sort Peptides on values in first search, or so on if no data for first search

@@ -255,6 +255,12 @@
 					<td>
 						 <%--  Checkbox for removeNonUniquePSMs --%>
 						<%@ include file="/WEB-INF/jsp-includes/excludeLinksWith_Remove_NonUniquePSMs_Checkbox_Fragment.jsp" %>
+						
+						 <%--  Checkbox for removeIntraProteinLinks --%>
+						   <label><span style="white-space:nowrap;" >
+								<input type="checkbox" id="removeIntraProteinLinks"  onchange="if ( window.defaultPageView ) { window.defaultPageView.searchFormChanged_ForDefaultPageView(); }" > 					
+							 	 intra-protein links
+							 </span></label>
 					</td>
 				</tr>
 				
