@@ -366,7 +366,7 @@ LegacyJSONUpdater.prototype.convertProteinHashDataPre_protein_bar_data = functio
 				//  value is true so this protein id is reversed
 				var reversedProtein_ProteinId = reversedProtein_Key;
 				if( reversedProtein_ProteinId == nrseqId ) {
-					var imageProteinBarDataEntry = _imageProteinBarDataManager.getItemByUID( uid );
+					var imageProteinBarDataEntry = window.imagePagePrimaryRootCodeObject.getVariable__v_imageProteinBarDataManager().getItemByUID( uid );
 					imageProteinBarDataEntry.setProteinReversed( { proteinReversed : true } );
 				}
 			}
