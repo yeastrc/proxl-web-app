@@ -56,5 +56,13 @@ public interface ILinker {
 	 * @throws Exception
 	 */
 	public String getCrosslinkFormula( double mass ) throws Exception;
+
+	/**
+	 * Return true if this is a cleavable cross-linker, false if not. Cleavable cross-linkers
+	 * will be treated differently by proxl in appropriate situations.
+	 *
+	 * @return
+	 */
+	public boolean isCleavable();
 	
 }

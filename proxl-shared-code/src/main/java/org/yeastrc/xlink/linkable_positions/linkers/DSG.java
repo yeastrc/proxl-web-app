@@ -30,5 +30,10 @@ public class DSG extends AmineLinker {
 	public String getCrosslinkFormula(double mass) throws Exception {
 		return "C5H4O2";
 	}
+
+	@Override
+	public boolean isCleavable() {
+		return false;
+	}
 	
 }

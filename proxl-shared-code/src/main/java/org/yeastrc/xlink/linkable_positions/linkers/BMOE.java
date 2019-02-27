@@ -91,4 +91,9 @@ public class BMOE implements ILinker {
 		
 		throw new Exception( "Did not get a valid mass for a BMOE cross-linker." );
 	}
+
+	@Override
+	public boolean isCleavable() {
+		return false;
+	}
 }

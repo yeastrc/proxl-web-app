@@ -28,4 +28,9 @@ public class DSS_STY extends AmineLinkerSTY {
 	public String getCrosslinkFormula(double mass) throws Exception {
 		return "C8H10O2";
 	}
+
+	@Override
+	public boolean isCleavable() {
+		return false;
+	}
 }

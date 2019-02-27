@@ -62,5 +62,9 @@ public class Transglutaminase implements ILinker {
 	public String getCrosslinkFormula(double mass) throws Exception {
 		return "-NH3";
 	}
-	
+
+	@Override
+	public boolean isCleavable() {
+		return false;
+	}
 }

@@ -87,4 +87,9 @@ public class SulfoSMCC implements ILinker {
 		return "C12H13NO3";			// from 
 	}
 
+	@Override
+	public boolean isCleavable() {
+		return false;
+	}
+
 }
