@@ -116,6 +116,7 @@
 -->
         <!-- Loggers to filter out various class paths -->
 
+
         <logger name="org.yeastrc.xlink.www.cached_data_mgmt.CachedDataCentralRegistry" additivity="false">
         
                 <level value="INFO"/>
@@ -129,7 +130,17 @@
         </logger>
 
 <!--
+		Write log msg if Browser is detected to be Internet Explorer
+        <logger name="org.yeastrc.xlink.www.browser_type_logging.LogIfBrowserIsInternetExplorer" additivity="false">
+        
+                <level value="DEBUG"/>
+                
+                <appender-ref ref="ROLL" />
 
+                <appender-ref ref="ROLL_ERROR" />
+        </logger>
+        
+        
         <logger name="org.yeastrc.xlink" additivity="false">
         
                 <level value="INFO"/>
@@ -137,9 +148,6 @@
                 <appender-ref ref="ROLL" />
 
                 <appender-ref ref="ROLL_ERROR" />
-
-
-
         </logger>
 
 -->
@@ -152,9 +160,6 @@
                 <appender-ref ref="ROLL" />
 
                 <appender-ref ref="ROLL_ERROR" />
-
-
-
         </logger>
  -->
         

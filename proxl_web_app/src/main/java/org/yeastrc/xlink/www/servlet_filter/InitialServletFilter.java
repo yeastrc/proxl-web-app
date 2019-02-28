@@ -9,10 +9,13 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+
+import org.yeastrc.xlink.www.browser_type_logging.LogIfBrowserIsInternetExplorer;
 //import org.apache.log4j.Logger;
 import org.yeastrc.xlink.www.constants.WebConstants;
 import org.yeastrc.xlink.www.servlet_context.CurrentContext;
 import org.yeastrc.xlink.www.user_account.UserSessionObject;
+
 /**
  * This filter will be the first called for a request and does initial setup
  *
@@ -56,6 +59,9 @@ public class InitialServletFilter implements Filter {
 				httpRequest.setAttribute( WebConstants.REQUEST_LOGGED_IN_USER_ID, loggedInUserId );
 			}
 		}
+		
+		LogIfBrowserIsInternetExplorer.getSingletonInstance().logBrowserIsInternetExplorerIfConfigured( request );
+				
 		chain.doFilter(request, response);
 	}
 	
