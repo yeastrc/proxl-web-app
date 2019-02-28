@@ -30,4 +30,9 @@ public class DFDNB extends AmineLinker {
 	public String getCrosslinkFormula(double mass) throws Exception {
 		return "C6N2O4";
 	}
+
+	@Override
+	public boolean isCleavable() {
+		return false;
+	}
 }

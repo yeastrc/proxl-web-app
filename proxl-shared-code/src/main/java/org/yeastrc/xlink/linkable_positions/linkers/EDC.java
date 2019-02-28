@@ -110,4 +110,9 @@ public class EDC implements ILinker {
 		return "-H2O";
 	}
 
+	@Override
+	public boolean isCleavable() {
+		return false;
+	}
+
 }
