@@ -13,8 +13,11 @@
 //  JavaScript directive:   all variables have to be declared with "var", maybe other things
 "use strict";
 
-// Instance object on page:  searchesForPageChooser
 
+
+import { addSingleGenericProxlToolTip } from 'page_js/common_all_pages/header_section_every_page/genericToolTip.js';
+
+//  Instance object on page:  searchesForPageChooser
 
 
 /**
