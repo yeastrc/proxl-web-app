@@ -354,68 +354,62 @@ public class PsmPerPeptideService {
 				}
 			}
 			
-			{ //  Get data for psm_per_peptide record
+			{ //  Get data for psm_per_peptide record, This will not exist for some data since was added after the per annotation tables
 				
 				PsmPerPeptideDTO psmPerPeptideDTO =
 						PsmPerPeptideDAO.getInstance()
 						.getOnePsmPerPeptideDTOForPsmIdAndSrchRepPeptPeptideId( psmDTO.getId(), srchRepPeptPeptideDTO.getId() );
 				
-				if ( psmPerPeptideDTO == null ) {
-					String msg = "No psmPerPeptideDTO for psmId: " 
-							+ psmDTO.getId()
-							+ ", srchRepPeptPeptideId: " 
-							+ srchRepPeptPeptideDTO.getId();
-					log.error( msg );
-					throw new ProxlWebappInternalErrorException(msg);
-				}
-				
-				singlePeptideRow.setScanNumber( psmPerPeptideDTO.getScanNumber() );
-				
-				//  Get Scan Filename
-				if ( psmPerPeptideDTO.getSearchScanFilenameId() != null ) {
-					SearchScanFilenameDTO searchScanFilenameDTO =
-							SearchScanFilenameDAO.getInstance().getSearchScanFilenameDTO( psmPerPeptideDTO.getSearchScanFilenameId() );
-					if ( searchScanFilenameDTO == null ) {
-						String msg = "No searchScanFilenameDTO for id: " 
-								+ psmPerPeptideDTO.getSearchScanFilenameId()
-								+ ", psmId: " + psmDTO.getId();
-						log.error( msg );
-						throw new ProxlWebappInternalErrorException(msg);
-					}
-					singlePeptideRow.setScanFilename( searchScanFilenameDTO.getFilename() );
-				}
-				
-				//  Get Scan Data
-				if ( psmPerPeptideDTO.getScanId() != null ) {
-					//  Have scan data
-					singlePeptideRow.setShowViewSpectrumLink(true);
-					ScanDTO scanDTO = ScanDAO.getScanFromId( psmPerPeptideDTO.getScanId() );
-					if ( scanDTO == null ) {
-						String msg = "No scanDTO for id: " 
-								+ psmPerPeptideDTO.getScanId()
-								+ ", psmId: " + psmDTO.getId();
-						log.error( msg );
-						throw new ProxlWebappInternalErrorException(msg);
-					}
-					BigDecimal retentionTime = scanDTO.getRetentionTime();
-					if ( retentionTime != null ) {
-						singlePeptideRow.setRetentionTime( retentionTime );
-						//  Get the retention time in minutes
-						BigDecimal retentionInMinutesRounded = RetentionTimeScalingAndRounding.retentionTimeToMinutesRounded( retentionTime );
-						singlePeptideRow.setRetentionTimeMinutesRounded( retentionInMinutesRounded );
-						singlePeptideRow.setRetentionTimeMinutesRoundedString( retentionInMinutesRounded.toString() );
-					}
-					BigDecimal preMZ = scanDTO.getPreMZ();
-					if ( preMZ != null ) {
-						singlePeptideRow.setPreMZ( preMZ );
-						//  Round the preMZ
-						String preMZRoundedString = null;
-						if ( preMZ != null ) {
-							// first param to setScale is the number of decimal places to keep  
-							BigDecimal preMZRounded = preMZ.setScale( 5, RoundingMode.HALF_UP );
-							preMZRoundedString = preMZRounded.toString();  // convert to string so trailing zeros are preserved
+				if ( psmPerPeptideDTO != null ) {
+					
+					singlePeptideRow.setScanNumber( psmPerPeptideDTO.getScanNumber() );
+					
+					//  Get Scan Filename
+					if ( psmPerPeptideDTO.getSearchScanFilenameId() != null ) {
+						SearchScanFilenameDTO searchScanFilenameDTO =
+								SearchScanFilenameDAO.getInstance().getSearchScanFilenameDTO( psmPerPeptideDTO.getSearchScanFilenameId() );
+						if ( searchScanFilenameDTO == null ) {
+							String msg = "No searchScanFilenameDTO for id: " 
+									+ psmPerPeptideDTO.getSearchScanFilenameId()
+									+ ", psmId: " + psmDTO.getId();
+							log.error( msg );
+							throw new ProxlWebappInternalErrorException(msg);
 						}
-						singlePeptideRow.setPreMZRounded( preMZRoundedString );
+						singlePeptideRow.setScanFilename( searchScanFilenameDTO.getFilename() );
+					}
+					
+					//  Get Scan Data
+					if ( psmPerPeptideDTO.getScanId() != null ) {
+						//  Have scan data
+						singlePeptideRow.setShowViewSpectrumLink(true);
+						ScanDTO scanDTO = ScanDAO.getScanFromId( psmPerPeptideDTO.getScanId() );
+						if ( scanDTO == null ) {
+							String msg = "No scanDTO for id: " 
+									+ psmPerPeptideDTO.getScanId()
+									+ ", psmId: " + psmDTO.getId();
+							log.error( msg );
+							throw new ProxlWebappInternalErrorException(msg);
+						}
+						BigDecimal retentionTime = scanDTO.getRetentionTime();
+						if ( retentionTime != null ) {
+							singlePeptideRow.setRetentionTime( retentionTime );
+							//  Get the retention time in minutes
+							BigDecimal retentionInMinutesRounded = RetentionTimeScalingAndRounding.retentionTimeToMinutesRounded( retentionTime );
+							singlePeptideRow.setRetentionTimeMinutesRounded( retentionInMinutesRounded );
+							singlePeptideRow.setRetentionTimeMinutesRoundedString( retentionInMinutesRounded.toString() );
+						}
+						BigDecimal preMZ = scanDTO.getPreMZ();
+						if ( preMZ != null ) {
+							singlePeptideRow.setPreMZ( preMZ );
+							//  Round the preMZ
+							String preMZRoundedString = null;
+							if ( preMZ != null ) {
+								// first param to setScale is the number of decimal places to keep  
+								BigDecimal preMZRounded = preMZ.setScale( 5, RoundingMode.HALF_UP );
+								preMZRoundedString = preMZRounded.toString();  // convert to string so trailing zeros are preserved
+							}
+							singlePeptideRow.setPreMZRounded( preMZRoundedString );
+						}
 					}
 				}
 			}
