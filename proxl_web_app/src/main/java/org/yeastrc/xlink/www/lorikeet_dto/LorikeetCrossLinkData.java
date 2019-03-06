@@ -1,6 +1,7 @@
 package org.yeastrc.xlink.www.lorikeet_dto;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * Data for a Cross Link - Cross Links Project
@@ -15,6 +16,10 @@ public class LorikeetCrossLinkData {
 	private int crossLinkPos2;
 	
 	private BigDecimal linkerMass;
+	
+	//  Only populated when have linker_per_search_cleaved_crosslink_mass entries for Search
+	private String linkerAbbr;
+	private List<BigDecimal> cleavedLinkerMassList;
 
 	public int getCrossLinkPos1() {
 		return crossLinkPos1;
@@ -54,6 +59,22 @@ public class LorikeetCrossLinkData {
 
 	public void setPeptideData2(LorikeetPerPeptideData peptideData2) {
 		this.peptideData2 = peptideData2;
+	}
+
+	public List<BigDecimal> getCleavedLinkerMassList() {
+		return cleavedLinkerMassList;
+	}
+
+	public void setCleavedLinkerMassList(List<BigDecimal> cleavedLinkerMassList) {
+		this.cleavedLinkerMassList = cleavedLinkerMassList;
+	}
+
+	public String getLinkerAbbr() {
+		return linkerAbbr;
+	}
+
+	public void setLinkerAbbr(String linkerAbbr) {
+		this.linkerAbbr = linkerAbbr;
 	}
 	
 

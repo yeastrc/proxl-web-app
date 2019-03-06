@@ -331,7 +331,9 @@
 								<a data-tooltip="Download all distinct unique distance restraints (cross-links and loop-links) as tab-delimited text." id="download-protein-udrs" class="download-option tool_tip_attached_jq" href="downloadMergedProteinUDRs.do?<bean:write name="queryString" />">Download distinct UDRs (<bean:write name="numDistinctLinks" />)</a>
 								
 								<br><span style="font-size:15px;">Skyline export</span><br>
-								<a data-tooltip="Export peptides for listed proteins for import into Skyline quant. tool. (Shulman et al)" id="download-protein-shulman" class="download-option tool_tip_attached_jq" href="downloadMergedProteinsPeptidesSkylineShulman.do?<bean:write name="queryString" />">Export peptides for Skyline quant (Shulman et al)</a>
+								<c:if test="${ showDownloadLink_SkylineShulman }">
+									<a data-tooltip="Export peptides for listed proteins for import into Skyline quant. tool. (Shulman et al)" id="download-protein-shulman" class="download-option tool_tip_attached_jq" href="downloadMergedProteinsPeptidesSkylineShulman.do?<bean:write name="queryString" />">Export peptides for Skyline quant (Shulman et al)</a>
+								</c:if>
 								<a data-tooltip="Export peptides for listed proteins for Skyline PRM analysis. (Chavez et al)" id="download-protein-shulman" class="download-option tool_tip_attached_jq" href="downloadMergedProteinsPeptidesSkylineEng.do?<bean:write name="queryString" />">Export peptides for Skyline PRM (Chavez et al)</a>
 								
 								<br><span style="font-size:15px;">xiNET export</span><br>

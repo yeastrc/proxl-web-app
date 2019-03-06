@@ -467,6 +467,7 @@ function Peptide(seq, staticModifications, varModifications, ntermModification, 
             	
             	if ( sliceIndexStartAtOne == crossLinkData.getLinkerPosition() ) {
 
+            		//  If crossLinkData.cleavedLinkerMass is populated, that is returned
             		var massOtherPetideAndLinker = crossLinkData.getCrossLinkedPeptideAndLinkerMass( massType);
             		
             		mass += massOtherPetideAndLinker;
@@ -823,7 +824,7 @@ function LoopLinkData( loopLinkDataInputFormat ) { //  loopLinkData
 
 //  	Cross link data for Cross Linking projects
 
-function CrossLinkData( crossLinkDataInputFormat, options ) { //  loopLinkData
+function CrossLinkData( crossLinkDataInputFormat, options ) { //  crossLinkData
 	
 	//  From Server Side
 	this.peptideData1 = crossLinkDataInputFormat.peptideData1;
@@ -831,6 +832,7 @@ function CrossLinkData( crossLinkDataInputFormat, options ) { //  loopLinkData
 	this.peptideData2 = crossLinkDataInputFormat.peptideData2;
 	this.crossLinkPos2 = crossLinkDataInputFormat.crossLinkPos2;
 	this.linkerMass = crossLinkDataInputFormat.linkerMass;
+	this.cleavedLinkerMass = crossLinkDataInputFormat.cleavedLinkerMass; // Only on Some Linkers, passed in from Proxl XML file on Linker, User chooses which one to use
 	
 	//  Added on client side:
 	
@@ -890,6 +892,11 @@ CrossLinkData.prototype.getLinkerPosition = function() {
 };
 
 CrossLinkData.prototype.getCrossLinkedPeptideAndLinkerMass = function( massType ) {
+	
+	if ( this.cleavedLinkerMass !== undefined ) {
+		//  Crosslinker is cleaved so only return this.cleavedLinkerMass
+		return this.cleavedLinkerMass;  // EARLY RETURN
+	}
 	
 	var otherPeptideMass = this.linkerMass;
 	

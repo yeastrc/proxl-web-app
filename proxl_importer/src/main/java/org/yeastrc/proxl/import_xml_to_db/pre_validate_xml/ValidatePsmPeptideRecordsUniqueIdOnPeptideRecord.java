@@ -90,10 +90,10 @@ public class ValidatePsmPeptideRecordsUniqueIdOnPeptideRecord {
 			List<Psm> psmList = psms.getPsm();
 			if ( psmList != null ) {
 				for ( Psm psm : psmList ) {
-					List<PerPeptideAnnotations> perPeptideAnnotationsList = psm.getPerPeptideAnnotations();
-					if ( perPeptideAnnotationsList != null && ( ! perPeptideAnnotationsList.isEmpty() ) ) {
-						for ( PerPeptideAnnotations perPeptideAnnotations : perPeptideAnnotationsList  ) {
-							PsmPeptide psmPeptide = perPeptideAnnotations.getPsmPeptide();
+					PerPeptideAnnotations perPeptideAnnotations = psm.getPerPeptideAnnotations();
+					if ( perPeptideAnnotations != null ) {
+						List<PsmPeptide> psmPeptideList = perPeptideAnnotations.getPsmPeptide();
+						for ( PsmPeptide psmPeptide : psmPeptideList ) {
 							String psmPeptideUniqueId =	psmPeptide.getUniqueId();
 							if ( StringUtils.isEmpty( psmPeptideUniqueId ) ) {
 								String msg = "psm_peptide unique_id value is empty under reported peptide id: " + reportedPeptide.getReportedPeptideString();

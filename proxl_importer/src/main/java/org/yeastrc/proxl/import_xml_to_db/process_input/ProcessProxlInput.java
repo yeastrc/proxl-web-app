@@ -9,6 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.yeastrc.proxl.import_xml_to_db.dao.ProjectSearchDAO_Importer;
 import org.yeastrc.proxl.import_xml_to_db.dao.SearchDAO_Importer;
+import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_LinkerPerSearchCleavedCrosslinkMassDAO;
 import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_LinkerPerSearchCrosslinkMassDAO;
 import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_LinkerPerSearchMonolinkMassDAO;
 import org.yeastrc.proxl.import_xml_to_db.db.ImportDBConnectionFactory;
@@ -24,6 +25,7 @@ import org.yeastrc.proxl.import_xml_to_db.objects.SearchProgramEntry;
 import org.yeastrc.proxl.import_xml_to_db.post_insert_search_processing.PerformPostInsertSearchProcessing;
 import org.yeastrc.proxl.import_xml_to_db.spectrum.mzml_mzxml.process_scans.Process_MzML_MzXml_File;
 import org.yeastrc.proxl.import_xml_to_db.spectrum.validate_input_scan_file.ValidateInputScanFile;
+import org.yeastrc.proxl_import.api.xml_dto.CleavedCrosslinkMass;
 import org.yeastrc.proxl_import.api.xml_dto.CrosslinkMass;
 import org.yeastrc.proxl_import.api.xml_dto.CrosslinkMasses;
 import org.yeastrc.proxl_import.api.xml_dto.Linker;
@@ -43,6 +45,7 @@ import org.yeastrc.xlink.dao.SearchCommentDAO;
 import org.yeastrc.xlink.dao.SearchLinkerDAO;
 import org.yeastrc.xlink.dto.AnnotationTypeDTO;
 import org.yeastrc.xlink.dto.LinkerDTO;
+import org.yeastrc.xlink.dto.LinkerPerSearchCleavedCrosslinkMassDTO;
 import org.yeastrc.xlink.dto.LinkerPerSearchCrosslinkMassDTO;
 import org.yeastrc.xlink.dto.LinkerPerSearchMonolinkMassDTO;
 import org.yeastrc.xlink.dto.SearchCommentDTO;
@@ -484,21 +487,34 @@ public class ProcessProxlInput {
 		if ( crosslinkMasses == null ) {
 			return;  //  EARLY RETURN
 		}
-		List<CrosslinkMass> crosslinkMassList = crosslinkMasses.getCrosslinkMass();
-		if ( crosslinkMassList == null ) {
-			return;  //  EARLY RETURN
+		{
+			List<CrosslinkMass> crosslinkMassList = crosslinkMasses.getCrosslinkMass();
+			if ( crosslinkMassList != null && ( ! crosslinkMassList.isEmpty() ) ) {
+				for ( CrosslinkMass crosslinkMass : crosslinkMassList ) {
+					LinkerPerSearchCrosslinkMassDTO linkerPerSearchCrosslinkMassDTO = new LinkerPerSearchCrosslinkMassDTO();
+					linkerPerSearchCrosslinkMassDTO.setLinkerId( linkerDTO.getId() );
+					linkerPerSearchCrosslinkMassDTO.setSearchId(  searchDTO.getId() );
+					linkerPerSearchCrosslinkMassDTO.setCrosslinkMassDouble( crosslinkMass.getMass().doubleValue() );
+					linkerPerSearchCrosslinkMassDTO.setCrosslinkMassString( crosslinkMass.getMass().toString() );
+					DB_Insert_LinkerPerSearchCrosslinkMassDAO.getInstance().save( linkerPerSearchCrosslinkMassDTO );
+				}
+			}
 		}
-		for ( CrosslinkMass crosslinkMass : crosslinkMassList ) {
-			LinkerPerSearchCrosslinkMassDTO linkerPerSearchCrosslinkMassDTO = new LinkerPerSearchCrosslinkMassDTO();
-			linkerPerSearchCrosslinkMassDTO.setLinkerId( linkerDTO.getId() );
-			linkerPerSearchCrosslinkMassDTO.setSearchId(  searchDTO.getId() );
-			linkerPerSearchCrosslinkMassDTO.setCrosslinkMassDouble( crosslinkMass.getMass().doubleValue() );
-			linkerPerSearchCrosslinkMassDTO.setCrosslinkMassString( crosslinkMass.getMass().toString() );
-			DB_Insert_LinkerPerSearchCrosslinkMassDAO.getInstance().save( linkerPerSearchCrosslinkMassDTO );
+		{
+			List<CleavedCrosslinkMass> cleavedCrosslinkMassList = crosslinkMasses.getCleavedCrosslinkMass();
+			if ( cleavedCrosslinkMassList != null && ( ! cleavedCrosslinkMassList.isEmpty() ) ) {
+				for ( CleavedCrosslinkMass cleavedCrosslinkMass : cleavedCrosslinkMassList ) {
+					LinkerPerSearchCleavedCrosslinkMassDTO linkerPerSearchCleavedCrosslinkMassDTO = new LinkerPerSearchCleavedCrosslinkMassDTO();
+					linkerPerSearchCleavedCrosslinkMassDTO.setLinkerId( linkerDTO.getId() );
+					linkerPerSearchCleavedCrosslinkMassDTO.setSearchId(  searchDTO.getId() );
+					linkerPerSearchCleavedCrosslinkMassDTO.setCleavedCrosslinkMassDouble( cleavedCrosslinkMass.getMass().doubleValue() );
+					linkerPerSearchCleavedCrosslinkMassDTO.setCleavedCrosslinkMassString( cleavedCrosslinkMass.getMass().toString() );
+					DB_Insert_LinkerPerSearchCleavedCrosslinkMassDAO.getInstance().save( linkerPerSearchCleavedCrosslinkMassDTO );
+				}
+			}
 		}
 	}
 	
-
 	/**
 	 * At least one "peptide" under a "reported_peptide" contains "peptide_isotope_label"
 	 * @param proxlInput

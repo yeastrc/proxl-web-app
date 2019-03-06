@@ -94,12 +94,16 @@
 						  <tr>
 						  	<td style="vertical-align: top; font-weight: bold; " >Crosslinked peptides:</td>
 							
-							<td  style="vertical-align: top; font-family: monospace; padding-left: 10px;">
-								<div><span id="lorikeet_crosslink_sequence_1_space_before"
-										></span><span id="lorikeet_crosslink_sequence_1"></span></div>
-								<div ><span id="lorikeet_crosslink_linker_space_before"></span>|</div>
-								<div ><span id="lorikeet_crosslink_sequence_2_space_before"
-										></span><span id="lorikeet_crosslink_sequence_2"></span></div>
+							<td  style="vertical-align: top; padding-left: 10px;">
+								<div><span id="lorikeet_crosslink_sequence_1_space_before" style=" font-family: monospace; "
+										></span><span id="lorikeet_crosslink_sequence_1" style=" font-family: monospace; "
+										></span>&nbsp;&nbsp;&nbsp;&nbsp;<span id="lorikeet_crosslink_cleaved_mass_selection_block_1"></span></div>
+								<div ><span id="lorikeet_crosslink_linker_space_before" style=" font-family: monospace; "
+										></span><span style=" font-family: monospace; " >|</span></div>
+								<div ><span id="lorikeet_crosslink_sequence_2_space_before" style=" font-family: monospace; "
+										></span><span id="lorikeet_crosslink_sequence_2" style=" font-family: monospace; "
+										></span>&nbsp;&nbsp;&nbsp;&nbsp;<span id="lorikeet_crosslink_cleaved_mass_selection_block_2"
+										></span></div>
 							</td>
 						  </tr>
 						 </table>

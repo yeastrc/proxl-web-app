@@ -1,5 +1,6 @@
 package org.yeastrc.proxl.import_xml_to_db.process_input;
 
+import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -12,6 +13,7 @@ import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterDataException;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterInteralException;
 import org.yeastrc.proxl_import.api.xml_dto.ProxlInput;
 import org.yeastrc.proxl_import.api.xml_dto.Psm;
+import org.yeastrc.proxl_import.api.xml_dto.Psm.PerPeptideAnnotations.PsmPeptide;
 import org.yeastrc.proxl_import.api.xml_dto.Psms;
 import org.yeastrc.proxl_import.api.xml_dto.ReportedPeptide;
 import org.yeastrc.proxl_import.api.xml_dto.ReportedPeptides;
@@ -44,7 +46,7 @@ public class GetScanFilenamesAndScanNumbersToInsert {
 	public Map<String, Set<Integer>> getScanFilenamesAndScanNumbersToInsert( ProxlInput proxlInput, DropPeptidePSMCutoffValues dropPeptidePSMCutoffValues ) throws ProxlImporterDataException, ProxlImporterInteralException  {
 		
 		Map<String, Set<Integer>> mapOfScanFilenamesSetsOfScanNumbers = new HashMap<String, Set<Integer>>();
-		Set<Integer> setOfScanNumbersArbitraryScanfile = null;
+		Set<Integer> setOfScanNumbersArbitraryScanfile = new HashSet<>();
 		ReportedPeptides reportedPeptides =
 				proxlInput.getReportedPeptides();
 		List<ReportedPeptide> reportedPeptideList =
@@ -62,33 +64,71 @@ public class GetScanFilenamesAndScanNumbersToInsert {
 							.dropPSMForCmdLineCutoffs( psm, dropPeptidePSMCutoffValues ) ) {
 						continue;  // EARLY continue to next record
 					}
-					String scanFileName = psm.getScanFileName();
-					Set<Integer> setOfScanNumbers = null;
-					if ( scanFileName == null ) {
-						if ( setOfScanNumbersArbitraryScanfile == null ) {
-							setOfScanNumbersArbitraryScanfile = new HashSet<>();
+					{	// Process <psm> level data
+						BigInteger scanNumberBI = psm.getScanNumber();
+						String scanFileName = psm.getScanFileName();
+						
+						addScanTo_mapOfScanFilenamesSetsOfScanNumbers( mapOfScanFilenamesSetsOfScanNumbers, setOfScanNumbersArbitraryScanfile, scanFileName, scanNumberBI );
+					}
+
+						// Process <psm_per_peptide> level data under <psm>
+					if ( psm.getPerPeptideAnnotations() != null ) {
+						List<PsmPeptide> psmPeptideList = psm.getPerPeptideAnnotations().getPsmPeptide();
+						if ( psmPeptideList != null && ( ! psmPeptideList.isEmpty() ) ) {
+							// Get scan numbers from <psm_peptide> elements
+							for ( PsmPeptide psmPeptide : psmPeptideList ) {
+								BigInteger scanNumberBI = psmPeptide.getScanNumber();
+								String scanFileName = psmPeptide.getScanFileName();
+								
+								addScanTo_mapOfScanFilenamesSetsOfScanNumbers( mapOfScanFilenamesSetsOfScanNumbers, setOfScanNumbersArbitraryScanfile, scanFileName, scanNumberBI );
+							}
 						}
-						setOfScanNumbers = setOfScanNumbersArbitraryScanfile;
-					} else { 
-						setOfScanNumbers = mapOfScanFilenamesSetsOfScanNumbers.get( scanFileName );
 					}
-					if ( setOfScanNumbers == null ) {
-						setOfScanNumbers = new HashSet<>();
-						mapOfScanFilenamesSetsOfScanNumbers.put( scanFileName, setOfScanNumbers );
-					}
-					int scanNumber = psm.getScanNumber().intValue();
-					setOfScanNumbers.add( scanNumber );
 				}
 			}
 		}
-		if ( ( ! mapOfScanFilenamesSetsOfScanNumbers.isEmpty() ) && setOfScanNumbersArbitraryScanfile != null ) {
+		if ( ( ! mapOfScanFilenamesSetsOfScanNumbers.isEmpty() ) && ( ! setOfScanNumbersArbitraryScanfile.isEmpty() ) ) {
 			String msg = "Cannot have mix of PSMs with scan filenames and PSMs where scan filename is null";
 			log.error( msg );
 			throw new ProxlImporterDataException( msg );
 		}
-		if ( setOfScanNumbersArbitraryScanfile != null ) {
+		if ( ! setOfScanNumbersArbitraryScanfile.isEmpty() ) {
 			mapOfScanFilenamesSetsOfScanNumbers.put( ARBITRARY_FILENAME_FOR_NULL_FILENAME, setOfScanNumbersArbitraryScanfile );
 		}
 		return mapOfScanFilenamesSetsOfScanNumbers;
+	}
+	
+	
+	/**
+	 * @param mapOfScanFilenamesSetsOfScanNumbers
+	 * @param setOfScanNumbersArbitraryScanfile
+	 * @param scanFileName
+	 * @param scanNumberBI
+	 */
+	private void addScanTo_mapOfScanFilenamesSetsOfScanNumbers(
+			Map<String, Set<Integer>> mapOfScanFilenamesSetsOfScanNumbers,
+			Set<Integer> setOfScanNumbersArbitraryScanfile, 
+			String scanFileName, 
+			BigInteger scanNumberBI ) {
+
+		if ( scanNumberBI == null ) {
+			// No Scan Number
+			return; // Early Exit
+		}
+		
+		Integer scanNumber = scanNumberBI.intValue();
+		
+		Set<Integer> setOfScanNumbers = null;
+		if ( scanFileName == null ) {
+			setOfScanNumbers = setOfScanNumbersArbitraryScanfile;
+		} else { 
+			setOfScanNumbers = mapOfScanFilenamesSetsOfScanNumbers.get( scanFileName );
+		}
+		if ( setOfScanNumbers == null ) {
+			setOfScanNumbers = new HashSet<>();
+			mapOfScanFilenamesSetsOfScanNumbers.put( scanFileName, setOfScanNumbers );
+		}
+		setOfScanNumbers.add( scanNumber );
+
 	}
 }

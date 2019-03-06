@@ -671,46 +671,108 @@ function addOpenLorikeetViewerClickHandlers( $openLorkeetLinks ) {
 		if ( lorikeetOptions.crossLinkDataInputFormat ){ 
 			
 			//  Process cross link data
-
-//			crossLinkDataInputFormat: Object
-//			crossLinkPos1: 1
-//			crossLinkPos2: 1
-//			linkerMass: 138.0681
-//			peptideData1: Object
-//			sequence: "AAAAVVAATVPAQSMGADGASSVHWFR"
-//			variableMods: Array[0]
 			
 			$("#lorikeet-holder-divider-div").show();
 			$("#lorikeet-holder-2-div").show();
 
 			$("#lorikeet-cross-link-data").show();
-			
-//			$("#lorikeet-crosslink-sequence-1").text( lorikeetOptions.crossLinkDataInputFormat.peptideData1.sequence );
-//			$("#lorikeet-crosslink-data-position-1").text( lorikeetOptions.crossLinkDataInputFormat.crossLinkPos1 );
-//
-//			$("#lorikeet-crosslink-sequence-2").text( lorikeetOptions.crossLinkDataInputFormat.peptideData2.sequence );
-//			$("#lorikeet-crosslink-data-position-2").text( lorikeetOptions.crossLinkDataInputFormat.crossLinkPos2 );
-//		
-//			$("#lorikeet-crosslink-data-linker-mass").text( lorikeetOptions.crossLinkDataInputFormat.linkerMass );
-
-			
-//			<div><span id="lorikeet_crosslink_sequence_1_space_before"><span id="lorikeet_crosslink_sequence_1"></span></div>
-//			<div ><span id="lorikeet_crosslink_linker_space_before">|</div>
-//			<div ><span id="lorikeet_crosslink_sequence_2_space_before"><span id="lorikeet_crosslink_sequence_2"></span></div>
-
-			
+						
 //			Crosslinked peptides:   VKNTTTLQQHLIDGR
 //									   |
 //									  MPKDFPPFPQK
 			
 			$("#lorikeet_crosslink_sequence_1").text( lorikeetOptions.crossLinkDataInputFormat.peptideData1.sequence );
 			$("#lorikeet_crosslink_sequence_2").text( lorikeetOptions.crossLinkDataInputFormat.peptideData2.sequence );
+			
+			var get_crossLinkData_CleavedMass_singleRadioButtonHTML = function( mass, peptideNumber, checked ) {
+				
+				var checkedHTML = "";
+				if ( checked ) {
+					checkedHTML = " checked ";
+				}
+				
+				var radioElementName = "lorikeet_crosslink_cleaved_mass_select_" + peptideNumber;
+			
+				var singleRadioButtonHTML = '<label >' + 
+
+					'<input type="radio" name="' + radioElementName + '" ' +
+					' class=" lorikeet_crosslink_cleaved_mass_select_jq " ' +
+					' value="' + mass + '" ' + checkedHTML + '>' +
+					lorikeetOptions.crossLinkDataInputFormat.linkerAbbr +
+					'-' +
+					mass + 
+					'</label>';
+					
+				return singleRadioButtonHTML;
+			}
+			
+			var cleavedLinkerMassList = lorikeetOptions.crossLinkDataInputFormat.cleavedLinkerMassList;
+			if ( cleavedLinkerMassList && cleavedLinkerMassList.length !== 0 ) { 
+				
+				var $lorikeet_crosslink_cleaved_mass_selection_block_1 = $("#lorikeet_crosslink_cleaved_mass_selection_block_1");
+				
+				var $lorikeet_crosslink_cleaved_mass_selection_block_2 = $("#lorikeet_crosslink_cleaved_mass_selection_block_2");
+				
+				$lorikeet_crosslink_cleaved_mass_selection_block_1.empty();
+				$lorikeet_crosslink_cleaved_mass_selection_block_2.empty();
+				
+				cleavedLinkerMassList.forEach(function( cleavedLinkerMass, index, array) {
+					
+					//  For Peptide 1
+					
+					var checked = false;
+					if ( index === 0 ) {
+						checked = true; // Set first entry as checked initially
+					}
+					var singleRadioButtonForHTML = get_crossLinkData_CleavedMass_singleRadioButtonHTML( cleavedLinkerMass, 1, checked );
+					
+					var $singleRadioButtonHTML = $( singleRadioButtonForHTML );
+					
+					$lorikeet_crosslink_cleaved_mass_selection_block_1.append( $singleRadioButtonHTML );
+					
+					$singleRadioButtonHTML.change(function(eventObject) {
+						var selectedValue = this.value;
+						// Update Lorikeet for value
+						var cleavedLinkerMassLocal = cleavedLinkerMass;
+						lorikeetOptions.crossLinkDataInputFormat.cleavedLinkerMass = cleavedLinkerMassLocal;
+						
+						//  Re-create Lorikeet
+						createCrossLinkLorikeet_1( lorikeetOptions );
+					})
+				}, this );
+
+				cleavedLinkerMassList.forEach(function( cleavedLinkerMass, index, array) {
+					
+					//  For Peptide 2
+					
+					var checked = false;
+					if ( cleavedLinkerMassList.length === 1 || index === 1 ) {
+						checked = true; // If 2 entries, set second entry as checked initially, otherwise set first entry as checked initially
+					}
+					var singleRadioButtonForHTML = get_crossLinkData_CleavedMass_singleRadioButtonHTML( cleavedLinkerMass, 2, checked );
+					
+					var $singleRadioButtonHTML = $( singleRadioButtonForHTML );
+					
+					$lorikeet_crosslink_cleaved_mass_selection_block_2.append( $singleRadioButtonHTML );
+
+					$singleRadioButtonHTML.change(function(eventObject) {
+						var selectedValue = this.value;
+						// Update Lorikeet for value
+						var cleavedLinkerMassLocal = cleavedLinkerMass;
+						lorikeetOptions.crossLinkDataInputFormat.cleavedLinkerMass = cleavedLinkerMassLocal;
+						
+						//  Re-create Lorikeet
+						createCrossLinkLorikeet_2( lorikeetOptions );
+					})
+					
+				}, this );
+				
+			}
 
 
 			var spaceBeforeSequence1 = 0;
 			var spaceBeforeSequence2 = 0;
 			var spaceBeforeLinker = 0;
-			
 			
 			var crossLinkPos1 = lorikeetOptions.crossLinkDataInputFormat.crossLinkPos1;
 			var crossLinkPos2 = lorikeetOptions.crossLinkDataInputFormat.crossLinkPos2;
@@ -746,28 +808,25 @@ function addOpenLorikeetViewerClickHandlers( $openLorkeetLinks ) {
 			$("#lorikeet_crosslink_sequence_2_space_before").html( spaceBeforeSequence2_string );
 			$("#lorikeet_crosslink_linker_space_before").html( spaceBeforeLinker_string );
 
-//			<div><span id="lorikeet_crosslink_sequence_1_space_before"><span id="lorikeet_crosslink_sequence_1"></span></div>
-//			<div ><span id="lorikeet_crosslink_linker_space_before">|</div>
-//			<div ><span id="lorikeet_crosslink_sequence_2_space_before"><span id="lorikeet_crosslink_sequence_2"></span></div>
+			//  Create Lorikeet for each Peptide in Crosslink
+			
+			if ( lorikeetOptions.crossLinkDataInputFormat.cleavedLinkerMassList && lorikeetOptions.crossLinkDataInputFormat.cleavedLinkerMassList.length !== 0 ) {
+				
+				lorikeetOptions.crossLinkDataInputFormat.cleavedLinkerMass = lorikeetOptions.crossLinkDataInputFormat.cleavedLinkerMassList[ 0 ];
+			}
+			
+			createCrossLinkLorikeet_1( lorikeetOptions );
 
+			if ( lorikeetOptions.crossLinkDataInputFormat.cleavedLinkerMassList && lorikeetOptions.crossLinkDataInputFormat.cleavedLinkerMassList.length !== 0 ) {
+				
+				if ( lorikeetOptions.crossLinkDataInputFormat.cleavedLinkerMassList.length === 1 ) {
+					lorikeetOptions.crossLinkDataInputFormat.cleavedLinkerMass = lorikeetOptions.crossLinkDataInputFormat.cleavedLinkerMassList[ 0 ];
+				} else {
+					lorikeetOptions.crossLinkDataInputFormat.cleavedLinkerMass = lorikeetOptions.crossLinkDataInputFormat.cleavedLinkerMassList[ 1 ];
+				}
+			}
 			
-			//  TODO  MUST REMOVE:   Hard coded to 1.    Need to fix Lorikeet so don't need these statements
-			
-			lorikeetOptions.sequence = lorikeetOptions.crossLinkDataInputFormat.peptideData1.sequence;
-			lorikeetOptions.variableMods = lorikeetOptions.crossLinkDataInputFormat.peptideData1.variableMods;
-			lorikeetOptions.label = lorikeetOptions.crossLinkDataInputFormat.peptideData1.label;
-			
-			
-			createSingleCrossLinkLorikeet( lorikeetOptions, 1 /* indexStartAtOne */ );
-			
-			//  TODO  MUST REMOVE:   Hard coded to 2.    Need to fix Lorikeet so don't need these statements
-			
-			lorikeetOptions.sequence = lorikeetOptions.crossLinkDataInputFormat.peptideData2.sequence;
-			lorikeetOptions.variableMods = lorikeetOptions.crossLinkDataInputFormat.peptideData2.variableMods;
-			lorikeetOptions.label = lorikeetOptions.crossLinkDataInputFormat.peptideData2.label;
-			
-			createSingleCrossLinkLorikeet( lorikeetOptions, 2 /* indexStartAtOne */ );
-
+			createCrossLinkLorikeet_2( lorikeetOptions );
 			
 		} else if ( lorikeetOptions.dimerDataInputFormat ) {
 			
@@ -829,6 +888,34 @@ function addOpenLorikeetViewerClickHandlers( $openLorkeetLinks ) {
 	};
 	
 
+
+	////////////////////////////////
+
+	var createCrossLinkLorikeet_1 = function( lorikeetOptions ) {
+		
+		//  TODO  MUST REMOVE:   Hard coded to 1.    Need to fix Lorikeet so don't need these statements
+		
+		lorikeetOptions.sequence = lorikeetOptions.crossLinkDataInputFormat.peptideData1.sequence;
+		lorikeetOptions.variableMods = lorikeetOptions.crossLinkDataInputFormat.peptideData1.variableMods;
+		lorikeetOptions.label = lorikeetOptions.crossLinkDataInputFormat.peptideData1.label;
+		
+		createSingleCrossLinkLorikeet( lorikeetOptions, 1 /* indexStartAtOne */ );
+	}
+
+	////////////////////////////////
+
+	var createCrossLinkLorikeet_2 = function( lorikeetOptions ) {
+		
+		//  TODO  MUST REMOVE:   Hard coded to 1.    Need to fix Lorikeet so don't need these statements
+		
+		lorikeetOptions.sequence = lorikeetOptions.crossLinkDataInputFormat.peptideData2.sequence;
+		lorikeetOptions.variableMods = lorikeetOptions.crossLinkDataInputFormat.peptideData2.variableMods;
+		lorikeetOptions.label = lorikeetOptions.crossLinkDataInputFormat.peptideData2.label;
+
+		createSingleCrossLinkLorikeet( lorikeetOptions, 2 /* indexStartAtOne */ );
+	}
+
+	
 	////////////////////////////////
 
 	var createSingleCrossLinkLorikeet = function( lorikeetOptions, indexStartAtOne ) {
@@ -837,7 +924,7 @@ function addOpenLorikeetViewerClickHandlers( $openLorkeetLinks ) {
 		//  Add these items to the lorikeetOptions variable
 		
 		lorikeetOptions.crossLinkDataInputFormat.currentPeptideNumber = indexStartAtOne;
-
+		
 		//  Get div to put lorikeet viewer in
 		
 		var $lorikeet_holder_div = $("#lorikeet-holder-" + indexStartAtOne + "-div");

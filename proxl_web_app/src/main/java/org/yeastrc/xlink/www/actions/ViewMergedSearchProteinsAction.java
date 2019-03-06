@@ -45,6 +45,7 @@ import org.yeastrc.xlink.www.web_utils.GenerateVennDiagramDataToJSON;
 import org.yeastrc.xlink.www.web_utils.GetAnnotationDisplayUserSelectionDetailsData;
 import org.yeastrc.xlink.www.web_utils.GetPageHeaderData;
 import org.yeastrc.xlink.www.web_utils.GetSearchDetailsData;
+import org.yeastrc.xlink.www.web_utils.IsShowDownloadLink_SkylineShulman;
 import org.yeastrc.xlink.www.web_utils.ProteinListingTooltipConfigUtil;
 import org.yeastrc.xlink.www.web_utils.TaxonomiesForSearchOrSearches;
 import org.yeastrc.xlink.www.web_utils.XLinkWebAppUtils;
@@ -140,7 +141,7 @@ public class ViewMergedSearchProteinsAction extends Action {
 			
 			Set<Integer> projectSearchIdsProcessedFromForm = new HashSet<>(); // add each projectSearchId as process in loop next
 
-			List<SearchDTO> searches = new ArrayList<SearchDTO>();
+			List<SearchDTO> searches = new ArrayList<SearchDTO>( projectSearchIdsListDeduppedSorted.size() );
 			Map<Integer, SearchDTO> searchesMapOnSearchId = new HashMap<>();
 			Collection<Integer> searchIds = new HashSet<>();
 			int[] searchIdsArray = new int[ projectSearchIdsListDeduppedSorted.size() ];
@@ -187,6 +188,9 @@ public class ViewMergedSearchProteinsAction extends Action {
 			//  Populate request objects for excludeLinksWith_Remove_NonUniquePSMs_Checkbox_Fragment.jsp
 			ExcludeLinksWith_Remove_NonUniquePSMs_Checkbox_PopRequestItems.getInstance().excludeLinksWith_Remove_NonUniquePSMs_Checkbox_PopRequestItems( searches, request );
 
+			//  Populates request attribute
+			IsShowDownloadLink_SkylineShulman.getInstance().isShowDownloadLink_SkylineShulman( searchIds, request );
+			
 			///////////////
 			// build list of taxonomies to show in exclusion list
 			//    puts Map<Integer, String> into request attribute where key is taxonomy id, value is taxonomy name

@@ -121,6 +121,7 @@ var ViewPsmPerPeptideLoadedFromWebServiceTemplate = function() {
 		
 		var annotationLabels = ajaxResponseData.annotationLabels;
 		var peptideRows = ajaxResponseData.peptideRows;
+		var searchHasScanData = ajaxResponseData.searchHasScanData;
 		
 		//	var ajaxRequestData = params.ajaxRequestData;
 		var $topTRelement = params.$topTRelement;
@@ -152,8 +153,12 @@ var ViewPsmPerPeptideLoadedFromWebServiceTemplate = function() {
 		if ( _psm_per_peptide_row_entry_no_annotation_data_no_scan_data_row_HTML === null ) {
 			_psm_per_peptide_row_entry_no_annotation_data_no_scan_data_row_HTML = $("#psm_data_row_entry_no_annotation_data_no_scan_data_row").html();
 		}
+		
 		var peptideLinkPosition_1_AnyRows = false;
 		var peptideLinkPosition_2_AnyRows = false;
+		var scanDataAnyRows = false;
+		var scanNumberAnyRows = false;
+		var scanFilenameAnyRows = false;
 		
 		peptideRows.forEach(function( peptideRow, index, array) {
 			if ( peptideRow.peptideLinkPosition_1 !== undefined && 
@@ -166,13 +171,33 @@ var ViewPsmPerPeptideLoadedFromWebServiceTemplate = function() {
 					peptideRow.peptideLinkPosition_2 !== -1 ) {
 				peptideLinkPosition_2_AnyRows = true;
 			}
+			if (  peptideRow.showViewSpectrumLink ) {
+				scanDataAnyRows = true;
+			}
+			if (  peptideRow.scanNumber ) {
+				scanNumberAnyRows = true;
+			}
+			if (  peptideRow.scanFilename ) {
+				scanFilenameAnyRows = true;
+			}
 		}, this );
+
+		var showViewSpectrumLinkColumn = false;
+		
+		if ( searchHasScanData && scanDataAnyRows ) {
+			showViewSpectrumLinkColumn = true;
+		}
 		
 		//  Context for creating column headings HTML
 		var context = {
 				annotationLabels : annotationLabels,
 				peptideLinkPosition_1_AnyRows : peptideLinkPosition_1_AnyRows,
-				peptideLinkPosition_2_AnyRows : peptideLinkPosition_2_AnyRows
+				peptideLinkPosition_2_AnyRows : peptideLinkPosition_2_AnyRows,
+				showViewSpectrumLinkColumn : showViewSpectrumLinkColumn,
+				scanDataAnyRows : scanDataAnyRows,
+				scanNumberAnyRows : scanNumberAnyRows,
+				scanFilenameAnyRows : scanFilenameAnyRows,
+				project_search_id : ajaxRequestData.project_search_id
 		};
 
 		var html = _handlebarsTemplate_psm_per_peptide_block_template( context );
@@ -197,7 +222,11 @@ var ViewPsmPerPeptideLoadedFromWebServiceTemplate = function() {
 					peptideRow : peptideRow,
 					mods : modsString,
 					peptideLinkPosition_1_AnyRows : peptideLinkPosition_1_AnyRows,
-					peptideLinkPosition_2_AnyRows : peptideLinkPosition_2_AnyRows
+					peptideLinkPosition_2_AnyRows : peptideLinkPosition_2_AnyRows,
+					showViewSpectrumLinkColumn : showViewSpectrumLinkColumn,
+					scanDataAnyRows : scanDataAnyRows,
+					scanNumberAnyRows : scanNumberAnyRows,
+					scanFilenameAnyRows : scanFilenameAnyRows
 			};
 			var html = _handlebarsTemplate_psm_per_peptide_data_row_entry_template(context);
 

@@ -286,11 +286,14 @@
 
     		var $linkerMassInfo = $(getElementSelector(container, elementIds.linkerMassInfo));
     		
-    		$linkerMassInfo.text( "Linker Mass: " + options.crossLinkData.linkerMass );
+    		var linkerMassDisplay = "Linker Mass: " + options.crossLinkData.linkerMass;
+    		if ( options.crossLinkData.cleavedLinkerMass ) {
+    			linkerMassDisplay = "Cleaved Linker Mass: " + options.crossLinkData.cleavedLinkerMass;
+    		}
     		
+    		$linkerMassInfo.text( linkerMassDisplay );
     		
-        	calculateSequenceMassAndPutOnPage(container);
-        
+    		calculateSequenceMassAndPutOnPage(container);
         }
         
         //  Copy from "Update" button Code
@@ -2518,12 +2521,14 @@
         
         if ( options.crossLinkData ) {
         	
-        	
         } else {
-        	
         	return;  //  EARLY EXIT   only do for cross link data
-        	
         }
+
+		if ( options.crossLinkData.cleavedLinkerMass !== undefined ) {
+			//  Only populate 'Linked Peptide + Linker Mass:' if not Cleaved Linker Mass
+			return;  //  EARLY EXIT   only do for cross link data
+		}
 
         var massType = getMassType(container);
         

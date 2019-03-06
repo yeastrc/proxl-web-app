@@ -1,5 +1,6 @@
 package org.yeastrc.xlink.www.webservices;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -27,6 +28,8 @@ import org.yeastrc.spectral_storage.get_data_webapp.shared_server_client.webserv
 import org.yeastrc.xlink.dao.ScanFileDAO;
 import org.yeastrc.xlink.dao.StaticModDAO;
 import org.yeastrc.xlink.dto.IsotopeLabelDTO;
+import org.yeastrc.xlink.dto.LinkerDTO;
+import org.yeastrc.xlink.dto.LinkerPerSearchCleavedCrosslinkMassDTO;
 import org.yeastrc.xlink.dto.PeptideDTO;
 import org.yeastrc.xlink.dto.PsmDTO;
 import org.yeastrc.xlink.dto.SearchScanFilenameDTO;
@@ -47,6 +50,8 @@ import org.yeastrc.xlink.www.dto.SrchRepPeptPeptideDTO;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappInternalErrorException;
 import org.yeastrc.xlink.www.searcher.IsotopeLabelSearcher;
+import org.yeastrc.xlink.www.searcher.LinkerForPSMMatcher;
+import org.yeastrc.xlink.www.searcher.LinkerPerSearchCleavedCrosslinkMass_Searcher;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
 import org.yeastrc.xlink.www.searcher.ProjectSearchIdsForSearchIdSearcher;
 import org.yeastrc.xlink.www.searcher.SearchReportedPeptideLinkTypeSearcher;
@@ -405,6 +410,7 @@ public class LorikeetSpectrumService {
 	 * @throws Exception
 	 */
 	private LorikeetCrossLinkData getCrossLinkData( PsmDTO psmDTO ) throws Exception {
+		
 		LorikeetCrossLinkData lorikeetCrossLinkData = new LorikeetCrossLinkData();
 		lorikeetCrossLinkData.setLinkerMass(  psmDTO.getLinkerMass() );
 		
@@ -430,6 +436,46 @@ public class LorikeetSpectrumService {
 		lorikeetCrossLinkData.setPeptideData1( peptideData1 );
 		LorikeetPerPeptideData peptideData2 = getLorikeetPerPeptideData( srchRepPeptPeptideDTO_2 );
 		lorikeetCrossLinkData.setPeptideData2( peptideData2 );
+		
+		{	
+			//  Get cleaved_crosslink_mass records for search id
+			List<LinkerPerSearchCleavedCrosslinkMassDTO> cleavedCrosslinkMassList_FromDB = LinkerPerSearchCleavedCrosslinkMass_Searcher.getInstance().getForSearchId( psmDTO.getSearchId() );
+			if ( ! cleavedCrosslinkMassList_FromDB.isEmpty() ) {
+				//  Have records so get the link id for the main crosslink mass on the PSM
+				LinkerDTO linkerdto = null;
+				try {
+					linkerdto = LinkerForPSMMatcher.getInstance().getLinkerForPSM( psmDTO );
+				} catch (Exception e ) {
+					try {
+						int psmId = psmDTO.getId();
+						log.error( "Error getting linkerDTO for psmId: " + psmId, e );
+					} catch (Exception e2 ) {
+						log.error( "Error getting searchId: " + psmDTO.getSearchId(), e2 );
+					}
+				}
+				//  Get cleaved_crosslink_mass records for linker id
+				List<LinkerPerSearchCleavedCrosslinkMassDTO> cleavedCrosslinkMassList_ForLinkerId = new ArrayList<>( cleavedCrosslinkMassList_FromDB.size() );
+				for ( LinkerPerSearchCleavedCrosslinkMassDTO entry : cleavedCrosslinkMassList_FromDB ) {
+					if ( entry.getLinkerId() == linkerdto.getId() ) {
+						cleavedCrosslinkMassList_ForLinkerId.add( entry );
+					}
+				}
+				if ( ! cleavedCrosslinkMassList_ForLinkerId.isEmpty() ) {
+					//  Found entries for cleavedCrosslinkMassList_ForLinkerId for Linker id
+					
+					//  Set linker abbr
+					lorikeetCrossLinkData.setLinkerAbbr( linkerdto.getAbbr() );
+					
+					//  Populate cleavedCrosslinkMassList in result
+					List<BigDecimal> cleavedLinkerMassList = new ArrayList<>( cleavedCrosslinkMassList_ForLinkerId.size() );
+					for ( LinkerPerSearchCleavedCrosslinkMassDTO entry : cleavedCrosslinkMassList_ForLinkerId ) {
+						BigDecimal cleavedLinkerMassBD = new BigDecimal( entry.getCleavedCrosslinkMassString() );
+						cleavedLinkerMassList.add( cleavedLinkerMassBD );
+					}
+					lorikeetCrossLinkData.setCleavedLinkerMassList( cleavedLinkerMassList );
+				}
+			}
+		}
 		return lorikeetCrossLinkData;
 	}
 	

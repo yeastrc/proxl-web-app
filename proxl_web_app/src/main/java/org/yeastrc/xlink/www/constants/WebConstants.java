@@ -87,6 +87,10 @@ public class WebConstants {
 
 	public static final String PARAMETER_ANNOTATION_DISPLAY_DATA_USER_SELECTION_REQUEST_KEY = "annDisplayDataUserSelctn";
 	
+	//    Only set for pages that contain SkylineShulman_DownloadLink, Set In class IsShowDownloadLink_SkylineShulman 
+	
+	public static final String PARAMETER_SHOW_DOWNLOAD_LINK_SKYLINE_SHULMAN = "showDownloadLink_SkylineShulman";
+	
 	
 	/////////    Redirect URLs
 	

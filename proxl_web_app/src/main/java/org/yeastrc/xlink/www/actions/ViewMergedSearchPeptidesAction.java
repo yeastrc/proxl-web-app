@@ -1,6 +1,7 @@
 package org.yeastrc.xlink.www.actions;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -41,6 +42,7 @@ import org.yeastrc.xlink.www.web_utils.GenerateVennDiagramDataToJSON;
 import org.yeastrc.xlink.www.web_utils.GetAnnotationDisplayUserSelectionDetailsData;
 import org.yeastrc.xlink.www.web_utils.GetPageHeaderData;
 import org.yeastrc.xlink.www.web_utils.GetSearchDetailsData;
+import org.yeastrc.xlink.www.web_utils.IsShowDownloadLink_SkylineShulman;
 import org.yeastrc.xlink.www.web_utils.ProteinListingTooltipConfigUtil;
 import org.yeastrc.xlink.www.webapp_timing.WebappTiming;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -124,8 +126,9 @@ public class ViewMergedSearchPeptidesAction extends Action {
 
 			Set<Integer> projectSearchIdsProcessedFromForm = new HashSet<>(); // add each projectSearchId as process in loop next
 			
-			List<SearchDTO> searches = new ArrayList<SearchDTO>();
+			List<SearchDTO> searches = new ArrayList<SearchDTO>( projectSearchIdsListDeduppedSorted.size() );
 			Map<Integer, SearchDTO> searchesMapOnSearchId = new HashMap<>();
+			Collection<Integer> searchIds = new HashSet<>();
 			int[] searchIdsArray = new int[ projectSearchIdsListDeduppedSorted.size() ];
 			int searchIdsArrayIndex = 0;
 			for ( int projectSearchId : projectSearchIdsFromForm ) {
@@ -142,6 +145,7 @@ public class ViewMergedSearchPeptidesAction extends Action {
 					}
 					searches.add( search );
 					searchesMapOnSearchId.put( search.getSearchId(), search );
+					searchIds.add( search.getSearchId() );
 					searchIdsArray[ searchIdsArrayIndex ] = search.getSearchId();
 					searchIdsArrayIndex++;
 				}
@@ -174,6 +178,9 @@ public class ViewMergedSearchPeptidesAction extends Action {
 			//  Populate request objects for excludeLinksWith_Remove_NonUniquePSMs_Checkbox_Fragment.jsp
 			ExcludeLinksWith_Remove_NonUniquePSMs_Checkbox_PopRequestItems.getInstance().excludeLinksWith_Remove_NonUniquePSMs_Checkbox_PopRequestItems( searches, request );
 
+			//  Populates request attribute
+			IsShowDownloadLink_SkylineShulman.getInstance().isShowDownloadLink_SkylineShulman( searchIds, request );
+			
 			List<Double> modMassDistinctForSearchesList = SearchModMassDistinctSearcher.getInstance().getDistinctDynamicModMassesForSearchId( searchIdsArray );
 			if ( webappTiming != null ) {
 				webappTiming.markPoint( "After get Distinct Dynamic Mod Masses For SearchId" );

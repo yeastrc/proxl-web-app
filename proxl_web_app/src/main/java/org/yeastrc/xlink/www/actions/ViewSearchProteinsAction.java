@@ -58,6 +58,7 @@ import org.yeastrc.xlink.www.web_utils.ExcludeOnTaxonomyForProteinSequenceVersio
 import org.yeastrc.xlink.www.web_utils.GetAnnotationDisplayUserSelectionDetailsData;
 import org.yeastrc.xlink.www.web_utils.GetPageHeaderData;
 import org.yeastrc.xlink.www.web_utils.GetSearchDetailsData;
+import org.yeastrc.xlink.www.web_utils.IsShowDownloadLink_SkylineShulman;
 import org.yeastrc.xlink.www.web_utils.ProteinListingTooltipConfigUtil;
 import org.yeastrc.xlink.www.web_utils.TaxonomiesForSearchOrSearches;
 import org.yeastrc.xlink.www.web_utils.URLEncodeDecodeAURL;
@@ -215,6 +216,9 @@ public class ViewSearchProteinsAction extends Action {
 			//  Populate request objects for excludeLinksWith_Remove_NonUniquePSMs_Checkbox_Fragment.jsp
 			ExcludeLinksWith_Remove_NonUniquePSMs_Checkbox_PopRequestItems.getInstance().excludeLinksWith_Remove_NonUniquePSMs_Checkbox_PopRequestItems( search, request );
 
+			//  Populates request attribute
+			IsShowDownloadLink_SkylineShulman.getInstance().isShowDownloadLink_SkylineShulman( searchIdsSet, request );
+			
 			String projectSearchIdAsString = Integer.toString( projectSearchId );
 			CutoffValuesSearchLevel cutoffValuesSearchLevel = proteinQueryJSONRoot.getCutoffs().getSearches().get( projectSearchIdAsString );
 			SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel = null;

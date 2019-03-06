@@ -1,5 +1,7 @@
 package org.yeastrc.xlink.www.webservices;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -19,10 +21,14 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.apache.log4j.Logger;
+import org.yeastrc.xlink.dao.ScanDAO;
 import org.yeastrc.xlink.dto.AnnotationTypeDTO;
 import org.yeastrc.xlink.dto.PeptideDTO;
 import org.yeastrc.xlink.dto.PsmDTO;
 import org.yeastrc.xlink.dto.PsmPerPeptideAnnotationDTO;
+import org.yeastrc.xlink.dto.PsmPerPeptideDTO;
+import org.yeastrc.xlink.dto.ScanDTO;
+import org.yeastrc.xlink.dto.SearchScanFilenameDTO;
 import org.yeastrc.xlink.dto.SrchRepPeptPeptDynamicModDTO;
 import org.yeastrc.xlink.enum_classes.FilterableDescriptiveAnnotationType;
 import org.yeastrc.xlink.enum_classes.PsmPeptideAnnotationType;
@@ -35,13 +41,16 @@ import org.yeastrc.xlink.www.annotation_utils.GetAnnotationTypeData;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.dao.PeptideDAO;
 import org.yeastrc.xlink.www.dao.PsmDAO;
+import org.yeastrc.xlink.www.dao.PsmPerPeptideDAO;
 import org.yeastrc.xlink.www.dao.SearchDAO;
+import org.yeastrc.xlink.www.dao.SearchScanFilenameDAO;
 import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.www.dto.SrchRepPeptPeptideDTO;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappInternalErrorException;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
+import org.yeastrc.xlink.www.web_utils.RetentionTimeScalingAndRounding;
 
 
 @Path("/data")
@@ -162,6 +171,8 @@ public class PsmPerPeptideService {
 			}
 
 			WebserviceResult webserviceResult = getPsmPerPeptideData( psmDTO );
+			
+			webserviceResult.setSearchHasScanData( search.isHasScanData() );
 
 			return webserviceResult;
 
@@ -292,7 +303,10 @@ public class PsmPerPeptideService {
 
 			SinglePeptideRow singlePeptideRow = new SinglePeptideRow();
 			peptideRows.add( singlePeptideRow );
-
+			
+			singlePeptideRow.setPsmId( psmDTO.getId() );
+			singlePeptideRow.setSrchRepPeptPeptideId( srchRepPeptPeptideDTO.getId() );
+			
 			PeptideDTO peptideDTO = PeptideDAO.getInstance().getPeptideDTOFromDatabase( srchRepPeptPeptideDTO.getPeptideId() );
 			if ( peptideDTO == null ) {
 				String msg = "Peptide record not found for srchRepPeptPeptideDTO.  srchRepPeptPeptideDTO.id: " + srchRepPeptPeptideDTO.getId()
@@ -305,69 +319,136 @@ public class PsmPerPeptideService {
 			singlePeptideRow.setPeptideLinkPosition_1( srchRepPeptPeptideDTO.getPeptidePosition_1() );
 			singlePeptideRow.setPeptideLinkPosition_2( srchRepPeptPeptideDTO.getPeptidePosition_2() );
 
-			//  Get Dynamic Mod List
-			
-			List<SrchRepPeptPeptDynamicModDTO> srchRepPeptPeptDynamicModDTOList = 
-					SrchRepPeptPeptDynamicModSearcher.getInstance().getSrchRepPeptPeptDynamicModForSrchRepPeptPeptideId( srchRepPeptPeptideDTO.getId() );
-
-			Collections.sort( srchRepPeptPeptDynamicModDTOList, new Comparator<SrchRepPeptPeptDynamicModDTO>() {
-				@Override
-				public int compare(SrchRepPeptPeptDynamicModDTO o1, SrchRepPeptPeptDynamicModDTO o2) {
-					if ( o1.getPosition() < o2.getPosition() ) {
-						return -1;
+			{ //  Get Dynamic Mod List
+				
+				List<SrchRepPeptPeptDynamicModDTO> srchRepPeptPeptDynamicModDTOList = 
+						SrchRepPeptPeptDynamicModSearcher.getInstance().getSrchRepPeptPeptDynamicModForSrchRepPeptPeptideId( srchRepPeptPeptideDTO.getId() );
+	
+				Collections.sort( srchRepPeptPeptDynamicModDTOList, new Comparator<SrchRepPeptPeptDynamicModDTO>() {
+					@Override
+					public int compare(SrchRepPeptPeptDynamicModDTO o1, SrchRepPeptPeptDynamicModDTO o2) {
+						if ( o1.getPosition() < o2.getPosition() ) {
+							return -1;
+						}
+						if ( o1.getPosition() > o2.getPosition() ) {
+							return 1;
+						}
+						if ( o1.getMass() < o2.getMass() ) {
+							return -1;
+						}
+						if ( o1.getMass() > o2.getMass() ) {
+							return 1;
+						}					
+						return 0;
 					}
-					if ( o1.getPosition() > o2.getPosition() ) {
-						return 1;
-					}
-					if ( o1.getMass() < o2.getMass() ) {
-						return -1;
-					}
-					if ( o1.getMass() > o2.getMass() ) {
-						return 1;
-					}					
-					return 0;
+				});
+	
+				List<SingleMod> mods = new ArrayList<>( srchRepPeptPeptDynamicModDTOList.size() );
+				singlePeptideRow.setMods( mods );
+				
+				for ( SrchRepPeptPeptDynamicModDTO srchRepPeptPeptDynamicModDTO : srchRepPeptPeptDynamicModDTOList ) {
+					SingleMod singleMod = new SingleMod();
+					mods.add( singleMod );
+					singleMod.setMass( srchRepPeptPeptDynamicModDTO.getMass() );
+					singleMod.setPosition( srchRepPeptPeptDynamicModDTO.getPosition() );
 				}
-			});
-
-			List<SingleMod> mods = new ArrayList<>( srchRepPeptPeptDynamicModDTOList.size() );
-			singlePeptideRow.setMods( mods );
-			
-			for ( SrchRepPeptPeptDynamicModDTO srchRepPeptPeptDynamicModDTO : srchRepPeptPeptDynamicModDTOList ) {
-				SingleMod singleMod = new SingleMod();
-				mods.add( singleMod );
-				singleMod.setMass( srchRepPeptPeptDynamicModDTO.getMass() );
-				singleMod.setPosition( srchRepPeptPeptDynamicModDTO.getPosition() );
 			}
 			
-			//  Get annotation values
-			
-			List<Integer> annotationTypeIdList = new ArrayList<>( annotationTypeDefaultDisplayList.size() );
-			for ( AnnotationTypeDTO annotationTypeDTO : annotationTypeDefaultDisplayList ) {
-				annotationTypeIdList.add( annotationTypeDTO.getId() );
-			}
-
-			List<PsmPerPeptideAnnotationDTO> psmPerPeptideAnnotationDTOList = 
-					PsmPerPeptideAnnotationDataSearcher.getInstance().getPsmPerPeptideAnnotationDTOList( psmDTO.getId(), srchRepPeptPeptideDTO.getId(), annotationTypeIdList );
-
-			Map<Integer,PsmPerPeptideAnnotationDTO> psmPerPeptideAnnotationDTO_Key_AnnTypeId = new HashMap<>();
-			for ( PsmPerPeptideAnnotationDTO psmPerPeptideAnnotationDTO : psmPerPeptideAnnotationDTOList ) {
-				psmPerPeptideAnnotationDTO_Key_AnnTypeId.put( psmPerPeptideAnnotationDTO.getAnnotationTypeId(), psmPerPeptideAnnotationDTO );
-			}
-			
-			List<String> annotationValues = new ArrayList<String>( annotationTypeDefaultDisplayList.size() );
-			singlePeptideRow.setAnnotationValues( annotationValues );
-			
-			for ( AnnotationTypeDTO annotationTypeDTO : annotationTypeDefaultDisplayList ) {
-				PsmPerPeptideAnnotationDTO psmPerPeptideAnnotationDTO = psmPerPeptideAnnotationDTO_Key_AnnTypeId.get( annotationTypeDTO.getId() );
-				if ( psmPerPeptideAnnotationDTO == null ) {
-					String msg = "psmPerPeptideAnnotationDTO not found for annotation type id: " + annotationTypeDTO.getId()
-					+ ", psm id: " + psmDTO.getId();
+			{ //  Get data for psm_per_peptide record
+				
+				PsmPerPeptideDTO psmPerPeptideDTO =
+						PsmPerPeptideDAO.getInstance()
+						.getOnePsmPerPeptideDTOForPsmIdAndSrchRepPeptPeptideId( psmDTO.getId(), srchRepPeptPeptideDTO.getId() );
+				
+				if ( psmPerPeptideDTO == null ) {
+					String msg = "No psmPerPeptideDTO for psmId: " 
+							+ psmDTO.getId()
+							+ ", srchRepPeptPeptideId: " 
+							+ srchRepPeptPeptideDTO.getId();
 					log.error( msg );
-					throw new ProxlWebappDataException( msg );
+					throw new ProxlWebappInternalErrorException(msg);
 				}
-				annotationValues.add( psmPerPeptideAnnotationDTO.getValueString() );
+				
+				singlePeptideRow.setScanNumber( psmPerPeptideDTO.getScanNumber() );
+				
+				//  Get Scan Filename
+				if ( psmPerPeptideDTO.getSearchScanFilenameId() != null ) {
+					SearchScanFilenameDTO searchScanFilenameDTO =
+							SearchScanFilenameDAO.getInstance().getSearchScanFilenameDTO( psmPerPeptideDTO.getSearchScanFilenameId() );
+					if ( searchScanFilenameDTO == null ) {
+						String msg = "No searchScanFilenameDTO for id: " 
+								+ psmPerPeptideDTO.getSearchScanFilenameId()
+								+ ", psmId: " + psmDTO.getId();
+						log.error( msg );
+						throw new ProxlWebappInternalErrorException(msg);
+					}
+					singlePeptideRow.setScanFilename( searchScanFilenameDTO.getFilename() );
+				}
+				
+				//  Get Scan Data
+				if ( psmPerPeptideDTO.getScanId() != null ) {
+					//  Have scan data
+					singlePeptideRow.setShowViewSpectrumLink(true);
+					ScanDTO scanDTO = ScanDAO.getScanFromId( psmPerPeptideDTO.getScanId() );
+					if ( scanDTO == null ) {
+						String msg = "No scanDTO for id: " 
+								+ psmPerPeptideDTO.getScanId()
+								+ ", psmId: " + psmDTO.getId();
+						log.error( msg );
+						throw new ProxlWebappInternalErrorException(msg);
+					}
+					BigDecimal retentionTime = scanDTO.getRetentionTime();
+					if ( retentionTime != null ) {
+						singlePeptideRow.setRetentionTime( retentionTime );
+						//  Get the retention time in minutes
+						BigDecimal retentionInMinutesRounded = RetentionTimeScalingAndRounding.retentionTimeToMinutesRounded( retentionTime );
+						singlePeptideRow.setRetentionTimeMinutesRounded( retentionInMinutesRounded );
+						singlePeptideRow.setRetentionTimeMinutesRoundedString( retentionInMinutesRounded.toString() );
+					}
+					BigDecimal preMZ = scanDTO.getPreMZ();
+					if ( preMZ != null ) {
+						singlePeptideRow.setPreMZ( preMZ );
+						//  Round the preMZ
+						String preMZRoundedString = null;
+						if ( preMZ != null ) {
+							// first param to setScale is the number of decimal places to keep  
+							BigDecimal preMZRounded = preMZ.setScale( 5, RoundingMode.HALF_UP );
+							preMZRoundedString = preMZRounded.toString();  // convert to string so trailing zeros are preserved
+						}
+						singlePeptideRow.setPreMZRounded( preMZRoundedString );
+					}
+				}
 			}
 			
+			{ //  Get annotation values
+			
+				List<Integer> annotationTypeIdList = new ArrayList<>( annotationTypeDefaultDisplayList.size() );
+				for ( AnnotationTypeDTO annotationTypeDTO : annotationTypeDefaultDisplayList ) {
+					annotationTypeIdList.add( annotationTypeDTO.getId() );
+				}
+	
+				List<PsmPerPeptideAnnotationDTO> psmPerPeptideAnnotationDTOList = 
+						PsmPerPeptideAnnotationDataSearcher.getInstance().getPsmPerPeptideAnnotationDTOList( psmDTO.getId(), srchRepPeptPeptideDTO.getId(), annotationTypeIdList );
+	
+				Map<Integer,PsmPerPeptideAnnotationDTO> psmPerPeptideAnnotationDTO_Key_AnnTypeId = new HashMap<>();
+				for ( PsmPerPeptideAnnotationDTO psmPerPeptideAnnotationDTO : psmPerPeptideAnnotationDTOList ) {
+					psmPerPeptideAnnotationDTO_Key_AnnTypeId.put( psmPerPeptideAnnotationDTO.getAnnotationTypeId(), psmPerPeptideAnnotationDTO );
+				}
+				
+				List<String> annotationValues = new ArrayList<String>( annotationTypeDefaultDisplayList.size() );
+				singlePeptideRow.setAnnotationValues( annotationValues );
+				
+				for ( AnnotationTypeDTO annotationTypeDTO : annotationTypeDefaultDisplayList ) {
+					PsmPerPeptideAnnotationDTO psmPerPeptideAnnotationDTO = psmPerPeptideAnnotationDTO_Key_AnnTypeId.get( annotationTypeDTO.getId() );
+					if ( psmPerPeptideAnnotationDTO == null ) {
+						String msg = "psmPerPeptideAnnotationDTO not found for annotation type id: " + annotationTypeDTO.getId()
+						+ ", psm id: " + psmDTO.getId();
+						log.error( msg );
+						throw new ProxlWebappDataException( msg );
+					}
+					annotationValues.add( psmPerPeptideAnnotationDTO.getValueString() );
+				}
+			}
 		}
 		
 		return webserviceResult;
@@ -379,6 +460,8 @@ public class PsmPerPeptideService {
 	 */
 	public static class WebserviceResult {
 
+		private boolean searchHasScanData; //  Set in root method after returned from sub method
+		
 		private List<String> annotationLabels;
 		
 		private List<SinglePeptideRow> peptideRows;
@@ -395,6 +478,12 @@ public class PsmPerPeptideService {
 		public void setAnnotationLabels(List<String> annotationLabels) {
 			this.annotationLabels = annotationLabels;
 		}
+		public boolean isSearchHasScanData() {
+			return searchHasScanData;
+		}
+		public void setSearchHasScanData(boolean searchHasScanData) {
+			this.searchHasScanData = searchHasScanData;
+		}
 	}
 
 	/**
@@ -402,11 +491,28 @@ public class PsmPerPeptideService {
 	 *
 	 */
 	public static class SinglePeptideRow {
+		
+		private int psmId;
+		private int srchRepPeptPeptideId;
 
 		private String peptideSequence;
 		private Integer peptideLinkPosition_1;
 		private Integer peptideLinkPosition_2;
 		private List<SingleMod> mods;
+		
+		private Integer scanNumber;
+		private String scanFilename;
+
+		//  From scan
+		
+		private boolean showViewSpectrumLink;
+		private BigDecimal retentionTime;
+		private BigDecimal retentionTimeMinutesRounded;
+		private String retentionTimeMinutesRoundedString;
+
+		private BigDecimal preMZ;
+		private String preMZRounded; 
+		
 		private List<String> annotationValues;
 
 		public String getPeptideSequence() {
@@ -438,6 +544,66 @@ public class PsmPerPeptideService {
 		}
 		public void setPeptideLinkPosition_2(Integer peptideLinkPosition_2) {
 			this.peptideLinkPosition_2 = peptideLinkPosition_2;
+		}
+		public int getPsmId() {
+			return psmId;
+		}
+		public void setPsmId(int psmId) {
+			this.psmId = psmId;
+		}
+		public int getSrchRepPeptPeptideId() {
+			return srchRepPeptPeptideId;
+		}
+		public void setSrchRepPeptPeptideId(int srchRepPeptPeptideId) {
+			this.srchRepPeptPeptideId = srchRepPeptPeptideId;
+		}
+		public Integer getScanNumber() {
+			return scanNumber;
+		}
+		public void setScanNumber(Integer scanNumber) {
+			this.scanNumber = scanNumber;
+		}
+		public String getScanFilename() {
+			return scanFilename;
+		}
+		public void setScanFilename(String scanFilename) {
+			this.scanFilename = scanFilename;
+		}
+		public BigDecimal getRetentionTime() {
+			return retentionTime;
+		}
+		public void setRetentionTime(BigDecimal retentionTime) {
+			this.retentionTime = retentionTime;
+		}
+		public BigDecimal getRetentionTimeMinutesRounded() {
+			return retentionTimeMinutesRounded;
+		}
+		public void setRetentionTimeMinutesRounded(BigDecimal retentionTimeMinutesRounded) {
+			this.retentionTimeMinutesRounded = retentionTimeMinutesRounded;
+		}
+		public String getRetentionTimeMinutesRoundedString() {
+			return retentionTimeMinutesRoundedString;
+		}
+		public void setRetentionTimeMinutesRoundedString(String retentionTimeMinutesRoundedString) {
+			this.retentionTimeMinutesRoundedString = retentionTimeMinutesRoundedString;
+		}
+		public BigDecimal getPreMZ() {
+			return preMZ;
+		}
+		public void setPreMZ(BigDecimal preMZ) {
+			this.preMZ = preMZ;
+		}
+		public String getPreMZRounded() {
+			return preMZRounded;
+		}
+		public void setPreMZRounded(String preMZRounded) {
+			this.preMZRounded = preMZRounded;
+		}
+		public boolean isShowViewSpectrumLink() {
+			return showViewSpectrumLink;
+		}
+		public void setShowViewSpectrumLink(boolean showViewSpectrumLink) {
+			this.showViewSpectrumLink = showViewSpectrumLink;
 		}
 	}
 
