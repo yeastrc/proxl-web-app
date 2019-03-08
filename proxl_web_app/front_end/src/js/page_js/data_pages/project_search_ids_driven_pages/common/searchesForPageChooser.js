@@ -100,7 +100,12 @@ SearchesForPageChooser.prototype.init = function( params ) {
 		var tooltipText = $searches_for_page_chooser_overlay_change_button_disabled_cover_div.attr("data-tooltip_get_in_init");			
 		tooltipText = tooltipText.replace("#", this.minimumNumberOfSearches );
 		$searches_for_page_chooser_overlay_change_button_disabled_cover_div.attr("data-tooltip", tooltipText);	
-		addSingleGenericProxlToolTip( $searches_for_page_chooser_overlay_change_button_disabled_cover_div );
+		
+		if ( addSingleGenericProxlToolTip ) {
+			addSingleGenericProxlToolTip( $searches_for_page_chooser_overlay_change_button_disabled_cover_div );
+		} else if ( window.addSingleGenericProxlToolTip ) {
+			window.addSingleGenericProxlToolTip( $searches_for_page_chooser_overlay_change_button_disabled_cover_div );
+		}
 
 		//  Compile Handlebars Templates
 		var singleSearchTemplate_handlebarsSource = $( "#searches_for_page_chooser_overlay_search_entry_template" ).text();
