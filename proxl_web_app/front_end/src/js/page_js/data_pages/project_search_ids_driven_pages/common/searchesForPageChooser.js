@@ -105,6 +105,14 @@ SearchesForPageChooser.prototype.init = function( params ) {
 			addSingleGenericProxlToolTip( $searches_for_page_chooser_overlay_change_button_disabled_cover_div );
 		} else if ( window.addSingleGenericProxlToolTip ) {
 			window.addSingleGenericProxlToolTip( $searches_for_page_chooser_overlay_change_button_disabled_cover_div );
+		} else {
+			try {
+				throw Error("Non Fatal Exception (Processing continues after this exception is caught): In SearchesForPageChooser.prototype.init: addSingleGenericProxlToolTip and window.addSingleGenericProxlToolTip are not set.")
+			} catch( e ) {
+				if ( window.reportWebErrorToServer ) {
+					reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				}
+			}
 		}
 
 		//  Compile Handlebars Templates
