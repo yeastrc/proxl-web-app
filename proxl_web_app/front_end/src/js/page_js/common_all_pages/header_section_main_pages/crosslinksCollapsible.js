@@ -26,7 +26,7 @@ if ( ! window.crosslinksCollapsible_js_Initialized ) {
 
 /////
 
-window.addCollapsableEventHandlers = function( $searchRoot ) {
+var addCollapsableEventHandlers = function( $searchRoot ) {
 	
 	try {
 
@@ -122,5 +122,7 @@ window.addCollapsableEventHandlers = function( $searchRoot ) {
 	}
 
 };
+
+window.addCollapsableEventHandlers = addCollapsableEventHandlers;
 
 export { addCollapsableEventHandlers }

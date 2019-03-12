@@ -50,7 +50,7 @@ if ( ! window.showHideErrorMessage_js_Initialized ) {
 
 ////////////
 
-window.showErrorMsg = function( $element, clearMsg ) {
+var showErrorMsg = function( $element, clearMsg ) {
 	
 	if ( clearMsg === undefined ) { //  If no value passed, default to true;
 		
@@ -83,11 +83,13 @@ window.showErrorMsg = function( $element, clearMsg ) {
 	}
 };
 
+window.showErrorMsg = showErrorMsg;
+
 
 
 /////////////
 
-window.hideAllErrorMessages = function() {
+var hideAllErrorMessages = function() {
 	
 	//  Hides all error messages
 
@@ -101,11 +103,13 @@ window.hideAllErrorMessages = function() {
 	});
 }
 
+window.hideAllErrorMessages = hideAllErrorMessages;
+
 
 
 ////////////
 
-window.clearErrorMsg = function( $element, fadeErrorMsg ) {
+var clearErrorMsg = function( $element, fadeErrorMsg ) {
 
 	$element.stop( true /* [clearQueue ] */ /*  [, jumpToEnd ] */ );
 	
@@ -131,12 +135,14 @@ window.clearErrorMsg = function( $element, fadeErrorMsg ) {
 	
 };
 
+window.clearErrorMsg = clearErrorMsg;
+
 
 
 
 ////////////
 
-window.initShowHideErrorMessage = function( ) {
+var initShowHideErrorMessage = function( ) {
 
 
 	var $error_message_close_x_jq  = $(".error_message_close_x_jq");
@@ -144,10 +150,12 @@ window.initShowHideErrorMessage = function( ) {
 	initShowHideErrorMessageSpecificElements( $error_message_close_x_jq );
 };
 
+window.initShowHideErrorMessage = initShowHideErrorMessage;
+
 
 ////////////
 
-window.initShowHideErrorMessageSpecificElements = function( $elements ) {
+var initShowHideErrorMessageSpecificElements = function( $elements ) {
 
 	$elements.click( function(eventObject) {
 		
@@ -165,6 +173,8 @@ window.initShowHideErrorMessageSpecificElements = function( $elements ) {
 	});
 	
 }
+
+window.initShowHideErrorMessageSpecificElements = initShowHideErrorMessageSpecificElements;
 
 
 export { showErrorMsg, hideAllErrorMessages, clearErrorMsg, initShowHideErrorMessage, initShowHideErrorMessageSpecificElements }

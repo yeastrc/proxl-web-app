@@ -61,7 +61,7 @@ window.closePDBShowAlignmentOverlay = function (  ) {
 
 
 //attach handlers for the upload overlay, namely ensure clicking "X" closes the overlay.
-window.attachPDBMapProteinOverlayClickHandlers = function (  ) {
+var attachPDBMapProteinOverlayClickHandlers = function (  ) {
 	var $pdb_map_protein_overlay_X_for_exit_overlay = $(".pdb-map-protein-overlay-X-for-exit-overlay");
 	
 	$pdb_map_protein_overlay_X_for_exit_overlay.click( function( eventObject ) {
@@ -92,6 +92,8 @@ window.attachPDBMapProteinOverlayClickHandlers = function (  ) {
 	} );
 	
 };
+
+window.attachPDBMapProteinOverlayClickHandlers = attachPDBMapProteinOverlayClickHandlers;
 
 
 

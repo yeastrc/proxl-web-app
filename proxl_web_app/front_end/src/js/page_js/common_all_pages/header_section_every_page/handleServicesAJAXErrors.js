@@ -27,10 +27,12 @@ var AJAX_RESPONSE_INVALID_PARAMETER_STATUS_CODE = 400;
 
 //Handle when AJAX call gets failure
 
-window.handleAJAXFailure = function( errMsg ) {
+var handleAJAXFailure = function( errMsg ) {
 
 	showAjaxErrorMsgFromMsg( { errorMsg : "Connecting to server failed: " + errorMsg } );
 }
+
+window.handleAJAXFailure = handleAJAXFailure;
 
 
 /////////////////////

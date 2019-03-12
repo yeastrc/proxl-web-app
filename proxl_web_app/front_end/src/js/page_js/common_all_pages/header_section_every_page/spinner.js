@@ -20,7 +20,7 @@ var SPINNER_OPTIONS = {
 
 var loadingSpinner;
 
-window.createSpinner = function () {
+var createSpinner = function () {
 
 	var $spinnerContainer = $( "div#coverage-map-loading-spinner-block" );
 
@@ -33,6 +33,8 @@ window.createSpinner = function () {
 
 	return loadingSpinner;
 };
+
+window.createSpinner = createSpinner;
 
 
 window.destroySpinner = function() {

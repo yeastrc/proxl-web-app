@@ -85,7 +85,9 @@ window.ReportWebErrorToServer = function() {
 
 //  Instance of class
 
-window.reportWebErrorToServer = new ReportWebErrorToServer();
+var reportWebErrorToServer = new ReportWebErrorToServer();
+
+window.reportWebErrorToServer = reportWebErrorToServer;
 
 export { reportWebErrorToServer }
 

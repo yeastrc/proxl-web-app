@@ -29,7 +29,7 @@ if ( ! window.genericToolTip_js_Initialized ) {
 //  Just define these functions again and attach to window
 
 	
-	window.addToolTips = function ( $element ) {
+var addToolTips = function ( $element ) {
 
 		var $elements;
 		
@@ -54,7 +54,7 @@ if ( ! window.genericToolTip_js_Initialized ) {
 	};
 	
 
-	window.addSingleGenericProxlToolTip = function ( $element ) {
+var addSingleGenericProxlToolTip = function ( $element ) {
 		
 		var tooltipText = $element.attr("data-tooltip");			
 		
@@ -70,5 +70,8 @@ if ( ! window.genericToolTip_js_Initialized ) {
 	    });		
 		
 	};
+	
+window.addToolTips = addToolTips;
+window.addSingleGenericProxlToolTip = addSingleGenericProxlToolTip;
 
 export { addToolTips, addSingleGenericProxlToolTip }

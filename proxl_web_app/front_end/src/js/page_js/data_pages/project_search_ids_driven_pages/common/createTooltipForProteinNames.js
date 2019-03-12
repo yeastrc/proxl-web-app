@@ -28,7 +28,7 @@ $(document).ready(function() {
 	},10);
 });
 
-window.createTooltipForProteinNames = function() {
+var createTooltipForProteinNames = function() {
 
 	_protein_listing_webservice_base_url_set = $("#protein_listing_webservice_base_url_set").val();
 	if ( _protein_listing_webservice_base_url_set === undefined 
@@ -228,5 +228,8 @@ var _addSingleTooltipForProteinName_HTML_Addition_DisplayedProteinName = functio
 };
 
 
-export { addSingleTooltipForProteinName }
+window.createTooltipForProteinNames = createTooltipForProteinNames;
+
+
+export { createTooltipForProteinNames }
 

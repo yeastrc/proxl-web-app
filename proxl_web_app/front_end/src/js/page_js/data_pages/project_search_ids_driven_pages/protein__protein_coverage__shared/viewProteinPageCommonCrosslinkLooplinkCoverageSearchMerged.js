@@ -372,7 +372,9 @@ var ViewSearchProteinPageCommonCrosslinkLooplinkCoverage = function() {
 };
 
 //  Instance of class
-window.viewSearchProteinPageCommonCrosslinkLooplinkCoverage = new ViewSearchProteinPageCommonCrosslinkLooplinkCoverage();
+var viewSearchProteinPageCommonCrosslinkLooplinkCoverage = new ViewSearchProteinPageCommonCrosslinkLooplinkCoverage();
+
+window.viewSearchProteinPageCommonCrosslinkLooplinkCoverage = viewSearchProteinPageCommonCrosslinkLooplinkCoverage;
 
 //  Copy to standard page level JS Code Object
 window.standardFullPageCode = window.viewSearchProteinPageCommonCrosslinkLooplinkCoverage;

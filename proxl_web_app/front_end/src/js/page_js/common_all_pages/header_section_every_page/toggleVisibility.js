@@ -148,11 +148,13 @@ window.addToggleVisibilityClickHandler = function( $parentElement ) {
 
 
 
-window.initToggleVisibility = function( ) {
+var initToggleVisibility = function( ) {
 
 	var $parentElement = $(document);
 	
 	addToggleVisibilityClickHandler( $parentElement );
 }	
+
+window.initToggleVisibility = initToggleVisibility;
 
 export { initToggleVisibility } // Export something to get this on the page
