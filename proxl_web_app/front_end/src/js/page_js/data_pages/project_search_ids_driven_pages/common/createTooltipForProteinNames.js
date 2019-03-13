@@ -60,7 +60,7 @@ var createTooltipForProteinNames = function() {
 var __proteinDataForToolTipFormattedHTMLCache = {};
 
 //   Add the tool tip to display on the top right of the element
-window.addSingleTooltipForProteinNameOnTopRight = function( params ) {
+var addSingleTooltipForProteinNameOnTopRight = function( params ) {
 	params.tipPosition = {
             my: 'bottom left',
             at: 'top right',
@@ -83,7 +83,7 @@ window.addSingleTooltipForProteinNameOnTopRight = function( params ) {
 //	addSingleTooltipForProteinName( params );
 //};
 
-window.addSingleTooltipForProteinName = function( params ) {
+var addSingleTooltipForProteinName = function( params ) {
 	
 	_protein_listing_webservice_base_url_set = $("#protein_listing_webservice_base_url_set").val();
 	if ( _protein_listing_webservice_base_url_set === undefined 
@@ -230,6 +230,9 @@ var _addSingleTooltipForProteinName_HTML_Addition_DisplayedProteinName = functio
 
 window.createTooltipForProteinNames = createTooltipForProteinNames;
 
+window.addSingleTooltipForProteinNameOnTopRight = addSingleTooltipForProteinNameOnTopRight;
+window.addSingleTooltipForProteinName = addSingleTooltipForProteinName;
 
-export { createTooltipForProteinNames }
+
+export { createTooltipForProteinNames, addSingleTooltipForProteinNameOnTopRight, addSingleTooltipForProteinName }
 
