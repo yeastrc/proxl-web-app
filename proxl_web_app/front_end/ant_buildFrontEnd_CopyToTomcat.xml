@@ -86,9 +86,39 @@
 		</copy>			 
 		
 		<!-- Copy legacy files -->
+
+	      <delete dir="${tomcat.css}"/>
+	      <mkdir  dir="${tomcat.css}"/>
+	      <delete dir="${tomcat.images}"/>
+	      <mkdir  dir="${tomcat.images}"/>
+	      <delete dir="${tomcat.js}"/>
+	      <mkdir  dir="${tomcat.js}"/>
+	      <delete dir="${tomcat.jsp-includes}"/>
+	      <mkdir  dir="${tomcat.jsp-includes}"/>
+	      <delete dir="${tomcat.jsp-pages}"/>
+	      <mkdir  dir="${tomcat.jsp-pages}"/>
+	      <delete dir="${tomcat.jsp_template_fragments}"/>
+	      <mkdir  dir="${tomcat.jsp_template_fragments}"/>
+
+		<copy todir="${tomcat.css}" >
+  		    <fileset dir="..${file.separator}src${file.separator}main${file.separator}webapp${file.separator}css" />
+		</copy>			 
+		<copy todir="${tomcat.images}" >
+  		    <fileset dir="..${file.separator}src${file.separator}main${file.separator}webapp${file.separator}images" />
+		</copy>
+		<copy todir="${tomcat.js}" >
+  		    <fileset dir="..${file.separator}src${file.separator}main${file.separator}webapp${file.separator}js" />
+		</copy>			
 		
-		<ant dir=".." antfile="ant_Copy_FrontEnd_ToTomcat.xml" />
-		
+		<copy todir="${tomcat.jsp-includes}" >
+  		    <fileset dir="..${file.separator}src${file.separator}main${file.separator}webapp${file.separator}WEB-INF${file.separator}jsp-includes" />
+		</copy>			 
+		<copy todir="${tomcat.jsp-pages}" >
+  		    <fileset dir="..${file.separator}src${file.separator}main${file.separator}webapp${file.separator}WEB-INF${file.separator}jsp-pages" />
+		</copy>	
+		<copy todir="${tomcat.jsp_template_fragments}" >
+  		    <fileset dir="..${file.separator}src${file.separator}main${file.separator}webapp${file.separator}WEB-INF${file.separator}jsp_template_fragments" />
+		</copy>	
 	</target>
 
 
