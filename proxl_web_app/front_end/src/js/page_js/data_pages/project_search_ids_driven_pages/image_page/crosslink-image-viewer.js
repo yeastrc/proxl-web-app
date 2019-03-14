@@ -1937,6 +1937,11 @@ var ImagePagePrimaryRootCodeClass = function() {
 							
 							// Update the first time only
 							_allLinkersSupportedForLinkablePositions = data.allLinkersSupportedForLinkablePositions;
+							
+							if ( _allLinkersSupportedForLinkablePositions === undefined ) {
+								//  Not returned from webservice so default to true
+								_allLinkersSupportedForLinkablePositions = true;
+							}
 						
 							updatePageAndHashIfNeededFor_allLinkersSupportedForLinkablePositions();
 						}

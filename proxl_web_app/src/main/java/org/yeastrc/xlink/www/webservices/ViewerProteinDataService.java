@@ -83,7 +83,7 @@ public class ViewerProteinDataService {
 	 * 
 	 *  Increment this value whenever change the resulting image since Caching the resulting JSON
 	 */
-	public static final int VERSION_FOR_CACHING = 2;
+	public static final int VERSION_FOR_CACHING = 3;
 	
 	
 	@GET
