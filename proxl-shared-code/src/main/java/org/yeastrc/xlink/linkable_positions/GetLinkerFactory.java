@@ -8,19 +8,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.exceptions.ProxlBaseDataException;
 import org.yeastrc.xlink.linkable_positions.GetLinkerFactory;
-import org.yeastrc.xlink.linkable_positions.linkers.BMOE;
-import org.yeastrc.xlink.linkable_positions.linkers.BS2;
-import org.yeastrc.xlink.linkable_positions.linkers.BS3;
-import org.yeastrc.xlink.linkable_positions.linkers.BS3_STY;
-import org.yeastrc.xlink.linkable_positions.linkers.DSG;
-import org.yeastrc.xlink.linkable_positions.linkers.DSS;
-import org.yeastrc.xlink.linkable_positions.linkers.DSSO;
-import org.yeastrc.xlink.linkable_positions.linkers.DSS_STY;
-import org.yeastrc.xlink.linkable_positions.linkers.EDC;
-import org.yeastrc.xlink.linkable_positions.linkers.DFDNB;
-import org.yeastrc.xlink.linkable_positions.linkers.ILinker;
-import org.yeastrc.xlink.linkable_positions.linkers.SulfoSMCC;
-import org.yeastrc.xlink.linkable_positions.linkers.Transglutaminase;
+import org.yeastrc.xlink.linkable_positions.linkers.*;
 
 public class GetLinkerFactory {
 	
@@ -37,7 +25,8 @@ public class GetLinkerFactory {
 	public static final String BUILT_IN_LINKER_DFDNB = "dfdnb";
 	public static final String BUILT_IN_LINKER_SULFO_SMCC = "sulfo-smcc";
 	public static final String BUILD_IN_LINKER_DSSO = "dsso";
-	
+	public static final String BUILD_IN_LINKER_DSBU = "dsbu";
+
 	public static final String BUILD_IN_LINKER_TG = "tg";
 	public static final String BUILD_IN_LINKER_transglutaminase = "transglutaminase";
 	
@@ -57,6 +46,7 @@ public class GetLinkerFactory {
 	private static ILinker LINKER_DFDNB = new DFDNB();
 	private static ILinker LINKER_SULFO_SMCC = new SulfoSMCC();
 	private static ILinker LINKER_DSSO = new DSSO();
+	private static ILinker LINKER_DSBU = new DSBU();
 	private static ILinker LINKER_TG = new Transglutaminase();
 
 	private static ILinker LINKER_DSS_STY = new DSS_STY();
@@ -76,6 +66,7 @@ public class GetLinkerFactory {
 		linkers.put( BUILT_IN_LINKER_DFDNB, LINKER_DFDNB );
 		linkers.put( BUILT_IN_LINKER_SULFO_SMCC, LINKER_SULFO_SMCC);
 		linkers.put( BUILD_IN_LINKER_DSSO, LINKER_DSSO);
+		linkers.put( BUILD_IN_LINKER_DSBU, LINKER_DSBU);
 
 		linkers.put( BUILD_IN_LINKER_TG, LINKER_TG );
 		linkers.put( BUILD_IN_LINKER_transglutaminase, LINKER_TG );
