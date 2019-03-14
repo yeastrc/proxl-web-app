@@ -11,7 +11,7 @@ import org.yeastrc.xlink.dto.LinkerPerSearchMonolinkMassDTO;
 
 
 /**
- * table linker_per_search_monolink_mass
+ * table linker_per_search_monolink_mass_tbl
  *
  */
 public class DB_Insert_LinkerPerSearchMonolinkMassDAO {
@@ -23,8 +23,8 @@ public class DB_Insert_LinkerPerSearchMonolinkMassDAO {
 	
 
 	private final String INSERT_SQL = 
-			"INSERT INTO linker_per_search_monolink_mass "
-			+ "(linker_id, search_id, monolink_mass_double, monolink_mass_string) "
+			"INSERT INTO linker_per_search_monolink_mass_tbl "
+			+ "(search_linker_id, search_id, monolink_mass_double, monolink_mass_string) "
 			+ "VALUES (?, ?, ?, ?)";
 	
 	  
@@ -45,7 +45,7 @@ public class DB_Insert_LinkerPerSearchMonolinkMassDAO {
 			int counter = 0;
 			
 			counter++;
-			pstmt.setInt( counter, linkerPerSearchMonolinkMassDTO.getLinkerId() );
+			pstmt.setInt( counter, linkerPerSearchMonolinkMassDTO.getSearchLinkerId() );
 			counter++;
 			pstmt.setInt( counter, linkerPerSearchMonolinkMassDTO.getSearchId() );
 			counter++;
@@ -61,12 +61,12 @@ public class DB_Insert_LinkerPerSearchMonolinkMassDAO {
 			if( rs.next() ) {
 				linkerPerSearchMonolinkMassDTO.setId( rs.getInt( 1 ) );
 			} else
-				throw new Exception( "Failed to insert linker_per_search_monolink_mass" );
+				throw new Exception( "Failed to insert linker_per_search_monolink_mass_tbl" );
 			
 		} catch ( Exception e ) {
 			
-			String msg = "ERROR inserting linker_per_search_monolink_mass. database connection: '" + DBConnectionFactory.PROXL + "'"
-					+ "\n linker_per_search_monolink_mass: " + linkerPerSearchMonolinkMassDTO
+			String msg = "ERROR inserting linker_per_search_monolink_mass_tbl. database connection: '" + DBConnectionFactory.PROXL + "'"
+					+ "\n linker_per_search_monolink_mass_tbl: " + linkerPerSearchMonolinkMassDTO
 					+ "\nsql: " + sql;
 			log.error( msg, e );
 			

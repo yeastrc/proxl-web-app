@@ -657,6 +657,9 @@ var ImagePagePrimaryRootCodeClass = function() {
 	var _projectSearchIdsUserOrdered = "";
 
 	//  Loaded data:
+	
+	var _allLinkersSupportedForLinkablePositions = undefined; // true or false returned from webservice
+	
 	var _proteins;
 	var _proteinSequences = {};
 	var _proteinSequenceTrypsinCutPoints = {};
@@ -1929,6 +1932,15 @@ var ImagePagePrimaryRootCodeClass = function() {
 						populateSearchForm();
 						populateSelectProteinSelect();
 						initializeViewer();
+
+						if ( _allLinkersSupportedForLinkablePositions === undefined ) {
+							
+							// Update the first time only
+							_allLinkersSupportedForLinkablePositions = data.allLinkersSupportedForLinkablePositions;
+						
+							updatePageAndHashIfNeededFor_allLinkersSupportedForLinkablePositions();
+						}
+						
 						updateURLHash( false /* useSearchForm */ );
 						decrementSpinner();
 						loadDataAndDraw( true /* doDraw */ );
@@ -1946,6 +1958,29 @@ var ImagePagePrimaryRootCodeClass = function() {
 	//					alert( "exception: " + errorThrown + ", jqXHR: " + jqXHR + ", textStatus: " + textStatus );
 				}
 		});
+	}
+	
+	/**
+	 * 
+	 */
+	function updatePageAndHashIfNeededFor_allLinkersSupportedForLinkablePositions() {
+		
+		if ( _allLinkersSupportedForLinkablePositions ) {
+			//  Yes all linkers support Linkable positions so:
+			//     Hide disabled option
+			//     Show option for selecting it
+			$("#show-linkable-positions-disabled-container").hide();
+			$("#show-linkable-positions-container").show();
+			
+		} else {
+			//  Not all linkers support Linkable positions so:
+			//    Hide option for selecting it and clear that checkbox
+			//    Show disabled option
+			$("#show-linkable-positions-container").hide();
+			$("#show-linkable-positions-disabled-container").show();
+
+			$( "input#show-linkable-positions" ).prop('checked', false );
+		}
 	}
 
 	/**

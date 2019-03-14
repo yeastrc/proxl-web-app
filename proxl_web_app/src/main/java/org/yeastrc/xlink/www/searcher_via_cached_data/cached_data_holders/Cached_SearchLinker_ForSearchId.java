@@ -3,21 +3,18 @@ package org.yeastrc.xlink.www.searcher_via_cached_data.cached_data_holders;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.log4j.Logger;
-import org.yeastrc.xlink.dto.LinkerDTO;
+import org.yeastrc.xlink.dto.SearchLinkerDTO;
 import org.yeastrc.xlink.www.cached_data_mgmt.CacheCurrentSizeMaxSizeResult;
 import org.yeastrc.xlink.www.cached_data_mgmt.CachedDataCentralRegistry;
 import org.yeastrc.xlink.www.cached_data_mgmt.CachedDataCommonIF;
-import org.yeastrc.xlink.www.exceptions.ProxlWebappDataNotFoundException;
-import org.yeastrc.xlink.www.exceptions.ProxlWebappInternalErrorException;
 import org.yeastrc.xlink.www.searcher.SearchLinkerSearcher;
 import org.yeastrc.xlink.www.searcher_via_cached_data.config_size_etc_central_code.CachedDataCentralConfigStorageAndProcessing;
 import org.yeastrc.xlink.www.searcher_via_cached_data.config_size_etc_central_code.CachedDataSizeOptions;
-import org.yeastrc.xlink.www.searcher_via_cached_data.return_objects_from_searchers_for_cached_data.Linkers_ForSearchId_Response;
+import org.yeastrc.xlink.www.searcher_via_cached_data.return_objects_from_searchers_for_cached_data.SearchLinker_ForSearchId_Response;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -25,11 +22,11 @@ import com.google.common.cache.LoadingCache;
 
 /**
  * Cache Key:   Integer searchId;
- * Cache Value: Linkers_ForSearchId_Response linkers_ForSearchId_Response;
+ * Cache Value: Linkers_ForSearchId_Response searchLinker_ForSearchId_Response;
  */
-public class Cached_Linkers_ForSearchId implements CachedDataCommonIF {
+public class Cached_SearchLinker_ForSearchId implements CachedDataCommonIF {
 
-	private static final Logger log = Logger.getLogger( Cached_Linkers_ForSearchId.class );
+	private static final Logger log = Logger.getLogger( Cached_SearchLinker_ForSearchId.class );
 
 	private static final int CACHE_MAX_SIZE_FULL_SIZE = 400;
 	private static final int CACHE_MAX_SIZE_SMALL = 10;
@@ -48,17 +45,17 @@ public class Cached_Linkers_ForSearchId implements CachedDataCommonIF {
 	/**
 	 * Static singleton instance
 	 */
-	private static Cached_Linkers_ForSearchId _instance = null; //  Delay creating until first getInstance() call
+	private static Cached_SearchLinker_ForSearchId _instance = null; //  Delay creating until first getInstance() call
 
 	/**
 	 * Static get singleton instance
 	 * @return
 	 * @throws Exception 
 	 */
-	public static synchronized Cached_Linkers_ForSearchId getInstance() throws Exception {
+	public static synchronized Cached_SearchLinker_ForSearchId getInstance() throws Exception {
 
 		if ( _instance == null ) {
-			_instance = new Cached_Linkers_ForSearchId();
+			_instance = new Cached_SearchLinker_ForSearchId();
 		}
 		return _instance; 
 	}
@@ -66,7 +63,7 @@ public class Cached_Linkers_ForSearchId implements CachedDataCommonIF {
 	/**
 	 * constructor
 	 */
-	private Cached_Linkers_ForSearchId() {
+	private Cached_SearchLinker_ForSearchId() {
 		if ( log.isDebugEnabled() ) {
 			debugLogLevelEnabled = true;
 			log.debug( "debug log level enabled" );
@@ -106,8 +103,7 @@ public class Cached_Linkers_ForSearchId implements CachedDataCommonIF {
 	 * @return - retrieved from DB
 	 * @throws Exception
 	 */
-	public Linkers_ForSearchId_Response getLinkers_ForSearchId_Response( 
-			Integer searchId ) throws Exception {
+	public SearchLinker_ForSearchId_Response getSearchLinkers_ForSearchId_Response( Integer searchId ) throws Exception {
 
 		printPrevCacheHitCounts( false /* forcePrintNow */ );
 		
@@ -115,15 +111,15 @@ public class Cached_Linkers_ForSearchId implements CachedDataCommonIF {
 			cacheGetCount.incrementAndGet();
 		}
 		
-		LoadingCache<Integer, Linkers_ForSearchId_Response> cache = cacheHolderInternal.getCache();
+		LoadingCache<Integer, SearchLinker_ForSearchId_Response> cache = cacheHolderInternal.getCache();
 		
 		if ( cache != null ) {
-			Linkers_ForSearchId_Response linkers_ForSearchId_Response = cache.get( searchId );
-			return linkers_ForSearchId_Response; // EARLY return
+			SearchLinker_ForSearchId_Response searchLinker_ForSearchId_Response = cache.get( searchId );
+			return searchLinker_ForSearchId_Response; // EARLY return
 		}
 		
-		Linkers_ForSearchId_Response linkers_ForSearchId_Response = cacheHolderInternal.loadFromDB( searchId );
-		return linkers_ForSearchId_Response;
+		SearchLinker_ForSearchId_Response searchLinker_ForSearchId_Response = cacheHolderInternal.loadFromDB( searchId );
+		return searchLinker_ForSearchId_Response;
 	}
 
 
@@ -133,9 +129,9 @@ public class Cached_Linkers_ForSearchId implements CachedDataCommonIF {
 	 */
 	private static class CacheHolderInternal {
 
-		private Cached_Linkers_ForSearchId parentObject;
+		private Cached_SearchLinker_ForSearchId parentObject;
 		
-		private CacheHolderInternal( Cached_Linkers_ForSearchId parentObject ) {
+		private CacheHolderInternal( Cached_SearchLinker_ForSearchId parentObject ) {
 			this.parentObject = parentObject;
 		}
 		
@@ -144,7 +140,7 @@ public class Cached_Linkers_ForSearchId implements CachedDataCommonIF {
 		/**
 		 * cached data, left null if no caching
 		 */
-		private LoadingCache<Integer, Linkers_ForSearchId_Response> dbRecordsDataCache = null;
+		private LoadingCache<Integer, SearchLinker_ForSearchId_Response> dbRecordsDataCache = null;
 		
 		private int cacheMaxSize;
 
@@ -165,7 +161,7 @@ public class Cached_Linkers_ForSearchId implements CachedDataCommonIF {
 		 * @throws Exception
 		 */
 		@SuppressWarnings("static-access")
-		private synchronized LoadingCache<Integer, Linkers_ForSearchId_Response> getCache(  ) throws Exception {
+		private synchronized LoadingCache<Integer, SearchLinker_ForSearchId_Response> getCache(  ) throws Exception {
 			if ( ! cacheDataInitialized ) { 
 				CachedDataSizeOptions cachedDataSizeOptions = 
 						CachedDataCentralConfigStorageAndProcessing.getInstance().getCurrentSizeConfigValue();
@@ -189,8 +185,8 @@ public class Cached_Linkers_ForSearchId implements CachedDataCommonIF {
 						.expireAfterAccess( cacheTimeout, TimeUnit.DAYS )
 						.maximumSize( cacheMaxSize )
 						.build(
-								new CacheLoader<Integer, Linkers_ForSearchId_Response>() {
-									public Linkers_ForSearchId_Response load(Integer searchId) throws Exception {
+								new CacheLoader<Integer, SearchLinker_ForSearchId_Response>() {
+									public SearchLinker_ForSearchId_Response load(Integer searchId) throws Exception {
 										
 										//   WARNING  cannot return null.  
 										//   If would return null, throw ProxlWebappDataNotFoundException and catch at the .get(...)
@@ -216,7 +212,7 @@ public class Cached_Linkers_ForSearchId implements CachedDataCommonIF {
 		 * @return
 		 * @throws Exception
 		 */
-		private Linkers_ForSearchId_Response loadFromDB( Integer searchId ) throws Exception {
+		private SearchLinker_ForSearchId_Response loadFromDB( Integer searchId ) throws Exception {
 			
 			//   WARNING  cannot return null.  
 			//   If would return null, throw ProxlWebappDataNotFoundException and catch at the .get(...)
@@ -225,38 +221,19 @@ public class Cached_Linkers_ForSearchId implements CachedDataCommonIF {
 			if ( debugLogLevelEnabled ) {
 				cacheDBRetrievalCount.incrementAndGet();
 			}
-			List<Integer> linkerIdList = 
-					SearchLinkerSearcher.getInstance()
-					.getLinkerIdsForSearch( searchId );
-			List<LinkerDTO> linkersForSearchIdList = new ArrayList<LinkerDTO>( linkerIdList.size() );
-			for ( Integer linkerId : linkerIdList ) {
-				LinkerDTO linkerDTO = null;
-				try {
-					linkerDTO = Cached_Linker.getInstance().getLinkerDTO( linkerId );
+			List<SearchLinkerDTO> searchLinkerDTOList =
+					SearchLinkerSearcher.getInstance().getSearchLinkerDTOForSearch( searchId );
 					
-				} catch ( ExecutionException e ) {
-					//  caught from LoadingCache when loadFromDB throws ProxlWebappDataNotFoundException
-					if ( e.getCause() instanceof ProxlWebappDataNotFoundException ) {
-						//  DB query returned null so return null here
-					} else {
-						throw e;
-					}
-					
-				} catch ( ProxlWebappDataNotFoundException e ) {
-					// thrown when not in DB
-				}
-				if ( linkerDTO == null ) {
-					String msg = "linker id not found in DB after linker id returned from SearchLinkerSearcher.  "
-							+ "linker id: " + linkerId;
-					log.error( msg );
-					throw new ProxlWebappInternalErrorException(msg);
-				}
-				linkersForSearchIdList.add( linkerDTO );
+			//  Create Linker Abbr List
+			List<String> linkerAbbreviationsForSearchIdList = new ArrayList<>( searchLinkerDTOList.size() );
+			for ( SearchLinkerDTO item : searchLinkerDTOList ) {
+				linkerAbbreviationsForSearchIdList.add( item.getLinkerAbbr() );
 			}
-			Linkers_ForSearchId_Response linkers_ForSearchId_Response =
-					new Linkers_ForSearchId_Response();
-			linkers_ForSearchId_Response.setLinkersForSearchIdList( linkersForSearchIdList );
-			return linkers_ForSearchId_Response;
+			
+			SearchLinker_ForSearchId_Response searchLinker_ForSearchId_Response = new SearchLinker_ForSearchId_Response();
+			searchLinker_ForSearchId_Response.setSearchLinkerDTOList( searchLinkerDTOList );
+			searchLinker_ForSearchId_Response.setLinkerAbbreviationsForSearchIdList( linkerAbbreviationsForSearchIdList );
+			return searchLinker_ForSearchId_Response;
 		}
  	}
 

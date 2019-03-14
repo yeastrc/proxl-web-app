@@ -54,7 +54,7 @@ import org.yeastrc.xlink.www.web_utils.GetAnnotationDisplayUserSelectionDetailsD
 import org.yeastrc.xlink.www.web_utils.GetLinkTypesForSearchers;
 import org.yeastrc.xlink.www.web_utils.GetPageHeaderData;
 import org.yeastrc.xlink.www.web_utils.GetSearchDetailsData;
-import org.yeastrc.xlink.www.web_utils.IsShowDownloadLink_SkylineShulman;
+import org.yeastrc.xlink.www.web_utils.IsShowDownloadLinks_Skyline_SetRequestParameters;
 import org.yeastrc.xlink.www.web_utils.ProteinListingTooltipConfigUtil;
 import org.yeastrc.xlink.www.web_utils.SearchPeptideWebserviceCommonCode;
 import org.yeastrc.xlink.www.web_utils.SearchPeptideWebserviceCommonCode.SearchPeptideWebserviceCommonCodeGetDataResult;
@@ -163,7 +163,7 @@ public class ViewSearchPeptidesAction extends Action {
 			ExcludeLinksWith_Remove_NonUniquePSMs_Checkbox_PopRequestItems.getInstance().excludeLinksWith_Remove_NonUniquePSMs_Checkbox_PopRequestItems( search, request );
 			
 			//  Populates request attribute
-			IsShowDownloadLink_SkylineShulman.getInstance().isShowDownloadLink_SkylineShulman( searchIdsSet, request );
+			IsShowDownloadLinks_Skyline_SetRequestParameters.getInstance().isShowDownloadLinks_Skyline_SetRequestParameters( searchIdsSet, request );
 			
 			///  Get list of all possible Dynamic Mod Masses.  Do here so if convert existing Query Param Data, have it here.
 			int[] searchIdsArray = { searchId };

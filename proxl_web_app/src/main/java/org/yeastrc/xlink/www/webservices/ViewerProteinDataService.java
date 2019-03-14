@@ -25,9 +25,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.www.factories.ProteinSequenceVersionObjectFactory;
 import org.yeastrc.xlink.www.dao.SearchDAO;
-import org.yeastrc.xlink.dto.LinkerDTO;
 import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.linkable_positions.GetLinkablePositionsForLinkers;
+import org.yeastrc.xlink.linkable_positions.GetLinkerFactory;
+import org.yeastrc.xlink.linkable_positions.linkers.ILinker;
 import org.yeastrc.xlink.www.linked_positions.CrosslinkLinkedPositions;
 import org.yeastrc.xlink.www.linked_positions.LinkedPositions_FilterExcludeLinksWith_Param;
 import org.yeastrc.xlink.www.linked_positions.LooplinkLinkedPositions;
@@ -44,12 +45,13 @@ import org.yeastrc.xlink.www.objects.SearchProteinLooplinkWrapper;
 import org.yeastrc.xlink.www.objects.SearchProteinCrosslinkWrapper;
 import org.yeastrc.xlink.www.objects.SearchProteinUnlinked;
 import org.yeastrc.xlink.www.objects.SearchProteinUnlinkedWrapper;
+import org.yeastrc.xlink.www.objects.SearchDTO_PartsForImageStructureWebservices.LinkerData;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
-import org.yeastrc.xlink.www.searcher_via_cached_data.cached_data_holders.Cached_Linkers_ForSearchId;
+import org.yeastrc.xlink.www.searcher_via_cached_data.cached_data_holders.Cached_SearchLinker_ForSearchId;
 import org.yeastrc.xlink.www.searcher_via_cached_data.cached_data_holders.Cached_TaxonomyIdsFor_ProtSeqVersionId_SearchId;
 import org.yeastrc.xlink.www.searcher_via_cached_data.cached_data_holders.Cached_TaxonomyNameStringForTaxonomyId;
 import org.yeastrc.xlink.www.searcher_via_cached_data.request_objects_for_searchers_for_cached_data.TaxonomyIdsForProtSeqIdSearchId_Request;
-import org.yeastrc.xlink.www.searcher_via_cached_data.return_objects_from_searchers_for_cached_data.Linkers_ForSearchId_Response;
+import org.yeastrc.xlink.www.searcher_via_cached_data.return_objects_from_searchers_for_cached_data.SearchLinker_ForSearchId_Response;
 import org.yeastrc.xlink.www.searcher_via_cached_data.return_objects_from_searchers_for_cached_data.TaxonomyIdsForProtSeqIdSearchId_Result;
 import org.yeastrc.xlink.www.searcher_via_cached_data.return_objects_from_searchers_for_cached_data.TaxonomyNameStringForTaxonomyId_Result;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesRootLevel;
@@ -472,24 +474,39 @@ public class ViewerProteinDataService {
 			}
 			//  Map of linkablePositions where the key is the protein id and the value is the collection of linkable positions
 			Map<Integer, Collection<Integer>> proteinIdslinkablePositionsMap = new HashMap<Integer, Collection<Integer>>();
+
+			//  Get if all Linker Abbreviations have ILinker instances and thus can get Linkable Positions
 			
+			boolean allLinkersSupportedForLinkablePositions = true;
+
 			//  Get the linker abbreviations for the searches
+
+			Cached_SearchLinker_ForSearchId cached_Linkers_ForSearchId = Cached_SearchLinker_ForSearchId.getInstance();
+			
 			Set<String> linkerAbbrSet = new HashSet<>();
 			{
-				Cached_Linkers_ForSearchId cached_Linkers_ForSearchId = Cached_Linkers_ForSearchId.getInstance();
 				for ( SearchDTO search : searchList ) {
 					int searchId = search.getSearchId();
-					Linkers_ForSearchId_Response linkers_ForSearchId_Response =
-							cached_Linkers_ForSearchId.getLinkers_ForSearchId_Response( searchId );
-					List<LinkerDTO>  linkerList = linkers_ForSearchId_Response.getLinkersForSearchIdList();
-					if ( linkerList == null || linkerList.isEmpty() ) {
+					SearchLinker_ForSearchId_Response linkers_ForSearchId_Response =
+							cached_Linkers_ForSearchId.getSearchLinkers_ForSearchId_Response( searchId );
+					List<String>  linkerAbbreviationList = linkers_ForSearchId_Response.getLinkerAbbreviationsForSearchIdList();
+					if ( linkerAbbreviationList == null || linkerAbbreviationList.isEmpty() ) {
 						String msg = "No linkers found for Search Id: " + searchId;
 						log.error( msg );
 						//			throw new Exception(msg);
-					}
-					for ( LinkerDTO linker : linkerList ) {
-						String linkerAbbr = linker.getAbbr();
-						linkerAbbrSet.add( linkerAbbr );
+					} else {
+						for ( String linkerAbbreviation : linkerAbbreviationList ) {
+							linkerAbbrSet.add( linkerAbbreviation );
+
+							ILinker linker = GetLinkerFactory.getLinkerForAbbr( linkerAbbreviation );
+							
+							if( linker == null ) {
+
+								//  No ILinker linker for linkerAbbr 
+								
+								allLinkersSupportedForLinkablePositions = false;
+							}
+						}
 					}
 				}
 			}
@@ -530,10 +547,30 @@ public class ViewerProteinDataService {
 			
 			List<SearchDTO_PartsForImageStructureWebservices> searchPartsList = new ArrayList<>( searchList.size() );
 			for ( SearchDTO search : searchList ) {
+				
+				int searchId = search.getSearchId();
+				SearchLinker_ForSearchId_Response linkers_ForSearchId_Response =
+						cached_Linkers_ForSearchId.getSearchLinkers_ForSearchId_Response( searchId );
+				List<String>  linkerAbbreviationList = linkers_ForSearchId_Response.getLinkerAbbreviationsForSearchIdList();
+				if ( linkerAbbreviationList == null || linkerAbbreviationList.isEmpty() ) {
+					String msg = "No linkers found for Search Id: " + searchId;
+					log.error( msg );
+					//			throw new Exception(msg);
+				}
+
+				List<LinkerData> linkers = new ArrayList<>( linkerAbbreviationList.size() );
+				
+				for ( String linkerAbbreviation : linkerAbbreviationList ) {
+					LinkerData linkerData = new LinkerData();
+					linkerData.setAbbr( linkerAbbreviation );
+					linkers.add( linkerData );
+				}
+				
+				
 				SearchDTO_PartsForImageStructureWebservices searchParts = new SearchDTO_PartsForImageStructureWebservices();
 				searchParts.setId( search.getProjectSearchId() );
 				searchParts.setSearchId( search.getSearchId() );
-				searchParts.setLinkers( search.getLinkers() );
+				searchParts.setLinkers( linkers );
 				searchPartsList.add( searchParts );
 			}
 			
@@ -547,6 +584,8 @@ public class ViewerProteinDataService {
 			ivd.setFilterNonUniquePeptides( filterNonUniquePeptides );
 			ivd.setFilterOnlyOnePeptide( filterOnlyOnePeptide );
 			ivd.setRemoveNonUniquePSMs( removeNonUniquePSMs );
+			
+			ivd.setAllLinkersSupportedForLinkablePositions( allLinkersSupportedForLinkablePositions );
 			
 			byte[] resultJSONasBytes = getResultsByteArray( ivd );
 			

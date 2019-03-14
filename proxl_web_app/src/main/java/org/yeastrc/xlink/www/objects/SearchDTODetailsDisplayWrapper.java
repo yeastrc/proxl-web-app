@@ -1,13 +1,13 @@
 package org.yeastrc.xlink.www.objects;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 //import org.apache.log4j.Logger;
-import org.yeastrc.xlink.dto.LinkerDTO;
 import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.www.form_page_objects.CutoffPageDisplaySearchLevel;
 import org.yeastrc.xlink.www.searcher.SearchProgramDisplaySearcher;
+import org.yeastrc.xlink.www.searcher_via_cached_data.cached_data_holders.Cached_SearchLinker_ForSearchId;
+import org.yeastrc.xlink.www.searcher_via_cached_data.return_objects_from_searchers_for_cached_data.SearchLinker_ForSearchId_Response;
 import org.yeastrc.xlink.www.web_utils.GetCutoffsAppliedOnImport;
 
 
@@ -38,21 +38,22 @@ public class SearchDTODetailsDisplayWrapper {
 		if ( searchDTO == null ) {
 			throw new IllegalStateException( "searchDTO == null");
 		}
-		List<LinkerDTO> linkers = searchDTO.getLinkers();
-		if ( linkers == null || linkers.isEmpty() ) {
+		
+		Cached_SearchLinker_ForSearchId cached_Linkers_ForSearchId = Cached_SearchLinker_ForSearchId.getInstance();
+		int searchId = searchDTO.getSearchId();
+		SearchLinker_ForSearchId_Response linkers_ForSearchId_Response =
+				cached_Linkers_ForSearchId.getSearchLinkers_ForSearchId_Response( searchId );
+		List<String>  linkerAbbreviationList = linkers_ForSearchId_Response.getLinkerAbbreviationsForSearchIdList();
+		if ( linkerAbbreviationList == null || linkerAbbreviationList.isEmpty() ) {
 			return "";
 		}
-		List<String> linkerAbbreviations = new ArrayList<>( linkers.size() );
-		for ( LinkerDTO linker : linkers ) {
-			linkerAbbreviations.add( linker.getAbbr() );
-		}
-		Collections.sort( linkerAbbreviations );
-		String linkersString = linkerAbbreviations.get(0);
-		if ( linkerAbbreviations.size() > 1 ) {
+		Collections.sort( linkerAbbreviationList );
+		String linkersString = linkerAbbreviationList.get(0);
+		if ( linkerAbbreviationList.size() > 1 ) {
 			//  start loop at second index
-			for ( int index = 1; index < linkerAbbreviations.size(); index++ ) {
+			for ( int index = 1; index < linkerAbbreviationList.size(); index++ ) {
 				linkersString += ", ";
-				linkersString += linkerAbbreviations.get( index );
+				linkersString += linkerAbbreviationList.get( index );
 			}
 		}
 		return linkersString;

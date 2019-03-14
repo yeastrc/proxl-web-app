@@ -321,7 +321,20 @@
 					<label><span class="tool_tip_attached_jq" data-tooltip="Toggle showing intra-protein crosslinks" style="white-space:nowrap;" ><input type="checkbox" id="show-self-crosslinks" checked>Show self-crosslinks</span></label>
 					<label><span class="tool_tip_attached_jq" data-tooltip="Toggle showing looplinks" style="white-space:nowrap;" ><input type="checkbox" id="show-looplinks" checked>Show looplinks</span></label>
 					<label><span class="tool_tip_attached_jq" data-tooltip="Toggle showing monolinks" style="white-space:nowrap;" ><input type="checkbox" id="show-monolinks">Show monolinks</span></label>
-					<label><span class="tool_tip_attached_jq" data-tooltip="Toggle marking possible positions in protein where crosslinker(s) may react" style="white-space:nowrap;" ><input type="checkbox" id="show-linkable-positions">Show linkable positions</span></label>
+					
+					
+					<label id="show-linkable-positions-container" style="display: none;" ><span class="tool_tip_attached_jq" 
+						data-tooltip="Toggle marking possible positions in protein where crosslinker(s) may react" 
+						style="white-space:nowrap;" 
+						><input type="checkbox" id="show-linkable-positions"
+						>Show linkable positions</span></label>
+					
+					<label id="show-linkable-positions-disabled-container" style="display: none;" ><span style="white-space:nowrap;" class="disabled-checkbox tool_tip_attached_jq " 
+						data-tooltip="Feature not available. At least one cross-linker has no parameters."
+						style="white-space:nowrap;" 
+						><input disabled="disabled" type="checkbox"
+						>Show linkable positions</span></label>	
+					
 					<label><span class="tool_tip_attached_jq" data-tooltip="Toggle marking trypic positions in proteins" style="white-space:nowrap;" ><input type="checkbox" id="show-tryptic-cleavage-positions">Show tryptic positions</span></label>
 					<label><span class="bar-only tool_tip_attached_jq" data-tooltip="Toggle showing protein termini labels" style="white-space:nowrap;" ><input type="checkbox" id="show-protein-termini">Show protein termini</span></label>
 					<label><span class="tool_tip_attached_jq" data-tooltip="Toggle shading of links based on spectrum counts" style="white-space:nowrap;" ><input type="checkbox" id="shade-by-counts">Shade by counts</span></label>

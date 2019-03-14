@@ -20,7 +20,7 @@ import com.google.common.cache.LoadingCache;
 
 /**
  * Cache Key:   Integer isotopeLabelId;
- * Cache Value: IsotopeLabelDTO linkerDTO;
+ * Cache Value: IsotopeLabelDTO isotopeLabelDTO;
  * 
  * uses ProxlWebappDataNotFoundException internally since loadFromDB call to searcher may return null
  */

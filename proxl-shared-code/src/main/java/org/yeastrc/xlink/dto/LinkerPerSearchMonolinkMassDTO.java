@@ -1,29 +1,30 @@
 package org.yeastrc.xlink.dto;
 
 /**
- * table linker_per_search_monolink_mass
+ * table linker_per_search_monolink_mass_tbl
  *
  */
 public class LinkerPerSearchMonolinkMassDTO {
 
 	private int id;
-	private int linkerId;
+	private int searchLinkerId;
 	private int searchId;
 	private double monolinkMassDouble;
 	private String monolinkMassString;
 	
+	@Override
+	public String toString() {
+		return "LinkerPerSearchMonolinkMassDTO [id=" + id + ", searchLinkerId="
+				+ searchLinkerId + ", searchId=" + searchId + ", monolinkMassDouble="
+				+ monolinkMassDouble + ", monolinkMassString="
+				+ monolinkMassString + "]";
+	}
 	
 	public int getId() {
 		return id;
 	}
 	public void setId(int id) {
 		this.id = id;
-	}
-	public int getLinkerId() {
-		return linkerId;
-	}
-	public void setLinkerId(int linkerId) {
-		this.linkerId = linkerId;
 	}
 	public int getSearchId() {
 		return searchId;
@@ -43,11 +44,10 @@ public class LinkerPerSearchMonolinkMassDTO {
 	public void setMonolinkMassString(String monolinkMassString) {
 		this.monolinkMassString = monolinkMassString;
 	}
-	@Override
-	public String toString() {
-		return "LinkerPerSearchMonolinkMassDTO [id=" + id + ", linkerId="
-				+ linkerId + ", searchId=" + searchId + ", monolinkMassDouble="
-				+ monolinkMassDouble + ", monolinkMassString="
-				+ monolinkMassString + "]";
+	public int getSearchLinkerId() {
+		return searchLinkerId;
+	}
+	public void setSearchLinkerId(int searchLinkerId) {
+		this.searchLinkerId = searchLinkerId;
 	}
 }

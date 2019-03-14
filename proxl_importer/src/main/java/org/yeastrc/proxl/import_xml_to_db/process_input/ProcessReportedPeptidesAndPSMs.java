@@ -98,8 +98,10 @@ public class ProcessReportedPeptidesAndPSMs {
 		GetProteinsForPeptide.getInstance().setMatchedProteinsFromProxlXML( matchedProteinsFromProxlXML );
 		Linkers proxlInputLinkers = proxlInput.getLinkers();
 		List<Linker> proxlInputLinkerList = proxlInputLinkers.getLinker();
+		
 		List<ILinker> linkerList = new ArrayList<>();
 		String linkerListStringForErrorMsgs = null;
+		
 		for ( Linker proxlInputLinker : proxlInputLinkerList ) {
 			String proxlInputLinkerName = proxlInputLinker.getName();
 			
@@ -113,13 +115,24 @@ public class ProcessReportedPeptidesAndPSMs {
 				log.error( "GetLinkerFactory.getLinkerForAbbr( linkerAbbr ); threw Exception.  Abbr: " + proxlInputLinkerName, e );
 				throw e;
 			}
-			if( linker == null ) {
-				String msg = "Could not get an ILinker for linker abbreviation: " 
-						+ proxlInputLinkerName;
-				log.error( "processReportedPeptides(...): " + msg );
-				throw new ProxlImporterDataException( msg );
+			if ( linker == null ) {
+				String msg = "Could not get an ILinker for linker abbreviation: '" 
+						+ proxlInputLinkerName
+						+ "'.  No Linkers will be used for evaluation when mapping peptides to proteins.";
+					
+				log.warn( "processReportedPeptides(...): " + msg );
+//				throw new ProxlImporterDataException( msg );
 			}
+			
+			if ( linker == null ) {
+			
+				linkerList.clear(); //  REMOVE all Linkers and Exit Loop since found "Unsupported" Linker
+				
+				break;  //  EARLY LOOP EXIT
+			}
+			
 			linkerList.add( linker );
+			
 			if ( linkerListStringForErrorMsgs == null ) {
 				linkerListStringForErrorMsgs = proxlInputLinkerName;
 			} else {
@@ -195,7 +208,7 @@ public class ProcessReportedPeptidesAndPSMs {
 	/**
 	 * @param reportedPeptide
 	 * @param searchId
-	 * @param linkerList
+	 * @param linkerList - EMPTY if linker abbr in input is not in listed linkers
 	 * @param linkerListStringForErrorMsgs
 	 * @param dropPeptidePSMCutoffValues
 	 * @param searchProgramEntryMap
@@ -524,7 +537,7 @@ public class ProcessReportedPeptidesAndPSMs {
 	
 	/**
 	 * @param reportedPeptide
-	 * @param linkerList
+	 * @param linkerList - EMPTY if linker abbr in input is not in listed linkers
 	 * @param linkerListStringForErrorMsgs
 	 * @return
 	 * @throws Exception

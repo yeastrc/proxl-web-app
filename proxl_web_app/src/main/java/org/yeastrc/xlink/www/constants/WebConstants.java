@@ -86,8 +86,12 @@ public class WebConstants {
 
 
 	public static final String PARAMETER_ANNOTATION_DISPLAY_DATA_USER_SELECTION_REQUEST_KEY = "annDisplayDataUserSelctn";
+
+	//    Only set for pages that contain Skyline_DownloadLink, Set In class IsShowDownloadLinks_Skyline_SetRequestParameters 
 	
-	//    Only set for pages that contain SkylineShulman_DownloadLink, Set In class IsShowDownloadLink_SkylineShulman 
+	public static final String PARAMETER_SHOW_DOWNLOAD_LINKS_SKYLINE = "showDownloadLinks_Skyline";
+	
+	//    Only set for pages that contain SkylineShulman_DownloadLink, Set In class IsShowDownloadLinks_Skyline_SetRequestParameters 
 	
 	public static final String PARAMETER_SHOW_DOWNLOAD_LINK_SKYLINE_SHULMAN = "showDownloadLink_SkylineShulman";
 	

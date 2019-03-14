@@ -2,6 +2,7 @@ package org.yeastrc.proxl.import_xml_to_db.process_input;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -40,19 +41,15 @@ import org.yeastrc.proxl_import.api.xml_dto.ReportedPeptides;
 import org.yeastrc.proxl_import.api.xml_dto.Peptide.PeptideIsotopeLabels;
 import org.yeastrc.proxl_import.api.xml_dto.Peptide.PeptideIsotopeLabels.PeptideIsotopeLabel;
 import org.yeastrc.xlink.base.file_import_proxl_xml_scans.dto.ProxlXMLFileImportTrackingSingleFileDTO;
-import org.yeastrc.xlink.dao.LinkerDAO;
 import org.yeastrc.xlink.dao.SearchCommentDAO;
 import org.yeastrc.xlink.dao.SearchLinkerDAO;
 import org.yeastrc.xlink.dto.AnnotationTypeDTO;
-import org.yeastrc.xlink.dto.LinkerDTO;
 import org.yeastrc.xlink.dto.LinkerPerSearchCleavedCrosslinkMassDTO;
 import org.yeastrc.xlink.dto.LinkerPerSearchCrosslinkMassDTO;
 import org.yeastrc.xlink.dto.LinkerPerSearchMonolinkMassDTO;
 import org.yeastrc.xlink.dto.SearchCommentDTO;
 import org.yeastrc.xlink.dto.SearchLinkerDTO;
 import org.yeastrc.xlink.enum_classes.FilterableDescriptiveAnnotationType;
-import org.yeastrc.xlink.exceptions.ProxlBaseDataException;
-import org.yeastrc.xlink.linkable_positions.GetLinkerFactory;
 
 /**
  * 
@@ -397,6 +394,10 @@ public class ProcessProxlInput {
 			log.error( msg );
 			throw new ProxlImporterDataException(msg);
 		}
+		
+		//  Ensure no duplicate linker abbr 
+		Set<String> linkerAbbrSet = new HashSet<>();
+		
 		for ( Linker proxlInputLinkerItem : proxlInputLinkerList ) {
 			String linkerAbbr = proxlInputLinkerItem.getName();
 			
@@ -409,43 +410,19 @@ public class ProcessProxlInput {
 				throw new ProxlImporterDataException( msg );
 			}
 			
-			//  Lower case since all linker abbr are lower case
-			linkerAbbr = linkerAbbr.toLowerCase();
-			
-			//  Save the lower case version back to the object for use in the rest of the program
-			proxlInputLinkerItem.setName( linkerAbbr );
-			
-			try {
-				//  throws exception if linker abbr not supported in the code
-				GetLinkerFactory.getLinkerForAbbr( linkerAbbr );
-
-			} catch ( ProxlBaseDataException e ) {
-				log.error( "GetLinkerFactory.getLinkerForAbbr( linkerAbbr ); threw ProxlBaseDataException. Abbr: " + linkerAbbr, e );
-				throw e;
-			} catch ( Exception e ) {
-				log.error( "GetLinkerFactory.getLinkerForAbbr( linkerAbbr ); threw Exception.  Abbr: " + linkerAbbr, e );
-				throw e;
-			}
-			
-			LinkerDTO linkerDTO = null;
-			try {
-				linkerDTO = LinkerDAO.getInstance().getLinkerDTOForAbbr( linkerAbbr );
-			} catch ( Exception e ) {
-				log.error( "LinkerDAO.getInstance().getLinkerDTOForAbbr( linkerAbbr ); threw Exception.  Abbr: " + linkerAbbr, e );
-				throw e;
-			}
-			if ( linkerDTO == null ) {
-				String msg = "No 'linker' record found for 'abbr': " + linkerAbbr;
+			if ( ! linkerAbbrSet.add( linkerAbbr ) ) {
+				String msg = "More than one linker with same name/abbreviation: '"
+						+ linkerAbbr + "'";
+				log.error( "" + msg );
 				throw new ProxlImporterDataException( msg );
 			}
 			
 			SearchLinkerDTO searchLinkerDTO = new SearchLinkerDTO();
 			searchLinkerDTO.setSearchId( searchDTO.getId() );
-			searchLinkerDTO.setLinkerId( linkerDTO.getId() );
+			searchLinkerDTO.setLinkerAbbr( linkerAbbr );
 			SearchLinkerDAO.getInstance().saveToDatabase( searchLinkerDTO );
-			saveMonolinkMasses( proxlInputLinkerItem, linkerDTO, searchDTO );
-			saveCrosslinkMasses( proxlInputLinkerItem, linkerDTO, searchDTO );
-			
+			saveMonolinkMasses( proxlInputLinkerItem, searchLinkerDTO, searchDTO );
+			saveCrosslinkMasses( proxlInputLinkerItem, searchLinkerDTO, searchDTO );
 		}
 	}
 	
@@ -455,7 +432,7 @@ public class ProcessProxlInput {
 	 * @param searchDTO
 	 * @throws Exception
 	 */
-	private void saveMonolinkMasses( Linker proxlInputLinkerItem, LinkerDTO linkerDTO, SearchDTO_Importer searchDTO ) throws Exception {
+	private void saveMonolinkMasses( Linker proxlInputLinkerItem, SearchLinkerDTO searchLinkerDTO, SearchDTO_Importer searchDTO ) throws Exception {
 		
 		MonolinkMasses monolinkMasses = proxlInputLinkerItem.getMonolinkMasses();
 		if ( monolinkMasses == null ) {
@@ -467,7 +444,7 @@ public class ProcessProxlInput {
 		}
 		for ( MonolinkMass monolinkMass : monolinkMassList ) {
 			LinkerPerSearchMonolinkMassDTO linkerPerSearchMonolinkMassDTO = new LinkerPerSearchMonolinkMassDTO();
-			linkerPerSearchMonolinkMassDTO.setLinkerId( linkerDTO.getId() );
+			linkerPerSearchMonolinkMassDTO.setSearchLinkerId( searchLinkerDTO.getId() );
 			linkerPerSearchMonolinkMassDTO.setSearchId(  searchDTO.getId() );
 			linkerPerSearchMonolinkMassDTO.setMonolinkMassDouble( monolinkMass.getMass().doubleValue() );
 			linkerPerSearchMonolinkMassDTO.setMonolinkMassString( monolinkMass.getMass().toString() );
@@ -481,7 +458,7 @@ public class ProcessProxlInput {
 	 * @param searchDTO
 	 * @throws Exception
 	 */
-	private void saveCrosslinkMasses( Linker proxlInputLinkerItem, LinkerDTO linkerDTO, SearchDTO_Importer searchDTO ) throws Exception {
+	private void saveCrosslinkMasses( Linker proxlInputLinkerItem, SearchLinkerDTO searchLinkerDTO, SearchDTO_Importer searchDTO ) throws Exception {
 		
 		CrosslinkMasses crosslinkMasses = proxlInputLinkerItem.getCrosslinkMasses();
 		if ( crosslinkMasses == null ) {
@@ -492,7 +469,7 @@ public class ProcessProxlInput {
 			if ( crosslinkMassList != null && ( ! crosslinkMassList.isEmpty() ) ) {
 				for ( CrosslinkMass crosslinkMass : crosslinkMassList ) {
 					LinkerPerSearchCrosslinkMassDTO linkerPerSearchCrosslinkMassDTO = new LinkerPerSearchCrosslinkMassDTO();
-					linkerPerSearchCrosslinkMassDTO.setLinkerId( linkerDTO.getId() );
+					linkerPerSearchCrosslinkMassDTO.setSearchLinkerId( searchLinkerDTO.getId() );
 					linkerPerSearchCrosslinkMassDTO.setSearchId(  searchDTO.getId() );
 					linkerPerSearchCrosslinkMassDTO.setCrosslinkMassDouble( crosslinkMass.getMass().doubleValue() );
 					linkerPerSearchCrosslinkMassDTO.setCrosslinkMassString( crosslinkMass.getMass().toString() );
@@ -505,7 +482,7 @@ public class ProcessProxlInput {
 			if ( cleavedCrosslinkMassList != null && ( ! cleavedCrosslinkMassList.isEmpty() ) ) {
 				for ( CleavedCrosslinkMass cleavedCrosslinkMass : cleavedCrosslinkMassList ) {
 					LinkerPerSearchCleavedCrosslinkMassDTO linkerPerSearchCleavedCrosslinkMassDTO = new LinkerPerSearchCleavedCrosslinkMassDTO();
-					linkerPerSearchCleavedCrosslinkMassDTO.setLinkerId( linkerDTO.getId() );
+					linkerPerSearchCleavedCrosslinkMassDTO.setSearchLinkerId( searchLinkerDTO.getId() );
 					linkerPerSearchCleavedCrosslinkMassDTO.setSearchId(  searchDTO.getId() );
 					linkerPerSearchCleavedCrosslinkMassDTO.setCleavedCrosslinkMassDouble( cleavedCrosslinkMass.getMass().doubleValue() );
 					linkerPerSearchCleavedCrosslinkMassDTO.setCleavedCrosslinkMassString( cleavedCrosslinkMass.getMass().toString() );

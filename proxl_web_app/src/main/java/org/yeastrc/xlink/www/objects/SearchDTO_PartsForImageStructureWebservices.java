@@ -2,8 +2,6 @@ package org.yeastrc.xlink.www.objects;
 
 import java.util.List;
 
-import org.yeastrc.xlink.dto.LinkerDTO;
-
 /**
  * Parts from SearchDTO serialized to JSON and sent to JS code on Image and Structure Pages 
  *
@@ -20,7 +18,7 @@ public class SearchDTO_PartsForImageStructureWebservices {
 	/**
 	 * Used in Structure page
 	 */
-	private List<LinkerDTO> linkers;
+	private List<LinkerData> linkers;
 	
 	/**
 	 * @return projectSearchId
@@ -34,10 +32,10 @@ public class SearchDTO_PartsForImageStructureWebservices {
 	public void setId(int id) {
 		this.id = id;
 	}
-	public List<LinkerDTO> getLinkers() {
+	public List<LinkerData> getLinkers() {
 		return linkers;
 	}
-	public void setLinkers(List<LinkerDTO> linkers) {
+	public void setLinkers(List<LinkerData> linkers) {
 		this.linkers = linkers;
 	}
 	public int getSearchId() {
@@ -45,5 +43,22 @@ public class SearchDTO_PartsForImageStructureWebservices {
 	}
 	public void setSearchId(int searchId) {
 		this.searchId = searchId;
+	}
+	
+	/**
+	 * Linker Data
+	 *
+	 */
+	public static class LinkerData {
+		
+		private String abbr;
+
+		public String getAbbr() {
+			return abbr;
+		}
+
+		public void setAbbr(String abbr) {
+			this.abbr = abbr;
+		}
 	}
 }

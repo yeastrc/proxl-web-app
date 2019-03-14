@@ -3,25 +3,40 @@ package org.yeastrc.xlink.dto;
 
 
 /**
- * Table search_linker
+ * Table search_linker_tbl
  *
  */
 public class SearchLinkerDTO {
 	
-
+	private int id;
 	private int searchId;
-	private int linkerId;
+	
+	private String linkerAbbr;
+	private String linkerName;
+	
 	public int getSearchId() {
 		return searchId;
 	}
 	public void setSearchId(int searchId) {
 		this.searchId = searchId;
 	}
-	public int getLinkerId() {
-		return linkerId;
+	public int getId() {
+		return id;
 	}
-	public void setLinkerId(int linkerId) {
-		this.linkerId = linkerId;
+	public void setId(int id) {
+		this.id = id;
+	}
+	public String getLinkerAbbr() {
+		return linkerAbbr;
+	}
+	public void setLinkerAbbr(String linkerAbbr) {
+		this.linkerAbbr = linkerAbbr;
+	}
+	public String getLinkerName() {
+		return linkerName;
+	}
+	public void setLinkerName(String linkerName) {
+		this.linkerName = linkerName;
 	}
 	
 	

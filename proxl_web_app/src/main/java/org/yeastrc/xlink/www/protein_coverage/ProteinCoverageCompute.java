@@ -11,7 +11,6 @@ import java.util.Map;
 import java.util.Set;
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.www.factories.ProteinSequenceVersionObjectFactory;
-import org.yeastrc.xlink.dto.LinkerDTO;
 import org.yeastrc.xlink.www.objects.ProteinSequenceVersionObject;
 import org.yeastrc.xlink.www.constants.MinimumPSMsConstants;
 import org.yeastrc.xlink.www.dto.SearchDTO;
@@ -38,10 +37,10 @@ import org.yeastrc.xlink.www.objects.SearchProteinMonolink;
 import org.yeastrc.xlink.www.objects.SearchProteinMonolinkWrapper;
 import org.yeastrc.xlink.www.objects.SearchProteinUnlinked;
 import org.yeastrc.xlink.www.objects.SearchProteinUnlinkedWrapper;
-import org.yeastrc.xlink.www.searcher_via_cached_data.cached_data_holders.Cached_Linkers_ForSearchId;
+import org.yeastrc.xlink.www.searcher_via_cached_data.cached_data_holders.Cached_SearchLinker_ForSearchId;
 import org.yeastrc.xlink.www.searcher_via_cached_data.cached_data_holders.Cached_TaxonomyIdsFor_ProtSeqVersionId_SearchId;
 import org.yeastrc.xlink.www.searcher_via_cached_data.request_objects_for_searchers_for_cached_data.TaxonomyIdsForProtSeqIdSearchId_Request;
-import org.yeastrc.xlink.www.searcher_via_cached_data.return_objects_from_searchers_for_cached_data.Linkers_ForSearchId_Response;
+import org.yeastrc.xlink.www.searcher_via_cached_data.return_objects_from_searchers_for_cached_data.SearchLinker_ForSearchId_Response;
 import org.yeastrc.xlink.www.searcher_via_cached_data.return_objects_from_searchers_for_cached_data.TaxonomyIdsForProtSeqIdSearchId_Result;
 import org.yeastrc.xlink.www.web_utils.ExcludeOnTaxonomyForProteinSequenceVersionIdSearchId;
 
@@ -379,20 +378,19 @@ public class ProteinCoverageCompute {
 		//  Get the linker abbreviations for the searches
 		Set<String> linkerAbbrSet = new HashSet<>();
 		{
-			Cached_Linkers_ForSearchId cached_Linkers_ForSearchId = Cached_Linkers_ForSearchId.getInstance();
+			Cached_SearchLinker_ForSearchId cached_Linkers_ForSearchId = Cached_SearchLinker_ForSearchId.getInstance();
 			for ( SearchDTO search : searches ) {
 				int searchId = search.getSearchId();
-				Linkers_ForSearchId_Response linkers_ForSearchId_Response =
-						cached_Linkers_ForSearchId.getLinkers_ForSearchId_Response( searchId );
-				List<LinkerDTO>  linkerList = linkers_ForSearchId_Response.getLinkersForSearchIdList();
-				if ( linkerList == null || linkerList.isEmpty() ) {
+				SearchLinker_ForSearchId_Response linkers_ForSearchId_Response =
+						cached_Linkers_ForSearchId.getSearchLinkers_ForSearchId_Response( searchId );
+				List<String>  linkerAbbreviationList = linkers_ForSearchId_Response.getLinkerAbbreviationsForSearchIdList();
+				if ( linkerAbbreviationList == null || linkerAbbreviationList.isEmpty() ) {
 					String msg = "No linkers found for Search Id: " + searchId;
 					log.error( msg );
 					//			throw new Exception(msg);
 				}
-				for ( LinkerDTO linker : linkerList ) {
-					String linkerAbbr = linker.getAbbr();
-					linkerAbbrSet.add( linkerAbbr );
+				for ( String linkerAbbreviation : linkerAbbreviationList ) {
+					linkerAbbrSet.add( linkerAbbreviation );
 				}
 			}
 		}

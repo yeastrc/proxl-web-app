@@ -1,5 +1,6 @@
 package org.yeastrc.xlink.www.webservices;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -41,10 +42,40 @@ public class LinkablePositionsService {
 														@QueryParam("linkers")List<String> linkers,
 														@Context HttpServletRequest request )
 	throws Exception {
-		
 		try {
+			if ( linkers == null || linkers.isEmpty() ) {
+
+				String msg = "No 'linkers' parameter";
+				log.warn( msg );
+				throw new WebApplicationException(
+						Response.status( WebServiceErrorMessageConstants.INVALID_PARAMETER_STATUS_CODE )  //  Send HTTP code
+						.entity( WebServiceErrorMessageConstants.INVALID_PARAMETER_STATUS_CODE ) // This string will be passed to the client
+						.build()
+						);
+			}
 
 			Set<ProteinPositionPair> positionPairs = new HashSet<ProteinPositionPair>();
+			
+			List<ILinker> linkerObjects = new ArrayList<>( linkers.size() );
+			for( String linkerAbbr : linkers ) {
+				
+				ILinker linker = GetLinkerFactory.getLinkerForAbbr( linkerAbbr );
+				
+				//  linker == null is now a valid response that needs to be handled.
+				
+				if( linker == null ) {
+
+					//  No ILinker linker for linkerAbbr so no Linkable positions will be computed
+					
+					return positionPairs;  //  EARLY RETURN
+					
+//					throw new Exception( "Invalid linker: " + linkerAbbr );
+				}
+				
+				if ( linker != null ) {
+					linkerObjects.add( linker );
+				}
+			}
 
 			for( int proteinId1 : proteins ) {
 				for( int proteinId2 : proteins ) {
@@ -78,21 +109,13 @@ public class LinkablePositionsService {
 						proteinSequence_2 = proteinSequenceDTO_2.getSequence();
 					}
 
-					for( String l : linkers ) {
-						ILinker linker = GetLinkerFactory.getLinkerForAbbr( l );
-						if( linker == null ) {
-							throw new Exception( "Invalid linker: " + l );
-						}
-
-						for( int position1 : linker.getLinkablePositions( proteinSequence_1 ) ) {
-							for( int position2 : linker.getLinkablePositions( proteinSequence_2, proteinSequence_1, position1 ) ) {					
+					for ( ILinker linkerObject : linkerObjects ) {
+						for( int position1 : linkerObject.getLinkablePositions( proteinSequence_1 ) ) {
+							for( int position2 : linkerObject.getLinkablePositions( proteinSequence_2, proteinSequence_1, position1 ) ) {					
 								positionPairs.add( new ProteinPositionPair( proteinId1, position1, proteinId2, position2 ) );					
 							}
-
 						}
-
 					}
-
 				}
 			}
 

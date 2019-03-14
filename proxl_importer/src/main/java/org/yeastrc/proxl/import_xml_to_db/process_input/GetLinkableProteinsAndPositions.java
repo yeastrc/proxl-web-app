@@ -7,13 +7,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterInteralException;
 import org.yeastrc.proxl.import_xml_to_db.objects.ProteinImporterContainer;
 import org.yeastrc.proxl.import_xml_to_db.utils.PeptideProteinSequenceForProteinInference;
-import org.yeastrc.proxl_import.api.xml_dto.Peptide;
 import org.yeastrc.proxl_import.api.xml_dto.ReportedPeptide;
 import org.yeastrc.xlink.linkable_positions.linkers.ILinker;
 
@@ -31,6 +29,7 @@ public class GetLinkableProteinsAndPositions {
 	private GetLinkableProteinsAndPositions() { }
 	public static GetLinkableProteinsAndPositions getInstance() { return instance; }
 	
+	
 	/**
 	 * For Crosslinks:
 	 * 
@@ -40,10 +39,12 @@ public class GetLinkableProteinsAndPositions {
 	 * 
 	 * Also validate that all the monolinks are linkable at the associated protein positions
 	 * 
-	 * @param peptide - 
+	 * @param peptideSequence
 	 * @param peptideCrossLinkPosition
-	 * @param linker
-	 * @param peptideProteins
+	 * @param peptideMonolinkPositions
+	 * @param linkerList - EMPTY if linker abbr in input is not in listed linkers
+	 * @param proteinImporterContainerCollection
+	 * @param reportedPeptide
 	 * @return
 	 * @throws Exception
 	 */
@@ -75,6 +76,8 @@ public class GetLinkableProteinsAndPositions {
 			
 			//  Get linkable positions for all the linkers
 			Collection<Integer> proteinLinkablePositionsCollection = new HashSet<Integer>();
+			
+			// linkerList: EMPTY if linker abbr in input is not in listed linkers
 			for ( ILinker linker : linkerList ) {
 				Collection<Integer> proteinLinkablePositionsCollectionForLinker = linker.getLinkablePositions( proteinSequence );
 				proteinLinkablePositionsCollection.addAll( proteinLinkablePositionsCollectionForLinker );
@@ -82,45 +85,51 @@ public class GetLinkableProteinsAndPositions {
 			List<Integer> proteinPositionList = null;
 			for( Integer proteinCrosslinkedPosition : proteinCrosslinkedPositions ) {
 				boolean crosslinkAndMonolinksPositionsFoundInLinkablePositions = true; 
-				if( ! ( proteinLinkablePositionsCollection.contains( proteinCrosslinkedPosition ) ) ) {
-					crosslinkAndMonolinksPositionsFoundInLinkablePositions = false;
-					if ( log.isInfoEnabled() ) {
-						String msg = " Skipping link for protein " + proteinImporterContainer.getProteinSequenceDTO().getSequence() 
-								+ " for peptide " + peptideSequence 
-								+ " at position " + peptideCrossLinkPosition 
-								+ " because it was not a linkable residue in the protein at crosslink position "
-								+ proteinCrosslinkedPosition 
-								+ " for reported peptide: " + reportedPeptide.getReportedPeptideString()
-								+ ".";
-						log.info( msg );
+				
+				if ( ! linkerList.isEmpty() ) {
+					//  ONLY Check if crosslink and monolink protein position is a linkable position SINCE Linkers provided (linker abbr in input is in listed linkers)
+
+					if( ! ( proteinLinkablePositionsCollection.contains( proteinCrosslinkedPosition ) ) ) {
+						crosslinkAndMonolinksPositionsFoundInLinkablePositions = false;
+						if ( log.isInfoEnabled() ) {
+							String msg = " Skipping link for protein " + proteinImporterContainer.getProteinSequenceDTO().getSequence() 
+									+ " for peptide " + peptideSequence 
+									+ " at position " + peptideCrossLinkPosition 
+									+ " because it was not a linkable residue in the protein at crosslink position "
+									+ proteinCrosslinkedPosition 
+									+ " for reported peptide: " + reportedPeptide.getReportedPeptideString()
+									+ ".";
+							log.info( msg );
+						}
 					}
-				}
-				if ( crosslinkAndMonolinksPositionsFoundInLinkablePositions
-						&& peptideMonolinkPositions != null && ( ! peptideMonolinkPositions.isEmpty() ) ) {
-					for ( Integer peptideMonolinkPosition : peptideMonolinkPositions ) {
-						//  Convert peptide monolink position to protein position
-						int proteinMonolinkPosition = proteinCrosslinkedPosition - peptideCrossLinkPosition + peptideMonolinkPosition; 
-						//  Check if monolink protein position is a linkable position
-						if( ! ( proteinLinkablePositionsCollection.contains( proteinMonolinkPosition ) ) ) {
-							if ( log.isInfoEnabled() ) {
-								String msg = " Skipping link for protein " + proteinImporterContainer.getProteinSequenceDTO().getSequence() 
-										+ " for peptide " + peptideSequence 
-										+ " because the monolink at peptide position " + peptideMonolinkPosition 
-										+ " was not a linkable residue in the protein at position "
-										+ proteinMonolinkPosition
-										+ " while processing crosslink "
-										+ " at crosslink peptide position " + peptideCrossLinkPosition 
-										+ " and crosslink protein position: "
-										+ proteinCrosslinkedPosition 
-										+ " for reported peptide: " + reportedPeptide.getReportedPeptideString()
-										+ ".";
-								log.info( msg );
+					if ( crosslinkAndMonolinksPositionsFoundInLinkablePositions
+							&& peptideMonolinkPositions != null && ( ! peptideMonolinkPositions.isEmpty() ) ) {
+						for ( Integer peptideMonolinkPosition : peptideMonolinkPositions ) {
+							//  Convert peptide monolink position to protein position
+							int proteinMonolinkPosition = proteinCrosslinkedPosition - peptideCrossLinkPosition + peptideMonolinkPosition; 
+							//  Check if monolink protein position is a linkable position
+							if( ! ( proteinLinkablePositionsCollection.contains( proteinMonolinkPosition ) ) ) {
+								if ( log.isInfoEnabled() ) {
+									String msg = " Skipping link for protein " + proteinImporterContainer.getProteinSequenceDTO().getSequence() 
+											+ " for peptide " + peptideSequence 
+											+ " because the monolink at peptide position " + peptideMonolinkPosition 
+											+ " was not a linkable residue in the protein at position "
+											+ proteinMonolinkPosition
+											+ " while processing crosslink "
+											+ " at crosslink peptide position " + peptideCrossLinkPosition 
+											+ " and crosslink protein position: "
+											+ proteinCrosslinkedPosition 
+											+ " for reported peptide: " + reportedPeptide.getReportedPeptideString()
+											+ ".";
+									log.info( msg );
+								}
+								crosslinkAndMonolinksPositionsFoundInLinkablePositions = false;
+								break;
 							}
-							crosslinkAndMonolinksPositionsFoundInLinkablePositions = false;
-							break;
 						}
 					}
 				}
+				
 				if ( crosslinkAndMonolinksPositionsFoundInLinkablePositions ) {
 					if ( proteinPositionList == null ) {
 						//  First position found, create list and put in map
@@ -151,11 +160,13 @@ public class GetLinkableProteinsAndPositions {
 	 * 
 	 * Also validate that all the monolinks are linkable at the associated protein positions
 	 * 
-	 * @param peptide
-	 * @param position1
-	 * @param position2
-	 * @param linker
-	 * @param peptideProteins
+	 * @param peptideSequence
+	 * @param peptideLooplinkPosition_1
+	 * @param peptideLooplinkPosition_2
+	 * @param peptideMonolinkPositions
+	 * @param linkerList - EMPTY if linker abbr in input is not in listed linkers
+	 * @param proteinImporterContainerCollection
+	 * @param reportedPeptide
 	 * @return
 	 * @throws Exception
 	 */
@@ -192,6 +203,8 @@ public class GetLinkableProteinsAndPositions {
 
 			//  Get linkable positions for all the linkers
 			Collection<Integer> proteinLinkablePositionsCollection = new HashSet<Integer>();
+			
+			// linkerList: EMPTY if linker abbr in input is not in listed linkers
 			for ( ILinker linker : linkerList ) {
 				Collection<Integer> linkablePositionsCollectionForLinker = linker.getLinkablePositions( proteinSequence );
 				proteinLinkablePositionsCollection.addAll( linkablePositionsCollectionForLinker );
@@ -201,42 +214,49 @@ public class GetLinkableProteinsAndPositions {
 				boolean looplinkAndMonolinksFoundInLinkablePositions = true; 
 				int looplinkProteinPosition_1 = linkedPositions_1_2.get( 0 );
 				int looplinkProteinPosition_2 = linkedPositions_1_2.get( 1 );
-				if( ! ( proteinLinkablePositionsCollection.contains( looplinkProteinPosition_1 )
-						&& proteinLinkablePositionsCollection.contains( looplinkProteinPosition_2 ) ) ) {
-					looplinkAndMonolinksFoundInLinkablePositions = false;
-					if ( log.isInfoEnabled() ) {
-						String msg = "Skipping looplink for protein " + proteinImporterContainer.getProteinSequenceDTO().getSequence()
-								+ " for peptide " + peptideSequence 
-								+ " at positions " + peptideLooplinkPosition_1 + " and " + peptideLooplinkPosition_2 
-								+ " because they were not linkable residues in the protein at positions "
-								+ looplinkProteinPosition_1 + " and " + looplinkProteinPosition_2 + ".";
-						log.info( msg );
+
+				if ( ! linkerList.isEmpty() ) {
+					//  ONLY Check if looplink and monolink protein position is a linkable position SINCE Linkers provided (linker abbr in input is in listed linkers)
+
+					if( ! ( proteinLinkablePositionsCollection.contains( looplinkProteinPosition_1 )
+							&& proteinLinkablePositionsCollection.contains( looplinkProteinPosition_2 ) ) ) {
+						looplinkAndMonolinksFoundInLinkablePositions = false;
+						if ( log.isInfoEnabled() ) {
+							String msg = "Skipping looplink for protein " + proteinImporterContainer.getProteinSequenceDTO().getSequence()
+									+ " for peptide " + peptideSequence 
+									+ " at positions " + peptideLooplinkPosition_1 + " and " + peptideLooplinkPosition_2 
+									+ " because they were not linkable residues in the protein at positions "
+									+ looplinkProteinPosition_1 + " and " + looplinkProteinPosition_2 + ".";
+							log.info( msg );
+						}
 					}
-				}
-				if ( looplinkAndMonolinksFoundInLinkablePositions
-						&& peptideMonolinkPositions != null && ( ! peptideMonolinkPositions.isEmpty() ) ) {
-					for ( Integer peptideMonolinkPosition : peptideMonolinkPositions ) {
-						//  Convert peptide monolink position to protein position
-						int proteinMonolinkPosition = looplinkProteinPosition_1 - peptideLooplinkPosition_1 + peptideMonolinkPosition; 
-						//  Check if monolink protein position is a linkable position
-						if( ! ( proteinLinkablePositionsCollection.contains( proteinMonolinkPosition ) ) ) {
-							if ( log.isInfoEnabled() ) {
-								String msg = " Skipping link for protein " + proteinImporterContainer.getProteinSequenceDTO().getSequence() 
-										+ " for peptide " + peptideSequence 
-										+ " because the monolink at peptide position " + peptideMonolinkPosition 
-										+ " was not a linkable residue in the protein at position "
-										+ proteinMonolinkPosition
-										+ " while processing looplink "
-										+ " at looplink peptide positions " 
-										+ peptideLooplinkPosition_1 + " and " + peptideLooplinkPosition_2
-										+ " and looplink protein positions: "
-										+ looplinkProteinPosition_1 + " and " + looplinkProteinPosition_2 
-										+ " for reported peptide: " + reportedPeptide.getReportedPeptideString()
-										+ ".";
-								log.info( msg );
+
+					if ( looplinkAndMonolinksFoundInLinkablePositions
+							&& peptideMonolinkPositions != null && ( ! peptideMonolinkPositions.isEmpty() ) ) {
+						for ( Integer peptideMonolinkPosition : peptideMonolinkPositions ) {
+							//  Convert peptide monolink position to protein position
+							int proteinMonolinkPosition = looplinkProteinPosition_1 - peptideLooplinkPosition_1 + peptideMonolinkPosition; 
+							//  Check if monolink protein position is a linkable position
+							if( ! ( proteinLinkablePositionsCollection.contains( proteinMonolinkPosition ) ) ) {
+								if ( log.isInfoEnabled() ) {
+									String msg = " Skipping link for protein " + proteinImporterContainer.getProteinSequenceDTO().getSequence() 
+											+ " for peptide " + peptideSequence 
+											+ " because the monolink at peptide position " + peptideMonolinkPosition 
+											+ " was not a linkable residue in the protein at position "
+											+ proteinMonolinkPosition
+											+ " while processing looplink "
+											+ " at looplink peptide positions " 
+											+ peptideLooplinkPosition_1 + " and " + peptideLooplinkPosition_2
+											+ " and looplink protein positions: "
+											+ looplinkProteinPosition_1 + " and " + looplinkProteinPosition_2 
+											+ " for reported peptide: " + reportedPeptide.getReportedPeptideString()
+											+ ".";
+									log.info( msg );
+								}
+								looplinkAndMonolinksFoundInLinkablePositions = false;
+								
+								break; // Exit Loop: for ( Integer peptideMonolinkPosition : peptideMonolinkPositions ) {
 							}
-							looplinkAndMonolinksFoundInLinkablePositions = false;
-							break;
 						}
 					}
 				}
@@ -263,13 +283,17 @@ public class GetLinkableProteinsAndPositions {
 		return results;
 	}
 	
+
 	/**
 	 * For Unlinked and Dimer
 	 * 
-	 * @param reportedPeptideDTO
-	 * @param searchId
-	 * @param peptideDTO
-	 * @param proteinImporterContainer
+	 * 
+	 * @param peptideSequence
+	 * @param peptideMonolinkPositions
+	 * @param linkerList - EMPTY if linker abbr in input is not in listed linkers
+	 * @param proteinImporterContainerCollection
+	 * @param reportedPeptide
+	 * @return
 	 * @throws Exception
 	 */
 	public Map<ProteinImporterContainer, Collection<Integer>> get_Unlinked_Dimer_PeptidePositionsInProteins(
@@ -293,6 +317,8 @@ public class GetLinkableProteinsAndPositions {
 			
 			//  Get linkable positions for all the linkers
 			Collection<Integer> proteinLinkablePositionsCollection = new HashSet<Integer>();
+			
+			// linkerList: EMPTY if linker abbr in input is not in listed linkers
 			for ( ILinker linker : linkerList ) {
 				Collection<Integer> linkablePositionsCollectionForLinker = linker.getLinkablePositions( proteinSequence );
 				proteinLinkablePositionsCollection.addAll( linkablePositionsCollectionForLinker );
@@ -304,27 +330,33 @@ public class GetLinkableProteinsAndPositions {
 				int proteinStartPosition = peptideIndex + 1;  //  Positions are 1 based
 //				int proteinEndPosition = proteinStartPosition + peptideSequence.length() - 1;
 				boolean monolinksFoundInLinkablePositions = true;
-				if ( peptideMonolinkPositions != null && ( ! peptideMonolinkPositions.isEmpty() ) ) {
-					for ( Integer peptideMonolinkPosition : peptideMonolinkPositions ) {
-						//  Convert peptide monolink position to protein position
-						int proteinMonolinkPosition = peptideIndex + peptideMonolinkPosition; 
-						//  Check if monolink protein position is a linkable position
-						if( ! ( proteinLinkablePositionsCollection.contains( proteinMonolinkPosition ) ) ) {
-							if ( log.isInfoEnabled() ) {
-								String msg = " Skipping link for protein " + proteinImporterContainer.getProteinSequenceDTO().getSequence() 
-										+ " for peptide " + peptideSequence 
-										+ " because the monolink at peptide position " + peptideMonolinkPosition 
-										+ " was not a linkable residue in the protein at position "
-										+ proteinMonolinkPosition
-										+ " while processing unlinked or dimer "
-										+ " at peptide start position on the protein: " 
-										+ proteinStartPosition
-										+ ", for reported peptide: " + reportedPeptide.getReportedPeptideString()
-										+ ".";
-								log.info( msg );
+
+				if ( ! linkerList.isEmpty() ) {
+					//  ONLY Check if monolink protein position is a linkable position SINCE Linkers provided (linker abbr in input is in listed linkers)
+
+					if ( peptideMonolinkPositions != null && ( ! peptideMonolinkPositions.isEmpty() ) ) {
+
+						for ( Integer peptideMonolinkPosition : peptideMonolinkPositions ) {
+							//  Convert peptide monolink position to protein position
+							int proteinMonolinkPosition = peptideIndex + peptideMonolinkPosition; 
+							if( ! ( proteinLinkablePositionsCollection.contains( proteinMonolinkPosition ) ) ) {
+								if ( log.isInfoEnabled() ) {
+									String msg = " Skipping link for protein " + proteinImporterContainer.getProteinSequenceDTO().getSequence() 
+											+ " for peptide " + peptideSequence 
+											+ " because the monolink at peptide position " + peptideMonolinkPosition 
+											+ " was not a linkable residue in the protein at position "
+											+ proteinMonolinkPosition
+											+ " while processing unlinked or dimer "
+											+ " at peptide start position on the protein: " 
+											+ proteinStartPosition
+											+ ", for reported peptide: " + reportedPeptide.getReportedPeptideString()
+											+ ".";
+									log.info( msg );
+								}
+								monolinksFoundInLinkablePositions = false;
+
+								break; //  Exit Loop:  for ( Integer peptideMonolinkPosition : peptideMonolinkPositions ) {
 							}
-							monolinksFoundInLinkablePositions = false;
-							break;
 						}
 					}
 				}

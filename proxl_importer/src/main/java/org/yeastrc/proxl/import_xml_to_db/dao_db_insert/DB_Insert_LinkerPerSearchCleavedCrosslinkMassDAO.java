@@ -11,7 +11,7 @@ import org.yeastrc.xlink.dto.LinkerPerSearchCleavedCrosslinkMassDTO;
 
 
 /**
- * table linker_per_search_cleaved_crosslink_mass
+ * table linker_per_search_cleaved_crosslink_mass_tbl
  *
  */
 public class DB_Insert_LinkerPerSearchCleavedCrosslinkMassDAO {
@@ -23,8 +23,8 @@ public class DB_Insert_LinkerPerSearchCleavedCrosslinkMassDAO {
 	
 
 	private final String INSERT_SQL = 
-			"INSERT INTO linker_per_search_cleaved_crosslink_mass "
-			+ "(linker_id, search_id, cleaved_crosslink_mass_double, cleaved_crosslink_mass_string) "
+			"INSERT INTO linker_per_search_cleaved_crosslink_mass_tbl "
+			+ "(search_linker_id, search_id, cleaved_crosslink_mass_double, cleaved_crosslink_mass_string) "
 			+ "VALUES (?, ?, ?, ?)";
 	
 	  
@@ -45,7 +45,7 @@ public class DB_Insert_LinkerPerSearchCleavedCrosslinkMassDAO {
 			int counter = 0;
 			
 			counter++;
-			pstmt.setInt( counter, item.getLinkerId() );
+			pstmt.setInt( counter, item.getSearchLinkerId() );
 			counter++;
 			pstmt.setInt( counter, item.getSearchId() );
 			counter++;
@@ -61,12 +61,12 @@ public class DB_Insert_LinkerPerSearchCleavedCrosslinkMassDAO {
 			if( rs.next() ) {
 				item.setId( rs.getInt( 1 ) );
 			} else
-				throw new Exception( "Failed to insert linker_per_search_cleaved_crosslink_mass" );
+				throw new Exception( "Failed to insert linker_per_search_cleaved_crosslink_mass_tbl" );
 			
 		} catch ( Exception e ) {
 			
-			String msg = "ERROR inserting linker_per_search_cleaved_crosslink_mass. database connection: '" + DBConnectionFactory.PROXL + "'"
-					+ "\n linker_per_search_cleaved_crosslink_mass: " + item
+			String msg = "ERROR inserting linker_per_search_cleaved_crosslink_mass_tbl. database connection: '" + DBConnectionFactory.PROXL + "'"
+					+ "\n linker_per_search_cleaved_crosslink_mass_tbl: " + item
 					+ "\nsql: " + sql;
 			log.error( msg, e );
 			

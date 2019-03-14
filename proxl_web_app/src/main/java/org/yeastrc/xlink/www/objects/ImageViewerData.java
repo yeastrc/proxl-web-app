@@ -177,6 +177,14 @@ public class ImageViewerData {
 		this.cutoffs = cutoffs;
 	}
 
+	public boolean isAllLinkersSupportedForLinkablePositions() {
+		return allLinkersSupportedForLinkablePositions;
+	}
+
+	public void setAllLinkersSupportedForLinkablePositions(boolean allLinkersSupportedForLinkablePositions) {
+		this.allLinkersSupportedForLinkablePositions = allLinkersSupportedForLinkablePositions;
+	}
+
 
 
 
@@ -203,6 +211,8 @@ public class ImageViewerData {
 
 
 	private Map<Integer, Collection<Integer>> linkablePositions;
+	
+	private boolean allLinkersSupportedForLinkablePositions;
 
 
 

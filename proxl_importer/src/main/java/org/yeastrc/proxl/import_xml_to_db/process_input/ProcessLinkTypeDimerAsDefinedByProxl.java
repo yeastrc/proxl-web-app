@@ -80,7 +80,7 @@ public class ProcessLinkTypeDimerAsDefinedByProxl {
 	 * The PeptideDTO entries are saved to the DB in this step since used for Protein Mappings
 	 * 
 	 * @param reportedPeptide
-	 * @param linkerList
+	 * @param linkerList - EMPTY if linker abbr in input is not in listed linkers
 	 * @param linkerListStringForErrorMsgs
 	 * @return
 	 * @throws Exception
@@ -125,7 +125,7 @@ public class ProcessLinkTypeDimerAsDefinedByProxl {
 	
 	/**
 	 * @param peptide
-	 * @param linkerList
+	 * @param linkerList - EMPTY if linker abbr in input is not in listed linkers
 	 * @param linkerListStringForErrorMsgs
 	 * @param reportedPeptide
 	 * @param peptideNumber
@@ -163,10 +163,12 @@ public class ProcessLinkTypeDimerAsDefinedByProxl {
 						proteinMatches_Peptide,
 						reportedPeptide // For error reporting only
 						);
-		if( proteinMap.size() < 1 ) {
+		
+		if ( proteinMap.isEmpty() ) {
+			
 			String msg = null;
 			
-			if ( peptideMonolinkPositions != null && ( ! peptideMonolinkPositions.isEmpty() ) ) {
+			if ( peptideMonolinkPositions != null && ( ! peptideMonolinkPositions.isEmpty() && ( ! linkerList.isEmpty()  ) ) ) {
 
 				List<String> linkersToStringArray = new ArrayList<>( linkerList.size() );
 				for ( ILinker linkerItem : linkerList ) {

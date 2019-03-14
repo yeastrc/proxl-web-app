@@ -31,7 +31,7 @@ public class LinkerPerSearchCleavedCrosslinkMass_Searcher {
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
-		final String sql = "SELECT * FROM linker_per_search_cleaved_crosslink_mass WHERE search_id = ?";
+		final String sql = "SELECT * FROM linker_per_search_cleaved_crosslink_mass_tbl WHERE search_id = ?";
 		try {
 			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 			pstmt = conn.prepareStatement( sql );
@@ -40,7 +40,7 @@ public class LinkerPerSearchCleavedCrosslinkMass_Searcher {
 			while( rs.next() ) {
 				LinkerPerSearchCleavedCrosslinkMassDTO result = new LinkerPerSearchCleavedCrosslinkMassDTO();
 				result.setId( rs.getInt( "id" ) );
-				result.setLinkerId( rs.getInt( "linker_id" ) );
+				result.setSearchLinkerId( rs.getInt( "search_linker_id" ) );
 				result.setSearchId( rs.getInt( "search_id" ) );
 				result.setCleavedCrosslinkMassDouble( rs.getDouble( "cleaved_crosslink_mass_double" ) );
 				result.setCleavedCrosslinkMassString( rs.getString( "cleaved_crosslink_mass_string" ) );

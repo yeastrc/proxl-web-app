@@ -42,7 +42,7 @@ import org.yeastrc.xlink.www.web_utils.GenerateVennDiagramDataToJSON;
 import org.yeastrc.xlink.www.web_utils.GetAnnotationDisplayUserSelectionDetailsData;
 import org.yeastrc.xlink.www.web_utils.GetPageHeaderData;
 import org.yeastrc.xlink.www.web_utils.GetSearchDetailsData;
-import org.yeastrc.xlink.www.web_utils.IsShowDownloadLink_SkylineShulman;
+import org.yeastrc.xlink.www.web_utils.IsShowDownloadLinks_Skyline_SetRequestParameters;
 import org.yeastrc.xlink.www.web_utils.ProteinListingTooltipConfigUtil;
 import org.yeastrc.xlink.www.webapp_timing.WebappTiming;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -179,7 +179,7 @@ public class ViewMergedSearchPeptidesAction extends Action {
 			ExcludeLinksWith_Remove_NonUniquePSMs_Checkbox_PopRequestItems.getInstance().excludeLinksWith_Remove_NonUniquePSMs_Checkbox_PopRequestItems( searches, request );
 
 			//  Populates request attribute
-			IsShowDownloadLink_SkylineShulman.getInstance().isShowDownloadLink_SkylineShulman( searchIds, request );
+			IsShowDownloadLinks_Skyline_SetRequestParameters.getInstance().isShowDownloadLinks_Skyline_SetRequestParameters( searchIds, request );
 			
 			List<Double> modMassDistinctForSearchesList = SearchModMassDistinctSearcher.getInstance().getDistinctDynamicModMassesForSearchId( searchIdsArray );
 			if ( webappTiming != null ) {

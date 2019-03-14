@@ -2,6 +2,7 @@ package org.yeastrc.xlink.www.actions;
 
 import java.io.BufferedOutputStream;
 import java.io.OutputStreamWriter;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -25,7 +26,7 @@ import org.apache.struts.action.ActionMapping;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
-import org.yeastrc.xlink.dto.LinkerDTO;
+import org.yeastrc.xlink.dto.PsmDTO;
 import org.yeastrc.xlink.linkable_positions.GetLinkerFactory;
 import org.yeastrc.xlink.linkable_positions.linkers.ILinker;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesRootLevel;
@@ -38,19 +39,22 @@ import org.yeastrc.xlink.www.constants.WebConstants;
 import org.yeastrc.xlink.www.dao.SearchDAO;
 import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
+import org.yeastrc.xlink.www.exceptions.ProxlWebappInternalErrorException;
 import org.yeastrc.xlink.www.form_query_json_objects.MergedPeptideQueryJSONRoot;
 import org.yeastrc.xlink.www.forms.MergedSearchViewPeptidesForm;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
 import org.yeastrc.xlink.www.objects.PsmWebDisplayWebServiceResult;
 import org.yeastrc.xlink.www.objects.WebMergedProteinPosition;
 import org.yeastrc.xlink.www.objects.WebMergedReportedPeptide;
-import org.yeastrc.xlink.www.searcher.LinkerForPSMMatcher;
-import org.yeastrc.xlink.www.searcher.LinkersForSearchIdsSearcher;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
 import org.yeastrc.xlink.www.searcher.PsmWebDisplaySearcher;
 import org.yeastrc.xlink.www.searcher.ReportedPeptideIdsForSearchIdsUnifiedPeptideIdSearcher;
+import org.yeastrc.xlink.www.searcher_via_cached_data.cached_data_holders.Cached_SearchLinker_ForSearchId;
+import org.yeastrc.xlink.www.searcher_via_cached_data.return_objects_from_searchers_for_cached_data.SearchLinker_ForSearchId_Response;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
+import org.yeastrc.xlink.www.web_utils.SearchLinkerAndLinkerAbbreviationForLinkerMass_SingleSearch_Util;
+
 /**
  * 
  *
@@ -67,6 +71,7 @@ public class DownloadMergedPeptidesSkylineShulman extends Action {
 			  HttpServletRequest request,
 			  HttpServletResponse response )
 					  throws Exception {
+		
 		try {
 			// our form
 			MergedSearchViewPeptidesForm form = (MergedSearchViewPeptidesForm)actionForm;
@@ -163,12 +168,66 @@ public class DownloadMergedPeptidesSkylineShulman extends Action {
 				SearcherCutoffValuesRootLevel searcherCutoffValuesRootLevel =
 						peptidesMergedCommonPageDownloadResult.searcherCutoffValuesRootLevel;
 
+				
+				String crosslinkerFormulaString = null;
+				
+				// if there is only one possible formula, just use it no matter what
+				
+				{
+					Set<String> linkerAbbreviationsAllSearches = new HashSet<>(); // Accumulate distinct values for all searches
+					
+					Cached_SearchLinker_ForSearchId cached_SearchLinker_ForSearchId = Cached_SearchLinker_ForSearchId.getInstance();
+					
+					for ( Integer searchId : searchIds ) {
+					
+						SearchLinker_ForSearchId_Response searchLinker_ForSearchId_Response =
+								cached_SearchLinker_ForSearchId.getSearchLinkers_ForSearchId_Response( searchId );
+						
+						List<String> linkerAbbreviationsForSearchIdList = searchLinker_ForSearchId_Response.getLinkerAbbreviationsForSearchIdList();
+						if ( linkerAbbreviationsForSearchIdList == null || linkerAbbreviationsForSearchIdList.isEmpty() ) {
+							String msg = "No Linker abbreviations for searchId: " + searchId;
+							log.error( msg );
+							throw new ProxlWebappDataException(msg);
+						}
+						linkerAbbreviationsAllSearches.addAll( linkerAbbreviationsForSearchIdList );  //  Accumulate distinct values for all searches
+					}
+					
+					if( linkerAbbreviationsAllSearches.size() == 1 ) {
+						
+						String linkerAbbr = linkerAbbreviationsAllSearches.iterator().next();
+						
+						ILinker linker = GetLinkerFactory.getLinkerForAbbr( linkerAbbr );
+						
+						if ( linker == null ) {
+							//  No ILinker for Linker Abbreviation, is not a supported Linker for extra compute
+							//  Not valid to get here.  The download link should have been hidden
+							String msg = "No ILinker for linker abbreviation: '"
+									+ linkerAbbr
+									+ "'.  Should not get here.  The download link should have been hidden";
+							log.error( msg );
+							throw new ProxlWebappInternalErrorException( msg );
+						}
+						
+						if( linker.getCrosslinkFormulas().size() == 1 ) {
+							
+							crosslinkerFormulaString = linker.getCrosslinkFormula( 0.0 );
+						}
+					}
+				}
+				
 
 
 
 				Collection<String> lines = new HashSet<>();
 				
+				//  Cached Data
 				
+				Map<String, ILinker> linkersCachedKeyLinkerAbbr = new HashMap<>();
+				
+				Map<Integer, SearchLinkerAndLinkerAbbreviationForLinkerMass_SingleSearch_Util> searchLinkerAndLinkerAbbreviationForLinkerMass_SingleSearch_Util_KEY_SearchId = new HashMap<>();
+				Map<Integer, SearcherCutoffValuesSearchLevel> searcherCutoffValuesSearchLevel_KEY_SearchId = new HashMap<>();
+				
+				//  Process Main Reported Peptides for Merged:
 				
 				for( WebMergedReportedPeptide link : peptidesMergedCommonPageDownloadResult.getWebMergedReportedPeptideList() ) {
 					
@@ -194,19 +253,16 @@ public class DownloadMergedPeptidesSkylineShulman extends Action {
 					line += link.getPeptide1().getSequence() + "--" + link.getPeptide2().getSequence() + "\t";
 					
 					// if there is only one possible formula, just use it no matter what
-					{
+					
+					if ( crosslinkerFormulaString != null ) {
+
+						lines.add( line + crosslinkerFormulaString );
 						
-						Collection<LinkerDTO> linkerDTOs = LinkersForSearchIdsSearcher.getInstance().getLinkersForSearchIds( searchIds );
+						// go to next reported peptide
 						
-						if( linkerDTOs.size() == 1 ) {
-							ILinker linker = GetLinkerFactory.getLinkerForAbbr( searches.get( 0 ).getLinkers().get( 0 ).getAbbr() );
-							if( linker.getCrosslinkFormulas().size() == 1 ) {
-								
-								lines.add( line + linker.getCrosslinkFormula( 0.0 ) );
-								continue;// go to next reported peptide
-							}
-						}
+						continue;  //  EARLY CONTINUE
 					}
+					
 					
 					// iterate over PSMs for this reported peptide, get linker masses to find linker formula
 					int unifiedReportedPeptideId = link.getUnifiedReportedPeptideId();
@@ -214,22 +270,40 @@ public class DownloadMergedPeptidesSkylineShulman extends Action {
 					for ( SearchDTO search : searches ) {
 						int eachProjectSearchIdToProcess = search.getProjectSearchId();
 						Integer eachSearchIdToProcess = search.getSearchId();
-																		
-						SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel = 
-								searcherCutoffValuesRootLevel.getPerSearchCutoffs( eachProjectSearchIdToProcess );
+						
+						//  Linkers for Search
+						
+						//  Get from Cache, if not found, create
+						SearchLinkerAndLinkerAbbreviationForLinkerMass_SingleSearch_Util searchLinkerAndLinkerAbbreviationForLinkerMass_SingleSearch_Util =
+								searchLinkerAndLinkerAbbreviationForLinkerMass_SingleSearch_Util_KEY_SearchId.get(  eachSearchIdToProcess );
+						if ( searchLinkerAndLinkerAbbreviationForLinkerMass_SingleSearch_Util == null ) { 
+							searchLinkerAndLinkerAbbreviationForLinkerMass_SingleSearch_Util = SearchLinkerAndLinkerAbbreviationForLinkerMass_SingleSearch_Util.getInstanceForSearchId( eachSearchIdToProcess );
+							searchLinkerAndLinkerAbbreviationForLinkerMass_SingleSearch_Util_KEY_SearchId.put(  eachSearchIdToProcess, searchLinkerAndLinkerAbbreviationForLinkerMass_SingleSearch_Util );
+						}
+						
+						//  Searcher cutoffs for getting Reported Peptides and PSMs
+						
+						SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel = searcherCutoffValuesSearchLevel_KEY_SearchId.get(  eachSearchIdToProcess );
 						if ( searcherCutoffValuesSearchLevel == null ) {
-							String msg = "searcherCutoffValuesRootLevel.getPerSearchCutoffs(projectSearchId) returned null for:  " + eachProjectSearchIdToProcess;
-							log.error( msg );
-							throw new ProxlWebappDataException( msg );
+							searcherCutoffValuesSearchLevel = searcherCutoffValuesRootLevel.getPerSearchCutoffs( eachProjectSearchIdToProcess );
+							if ( searcherCutoffValuesSearchLevel == null ) {
+								String msg = "searcherCutoffValuesRootLevel.getPerSearchCutoffs(projectSearchId) returned null for:  " + eachProjectSearchIdToProcess;
+								log.error( msg );
+								throw new ProxlWebappDataException( msg );
+							}
+							searcherCutoffValuesSearchLevel_KEY_SearchId.put(  eachSearchIdToProcess, searcherCutoffValuesSearchLevel );
 						}
 						
 						//  First get list of reported peptide ids for unifiedReportedPeptideId and search id
 						List<Integer> reportedPeptideIdList = 
 								ReportedPeptideIdsForSearchIdsUnifiedPeptideIdSearcher.getInstance()
 								.getReportedPeptideIdsForSearchIdsAndUnifiedReportedPeptideId( eachSearchIdToProcess, unifiedReportedPeptideId );
+						
 						//  Process each search id, reported peptide id pair
 						for ( int reportedPeptideId : reportedPeptideIdList ) {
+							
 							//  Process Each search id/reported peptide id for the link
+							
 							//  Get the PSMs for a Peptide/Search combination and output the records
 							List<PsmWebDisplayWebServiceResult> psms = 
 									PsmWebDisplaySearcher.getInstance().getPsmsWebDisplay( 
@@ -246,21 +320,36 @@ public class DownloadMergedPeptidesSkylineShulman extends Action {
 
 							for ( PsmWebDisplayWebServiceResult psm : psms ) {
 																
-								LinkerDTO linkerdto = null;
-								try {
-									linkerdto = LinkerForPSMMatcher.getInstance().getLinkerForPSM( psm.getPsmDTO() );
-								} catch (Exception e ) {
-									try {
-										int psmId = psm.getPsmDTO().getId();
-										log.error( "Error getting linkerDTO for psmId: " + psmId, e );
-									} catch (Exception e2 ) {
-										log.error( "Error getting searchId: " + psm.getSearchId(), e2 );
+								PsmDTO psmDTO = psm.getPsmDTO();
+								BigDecimal psmLinkerMass = psmDTO.getLinkerMass();
+								
+								String linkerAbbr = searchLinkerAndLinkerAbbreviationForLinkerMass_SingleSearch_Util.getLinkerAbbreviationForLinkerMass( psmLinkerMass );
+								
+								if ( linkerAbbr == null ) {
+									String msg = "No Linker abbreviation for psm id: " 
+											+ psmDTO.getId() 
+											+ ", search id: " + eachSearchIdToProcess
+											+ ", project search id: " + eachProjectSearchIdToProcess;
+									log.error( msg );
+									throw new ProxlWebappDataException( msg );
+								}
+								
+								ILinker linker = linkersCachedKeyLinkerAbbr.get( linkerAbbr );
+										
+								if ( linker == null ) {
+									linker = GetLinkerFactory.getLinkerForAbbr( linkerAbbr );
+									if ( linker == null ) {
+										//  No ILinker for Linker Abbreviation, is not a supported Linker for extra compute
+										//  Not valid to get here.  The download link should have been hidden
+										String msg = "No ILinker for linker abbreviation: '"
+												+ linkerAbbr
+												+ "'.  Should not get here.  The download link should have been hidden";
+										log.error( msg );
+										throw new ProxlWebappInternalErrorException( msg );
 									}
 								}
 								
-								ILinker linker = GetLinkerFactory.getLinkerForAbbr( linkerdto.getAbbr() );
-								
-								String formula = linker.getCrosslinkFormula( psm.getPsmDTO().getLinkerMass().doubleValue() );
+								String formula = linker.getCrosslinkFormula( psmLinkerMass.doubleValue() );
 
 								lines.add( line + formula );
 								

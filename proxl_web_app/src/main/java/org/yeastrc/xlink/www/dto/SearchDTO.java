@@ -5,13 +5,11 @@ import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.yeastrc.xlink.dao.SearchFileProjectSearchDAO;
-import org.yeastrc.xlink.dto.LinkerDTO;
 import org.yeastrc.xlink.dto.SearchCommentDTO;
 import org.yeastrc.xlink.dto.SearchFileProjectSearchDTO;
 import org.yeastrc.xlink.www.searcher.SearchCommentSearcher;
 import org.yeastrc.xlink.www.searcher.SearchWebLinksSearcher;
-import org.yeastrc.xlink.www.searcher_via_cached_data.cached_data_holders.Cached_Linkers_ForSearchId;
-import org.yeastrc.xlink.www.searcher_via_cached_data.return_objects_from_searchers_for_cached_data.Linkers_ForSearchId_Response;
+
 /**
  * Table search
  *
@@ -140,18 +138,18 @@ public class SearchDTO implements Comparable<SearchDTO> {
 //		return linkers;
 //	}
 	
-	public List<LinkerDTO> getLinkers() throws Exception {
-		try {
-			Linkers_ForSearchId_Response linkers_ForSearchId_Response =
-					Cached_Linkers_ForSearchId.getInstance()
-					.getLinkers_ForSearchId_Response( this.searchId );
-			return linkers_ForSearchId_Response.getLinkersForSearchIdList();
-		} catch ( Exception e ) {
-			String msg = "Exception caught in getLinkers(): " + e.toString();
-			log.error( msg, e );
-			throw e;
-		}
-	}	
+//	public List<LinkerDTO> getLinkers() throws Exception {
+//		try {
+//			Linkers_ForSearchId_Response linkers_ForSearchId_Response =
+//					Cached_Linkers_ForSearchId.getInstance()
+//					.getLinkers_ForSearchId_Response( this.searchId );
+//			return linkers_ForSearchId_Response.getLinkersForSearchIdList();
+//		} catch ( Exception e ) {
+//			String msg = "Exception caught in getLinkers(): " + e.toString();
+//			log.error( msg, e );
+//			throw e;
+//		}
+//	}	
 	
 //	public String getName() {
 //		return name;

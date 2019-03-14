@@ -28,10 +28,10 @@ import org.yeastrc.spectral_storage.get_data_webapp.shared_server_client.webserv
 import org.yeastrc.xlink.dao.ScanFileDAO;
 import org.yeastrc.xlink.dao.StaticModDAO;
 import org.yeastrc.xlink.dto.IsotopeLabelDTO;
-import org.yeastrc.xlink.dto.LinkerDTO;
 import org.yeastrc.xlink.dto.LinkerPerSearchCleavedCrosslinkMassDTO;
 import org.yeastrc.xlink.dto.PeptideDTO;
 import org.yeastrc.xlink.dto.PsmDTO;
+import org.yeastrc.xlink.dto.SearchLinkerDTO;
 import org.yeastrc.xlink.dto.SearchScanFilenameDTO;
 import org.yeastrc.xlink.dto.SrchRepPeptPeptDynamicModDTO;
 import org.yeastrc.xlink.dto.StaticModDTO;
@@ -50,7 +50,6 @@ import org.yeastrc.xlink.www.dto.SrchRepPeptPeptideDTO;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappInternalErrorException;
 import org.yeastrc.xlink.www.searcher.IsotopeLabelSearcher;
-import org.yeastrc.xlink.www.searcher.LinkerForPSMMatcher;
 import org.yeastrc.xlink.www.searcher.LinkerPerSearchCleavedCrosslinkMass_Searcher;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
 import org.yeastrc.xlink.www.searcher.ProjectSearchIdsForSearchIdSearcher;
@@ -62,6 +61,7 @@ import org.yeastrc.xlink.www.searcher_via_cached_data.return_objects_from_search
 import org.yeastrc.xlink.www.spectral_storage_service_interface.Call_Get_ScanDataFromScanNumbers_SpectralStorageWebservice;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
+import org.yeastrc.xlink.www.web_utils.SearchLinkerAndLinkerAbbreviationForLinkerMass_SingleSearch_Util;
 
 /**
  * 
@@ -84,6 +84,7 @@ public class LorikeetSpectrumService {
 	public LorikeetGetSpectrumServiceResult getViewerData( @QueryParam( "psmId" ) int psmId,
 										  @Context HttpServletRequest request )
 	throws Exception {
+		
 		LorikeetRootData lorikeetRootData = new LorikeetRootData();
 		LorikeetGetSpectrumServiceResult lorikeetGetSpectrumServiceResult = new LorikeetGetSpectrumServiceResult();
 		lorikeetGetSpectrumServiceResult.setData( lorikeetRootData );
@@ -411,6 +412,12 @@ public class LorikeetSpectrumService {
 	 */
 	private LorikeetCrossLinkData getCrossLinkData( PsmDTO psmDTO ) throws Exception {
 		
+		if ( psmDTO.getLinkerMass() == null ) {
+			String msg = "getCrossLinkData(...): psmDTO.getLinkerMass() is null for psm id: " + psmDTO.getId();
+			log.error(msg);
+			throw new ProxlWebappDataException(msg);
+		}
+		
 		LorikeetCrossLinkData lorikeetCrossLinkData = new LorikeetCrossLinkData();
 		lorikeetCrossLinkData.setLinkerMass(  psmDTO.getLinkerMass() );
 		
@@ -441,22 +448,25 @@ public class LorikeetSpectrumService {
 			//  Get cleaved_crosslink_mass records for search id
 			List<LinkerPerSearchCleavedCrosslinkMassDTO> cleavedCrosslinkMassList_FromDB = LinkerPerSearchCleavedCrosslinkMass_Searcher.getInstance().getForSearchId( psmDTO.getSearchId() );
 			if ( ! cleavedCrosslinkMassList_FromDB.isEmpty() ) {
-				//  Have records so get the link id for the main crosslink mass on the PSM
-				LinkerDTO linkerdto = null;
-				try {
-					linkerdto = LinkerForPSMMatcher.getInstance().getLinkerForPSM( psmDTO );
-				} catch (Exception e ) {
-					try {
-						int psmId = psmDTO.getId();
-						log.error( "Error getting linkerDTO for psmId: " + psmId, e );
-					} catch (Exception e2 ) {
-						log.error( "Error getting searchId: " + psmDTO.getSearchId(), e2 );
-					}
+				
+				
+				SearchLinkerAndLinkerAbbreviationForLinkerMass_SingleSearch_Util searchLinkerAndLinkerAbbreviationForLinkerMass_SingleSearch_Util = 
+						SearchLinkerAndLinkerAbbreviationForLinkerMass_SingleSearch_Util.getInstanceForSearchId( psmDTO.getSearchId() );
+				
+				SearchLinkerDTO searchLinkerDTO = searchLinkerAndLinkerAbbreviationForLinkerMass_SingleSearch_Util.getSearchLinkerDTOForLinkerMass( psmDTO.getLinkerMass() );
+				
+				if ( searchLinkerDTO == null ) {
+					String msg = "No searchLinkerDTO for psm id: " 
+							+ psmDTO.getId() 
+							+ ", search id: " + psmDTO.getSearchId();
+					log.error( msg );
+					throw new ProxlWebappDataException( msg );
 				}
+				
 				//  Get cleaved_crosslink_mass records for linker id
 				List<LinkerPerSearchCleavedCrosslinkMassDTO> cleavedCrosslinkMassList_ForLinkerId = new ArrayList<>( cleavedCrosslinkMassList_FromDB.size() );
 				for ( LinkerPerSearchCleavedCrosslinkMassDTO entry : cleavedCrosslinkMassList_FromDB ) {
-					if ( entry.getLinkerId() == linkerdto.getId() ) {
+					if ( entry.getSearchLinkerId() == searchLinkerDTO.getId() ) {
 						cleavedCrosslinkMassList_ForLinkerId.add( entry );
 					}
 				}
@@ -464,7 +474,7 @@ public class LorikeetSpectrumService {
 					//  Found entries for cleavedCrosslinkMassList_ForLinkerId for Linker id
 					
 					//  Set linker abbr
-					lorikeetCrossLinkData.setLinkerAbbr( linkerdto.getAbbr() );
+					lorikeetCrossLinkData.setLinkerAbbr( searchLinkerDTO.getLinkerAbbr() );
 					
 					//  Populate cleavedCrosslinkMassList in result
 					List<BigDecimal> cleavedLinkerMassList = new ArrayList<>( cleavedCrosslinkMassList_ForLinkerId.size() );

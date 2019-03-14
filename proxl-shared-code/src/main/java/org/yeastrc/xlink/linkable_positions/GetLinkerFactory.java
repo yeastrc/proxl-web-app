@@ -76,16 +76,22 @@ public class GetLinkerFactory {
 	}
 	
 	/**
-	 * @param linkerAbbr
-	 * @return
+	 * @param linkerAbbr - Converted to lower case before looking up linker object
+	 * @return - null if not found.  Not Found is valid for provided abbreviations not yet supported
 	 * @throws ProxlBaseDataException 
 	 */
 	public static ILinker getLinkerForAbbr( String linkerAbbr ) throws ProxlBaseDataException {
-		ILinker linker = linkers.get( linkerAbbr );
+		if ( linkerAbbr == null ) {
+			throw new IllegalArgumentException( "linkerAbbr is null" );
+		}
+		String linkerAbbrLowerCase = linkerAbbr.toLowerCase();
+		ILinker linker = linkers.get( linkerAbbrLowerCase );
 		if ( linker == null ) {
-			String msg = "linker abbreviation '" + linkerAbbr + "' does not match to any supported linker.";
-			log.error( msg );
-			throw new ProxlBaseDataException( msg );
+			if ( log.isInfoEnabled() ) {
+				String msg = "linker abbreviation '" + linkerAbbrLowerCase + "' does not match to any supported linker.  Some processing will not be provided.";
+				log.info( msg );
+			}
+			// throw new ProxlBaseDataException( msg ); // Change to return null
 		}
 		return linker;
 	}

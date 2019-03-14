@@ -1,29 +1,29 @@
 package org.yeastrc.xlink.dto;
 
 /**
- * table linker_per_search_crosslink_mass
+ * table linker_per_search_crosslink_mass_tbl
  *
  */
 public class LinkerPerSearchCrosslinkMassDTO {
 
 	private int id;
-	private int linkerId;
+	private int searchLinkerId;
 	private int searchId;
 	private double crosslinkMassDouble;
 	private String crosslinkMassString;
 	
-	
+	@Override
+	public String toString() {
+		return "LinkerPerSearchCrosslinkMassDTO [id=" + id + ", searchLinkerId=" + searchLinkerId + ", searchId="
+				+ searchId + ", crosslinkMassDouble=" + crosslinkMassDouble + ", crosslinkMassString="
+				+ crosslinkMassString + "]";
+	}
+
 	public int getId() {
 		return id;
 	}
 	public void setId(int id) {
 		this.id = id;
-	}
-	public int getLinkerId() {
-		return linkerId;
-	}
-	public void setLinkerId(int linkerId) {
-		this.linkerId = linkerId;
 	}
 	public int getSearchId() {
 		return searchId;
@@ -43,11 +43,11 @@ public class LinkerPerSearchCrosslinkMassDTO {
 	public void setCrosslinkMassString(String crosslinkMassString) {
 		this.crosslinkMassString = crosslinkMassString;
 	}
-	@Override
-	public String toString() {
-		return "LinkerPerSearchCrosslinkMassDTO [id=" + id + ", linkerId="
-				+ linkerId + ", searchId=" + searchId
-				+ ", crosslinkMassDouble=" + crosslinkMassDouble
-				+ ", crosslinkMassString=" + crosslinkMassString + "]";
+	public int getSearchLinkerId() {
+		return searchLinkerId;
 	}
+	public void setSearchLinkerId(int searchLinkerId) {
+		this.searchLinkerId = searchLinkerId;
+	}
+
 }

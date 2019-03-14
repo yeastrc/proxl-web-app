@@ -81,7 +81,7 @@ public class ProcessLinkTypeCrosslink {
 	 * The PeptideDTO entries are saved to the DB in this step, but could be delayed
 	 * 
 	 * @param reportedPeptide
-	 * @param linkerList
+	 * @param linkerList - EMPTY if linker abbr in input is not in listed linkers
 	 * @param linkerListStringForErrorMsgs
 	 * @return
 	 * @throws Exception
@@ -171,14 +171,11 @@ public class ProcessLinkTypeCrosslink {
 						proteinMatches_Peptide,
 						reportedPeptide // for error reporting only 
 						);
-		if( proteinMap.size() < 1 ) {
+		
+		if ( proteinMap.isEmpty() ) {
 			
-			List<String> linkersToStringArray = new ArrayList<>( linkerList.size() );
-			for ( ILinker linkerItem : linkerList ) {
-				linkersToStringArray.add(  linkerItem.toString() );
-			}
-			String linkersToString = StringUtils.join( linkersToStringArray, "," );
-			
+			//  Throw ProxlImporterDataException since no proteins returned
+
 			List<Integer> peptideLinkPositions = new ArrayList<>();
 			peptideLinkPositions.add( peptideCrossLinkPosition );
 			
@@ -193,18 +190,42 @@ public class ProcessLinkTypeCrosslink {
 
 			Collections.sort( peptideLinkPositions );
 			
-			String msg = "Could not import this Proxl XML file. Either no protein in the Proxl XML contained this peptide sequence (" 
-					+ peptide.getSequence()
-					+ ") or the linked position(s) reported for the peptide (positions " 
-					+ StringUtils.join( peptideLinkPositions, ", " )
-					+ ") was not a linkable position in the matched protein for the given cross-linker(s) (["
-					+ linkersToString
-					+ "]). The whole reported peptide string was: "
-					+ reportedPeptide.getReportedPeptideString()
-					+   "\n\nThis is most-probably caused by specifying the incorrect cross-linker or the incorrect FASTA file when generating the Proxl XML file.";
 			
-			log.error( "getCrosslinks(...): Msg thrown in ProxlImporterDataException: " + msg );
-			throw new ProxlImporterDataException( msg );
+			if ( linkerList.isEmpty() ) {
+				//  No linker abbr in input is not in listed linkers
+				
+
+				String msg = "Could not import this Proxl XML file. No protein in the Proxl XML contained this peptide sequence (" 
+						+ peptide.getSequence()
+						+ ").  The whole reported peptide string was: "
+						+ reportedPeptide.getReportedPeptideString()
+						+   "\n\nThis is most-probably caused by specifying the incorrect FASTA file when generating the Proxl XML file.";
+				
+				log.error( "getCrosslinks(...): Msg thrown in ProxlImporterDataException: " + msg );
+				throw new ProxlImporterDataException( msg );
+				
+			} else {
+				//  Yes linker abbr in input is in listed linkers so list them
+				
+				List<String> linkersToStringArray = new ArrayList<>( linkerList.size() );
+				for ( ILinker linkerItem : linkerList ) {
+					linkersToStringArray.add(  linkerItem.toString() );
+				}
+				String linkersToString = StringUtils.join( linkersToStringArray, "," );
+				
+				String msg = "Could not import this Proxl XML file. Either no protein in the Proxl XML contained this peptide sequence (" 
+						+ peptide.getSequence()
+						+ ") or the linked position(s) reported for the peptide (positions " 
+						+ StringUtils.join( peptideLinkPositions, ", " )
+						+ ") was not a linkable position in the matched protein for the given cross-linker(s) (["
+						+ linkersToString
+						+ "]). The whole reported peptide string was: "
+						+ reportedPeptide.getReportedPeptideString()
+						+   "\n\nThis is most-probably caused by specifying the incorrect cross-linker or the incorrect FASTA file when generating the Proxl XML file.";
+				
+				log.error( "getCrosslinks(...): Msg thrown in ProxlImporterDataException: " + msg );
+				throw new ProxlImporterDataException( msg );
+			}
 		}
 		///  Data in perPeptideData for Monolinks
 		List<MonolinkContainer> monolinkContainerList = new ArrayList<>();

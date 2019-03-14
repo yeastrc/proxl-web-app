@@ -313,6 +313,7 @@ public class ImporterCoreEntryPoint {
 				System.out.println( "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 				System.out.println( "!!!!");
 			}
+			System.out.println( );
 			System.out.println( "Insert of search ID " + searchDTOInserted.getId() + " is complete and successful.");
 			if ( log.isInfoEnabled() ) {
 				System.out.println( "!!!!");
