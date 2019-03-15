@@ -26,7 +26,7 @@ import org.apache.log4j.Logger;
 import org.yeastrc.xlink.www.factories.ProteinSequenceVersionObjectFactory;
 import org.yeastrc.xlink.www.dao.SearchDAO;
 import org.yeastrc.xlink.www.dto.SearchDTO;
-import org.yeastrc.xlink.linkable_positions.GetLinkerFactory;
+import org.yeastrc.xlink.linkable_positions.Get_BuiltIn_Linker_From_Abbreviation_Factory;
 import org.yeastrc.xlink.linkable_positions.linkers.ILinker;
 import org.yeastrc.xlink.www.linked_positions.CrosslinkLinkedPositions;
 import org.yeastrc.xlink.www.linked_positions.LinkedPositions_FilterExcludeLinksWith_Param;
@@ -498,7 +498,7 @@ public class ViewerProteinDataService {
 						for ( String linkerAbbreviation : linkerAbbreviationList ) {
 							linkerAbbrSet.add( linkerAbbreviation );
 
-							ILinker linker = GetLinkerFactory.getLinkerForAbbr( linkerAbbreviation );
+							ILinker linker = Get_BuiltIn_Linker_From_Abbreviation_Factory.getLinkerForAbbr( linkerAbbreviation );
 							
 							if( linker == null ) {
 

@@ -3,7 +3,7 @@ package org.yeastrc.xlink.www.web_utils;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.yeastrc.xlink.linkable_positions.GetLinkerFactory;
+import org.yeastrc.xlink.linkable_positions.Get_BuiltIn_Linker_From_Abbreviation_Factory;
 import org.yeastrc.xlink.linkable_positions.linkers.ILinker;
 import org.yeastrc.xlink.www.searcher_via_cached_data.cached_data_holders.Cached_SearchLinker_ForSearchId;
 import org.yeastrc.xlink.www.searcher_via_cached_data.return_objects_from_searchers_for_cached_data.SearchLinker_ForSearchId_Response;
@@ -39,7 +39,7 @@ public class AllLinkerAbbrHaveILinkerObjectsForSearchUtil {
 		} else {
 			for ( String linkerAbbreviation : linkerAbbreviationList ) {
 
-				ILinker linker = GetLinkerFactory.getLinkerForAbbr( linkerAbbreviation );
+				ILinker linker = Get_BuiltIn_Linker_From_Abbreviation_Factory.getLinkerForAbbr( linkerAbbreviation );
 				
 				if( linker == null ) {
 

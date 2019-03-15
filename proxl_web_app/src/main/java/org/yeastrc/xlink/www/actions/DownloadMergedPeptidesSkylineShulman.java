@@ -27,7 +27,7 @@ import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.yeastrc.xlink.dto.PsmDTO;
-import org.yeastrc.xlink.linkable_positions.GetLinkerFactory;
+import org.yeastrc.xlink.linkable_positions.Get_BuiltIn_Linker_From_Abbreviation_Factory;
 import org.yeastrc.xlink.linkable_positions.linkers.ILinker;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesRootLevel;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
@@ -196,7 +196,7 @@ public class DownloadMergedPeptidesSkylineShulman extends Action {
 						
 						String linkerAbbr = linkerAbbreviationsAllSearches.iterator().next();
 						
-						ILinker linker = GetLinkerFactory.getLinkerForAbbr( linkerAbbr );
+						ILinker linker = Get_BuiltIn_Linker_From_Abbreviation_Factory.getLinkerForAbbr( linkerAbbr );
 						
 						if ( linker == null ) {
 							//  No ILinker for Linker Abbreviation, is not a supported Linker for extra compute
@@ -337,7 +337,7 @@ public class DownloadMergedPeptidesSkylineShulman extends Action {
 								ILinker linker = linkersCachedKeyLinkerAbbr.get( linkerAbbr );
 										
 								if ( linker == null ) {
-									linker = GetLinkerFactory.getLinkerForAbbr( linkerAbbr );
+									linker = Get_BuiltIn_Linker_From_Abbreviation_Factory.getLinkerForAbbr( linkerAbbr );
 									if ( linker == null ) {
 										//  No ILinker for Linker Abbreviation, is not a supported Linker for extra compute
 										//  Not valid to get here.  The download link should have been hidden

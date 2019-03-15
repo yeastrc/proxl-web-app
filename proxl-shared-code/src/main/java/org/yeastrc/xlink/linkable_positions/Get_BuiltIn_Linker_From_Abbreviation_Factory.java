@@ -7,12 +7,12 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.exceptions.ProxlBaseDataException;
-import org.yeastrc.xlink.linkable_positions.GetLinkerFactory;
+import org.yeastrc.xlink.linkable_positions.Get_BuiltIn_Linker_From_Abbreviation_Factory;
 import org.yeastrc.xlink.linkable_positions.linkers.*;
 
-public class GetLinkerFactory {
+public class Get_BuiltIn_Linker_From_Abbreviation_Factory {
 	
-	private static final Logger log = Logger.getLogger(GetLinkerFactory.class);
+	private static final Logger log = Logger.getLogger(Get_BuiltIn_Linker_From_Abbreviation_Factory.class);
 	
 	//   WARNING:  ALL linker abbreviations MUST be Lower Case.  This is because in the importer the incoming linker is converted to lower case
 	

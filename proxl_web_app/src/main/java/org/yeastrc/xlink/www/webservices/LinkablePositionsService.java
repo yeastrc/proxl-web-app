@@ -19,7 +19,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.apache.log4j.Logger;
-import org.yeastrc.xlink.linkable_positions.GetLinkerFactory;
+import org.yeastrc.xlink.linkable_positions.Get_BuiltIn_Linker_From_Abbreviation_Factory;
 import org.yeastrc.xlink.linkable_positions.linkers.ILinker;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.dao.ProteinSequenceDAO;
@@ -59,7 +59,7 @@ public class LinkablePositionsService {
 			List<ILinker> linkerObjects = new ArrayList<>( linkers.size() );
 			for( String linkerAbbr : linkers ) {
 				
-				ILinker linker = GetLinkerFactory.getLinkerForAbbr( linkerAbbr );
+				ILinker linker = Get_BuiltIn_Linker_From_Abbreviation_Factory.getLinkerForAbbr( linkerAbbr );
 				
 				//  linker == null is now a valid response that needs to be handled.
 				

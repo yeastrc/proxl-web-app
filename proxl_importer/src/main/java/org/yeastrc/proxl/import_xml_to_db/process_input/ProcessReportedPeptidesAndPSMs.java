@@ -57,7 +57,7 @@ import org.yeastrc.xlink.dto.UnifiedReportedPeptideLookupDTO;
 import org.yeastrc.xlink.enum_classes.FilterDirectionType;
 import org.yeastrc.xlink.enum_classes.Yes_No__NOT_APPLICABLE_Enum;
 import org.yeastrc.xlink.exceptions.ProxlBaseDataException;
-import org.yeastrc.xlink.linkable_positions.GetLinkerFactory;
+import org.yeastrc.xlink.linkable_positions.Get_BuiltIn_Linker_From_Abbreviation_Factory;
 import org.yeastrc.xlink.linkable_positions.linkers.ILinker;
 import org.yeastrc.xlink.utils.XLinkUtils;
 
@@ -107,7 +107,7 @@ public class ProcessReportedPeptidesAndPSMs {
 			
 			ILinker linker = null;
 			try {
-				linker = GetLinkerFactory.getLinkerForAbbr( proxlInputLinkerName );
+				linker = Get_BuiltIn_Linker_From_Abbreviation_Factory.getLinkerForAbbr( proxlInputLinkerName );
 			} catch ( ProxlBaseDataException e ) {
 				log.error( "GetLinkerFactory.getLinkerForAbbr( linkerAbbr ); threw ProxlBaseDataException. Abbr: " + proxlInputLinkerName, e );
 				throw e;
