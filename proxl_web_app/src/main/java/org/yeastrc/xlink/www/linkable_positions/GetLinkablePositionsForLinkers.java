@@ -1,4 +1,4 @@
-package org.yeastrc.xlink.linkable_positions;
+package org.yeastrc.xlink.www.linkable_positions;
 
 import java.util.ArrayList;
 import java.util.Collection;
