@@ -5,7 +5,7 @@ import java.util.HashSet;
 
 import org.yeastrc.xlink.utils.ProteinSequenceUtils;
 
-public class EDC implements ILinker {
+public class EDC implements ILinker_Builtin_Linker {
 
 	@Override
 	public String toString() {

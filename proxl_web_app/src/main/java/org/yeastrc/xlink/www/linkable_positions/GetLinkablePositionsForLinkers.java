@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.yeastrc.xlink.linkable_positions.Get_BuiltIn_Linker_From_Abbreviation_Factory;
-import org.yeastrc.xlink.linkable_positions.linkers.ILinker;
+import org.yeastrc.xlink.linkable_positions.linkers.ILinker_Builtin_Linker;
 
 public class GetLinkablePositionsForLinkers {
 
@@ -26,10 +26,10 @@ public class GetLinkablePositionsForLinkers {
 		
 		Set<Integer> linkablePositions = new HashSet<>();
 
-		List<ILinker> linkerObjects = new ArrayList<>( linkerAbbrSet.size() );
+		List<ILinker_Builtin_Linker> linkerObjects = new ArrayList<>( linkerAbbrSet.size() );
 		for( String linkerAbbr : linkerAbbrSet ) {
 			
-			ILinker linker = Get_BuiltIn_Linker_From_Abbreviation_Factory.getLinkerForAbbr( linkerAbbr );
+			ILinker_Builtin_Linker linker = Get_BuiltIn_Linker_From_Abbreviation_Factory.getLinkerForAbbr( linkerAbbr );
 			
 			//  linker == null is now a valid response that needs to be handled.
 			
@@ -47,7 +47,7 @@ public class GetLinkablePositionsForLinkers {
 			}
 		}
 		
-		for ( ILinker linkerObject : linkerObjects ) {
+		for ( ILinker_Builtin_Linker linkerObject : linkerObjects ) {
 			
 			Collection<Integer> linkablePositionsForLinker = linkerObject.getLinkablePositions( proteinSequence );
 			

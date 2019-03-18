@@ -5,7 +5,7 @@ import java.util.HashSet;
 
 import org.yeastrc.xlink.utils.ProteinSequenceUtils;
 
-public abstract class AmineLinkerSTY implements ILinker {
+public abstract class AmineLinkerSTY implements ILinker_Builtin_Linker {
 
 	@Override
 	public Collection<Integer> getLinkablePositions(String proteinSequence) throws Exception {

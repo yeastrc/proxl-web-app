@@ -11,7 +11,7 @@ import org.yeastrc.xlink.utils.ProteinSequenceUtils;
  * No N or C terminus processing
  *
  */
-public class BMOE implements ILinker {
+public class BMOE implements ILinker_Builtin_Linker {
 
 	@Override
 	public String toString() {

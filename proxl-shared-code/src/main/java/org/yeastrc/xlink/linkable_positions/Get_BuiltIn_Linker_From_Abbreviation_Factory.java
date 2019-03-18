@@ -37,23 +37,23 @@ public class Get_BuiltIn_Linker_From_Abbreviation_Factory {
 	
 	
 
-	private static ILinker LINKER_BMOE = new BMOE();
-	private static ILinker LINKER_BS2 = new BS2();
-	private static ILinker LINKER_BS3 = new BS3();
-	private static ILinker LINKER_DSG = new DSG();
-	private static ILinker LINKER_DSS = new DSS();
-	private static ILinker LINKER_EDC = new EDC();
-	private static ILinker LINKER_DFDNB = new DFDNB();
-	private static ILinker LINKER_SULFO_SMCC = new SulfoSMCC();
-	private static ILinker LINKER_DSSO = new DSSO();
-	private static ILinker LINKER_DSBU = new DSBU();
-	private static ILinker LINKER_TG = new Transglutaminase();
+	private static ILinker_Builtin_Linker LINKER_BMOE = new BMOE();
+	private static ILinker_Builtin_Linker LINKER_BS2 = new BS2();
+	private static ILinker_Builtin_Linker LINKER_BS3 = new BS3();
+	private static ILinker_Builtin_Linker LINKER_DSG = new DSG();
+	private static ILinker_Builtin_Linker LINKER_DSS = new DSS();
+	private static ILinker_Builtin_Linker LINKER_EDC = new EDC();
+	private static ILinker_Builtin_Linker LINKER_DFDNB = new DFDNB();
+	private static ILinker_Builtin_Linker LINKER_SULFO_SMCC = new SulfoSMCC();
+	private static ILinker_Builtin_Linker LINKER_DSSO = new DSSO();
+	private static ILinker_Builtin_Linker LINKER_DSBU = new DSBU();
+	private static ILinker_Builtin_Linker LINKER_TG = new Transglutaminase();
 
-	private static ILinker LINKER_DSS_STY = new DSS_STY();
-	private static ILinker LINKER_BS3_STY = new BS3_STY();
+	private static ILinker_Builtin_Linker LINKER_DSS_STY = new DSS_STY();
+	private static ILinker_Builtin_Linker LINKER_BS3_STY = new BS3_STY();
 
 	
-	private static Map<String,ILinker> linkers = new HashMap<String, ILinker>();
+	private static Map<String,ILinker_Builtin_Linker> linkers = new HashMap<String, ILinker_Builtin_Linker>();
 	
 	static {
 		
@@ -80,12 +80,12 @@ public class Get_BuiltIn_Linker_From_Abbreviation_Factory {
 	 * @return - null if not found.  Not Found is valid for provided abbreviations not yet supported
 	 * @throws ProxlBaseDataException 
 	 */
-	public static ILinker getLinkerForAbbr( String linkerAbbr ) throws ProxlBaseDataException {
+	public static ILinker_Builtin_Linker getLinkerForAbbr( String linkerAbbr ) throws ProxlBaseDataException {
 		if ( linkerAbbr == null ) {
 			throw new IllegalArgumentException( "linkerAbbr is null" );
 		}
 		String linkerAbbrLowerCase = linkerAbbr.toLowerCase();
-		ILinker linker = linkers.get( linkerAbbrLowerCase );
+		ILinker_Builtin_Linker linker = linkers.get( linkerAbbrLowerCase );
 		if ( linker == null ) {
 			if ( log.isInfoEnabled() ) {
 				String msg = "linker abbreviation '" + linkerAbbrLowerCase + "' does not match to any supported linker.  Some processing will not be provided.";
@@ -101,7 +101,7 @@ public class Get_BuiltIn_Linker_From_Abbreviation_Factory {
 	 * @param linker
 	 * @throws Exception
 	 */
-	public static void registerLinker( String linkerAbbr, ILinker linker ) throws Exception {
+	public static void registerLinker( String linkerAbbr, ILinker_Builtin_Linker linker ) throws Exception {
 		if ( linkers.containsKey(linkerAbbr)) {
 			String msg = "registerLinker: linker abbreviation '" + linkerAbbr + "' already registered.";
 			log.error( msg );
@@ -115,7 +115,7 @@ public class Get_BuiltIn_Linker_From_Abbreviation_Factory {
 	 */
 	public static List<String> getLinkerAbbrList() {
 		List<String> linkerAbbrList = new ArrayList<>();
-		for ( Map.Entry<String,ILinker> entry : linkers.entrySet() ) {
+		for ( Map.Entry<String,ILinker_Builtin_Linker> entry : linkers.entrySet() ) {
 			linkerAbbrList.add( entry.getKey() );
 		}
 		return linkerAbbrList;

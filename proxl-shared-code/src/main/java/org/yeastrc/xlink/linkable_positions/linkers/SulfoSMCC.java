@@ -10,7 +10,7 @@ import org.yeastrc.xlink.utils.ProteinSequenceUtils;
  * From Kai Cai: Sulfo-SMCC;C12H13NO3;K{;C
  * Info at: https://tools.thermofisher.com/content/sfs/manuals/MAN0011295_SMCC_SulfoSMCC_UG.pdf
  */
-public class SulfoSMCC implements ILinker {
+public class SulfoSMCC implements ILinker_Builtin_Linker {
 
 	@Override
 	public String toString() {

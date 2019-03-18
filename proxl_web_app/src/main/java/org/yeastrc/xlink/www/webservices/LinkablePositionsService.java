@@ -20,7 +20,7 @@ import javax.ws.rs.core.Response;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.linkable_positions.Get_BuiltIn_Linker_From_Abbreviation_Factory;
-import org.yeastrc.xlink.linkable_positions.linkers.ILinker;
+import org.yeastrc.xlink.linkable_positions.linkers.ILinker_Builtin_Linker;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.dao.ProteinSequenceDAO;
 import org.yeastrc.xlink.www.dao.ProteinSequenceVersionDAO;
@@ -56,10 +56,10 @@ public class LinkablePositionsService {
 
 			Set<ProteinPositionPair> positionPairs = new HashSet<ProteinPositionPair>();
 			
-			List<ILinker> linkerObjects = new ArrayList<>( linkers.size() );
+			List<ILinker_Builtin_Linker> linkerObjects = new ArrayList<>( linkers.size() );
 			for( String linkerAbbr : linkers ) {
 				
-				ILinker linker = Get_BuiltIn_Linker_From_Abbreviation_Factory.getLinkerForAbbr( linkerAbbr );
+				ILinker_Builtin_Linker linker = Get_BuiltIn_Linker_From_Abbreviation_Factory.getLinkerForAbbr( linkerAbbr );
 				
 				//  linker == null is now a valid response that needs to be handled.
 				
@@ -109,7 +109,7 @@ public class LinkablePositionsService {
 						proteinSequence_2 = proteinSequenceDTO_2.getSequence();
 					}
 
-					for ( ILinker linkerObject : linkerObjects ) {
+					for ( ILinker_Builtin_Linker linkerObject : linkerObjects ) {
 						for( int position1 : linkerObject.getLinkablePositions( proteinSequence_1 ) ) {
 							for( int position2 : linkerObject.getLinkablePositions( proteinSequence_2, proteinSequence_1, position1 ) ) {					
 								positionPairs.add( new ProteinPositionPair( proteinId1, position1, proteinId2, position2 ) );					

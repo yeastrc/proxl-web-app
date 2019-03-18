@@ -28,7 +28,7 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.yeastrc.xlink.dto.PsmDTO;
 import org.yeastrc.xlink.linkable_positions.Get_BuiltIn_Linker_From_Abbreviation_Factory;
-import org.yeastrc.xlink.linkable_positions.linkers.ILinker;
+import org.yeastrc.xlink.linkable_positions.linkers.ILinker_Builtin_Linker;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesRootLevel;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
 import org.yeastrc.xlink.utils.XLinkUtils;
@@ -196,7 +196,7 @@ public class DownloadMergedPeptidesSkylineShulman extends Action {
 						
 						String linkerAbbr = linkerAbbreviationsAllSearches.iterator().next();
 						
-						ILinker linker = Get_BuiltIn_Linker_From_Abbreviation_Factory.getLinkerForAbbr( linkerAbbr );
+						ILinker_Builtin_Linker linker = Get_BuiltIn_Linker_From_Abbreviation_Factory.getLinkerForAbbr( linkerAbbr );
 						
 						if ( linker == null ) {
 							//  No ILinker for Linker Abbreviation, is not a supported Linker for extra compute
@@ -222,7 +222,7 @@ public class DownloadMergedPeptidesSkylineShulman extends Action {
 				
 				//  Cached Data
 				
-				Map<String, ILinker> linkersCachedKeyLinkerAbbr = new HashMap<>();
+				Map<String, ILinker_Builtin_Linker> linkersCachedKeyLinkerAbbr = new HashMap<>();
 				
 				Map<Integer, SearchLinkerAndLinkerAbbreviationForLinkerMass_SingleSearch_Util> searchLinkerAndLinkerAbbreviationForLinkerMass_SingleSearch_Util_KEY_SearchId = new HashMap<>();
 				Map<Integer, SearcherCutoffValuesSearchLevel> searcherCutoffValuesSearchLevel_KEY_SearchId = new HashMap<>();
@@ -334,7 +334,7 @@ public class DownloadMergedPeptidesSkylineShulman extends Action {
 									throw new ProxlWebappDataException( msg );
 								}
 								
-								ILinker linker = linkersCachedKeyLinkerAbbr.get( linkerAbbr );
+								ILinker_Builtin_Linker linker = linkersCachedKeyLinkerAbbr.get( linkerAbbr );
 										
 								if ( linker == null ) {
 									linker = Get_BuiltIn_Linker_From_Abbreviation_Factory.getLinkerForAbbr( linkerAbbr );

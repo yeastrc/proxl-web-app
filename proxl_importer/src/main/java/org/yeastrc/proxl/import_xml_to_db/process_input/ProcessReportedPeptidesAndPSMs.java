@@ -58,7 +58,7 @@ import org.yeastrc.xlink.enum_classes.FilterDirectionType;
 import org.yeastrc.xlink.enum_classes.Yes_No__NOT_APPLICABLE_Enum;
 import org.yeastrc.xlink.exceptions.ProxlBaseDataException;
 import org.yeastrc.xlink.linkable_positions.Get_BuiltIn_Linker_From_Abbreviation_Factory;
-import org.yeastrc.xlink.linkable_positions.linkers.ILinker;
+import org.yeastrc.xlink.linkable_positions.linkers.ILinker_Builtin_Linker;
 import org.yeastrc.xlink.utils.XLinkUtils;
 
 /**
@@ -99,13 +99,13 @@ public class ProcessReportedPeptidesAndPSMs {
 		Linkers proxlInputLinkers = proxlInput.getLinkers();
 		List<Linker> proxlInputLinkerList = proxlInputLinkers.getLinker();
 		
-		List<ILinker> linkerList = new ArrayList<>();
+		List<ILinker_Builtin_Linker> linkerList = new ArrayList<>();
 		String linkerListStringForErrorMsgs = null;
 		
 		for ( Linker proxlInputLinker : proxlInputLinkerList ) {
 			String proxlInputLinkerName = proxlInputLinker.getName();
 			
-			ILinker linker = null;
+			ILinker_Builtin_Linker linker = null;
 			try {
 				linker = Get_BuiltIn_Linker_From_Abbreviation_Factory.getLinkerForAbbr( proxlInputLinkerName );
 			} catch ( ProxlBaseDataException e ) {
@@ -221,7 +221,7 @@ public class ProcessReportedPeptidesAndPSMs {
 	private void processSingleReportedPeptide(
 			ReportedPeptide reportedPeptide,
 			int searchId, 
-			List<ILinker> linkerList,
+			List<ILinker_Builtin_Linker> linkerList,
 			String linkerListStringForErrorMsgs,
 			DropPeptidePSMCutoffValues dropPeptidePSMCutoffValues,
 			Map<String, SearchProgramEntry> searchProgramEntryMap,
@@ -544,7 +544,7 @@ public class ProcessReportedPeptidesAndPSMs {
 	 */
 	private GetProteinMappings_For_XML_LinkType_Unlinked_Result   getProteinMappings_For_XML_LinkType_Unlinked( 
 			ReportedPeptide reportedPeptide, 
-			List<ILinker> linkerList,
+			List<ILinker_Builtin_Linker> linkerList,
 			String linkerListStringForErrorMsgs
 			) throws Exception {
 		

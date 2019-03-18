@@ -3,7 +3,7 @@ package org.yeastrc.xlink.linkable_positions.linkers;
 import java.util.Collection;
 
 
-public interface ILinker {
+public interface ILinker_Builtin_Linker {
 
 	/**
 	 * Get all theoretically linkable positions (N-terminal residue is position 1)

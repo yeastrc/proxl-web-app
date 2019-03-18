@@ -28,7 +28,7 @@ import org.yeastrc.proxl_import.api.xml_dto.Peptides;
 import org.yeastrc.proxl_import.api.xml_dto.ReportedPeptide;
 import org.yeastrc.xlink.dto.PeptideDTO;
 import org.yeastrc.xlink.dto.ReportedPeptideDTO;
-import org.yeastrc.xlink.linkable_positions.linkers.ILinker;
+import org.yeastrc.xlink.linkable_positions.linkers.ILinker_Builtin_Linker;
 import org.yeastrc.xlink.utils.XLinkUtils;
 
 /**
@@ -87,7 +87,7 @@ public class ProcessLinkTypeDimerAsDefinedByProxl {
 	 */
 	public GetDimerProteinMappingsResult getDimerProteinMappings( 
 			ReportedPeptide reportedPeptide, 
-			List<ILinker> linkerList,
+			List<ILinker_Builtin_Linker> linkerList,
 			String linkerListStringForErrorMsgs
 			) throws Exception {
 		
@@ -134,7 +134,7 @@ public class ProcessLinkTypeDimerAsDefinedByProxl {
 	 */
 	private GetDimerProteinMappingsSinglePeptideData getProteinMappingForSinglePeptide( 
 			Peptide peptide, 
-			List<ILinker> linkerList,
+			List<ILinker_Builtin_Linker> linkerList,
 			String linkerListStringForErrorMsgs,
 			ReportedPeptide reportedPeptide,
 			String peptideNumber
@@ -171,7 +171,7 @@ public class ProcessLinkTypeDimerAsDefinedByProxl {
 			if ( peptideMonolinkPositions != null && ( ! peptideMonolinkPositions.isEmpty() && ( ! linkerList.isEmpty()  ) ) ) {
 
 				List<String> linkersToStringArray = new ArrayList<>( linkerList.size() );
-				for ( ILinker linkerItem : linkerList ) {
+				for ( ILinker_Builtin_Linker linkerItem : linkerList ) {
 					linkersToStringArray.add(  linkerItem.toString() );
 				}
 				String linkersToString = StringUtils.join( linkersToStringArray, "," );

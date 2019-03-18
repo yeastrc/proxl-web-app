@@ -13,7 +13,7 @@ import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterInteralExcepti
 import org.yeastrc.proxl.import_xml_to_db.objects.ProteinImporterContainer;
 import org.yeastrc.proxl.import_xml_to_db.utils.PeptideProteinSequenceForProteinInference;
 import org.yeastrc.proxl_import.api.xml_dto.ReportedPeptide;
-import org.yeastrc.xlink.linkable_positions.linkers.ILinker;
+import org.yeastrc.xlink.linkable_positions.linkers.ILinker_Builtin_Linker;
 
 /**
  * 
@@ -52,7 +52,7 @@ public class GetLinkableProteinsAndPositions {
 			String peptideSequence, 
 			int peptideCrossLinkPosition, 
 			Set<Integer> peptideMonolinkPositions,
-			List<ILinker> linkerList, 
+			List<ILinker_Builtin_Linker> linkerList, 
 			Collection<ProteinImporterContainer> proteinImporterContainerCollection,
 			ReportedPeptide reportedPeptide // For error reporting only
 			) throws Exception {
@@ -78,7 +78,7 @@ public class GetLinkableProteinsAndPositions {
 			Collection<Integer> proteinLinkablePositionsCollection = new HashSet<Integer>();
 			
 			// linkerList: EMPTY if linker abbr in input is not in listed linkers
-			for ( ILinker linker : linkerList ) {
+			for ( ILinker_Builtin_Linker linker : linkerList ) {
 				Collection<Integer> proteinLinkablePositionsCollectionForLinker = linker.getLinkablePositions( proteinSequence );
 				proteinLinkablePositionsCollection.addAll( proteinLinkablePositionsCollectionForLinker );
 			}
@@ -175,7 +175,7 @@ public class GetLinkableProteinsAndPositions {
 			int peptideLooplinkPosition_1, 
 			int peptideLooplinkPosition_2, 
 			Set<Integer> peptideMonolinkPositions,
-			List<ILinker> linkerList, 
+			List<ILinker_Builtin_Linker> linkerList, 
 			Collection<ProteinImporterContainer> proteinImporterContainerCollection,
 			ReportedPeptide reportedPeptide // For error reporting only
 			) throws Exception {
@@ -205,7 +205,7 @@ public class GetLinkableProteinsAndPositions {
 			Collection<Integer> proteinLinkablePositionsCollection = new HashSet<Integer>();
 			
 			// linkerList: EMPTY if linker abbr in input is not in listed linkers
-			for ( ILinker linker : linkerList ) {
+			for ( ILinker_Builtin_Linker linker : linkerList ) {
 				Collection<Integer> linkablePositionsCollectionForLinker = linker.getLinkablePositions( proteinSequence );
 				proteinLinkablePositionsCollection.addAll( linkablePositionsCollectionForLinker );
 			}
@@ -299,7 +299,7 @@ public class GetLinkableProteinsAndPositions {
 	public Map<ProteinImporterContainer, Collection<Integer>> get_Unlinked_Dimer_PeptidePositionsInProteins(
 			String peptideSequence, 
 			Set<Integer> peptideMonolinkPositions,
-			List<ILinker> linkerList, 
+			List<ILinker_Builtin_Linker> linkerList, 
 			Collection<ProteinImporterContainer> proteinImporterContainerCollection,
 			ReportedPeptide reportedPeptide // For error reporting only
 			) throws Exception {
@@ -319,7 +319,7 @@ public class GetLinkableProteinsAndPositions {
 			Collection<Integer> proteinLinkablePositionsCollection = new HashSet<Integer>();
 			
 			// linkerList: EMPTY if linker abbr in input is not in listed linkers
-			for ( ILinker linker : linkerList ) {
+			for ( ILinker_Builtin_Linker linker : linkerList ) {
 				Collection<Integer> linkablePositionsCollectionForLinker = linker.getLinkablePositions( proteinSequence );
 				proteinLinkablePositionsCollection.addAll( linkablePositionsCollectionForLinker );
 			}
