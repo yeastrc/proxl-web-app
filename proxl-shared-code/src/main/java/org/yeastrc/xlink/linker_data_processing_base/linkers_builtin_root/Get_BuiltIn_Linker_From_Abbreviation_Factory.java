@@ -1,4 +1,4 @@
-package org.yeastrc.xlink.linkable_positions;
+package org.yeastrc.xlink.linker_data_processing_base.linkers_builtin_root;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -7,8 +7,8 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.exceptions.ProxlBaseDataException;
-import org.yeastrc.xlink.linkable_positions.Get_BuiltIn_Linker_From_Abbreviation_Factory;
-import org.yeastrc.xlink.linkable_positions.linkers.*;
+import org.yeastrc.xlink.linker_data_processing_base.linkers_builtin_root.Get_BuiltIn_Linker_From_Abbreviation_Factory;
+import org.yeastrc.xlink.linker_data_processing_base.linkers_builtin_root.linkers_builtin.*;
 
 public class Get_BuiltIn_Linker_From_Abbreviation_Factory {
 	

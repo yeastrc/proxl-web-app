@@ -1,38 +1,39 @@
-package org.yeastrc.xlink.linkable_positions.linkers;
+package org.yeastrc.xlink.linker_data_processing_base.linkers_builtin_root.linkers_builtin;
 
 import java.util.Collection;
 import java.util.HashSet;
 
-import org.yeastrc.xlink.linkable_positions.linkers.AmineLinker;
+import org.yeastrc.xlink.linker_data_processing_base.linkers_builtin_root.linkers_builtin.AmineLinker;
 
-public class DFDNB extends AmineLinker {
+public class DSG extends AmineLinker {
 
 	@Override
 	public String toString() {
-		return "DFDNB";
+		return "DSG";
 	}
 	
 	@Override
 	public double getLinkerLength() {
-		return 3;
+		return 7.7;
 	}
-	
+
 	@Override
 	public Collection<String> getCrosslinkFormulas() {
 		
 		Collection<String> formulas = new HashSet<>();
-		formulas.add( "C6N2O4" );
+		formulas.add( "C5H4O2" );
 		
 		return formulas;
 	}
 	
 	@Override
 	public String getCrosslinkFormula(double mass) throws Exception {
-		return "C6N2O4";
+		return "C5H4O2";
 	}
 
 	@Override
 	public boolean isCleavable() {
 		return false;
 	}
+	
 }

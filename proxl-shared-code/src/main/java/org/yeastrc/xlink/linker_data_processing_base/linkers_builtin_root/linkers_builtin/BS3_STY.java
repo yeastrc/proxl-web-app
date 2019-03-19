@@ -1,15 +1,13 @@
-package org.yeastrc.xlink.linkable_positions.linkers;
+package org.yeastrc.xlink.linker_data_processing_base.linkers_builtin_root.linkers_builtin;
 
 import java.util.Collection;
 import java.util.HashSet;
 
-import org.yeastrc.xlink.linkable_positions.linkers.AmineLinker;
-
-public class DSS extends AmineLinker {
+public class BS3_STY extends AmineLinkerSTY {
 
 	@Override
 	public String toString() {
-		return "DSS";
+		return "BS3 (include STY)";
 	}
 	
 	@Override
@@ -25,7 +23,7 @@ public class DSS extends AmineLinker {
 		
 		return formulas;
 	}
-	
+
 	@Override
 	public String getCrosslinkFormula(double mass) throws Exception {
 		return "C8H10O2";
@@ -35,5 +33,4 @@ public class DSS extends AmineLinker {
 	public boolean isCleavable() {
 		return false;
 	}
-	
 }

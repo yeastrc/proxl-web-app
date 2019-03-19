@@ -1,4 +1,4 @@
-package org.yeastrc.xlink.linkable_positions.linkers;
+package org.yeastrc.xlink.linker_data_processing_base.linkers_builtin_root.linkers_builtin;
 
 import java.util.Collection;
 
