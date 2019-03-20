@@ -45,6 +45,7 @@ import { getLooplinkDataCommon, getCrosslinkDataCommon, getMonolinkDataCommon, a
 
 import { downloadStringAsFile } from 'page_js/data_pages/project_search_ids_driven_pages/common/download-string-as-file.js';
 
+import { LinkExclusionHandler } from './link-exclusion-handler.js';
 
 /////////////////////////////
 
@@ -412,6 +413,9 @@ var StructurePagePrimaryRootCodeClass = function() {
 
 	// object to handle all link color determination duties
 	var _linkColorHandler = new LinkColorHandler();
+
+	// object to handle link exclusions
+	var _linkExclusionHandler = new LinkExclusionHandler();
 
 	//Loaded data:
 
@@ -1068,6 +1072,8 @@ var StructurePagePrimaryRootCodeClass = function() {
 			items[ 'udcl' ] = userDistanceConstraints.longDistance;
 		}
 
+		items[ 'le' ] = _linkExclusionHandler.getDataStructureForHash();
+
 		updateURLHashWithJSONObject( items );
 	}
 
@@ -1285,6 +1291,10 @@ var StructurePagePrimaryRootCodeClass = function() {
 			
 			for( var i = 0; i < _renderedLinks[ 'crosslinks' ].length; i++ ) {
 				var link = _renderedLinks[ 'crosslinks' ][ i ][ 'link' ];
+
+				if( _linkExclusionHandler.isLinkExcluded( link ) ) {
+					continue;
+				}
 		
 				var dataObj = { };
 				dataObj.protId1 = link.protein1;
@@ -1302,6 +1312,10 @@ var StructurePagePrimaryRootCodeClass = function() {
 			
 			for( var i = 0; i < _renderedLinks[ 'looplinks' ].length; i++ ) {
 				var link = _renderedLinks[ 'looplinks' ][ i ][ 'link' ];
+
+				if( _linkExclusionHandler.isLinkExcluded( link ) ) {
+					continue;
+				}
 		
 				var dataObj = { };
 				dataObj.protId1 = link.protein1;
@@ -1580,10 +1594,14 @@ var StructurePagePrimaryRootCodeClass = function() {
 			var udrItem = data[ 'udrItemList' ][ i ];
 					
 			var link = getRenderedLink( udrItem.linkType, udrItem.proteinSeqId_1, udrItem.proteinPos_1, udrItem.proteinSeqId_2, udrItem.proteinPos_2 );
-			
+
 			// not a rendered link, skip it.
 			if( !link ) { continue; }
-			
+
+			if( _linkExclusionHandler.isLinkExcluded( link ) ) {
+				continue;
+			}
+
 			reportText += udrItem.linkType + "\t";
 			reportText += _proteinNames[ link[ 'protein1' ]  ] + "\t";
 			reportText += link[ 'position1' ] + "\t";
@@ -2355,7 +2373,9 @@ var StructurePagePrimaryRootCodeClass = function() {
 	var populatePDBFormArea = function() {
 		
 		var json = getJsonFromHash();
-		
+
+		_linkExclusionHandler.populateDataFromJSON( json );
+
 		$( "input#show-looplinks" ).prop('checked', json[ 'show-looplinks' ] );
 		
 		if( 'show-crosslinks' in json ) {
@@ -2869,7 +2889,12 @@ var StructurePagePrimaryRootCodeClass = function() {
 			
 			
 			for( var i = 0; i < links.length; i++ ) {
-				
+
+				// skip hidden links
+				if( _linkExclusionHandler.isLinkExcluded( links[ i ][ 'link' ] ) ) {
+					continue;
+				}
+
 				var atom1 = links[ i ].atom1;
 				var atom2 = links[ i ].atom2;
 				
@@ -2918,7 +2943,12 @@ var StructurePagePrimaryRootCodeClass = function() {
 			
 			
 			for( var i = 0; i < links.length; i++ ) {
-				
+
+				// skip hidden links
+				if( _linkExclusionHandler.isLinkExcluded( links[ i ][ 'link' ] ) ) {
+					continue;
+				}
+
 				var atom1 = links[ i ].atom1;
 				var atom2 = links[ i ].atom2;
 				
@@ -3033,7 +3063,12 @@ var StructurePagePrimaryRootCodeClass = function() {
 		if( $( "input#show-looplinks" ).is( ':checked' ) && links ) {
 			
 			for( var i = 0; i < links.length; i++ ) {
-				
+
+				// skip hidden links
+				if( _linkExclusionHandler.isLinkExcluded( links[ i ][ 'link' ] ) ) {
+					continue;
+				}
+
 				var atom1 = links[ i ].atom1;
 				var atom2 = links[ i ].atom2;
 				
@@ -3105,7 +3140,12 @@ var StructurePagePrimaryRootCodeClass = function() {
 		if( $( "input#show-crosslinks" ).is( ':checked' ) && links ) {
 			
 			for( var i = 0; i < links.length; i++ ) {
-				
+
+				// skip hidden links
+				if( _linkExclusionHandler.isLinkExcluded( links[ i ][ 'link' ] ) ) {
+					continue;
+				}
+
 				var atom1 = links[ i ].atom1;
 				var atom2 = links[ i ].atom2;
 				
@@ -3345,6 +3385,10 @@ var StructurePagePrimaryRootCodeClass = function() {
 			
 			for( var i = 0; i < _renderedLinks[ 'crosslinks' ].length; i++ ) {
 
+				if( _linkExclusionHandler.isLinkExcluded( _renderedLinks[ 'crosslinks' ][ i ][ 'link' ] ) ) {
+					continue;
+				}
+
 				var atom1 =  _renderedLinks[ 'crosslinks' ][ i ][ 'atom1' ];	// cA atom
 				var atom2 =  _renderedLinks[ 'crosslinks' ][ i ][ 'atom2' ];	// cA atom
 			
@@ -3359,6 +3403,10 @@ var StructurePagePrimaryRootCodeClass = function() {
 		if( _renderedLinks[ 'looplinks' ] && _renderedLinks[ 'looplinks' ].length > 0 ) {
 					
 			for( var i = 0; i < _renderedLinks[ 'looplinks' ].length; i++ ) {
+
+				if( _linkExclusionHandler.isLinkExcluded( _renderedLinks[ 'looplinks' ][ i ][ 'link' ] ) ) {
+					continue;
+				}
 
 				var atom1 =  _renderedLinks[ 'looplinks' ][ i ][ 'atom1' ];	// cA atom
 				var atom2 =  _renderedLinks[ 'looplinks' ][ i ][ 'atom2' ];	// cA atom
@@ -3386,6 +3434,12 @@ var StructurePagePrimaryRootCodeClass = function() {
 			for( var i = 0; i < _renderedLinks[ 'crosslinks' ].length; i++ ) {
 				var link = _renderedLinks[ 'crosslinks' ][ i ][ 'link' ];
 
+				// skip hidden links
+				if( _linkExclusionHandler.isCrosslinkExcluded( link.protein1, link.position1, link.protein2, link.position2 ) ) {
+					continue;
+				}
+
+
 				var chain1 = _renderedLinks[ 'crosslinks' ][ i ][ 'atom1' ].residue().chain().name();
 				var chain2 = _renderedLinks[ 'crosslinks' ][ i ][ 'atom2' ].residue().chain().name();
 
@@ -3406,6 +3460,11 @@ var StructurePagePrimaryRootCodeClass = function() {
 					
 			for( var i = 0; i < _renderedLinks[ 'looplinks' ].length; i++ ) {
 				var link = _renderedLinks[ 'looplinks' ][ i ][ 'link' ];
+
+				// skip hidden links
+				if( _linkExclusionHandler.isLooplinkExcluded( link.protein1, link.position1, link.position2 ) ) {
+					continue;
+				}
 
 				var chain1 = _renderedLinks[ 'looplinks' ][ i ][ 'atom1' ].residue().chain().name();
 				var chain2 = _renderedLinks[ 'looplinks' ][ i ][ 'atom2' ].residue().chain().name();
@@ -3574,55 +3633,84 @@ var StructurePagePrimaryRootCodeClass = function() {
 		updateShownLinks();
 	};
 
-
 	var updateShownLinks = function () {
-		
+
+		updateShownCrosslinks();
+		updateShownLooplinks();
+
+	};
+
+	var updateShownCrosslinksHeader = function() {
+
+		var exclusionCount = _linkExclusionHandler.getExcludedRenderedCrosslinkCount( _renderedLinks[ 'crosslinks' ] );
+		var $headerDiv = $( 'div#shown-crosslinks-header' );
+
+		var html = "Shown Crosslinks:"
+
+		if( exclusionCount !== 0 ) {
+
+			html += " <span style=\"font-size:12pt;\">(" + exclusionCount + " hidden by user)</span>";
+
+		}
+
+		$headerDiv.html( html );
+	};
+
+	var updateShownCrosslinks = function() {
+
 		var $shownCrosslinksDiv = $( '#shown-crosslinks-text' );
 		if( !$shownCrosslinksDiv || $shownCrosslinksDiv.length < 1 ) { return; }
-		
-		var html = "<div style=\"font-size:14pt;margin-top:15px;\">Shown Crosslinks:</div>";
-		
+
+		var html = "<div id=\"shown-crosslinks-header\" style=\"font-size:14pt;margin-top:15px;\">Shown Crosslinks:</div>";
 
 		if( _renderedLinks[ 'crosslinks' ] && _renderedLinks[ 'crosslinks' ].length > 0 ) {
-			
-			html += "<table style=\"margin-left:20px;\">\n";
-			html += "<tr><td style=\"width:180px;font-weight:bold;\">Protein (Pos)</td><td style=\"width:180px;font-weight:bold;\">Protein (Pos)</td><td style=\"width:100px;font-weight:bold;\">Distance (&Aring;)</td></tr>";
 
-			
+			html += "<table style=\"margin-left:10px;\">\n";
+			html += "<tr><td style=\"width:20px;\">&nbsp;</td><td style=\"width:180px;font-weight:bold;\">Protein (Pos)</td><td style=\"width:180px;font-weight:bold;\">Protein (Pos)</td><td style=\"width:100px;font-weight:bold;\">Distance (&Aring;)</td></tr>";
+
+
 			for( var i = 0; i < _renderedLinks[ 'crosslinks' ].length; i++ ) {
 				var link = _renderedLinks[ 'crosslinks' ][ i ][ 'link' ];
-				
+
 				var color = _linkColorHandler.getLinkColor( link, 'rgb' );
-				var rgbaString = "rgba(" + color.r + "," + color.g + "," + color.b + ",0.15)";			
-				
-				html += "<tr class=\" reported_crosslink_jq tool_tip_attached_jq \" data-crosslink-index=\"" + i + "\" " 
+				var rgbaString = "rgba(" + color.r + "," + color.g + "," + color.b + ",0.15)";
+
+				var isLinkExcluded = _linkExclusionHandler.isCrosslinkExcluded( link.protein1, link.position1, link.protein2, link.position2 );
+
+				html += "<tr class=\" reported_crosslink_jq tool_tip_attached_jq " + _linkExclusionHandler.getClassNameForLink( link ) + "\" data-crosslink-index=\"" + i + "\" "
 					+ " data-tooltip=\"Click for Details\""
-					+ " style=\"cursor: pointer; background-color:" + rgbaString + "\">";		
+					+ " style=\"cursor: pointer; background-color:" + rgbaString + ";"
+					+ "opacity:" + _linkExclusionHandler.getOpacityForLinkRow( link ) + "\">";
+
+				html += "<td style=\"width:20px;background-color:white;\"><span class=\"" + _linkExclusionHandler.getClassNameForLink( link ) + "\" id=\"cross-link-show-toggle-index-" + i + "\">"
+					+ _linkExclusionHandler.getHTMLForLinkToggleLink( link )
+					+ "</span></td>";
+
 				html += "<td style=\"width:180px;\">" + _proteinNames[ link.protein1 ] + " (" + link.position1 + ")</td>";
 				html += "<td style=\"width:180px;\">" + _proteinNames[ link.protein2 ] + " (" + link.position2 + ")</td>";
 				html += "<td style=\"width:100px;\">" + link.length.toFixed( 1 ) + "</td>";
+
+
 				html += "</tr>";
-				
+
 			}
-			
 			html += "</table>\n";
 		} else {
 			html += "<div style=\"margin-left:20px;\">No crosslinks currently shown.</div>\n";
 		}
-		
-		
-		
+
 		$shownCrosslinksDiv.html( html );
-		
+		updateShownCrosslinksHeader();
+
 		var $reported_crosslink_jq = $( '.reported_crosslink_jq' );
-		
+
 		$reported_crosslink_jq.click( function( e ) {
 
 			try {
 
-				var params = { 
-						psmPeptideCutoffsRootObject : _psmPeptideCutoffsRootObjectStorage.getPsmPeptideCutoffsRootObject(),
-						removeNonUniquePSMs : _removeNonUniquePSMs
+				var params = {
+					psmPeptideCutoffsRootObject : _psmPeptideCutoffsRootObjectStorage.getPsmPeptideCutoffsRootObject(),
+					removeNonUniquePSMs : _removeNonUniquePSMs
 				};
 
 				var index = $(e.currentTarget ).attr( 'data-crosslink-index' );
@@ -3636,51 +3724,82 @@ var StructurePagePrimaryRootCodeClass = function() {
 				throw e;
 			}
 		});
-		
+
 		addToolTips( $shownCrosslinksDiv );
-		
+
+		// add click handlers for toggling visibility of links
+		_linkExclusionHandler.addClickHandlerToCrosslinkToggles( _renderedLinks, drawCrosslinks_noReportRedraw, updateURLHash );
+
+	}
+
+
+	var updateShownLooplinksHeader = function() {
+
+		var exclusionCount =  _linkExclusionHandler.getExcludedRenderedLooplinkCount( _renderedLinks[ 'looplinks' ] );
+		var $headerDiv = $( 'div#shown-looplinks-header' );
+
+		var html = "Shown Looplinks:"
+
+		if( exclusionCount !== 0 ) {
+
+			html += " <span style=\"font-size:12pt;\">(" + exclusionCount + " hidden by user)</span>";
+
+		}
+
+		$headerDiv.html( html );
+	}
+
+	var updateShownLooplinks = function() {
+
 		var $shownLooplinksDiv = $( '#shown-looplinks-text' );
 		if( !$shownLooplinksDiv || $shownLooplinksDiv.length < 1 ) { return; }
-		
-		
-		var html = "<div style=\"font-size:14pt;margin-top:15px;\">Shown Looplinks:</div>\n";
-		
-		if( _renderedLinks[ 'looplinks' ] && _renderedLinks[ 'looplinks' ].length > 0 ) {
-			
-			html += "<table style=\"margin-left:20px;\">\n";
-			html += "<tr><td style=\"width:180px;font-weight:bold;\">Protein (Pos, Pos)</td><td style=\"width:100px;font-weight:bold;\">Distance (&Aring;)</td></tr>";
 
-			
+
+		var html = "<div id=\"shown-looplinks-header\" style=\"font-size:14pt;margin-top:15px;\">Shown Looplinks:</div>\n";
+
+		if( _renderedLinks[ 'looplinks' ] && _renderedLinks[ 'looplinks' ].length > 0 ) {
+
+			html += "<table style=\"margin-left:10px;\">\n";
+			html += "<tr><td style=\"width:20px;\">&nbsp;</td><td style=\"width:180px;font-weight:bold;\">Protein (Pos, Pos)</td><td style=\"width:100px;font-weight:bold;\">Distance (&Aring;)</td></tr>";
+
+
 			for( var i = 0; i < _renderedLinks[ 'looplinks' ].length; i++ ) {
 				var link = _renderedLinks[ 'looplinks' ][ i ][ 'link' ];
-				
+
 				var color = _linkColorHandler.getLinkColor( link, 'rgb' );
-				var rgbaString = "rgba(" + color.r + "," + color.g + "," + color.b + ",0.15)";			
-				
-				html += "<tr class=\" reported_looplink_jq  tool_tip_attached_jq \" data-looplink-index=\"" + i + "\" "
+				var rgbaString = "rgba(" + color.r + "," + color.g + "," + color.b + ",0.15)";
+
+				html += "<tr class=\" reported_looplink_jq  tool_tip_attached_jq " + _linkExclusionHandler.getClassNameForLink( link )  + "\" data-looplink-index=\"" + i + "\" "
 					+ " data-tooltip=\"Click for Details\""
-					+ " style=\"cursor: pointer; background-color:" + rgbaString + "\">\n";			
+					+ " style=\"cursor: pointer; background-color:" + rgbaString + ";"
+					+ "opacity:" + _linkExclusionHandler.getOpacityForLinkRow( link ) + ";\">";
+
+				html += "<td style=\"width:20px;background-color:white;\"><span class=\"" + _linkExclusionHandler.getClassNameForLink( link )  + "\" id=\"loop-link-show-toggle-index-" + i + "\">"
+					+ _linkExclusionHandler.getHTMLForLinkToggleLink( link )
+					+ "</span></td>";
+
 				html += "<td style=\"width:180px;\">" + _proteinNames[ link.protein1 ] + " (" + link.position1 + ", " + link.position2 + ")</td>";
 				html += "<td style=\"width:100px;\">" + link.length.toFixed( 1 ) + "</td>";
 				html += "</tr>\n";
-				
+
 			}
-			
+
 			html += "</table>\n";
 		} else {
 			html += "<div style=\"margin-left:20px;\">No looplinks currently shown.</div>\n";
 		}
-		
-		
+
+
 		$shownLooplinksDiv.html( html );
-		
+		updateShownLooplinksHeader();
+
 		$( '.reported_looplink_jq' ).click( function( e ) {
 
 			try {
 
-				var params = { 
-						psmPeptideCutoffsRootObject : _psmPeptideCutoffsRootObjectStorage.getPsmPeptideCutoffsRootObject(),
-						removeNonUniquePSMs : _removeNonUniquePSMs
+				var params = {
+					psmPeptideCutoffsRootObject : _psmPeptideCutoffsRootObjectStorage.getPsmPeptideCutoffsRootObject(),
+					removeNonUniquePSMs : _removeNonUniquePSMs
 				};
 
 
@@ -3695,10 +3814,13 @@ var StructurePagePrimaryRootCodeClass = function() {
 				throw e;
 			}
 		});
-		
+
 
 		addToolTips( $shownLooplinksDiv );
-	};
+
+		// add click handlers for toggling visibility of links
+		_linkExclusionHandler.addClickHandlerToLooplinkToggles( _renderedLinks, drawLooplinks_noReportRedraw, updateURLHash );
+	}
 
 
 	var getDistanceReportCutoffFromHash = function() {
@@ -3709,6 +3831,7 @@ var StructurePagePrimaryRootCodeClass = function() {
 		
 		return parseInt( json[ 'distance-report-cutoff' ] );
 	};
+
 
 
 	/**
@@ -3738,15 +3861,24 @@ var StructurePagePrimaryRootCodeClass = function() {
 		
 
 		if( _renderedLinks[ 'crosslinks' ] ) {
-			totalRenderedCrosslinks = _renderedLinks[ 'crosslinks' ].length;
-			
+
 			for( var i = 0; i < _renderedLinks[ 'crosslinks' ].length; i++ ) {
+
+				var link = _renderedLinks[ 'crosslinks' ][ i ][ 'link' ];
+
+				// skip this link if it's hidden.
+				if( _linkExclusionHandler.isCrosslinkExcluded( link.protein1, link.position1, link.protein2, link.position2 ) ) {
+					continue;
+				}
+
 				var atom1 = _renderedLinks[ 'crosslinks' ][ i ][ 'atom1' ];
 				var atom2 = _renderedLinks[ 'crosslinks' ][ i ][ 'atom2' ];
 				
 				var distanceId = atom1.residue().chain().name() + "-" + atom1.residue().num() + "-" + atom2.residue().chain().name() + "-" + atom2.residue().num();
 				uniquePairs[ distanceId ] = calculateDistance( atom1.pos(), atom2.pos() );
-				
+
+				totalRenderedCrosslinks++;
+
 				if( calculateDistance( atom1.pos(), atom2.pos() ) <= cutoff ) {
 					totalRenderedCrosslinksMeetingCutoff++;
 				}
@@ -3755,15 +3887,24 @@ var StructurePagePrimaryRootCodeClass = function() {
 		}
 		
 		if( _renderedLinks[ 'looplinks' ] ) {
-			totalRenderedLooplinks = _renderedLinks[ 'looplinks' ].length;
-			
+
 			for( var i = 0; i < _renderedLinks[ 'looplinks' ].length; i++ ) {
+
+				var link = _renderedLinks[ 'looplinks' ][ i ][ 'link' ];
+
+				// skip this link if it's hidden.
+				if( _linkExclusionHandler.isLooplinkExcluded( link.protein1, link.position1, link.position2 ) ) {
+					continue;
+				}
+
 				var atom1 = _renderedLinks[ 'looplinks' ][ i ][ 'atom1' ];
 				var atom2 = _renderedLinks[ 'looplinks' ][ i ][ 'atom2' ];
 				
 				var distanceId = atom1.residue().chain().name() + "-" + atom1.residue().num() + "-" + atom2.residue().chain().name() + "-" + atom2.residue().num();
 				uniquePairs[ distanceId ] = calculateDistance( atom1.pos(), atom2.pos() );
-				
+
+				totalRenderedLooplinks++;
+
 				if( calculateDistance( atom1.pos(), atom2.pos() ) <= cutoff ) {
 					totalRenderedLooplinksMeetingCutoff++;
 				}
@@ -4339,9 +4480,31 @@ var StructurePagePrimaryRootCodeClass = function() {
 		return chains;
 	};
 
-
 	var _CROSSLINKS_MESH;
+
+	var drawCrosslinks_noReportRedraw = function( proteins ) {
+
+		if( !proteins ) {
+			proteins = getVisibleProteins();
+		}
+
+		drawCrosslinks_doRedraw( proteins );
+		updateDistanceCutoffReport();
+		updateShownCrosslinksHeader();
+
+	}
+
 	var drawCrosslinks = function( proteins ) {
+
+		if( !proteins ) {
+			proteins = getVisibleProteins();
+		}
+
+		drawCrosslinks_doRedraw( proteins );
+		redrawDistanceReport();
+	}
+
+	var drawCrosslinks_doRedraw = function( proteins ) {
 		
 		if( !_proteinLinkPositions ) {
 			loadCrosslinkData( true );
@@ -4362,7 +4525,11 @@ var StructurePagePrimaryRootCodeClass = function() {
 		
 		_renderedLinks.crosslinks = new Array();
 		
-		if( _CROSSLINKS_MESH ) { _CROSSLINKS_MESH.hide(); }
+		if( _CROSSLINKS_MESH ) {
+			//_CROSSLINKS_MESH.hide();
+			_VIEWER.hide( 'crosslinks' );
+			_VIEWER.rm( 'crosslinks' );
+		}
 		_CROSSLINKS_MESH = _VIEWER.customMesh('crosslinks');
 		
 		var proteinIds = Object.keys( proteins );
@@ -4400,7 +4567,8 @@ var StructurePagePrimaryRootCodeClass = function() {
 					
 					for( var jj = 0; jj < toKeys.length; jj++ ) {
 						var toPosition = toKeys[ jj ];
-						
+
+
 						// ensure we only consider a pair of positions once and we consider no zero-length crosslinks
 						if( protein1 == protein2 ) {
 							if( toPosition < fromPosition ) { continue; }	// ensure we only consider links within the same protein once
@@ -4477,9 +4645,12 @@ var StructurePagePrimaryRootCodeClass = function() {
 											console.log( link );
 										}
 									}
-									
-									_CROSSLINKS_MESH.addTube( shortestPair[ 0 ].pos(), shortestPair[ 1 ].pos(), 0.6, { cap: true, color : _linkColorHandler.getLinkColor( link, 'pvrgba' ), userData: link });
-									
+
+									// do not draw this link if it's being excluded
+									if( !_linkExclusionHandler.isCrosslinkExcluded( protein1, fromPosition, protein2, toPosition ) ) {
+										_CROSSLINKS_MESH.addTube( shortestPair[ 0 ].pos(), shortestPair[ 1 ].pos(), 0.6, { cap: true, color : _linkColorHandler.getLinkColor( link, 'pvrgba' ), userData: link });
+									}
+
 									renderedLink.link = link;
 									
 									_renderedLinks.crosslinks.push( renderedLink );
@@ -4559,11 +4730,14 @@ var StructurePagePrimaryRootCodeClass = function() {
 									console.log( link );
 								}
 							}
-							
-							_CROSSLINKS_MESH.addTube( UDR[ 'shortestPair' ][ 0 ].pos(), UDR[ 'shortestPair' ][ 1 ].pos(), 0.6, { cap: true, color : _linkColorHandler.getLinkColor( link, 'pvrgba' ), userData: link });
-							
+
+							// do not draw this link if it's being excluded
+							if( !_linkExclusionHandler.isCrosslinkExcluded( fromProtein, fromPosition, toProtein, toPosition ) ) {
+								_CROSSLINKS_MESH.addTube( UDR[ 'shortestPair' ][ 0 ].pos(), UDR[ 'shortestPair' ][ 1 ].pos(), 0.6, { cap: true, color : _linkColorHandler.getLinkColor( link, 'pvrgba' ), userData: link });
+							}
+
 							UDR[ 'renderedLink' ].link = link;
-							
+
 							_renderedLinks.crosslinks.push( UDR[ 'renderedLink' ] );
 
 						}
@@ -4574,8 +4748,6 @@ var StructurePagePrimaryRootCodeClass = function() {
 				
 			}
 		}
-
-		redrawDistanceReport();
 	};
 
 
@@ -4690,7 +4862,29 @@ var StructurePagePrimaryRootCodeClass = function() {
 
 
 	var _LOOPLINKS_MESH;
+
+	var drawLooplinks_noReportRedraw = function( proteins ) {
+
+		if( !proteins ) {
+			proteins = getVisibleProteins();
+		}
+
+		drawLooplinks_doRedraw( proteins );
+		updateDistanceCutoffReport();
+		updateShownLooplinksHeader();
+	}
+
 	var drawLooplinks = function( proteins ) {
+
+		if( !proteins ) {
+			proteins = getVisibleProteins();
+		}
+
+		drawLooplinks_doRedraw( proteins );
+		redrawDistanceReport();
+	}
+
+	var drawLooplinks_doRedraw = function( proteins ) {
 		
 		if( !_proteinLooplinkPositions ) {
 			loadLooplinkData( true );
@@ -4714,7 +4908,10 @@ var StructurePagePrimaryRootCodeClass = function() {
 		
 		_renderedLinks.looplinks = new Array();
 		
-		if( _LOOPLINKS_MESH ) { _LOOPLINKS_MESH.hide(); }
+		if( _LOOPLINKS_MESH ) {
+			_VIEWER.hide( 'looplinks' );
+			_VIEWER.rm( 'looplinks' );
+		}
 		_LOOPLINKS_MESH = _VIEWER.customMesh('looplinks');
 		
 		var proteinIds = Object.keys( proteins );
@@ -4784,9 +4981,14 @@ var StructurePagePrimaryRootCodeClass = function() {
 									console.log( link );
 								}
 							}
-							
-							_LOOPLINKS_MESH.addTube( fromCoords, toCoords, 0.6, { color: _linkColorHandler.getLinkColor( link, 'pvrgba' ), userData: link } );
-							
+
+							if( !_linkExclusionHandler.isLooplinkExcluded( proteinId, fromPosition, toPosition ) ) {
+								_LOOPLINKS_MESH.addTube(fromCoords, toCoords, 0.6, {
+									color: _linkColorHandler.getLinkColor(link, 'pvrgba'),
+									userData: link
+								});
+							}
+
 							renderedLink.link = link;
 							
 							_renderedLinks.looplinks.push( renderedLink );
@@ -4855,9 +5057,15 @@ var StructurePagePrimaryRootCodeClass = function() {
 								console.log( link );
 							}
 						}
-						
-						_LOOPLINKS_MESH.addTube( UDR[ 'shortestPair' ][ 0 ], UDR[ 'shortestPair' ][ 1 ], 0.6, { cap: true, color : _linkColorHandler.getLinkColor( link, 'pvrgba' ), userData: link });
-						
+
+						if( !_linkExclusionHandler.isLooplinkExcluded( fromProtein, fromPosition, toPosition ) ) {
+							_LOOPLINKS_MESH.addTube(UDR['shortestPair'][0], UDR['shortestPair'][1], 0.6, {
+								cap: true,
+								color: _linkColorHandler.getLinkColor(link, 'pvrgba'),
+								userData: link
+							});
+						}
+
 						UDR[ 'renderedLink' ].link = link;
 						
 						_renderedLinks.looplinks.push( UDR[ 'renderedLink' ] );
@@ -4866,8 +5074,6 @@ var StructurePagePrimaryRootCodeClass = function() {
 				}				
 			}
 		}
-		
-		redrawDistanceReport();
 	};
 
 
@@ -6216,8 +6422,6 @@ var StructurePagePrimaryRootCodeClass = function() {
 	//  Initialize the page and load the data
 
 	function initPage() {
-
-
 
 		var json = getJsonFromHash();
 
