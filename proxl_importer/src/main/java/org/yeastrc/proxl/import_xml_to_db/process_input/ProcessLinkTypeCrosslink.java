@@ -16,7 +16,7 @@ import org.yeastrc.proxl.import_xml_to_db.dto.ProteinSequenceVersionDTO;
 import org.yeastrc.proxl.import_xml_to_db.dto.SearchReportedPeptideDynamicModLookupDTO;
 import org.yeastrc.proxl.import_xml_to_db.dto.SrchRepPeptProtSeqIdPosCrosslinkDTO;
 import org.yeastrc.xlink.dto.SrchRepPeptPeptDynamicModDTO;
-import org.yeastrc.xlink.linker_data_processing_base.linkers_builtin_root.linkers_builtin.ILinker_Builtin_Linker;
+import org.yeastrc.xlink.linker_data_processing_base.ILinkers_Main_ForSingleSearch;
 import org.yeastrc.proxl.import_xml_to_db.dto.SrchRepPeptPeptideDTO;
 import org.yeastrc.proxl.import_xml_to_db.dto.SrchRepPeptProtSeqIdPosMonolinkDTO;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterDataException;
@@ -81,15 +81,13 @@ public class ProcessLinkTypeCrosslink {
 	 * The PeptideDTO entries are saved to the DB in this step, but could be delayed
 	 * 
 	 * @param reportedPeptide
-	 * @param linkerList - EMPTY if linker abbr in input is not in listed linkers
-	 * @param linkerListStringForErrorMsgs
+	 * @param linkers_Main_ForSingleSearch
 	 * @return
 	 * @throws Exception
 	 */
 	public GetCrosslinkProteinMappingsResult getCrosslinkProteinMappings( 
 			ReportedPeptide reportedPeptide, 
-			List<ILinker_Builtin_Linker> linkerList,
-			String linkerListStringForErrorMsgs
+			ILinkers_Main_ForSingleSearch linkers_Main_ForSingleSearch
 			) throws Exception {
 		
 		GetCrosslinkProteinMappingsResult getCrosslinkMappingsResult = new GetCrosslinkProteinMappingsResult();
@@ -112,8 +110,7 @@ public class ProcessLinkTypeCrosslink {
 			GetCrosslinkProteinMappingsSinglePeptideData getCrosslinkroteinMappingsSinglePeptideData =
 					getProteinMappingForSinglePeptide( 
 							peptide, 
-							linkerList, 
-							linkerListStringForErrorMsgs, 
+							linkers_Main_ForSingleSearch, 
 							reportedPeptide, 
 							Integer.toString( peptideNumberInt ) );
 			getCrosslinkMappingsResult.getCrosslinkroteinMappingsSinglePeptideDataList.add( getCrosslinkroteinMappingsSinglePeptideData );
@@ -126,8 +123,7 @@ public class ProcessLinkTypeCrosslink {
 	
 	/**
 	 * @param peptide
-	 * @param linkerList
-	 * @param linkerListStringForErrorMsgs
+	 * @param linkers_Main_ForSingleSearch
 	 * @param reportedPeptide
 	 * @param peptideNumber
 	 * @return
@@ -135,8 +131,7 @@ public class ProcessLinkTypeCrosslink {
 	 */
 	private GetCrosslinkProteinMappingsSinglePeptideData getProteinMappingForSinglePeptide( 
 			Peptide peptide, 
-			List<ILinker_Builtin_Linker> linkerList,
-			String linkerListStringForErrorMsgs,
+			ILinkers_Main_ForSingleSearch linkers_Main_ForSingleSearch,
 			ReportedPeptide reportedPeptide,
 			String peptideNumber
 			) throws Exception {
@@ -167,7 +162,7 @@ public class ProcessLinkTypeCrosslink {
 						peptideDTO.getSequence(), 
 						peptideCrossLinkPosition,
 						peptideMonolinkPositions,
-						linkerList, 
+						linkers_Main_ForSingleSearch, 
 						proteinMatches_Peptide,
 						reportedPeptide // for error reporting only 
 						);
@@ -191,9 +186,9 @@ public class ProcessLinkTypeCrosslink {
 			Collections.sort( peptideLinkPositions );
 			
 			
-			if ( linkerList.isEmpty() ) {
-				//  No linker abbr in input is not in listed linkers
+			if ( linkers_Main_ForSingleSearch.isAllLinkersHave_LinkablePositions() ) {
 				
+				//  Not all linkers have linkable positions so linkable positions not used for filtering
 
 				String msg = "Could not import this Proxl XML file. No protein in the Proxl XML contained this peptide sequence (" 
 						+ peptide.getSequence()
@@ -205,13 +200,9 @@ public class ProcessLinkTypeCrosslink {
 				throw new ProxlImporterDataException( msg );
 				
 			} else {
-				//  Yes linker abbr in input is in listed linkers so list them
+				//  Yes all linkers have linkable positions so linkable positions used for filtering so list them
 				
-				List<String> linkersToStringArray = new ArrayList<>( linkerList.size() );
-				for ( ILinker_Builtin_Linker linkerItem : linkerList ) {
-					linkersToStringArray.add(  linkerItem.toString() );
-				}
-				String linkersToString = StringUtils.join( linkersToStringArray, "," );
+				String linkersToString = linkers_Main_ForSingleSearch.getLinkerAbbreviationsCommaDelim();
 				
 				String msg = "Could not import this Proxl XML file. Either no protein in the Proxl XML contained this peptide sequence (" 
 						+ peptide.getSequence()

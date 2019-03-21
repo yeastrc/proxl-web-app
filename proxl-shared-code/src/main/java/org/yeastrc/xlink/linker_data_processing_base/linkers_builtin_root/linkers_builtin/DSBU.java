@@ -2,9 +2,9 @@ package org.yeastrc.xlink.linker_data_processing_base.linkers_builtin_root.linke
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 public class DSBU extends AmineLinker {
 
@@ -29,7 +29,7 @@ public class DSBU extends AmineLinker {
     }
 
     @Override
-    public Collection<String> getCrosslinkFormulas() {
+    public Set<String> getCrosslinkFormulas() {
         return FORMULA_MASSES.keySet();
     }
 

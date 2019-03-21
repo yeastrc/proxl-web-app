@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS search_linker_tbl (
     REFERENCES search (id)
     ON DELETE CASCADE
     ON UPDATE NO ACTION)
-ENGINE = InnoDB
+ENGINE = InnoDB;
 
 CREATE TABLE IF NOT EXISTS linker_per_search_crosslink_mass_tbl (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,

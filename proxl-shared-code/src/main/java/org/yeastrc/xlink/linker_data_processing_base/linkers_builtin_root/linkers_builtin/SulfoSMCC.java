@@ -1,7 +1,7 @@
 package org.yeastrc.xlink.linker_data_processing_base.linkers_builtin_root.linkers_builtin;
 
-import java.util.Collection;
 import java.util.HashSet;
+import java.util.Set;
 
 import org.yeastrc.xlink.utils.ProteinSequenceUtils;
 
@@ -18,10 +18,10 @@ public class SulfoSMCC implements ILinker_Builtin_Linker {
 	}
 	
 	@Override
-	public Collection<Integer> getLinkablePositions(String proteinSequence) throws Exception {
+	public Set<Integer> getLinkablePositions(String proteinSequence) throws Exception {
 
 		// add in lysines
-		Collection<Integer> linkablePositions = ProteinSequenceUtils.getPositionsOfResidueForProteinSequence( proteinSequence, "K" );
+		Set<Integer> linkablePositions = ProteinSequenceUtils.getPositionsOfResidueForProteinSequence( proteinSequence, "K" );
 
 		// add in cysteines
 		linkablePositions.addAll( ProteinSequenceUtils.getPositionsOfResidueForProteinSequence( proteinSequence, "C" ) );
@@ -39,11 +39,11 @@ public class SulfoSMCC implements ILinker_Builtin_Linker {
 	}
 
 	@Override
-	public Collection<Integer> getLinkablePositions(String querySequence, String subjectSequence, int subjectPosition)
+	public Set<Integer> getLinkablePositions(String querySequence, String subjectSequence, int subjectPosition)
 			throws Exception {
 
 		String subjectResidue = subjectSequence.substring( subjectPosition - 1, subjectPosition );
-		Collection<Integer> linkablePositions = new HashSet<Integer>();
+		Set<Integer> linkablePositions = new HashSet<Integer>();
 		
 		if( subjectResidue.equals( "K" ) ) {
 			
@@ -73,9 +73,9 @@ public class SulfoSMCC implements ILinker_Builtin_Linker {
 	}
 
 	@Override
-	public Collection<String> getCrosslinkFormulas() {
+	public Set<String> getCrosslinkFormulas() {
 
-		Collection<String> formulas = new HashSet<>();
+		Set<String> formulas = new HashSet<>();
 		formulas.add( "C12H13NO3" );
 		
 		return formulas;

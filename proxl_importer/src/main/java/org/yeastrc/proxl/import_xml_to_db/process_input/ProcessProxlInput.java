@@ -13,6 +13,7 @@ import org.yeastrc.proxl.import_xml_to_db.dao.SearchDAO_Importer;
 import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_LinkerPerSearchCleavedCrosslinkMassDAO;
 import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_LinkerPerSearchCrosslinkMassDAO;
 import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_LinkerPerSearchMonolinkMassDAO;
+import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_SearchLinkerDAO;
 import org.yeastrc.proxl.import_xml_to_db.db.ImportDBConnectionFactory;
 import org.yeastrc.proxl.import_xml_to_db.drop_peptides_psms_for_cutoffs.DropPeptidePSMCutoffValues;
 import org.yeastrc.proxl.import_xml_to_db.drop_peptides_psms_for_cutoffs.DropPeptidePSM_InsertToDB;
@@ -42,7 +43,6 @@ import org.yeastrc.proxl_import.api.xml_dto.Peptide.PeptideIsotopeLabels;
 import org.yeastrc.proxl_import.api.xml_dto.Peptide.PeptideIsotopeLabels.PeptideIsotopeLabel;
 import org.yeastrc.xlink.base.file_import_proxl_xml_scans.dto.ProxlXMLFileImportTrackingSingleFileDTO;
 import org.yeastrc.xlink.dao.SearchCommentDAO;
-import org.yeastrc.xlink.dao.SearchLinkerDAO;
 import org.yeastrc.xlink.dto.AnnotationTypeDTO;
 import org.yeastrc.xlink.dto.LinkerPerSearchCleavedCrosslinkMassDTO;
 import org.yeastrc.xlink.dto.LinkerPerSearchCrosslinkMassDTO;
@@ -50,6 +50,7 @@ import org.yeastrc.xlink.dto.LinkerPerSearchMonolinkMassDTO;
 import org.yeastrc.xlink.dto.SearchCommentDTO;
 import org.yeastrc.xlink.dto.SearchLinkerDTO;
 import org.yeastrc.xlink.enum_classes.FilterableDescriptiveAnnotationType;
+import org.yeastrc.xlink.linker_data_processing_base.linker_db_data_per_search.LinkersDBDataSingleSearchRoot;
 
 /**
  * 
@@ -125,12 +126,13 @@ public class ProcessProxlInput {
 				searchCommentDTO.setAuthUserId(null);
 				SearchCommentDAO.getInstance().save( searchCommentDTO );
 			}
+			
 			///   process Linkers
-			processLinkersValidateAndSave(proxlInput, searchDTO);
+			LinkersDBDataSingleSearchRoot linkersDBDataSingleSearchRoot = SaveLinkersData.getInstance().saveLinkersData( proxlInput, searchDTO );
+			
 			ProcessStaticModifications.getInstance().processStaticModifications( proxlInput, searchDTO.getId() );
 			ProcessConfigurationFiles.getInstance().processConfigurationFiles( proxlInput, searchDTO.getId(), projectSearchDTOInserted.getId() );
-			//  TODO  Must load linkers in a Per Search way
-//			proxlInput.getLinkers();
+
 			//  Scan Numbers to Scan Ids Map per Scan Filename
 			Map<String, ScanFilenameScanNumberScanIdScanFileId_Mapping> mapOfScanFilenamesMapsOfScanNumbersToScanIds = new HashMap<>();
 			if ( scanFileFileContainerList != null && ( ! scanFileFileContainerList.isEmpty() ) ) {
@@ -246,6 +248,7 @@ public class ProcessProxlInput {
 			ProcessReportedPeptidesAndPSMs.getInstance().processReportedPeptides( 
 					proxlInput, 
 					searchDTO, 
+					linkersDBDataSingleSearchRoot,
 					dropPeptidePSMCutoffValues,
 					searchProgramEntryMap,
 					reportedPeptideAndPsmFilterableAnnotationTypesOnId,
@@ -371,126 +374,6 @@ public class ProcessProxlInput {
 		return filterableAnnotationTypesOnId;
 	}
 	
-	/**
-	 * Validate that the linkers are supported and save linker data for the search
-	 * 
-	 * @param proxlInput
-	 * @param searchDTO
-	 * @throws ProxlImporterDataException
-	 * @throws Exception
-	 */
-	private void processLinkersValidateAndSave( ProxlInput proxlInput, SearchDTO_Importer searchDTO ) throws ProxlImporterDataException, Exception {
-		
-		// Save Linker mapping for search
-		Linkers proxlInputLinkers = proxlInput.getLinkers();
-		if ( proxlInputLinkers == null ) {
-			String msg = "at least one linker is required";
-			log.error( msg );
-			throw new ProxlImporterDataException(msg);
-		}
-		List<Linker> proxlInputLinkerList = proxlInputLinkers.getLinker();
-		if ( proxlInputLinkerList.isEmpty() ) {
-			String msg = "at least one linker is required";
-			log.error( msg );
-			throw new ProxlImporterDataException(msg);
-		}
-		
-		//  Ensure no duplicate linker abbr 
-		Set<String> linkerAbbrSet = new HashSet<>();
-		
-		for ( Linker proxlInputLinkerItem : proxlInputLinkerList ) {
-			String linkerAbbr = proxlInputLinkerItem.getName();
-			
-			if ( linkerAbbr == null ) {
-				String msg = "linker element does not have value for name attribute";
-				throw new ProxlImporterDataException( msg );
-			}
-			if ( linkerAbbr.length() == 0 ) {
-				String msg = "linker element name attribute is emty string";
-				throw new ProxlImporterDataException( msg );
-			}
-			
-			if ( ! linkerAbbrSet.add( linkerAbbr ) ) {
-				String msg = "More than one linker with same name/abbreviation: '"
-						+ linkerAbbr + "'";
-				log.error( "" + msg );
-				throw new ProxlImporterDataException( msg );
-			}
-			
-			SearchLinkerDTO searchLinkerDTO = new SearchLinkerDTO();
-			searchLinkerDTO.setSearchId( searchDTO.getId() );
-			searchLinkerDTO.setLinkerAbbr( linkerAbbr );
-			SearchLinkerDAO.getInstance().saveToDatabase( searchLinkerDTO );
-			saveMonolinkMasses( proxlInputLinkerItem, searchLinkerDTO, searchDTO );
-			saveCrosslinkMasses( proxlInputLinkerItem, searchLinkerDTO, searchDTO );
-		}
-	}
-	
-	/**
-	 * @param proxlInputLinkerItem
-	 * @param linkerDTO
-	 * @param searchDTO
-	 * @throws Exception
-	 */
-	private void saveMonolinkMasses( Linker proxlInputLinkerItem, SearchLinkerDTO searchLinkerDTO, SearchDTO_Importer searchDTO ) throws Exception {
-		
-		MonolinkMasses monolinkMasses = proxlInputLinkerItem.getMonolinkMasses();
-		if ( monolinkMasses == null ) {
-			return;  //  EARLY RETURN
-		}
-		List<MonolinkMass> monolinkMassList = monolinkMasses.getMonolinkMass();
-		if ( monolinkMassList == null ) {
-			return;  //  EARLY RETURN
-		}
-		for ( MonolinkMass monolinkMass : monolinkMassList ) {
-			LinkerPerSearchMonolinkMassDTO linkerPerSearchMonolinkMassDTO = new LinkerPerSearchMonolinkMassDTO();
-			linkerPerSearchMonolinkMassDTO.setSearchLinkerId( searchLinkerDTO.getId() );
-			linkerPerSearchMonolinkMassDTO.setSearchId(  searchDTO.getId() );
-			linkerPerSearchMonolinkMassDTO.setMonolinkMassDouble( monolinkMass.getMass().doubleValue() );
-			linkerPerSearchMonolinkMassDTO.setMonolinkMassString( monolinkMass.getMass().toString() );
-			DB_Insert_LinkerPerSearchMonolinkMassDAO.getInstance().save( linkerPerSearchMonolinkMassDTO );
-		}
-	}
-	
-	/**
-	 * @param proxlInputLinkerItem
-	 * @param linkerDTO
-	 * @param searchDTO
-	 * @throws Exception
-	 */
-	private void saveCrosslinkMasses( Linker proxlInputLinkerItem, SearchLinkerDTO searchLinkerDTO, SearchDTO_Importer searchDTO ) throws Exception {
-		
-		CrosslinkMasses crosslinkMasses = proxlInputLinkerItem.getCrosslinkMasses();
-		if ( crosslinkMasses == null ) {
-			return;  //  EARLY RETURN
-		}
-		{
-			List<CrosslinkMass> crosslinkMassList = crosslinkMasses.getCrosslinkMass();
-			if ( crosslinkMassList != null && ( ! crosslinkMassList.isEmpty() ) ) {
-				for ( CrosslinkMass crosslinkMass : crosslinkMassList ) {
-					LinkerPerSearchCrosslinkMassDTO linkerPerSearchCrosslinkMassDTO = new LinkerPerSearchCrosslinkMassDTO();
-					linkerPerSearchCrosslinkMassDTO.setSearchLinkerId( searchLinkerDTO.getId() );
-					linkerPerSearchCrosslinkMassDTO.setSearchId(  searchDTO.getId() );
-					linkerPerSearchCrosslinkMassDTO.setCrosslinkMassDouble( crosslinkMass.getMass().doubleValue() );
-					linkerPerSearchCrosslinkMassDTO.setCrosslinkMassString( crosslinkMass.getMass().toString() );
-					DB_Insert_LinkerPerSearchCrosslinkMassDAO.getInstance().save( linkerPerSearchCrosslinkMassDTO );
-				}
-			}
-		}
-		{
-			List<CleavedCrosslinkMass> cleavedCrosslinkMassList = crosslinkMasses.getCleavedCrosslinkMass();
-			if ( cleavedCrosslinkMassList != null && ( ! cleavedCrosslinkMassList.isEmpty() ) ) {
-				for ( CleavedCrosslinkMass cleavedCrosslinkMass : cleavedCrosslinkMassList ) {
-					LinkerPerSearchCleavedCrosslinkMassDTO linkerPerSearchCleavedCrosslinkMassDTO = new LinkerPerSearchCleavedCrosslinkMassDTO();
-					linkerPerSearchCleavedCrosslinkMassDTO.setSearchLinkerId( searchLinkerDTO.getId() );
-					linkerPerSearchCleavedCrosslinkMassDTO.setSearchId(  searchDTO.getId() );
-					linkerPerSearchCleavedCrosslinkMassDTO.setCleavedCrosslinkMassDouble( cleavedCrosslinkMass.getMass().doubleValue() );
-					linkerPerSearchCleavedCrosslinkMassDTO.setCleavedCrosslinkMassString( cleavedCrosslinkMass.getMass().toString() );
-					DB_Insert_LinkerPerSearchCleavedCrosslinkMassDAO.getInstance().save( linkerPerSearchCleavedCrosslinkMassDTO );
-				}
-			}
-		}
-	}
 	
 	/**
 	 * At least one "peptide" under a "reported_peptide" contains "peptide_isotope_label"

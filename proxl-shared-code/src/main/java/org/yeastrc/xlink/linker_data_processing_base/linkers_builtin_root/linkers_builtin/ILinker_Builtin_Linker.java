@@ -1,8 +1,12 @@
 package org.yeastrc.xlink.linker_data_processing_base.linkers_builtin_root.linkers_builtin;
 
-import java.util.Collection;
+import java.util.Set;
 
 
+/**
+ * All builtin linker classes that implement this are expected to return valid values for all methods
+ *
+ */
 public interface ILinker_Builtin_Linker {
 
 	/**
@@ -13,7 +17,7 @@ public interface ILinker_Builtin_Linker {
 	 * @return A collection of integers corresponding to linkable protein positions
 	 * @throws Exception
 	 */
-	public Collection<Integer> getLinkablePositions( String proteinSequence ) throws Exception;
+	public Set<Integer> getLinkablePositions( String proteinSequence ) throws Exception;
 
 	/**
 	 * Get all theoretically linkable positions (N-terminal residue is position 1)
@@ -27,7 +31,7 @@ public interface ILinker_Builtin_Linker {
 	 * @return
 	 * @throws Exception
 	 */
-	public Collection<Integer> getLinkablePositions( String querySequence, String subjectSequence, int subjectPosition ) throws Exception;
+	public Set<Integer> getLinkablePositions( String querySequence, String subjectSequence, int subjectPosition ) throws Exception;
 	
 	/**
 	 * Get the length, in Angstroms of this crosslinker
@@ -42,7 +46,7 @@ public interface ILinker_Builtin_Linker {
 	 * 
 	 * @return
 	 */
-	public Collection<String> getCrosslinkFormulas();
+	public Set<String> getCrosslinkFormulas();
 	
 	/**
 	 * Attempt to get the cross link formula for the given mass. For linkers with

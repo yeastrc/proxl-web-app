@@ -81,7 +81,7 @@ public class ViewMergedStructureAction extends Action {
 				for ( int projectSearchId : projectSearchIdsFromForm ) {
 					msg += projectSearchId + ", ";
 				}
-				log.error( msg );
+				log.warn( msg );
 				return mapping.findForward( StrutsGlobalForwardNames.INVALID_REQUEST_DATA );
 			}
 			if ( projectIdsFromSearchIds.size() > 1 ) {

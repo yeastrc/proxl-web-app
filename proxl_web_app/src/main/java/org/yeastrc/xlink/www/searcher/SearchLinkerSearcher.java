@@ -27,7 +27,7 @@ public class SearchLinkerSearcher {
 		ResultSet rs = null;
 		try {
 			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
-			String sql = "SELECT id, linker_abbr, linker_name FROM search_linker_tbl WHERE search_id = ?";
+			String sql = "SELECT id, linker_abbr, spacer_arm_length, spacer_arm_length_string FROM search_linker_tbl WHERE search_id = ?";
 			pstmt = conn.prepareStatement( sql );
 			pstmt.setInt( 1, searchId );
 			rs = pstmt.executeQuery();
@@ -36,7 +36,11 @@ public class SearchLinkerSearcher {
 				item.setId( rs.getInt( "id" ) );
 				item.setSearchId( searchId );
 				item.setLinkerAbbr( rs.getString( "linker_abbr" ) );
-				item.setLinkerName( rs.getString( "linker_abbr" ) );
+				double spacerArmLength = rs.getDouble( "spacer_arm_length" );
+				if ( ! rs.wasNull() ) {
+					item.setSpacerArmLength( spacerArmLength );	
+				}
+				item.setSpacerArmLengthString( rs.getString( "spacer_arm_length_string" ) );
 				resultList.add( item );
 			}
 		} finally {
@@ -58,42 +62,42 @@ public class SearchLinkerSearcher {
 		return resultList;
 	}
 	
-//	/**
-//	 * @param search
-//	 * @return
-//	 * @throws Exception
-//	 */
-//	public List<String> getLinkerAbbreviationsForSearch( int searchId ) throws Exception {
-//		
-//		List<String> resultList = new ArrayList<>();
-//		Connection conn = null;
-//		PreparedStatement pstmt = null;
-//		ResultSet rs = null;
-//		try {
-//			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
-//			String sql = "SELECT linker_abbr FROM search_linker_tbl WHERE search_id = ?";
-//			pstmt = conn.prepareStatement( sql );
-//			pstmt.setInt( 1, searchId );
-//			rs = pstmt.executeQuery();
-//			while( rs.next() ) {
-//				resultList.add(  rs.getString( "linker_abbr" ) );
-//			}
-//		} finally {
-//			// be sure database handles are closed
-//			if( rs != null ) {
-//				try { rs.close(); } catch( Throwable t ) { ; }
-//				rs = null;
-//			}
-//			if( pstmt != null ) {
-//				try { pstmt.close(); } catch( Throwable t ) { ; }
-//				pstmt = null;
-//			}
-//			if( conn != null ) {
-//				try { conn.close(); } catch( Throwable t ) { ; }
-//				conn = null;
-//			}
-//		}
-//		
-//		return resultList;
-//	}
+	/**
+	 * @param search
+	 * @return
+	 * @throws Exception
+	 */
+	public List<String> getLinkerAbbreviationsForSearch( int searchId ) throws Exception {
+		
+		List<String> resultList = new ArrayList<>();
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		try {
+			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
+			String sql = "SELECT linker_abbr FROM search_linker_tbl WHERE search_id = ?";
+			pstmt = conn.prepareStatement( sql );
+			pstmt.setInt( 1, searchId );
+			rs = pstmt.executeQuery();
+			while( rs.next() ) {
+				resultList.add(  rs.getString( "linker_abbr" ) );
+			}
+		} finally {
+			// be sure database handles are closed
+			if( rs != null ) {
+				try { rs.close(); } catch( Throwable t ) { ; }
+				rs = null;
+			}
+			if( pstmt != null ) {
+				try { pstmt.close(); } catch( Throwable t ) { ; }
+				pstmt = null;
+			}
+			if( conn != null ) {
+				try { conn.close(); } catch( Throwable t ) { ; }
+				conn = null;
+			}
+		}
+		
+		return resultList;
+	}
 }

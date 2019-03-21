@@ -2291,7 +2291,8 @@ CREATE TABLE  search_linker_tbl (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   search_id INT UNSIGNED NOT NULL,
   linker_abbr VARCHAR(255) NOT NULL,
-  linker_name VARCHAR(500) NULL,
+  spacer_arm_length DOUBLE NULL,
+  spacer_arm_length_string VARCHAR(45) NULL,
   PRIMARY KEY (id),
   CONSTRAINT search_linker_tbl_search_id_fk
     FOREIGN KEY (search_id)
@@ -2316,6 +2317,7 @@ CREATE TABLE  linker_per_search_crosslink_mass_tbl (
   search_id INT UNSIGNED NOT NULL,
   crosslink_mass_double DOUBLE NOT NULL,
   crosslink_mass_string VARCHAR(200) NOT NULL,
+  chemical_formula VARCHAR(1000) NULL,
   PRIMARY KEY (id),
   CONSTRAINT linkr_pr_srch_crosslnk_mss_tbl_search_fk
     FOREIGN KEY (search_id)
@@ -2398,9 +2400,69 @@ CREATE INDEX linkr_pr_srch_monolnk_mss_search_fk_idx ON linker_per_search_monoli
 CREATE INDEX lnkr_pr_sch_monlnk_mss_tbl_srch_lnkr_fk_idx ON linker_per_search_monolink_mass_tbl (search_linker_id ASC);
 
 
-SET SQL_MODE=@OLD_SQL_MODE;
-SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
-SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
+-- -----------------------------------------------------
+-- Table search_linker_per_side_definition_tbl
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS search_linker_per_side_definition_tbl ;
+
+CREATE TABLE  search_linker_per_side_definition_tbl (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  search_linker_id INT UNSIGNED NOT NULL,
+  PRIMARY KEY (id),
+  CONSTRAINT srch_lnkr_defntn_tbl_srch_lnkr_fk
+    FOREIGN KEY (search_linker_id)
+    REFERENCES search_linker_tbl (id)
+    ON DELETE CASCADE
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+COMMENT = '2 records per linker per search';
+
+CREATE INDEX srch_lnkr_defntn_tbl_srch_lnkr_fk_idx ON search_linker_per_side_definition_tbl (search_linker_id ASC);
+
+
+-- -----------------------------------------------------
+-- Table search_linker_per_side_linkable_residues_tbl
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS search_linker_per_side_linkable_residues_tbl ;
+
+CREATE TABLE  search_linker_per_side_linkable_residues_tbl (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  search_linker_per_side_definition_id INT UNSIGNED NOT NULL,
+  residue VARCHAR(1) NOT NULL,
+  PRIMARY KEY (id),
+  CONSTRAINT srchlnkrpersd_lkbl_rsds_fkid_fk
+    FOREIGN KEY (search_linker_per_side_definition_id)
+    REFERENCES search_linker_per_side_definition_tbl (id)
+    ON DELETE CASCADE
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = latin1
+COLLATE = latin1_bin;
+
+CREATE INDEX srchlnkrpersd_lkbl_rsds_fkid_fk_idx ON search_linker_per_side_linkable_residues_tbl (search_linker_per_side_definition_id ASC);
+
+
+-- -----------------------------------------------------
+-- Table search_linker_per_side_linkable_protein_termini_tbl
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS search_linker_per_side_linkable_protein_termini_tbl ;
+
+CREATE TABLE  search_linker_per_side_linkable_protein_termini_tbl (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  search_linker_per_side_definition_id INT UNSIGNED NOT NULL,
+  n_terminus_c_terminus ENUM('n', 'c') NOT NULL COMMENT '\"n\" or \"c\" terminus',
+  distance_from_terminus INT UNSIGNED NOT NULL COMMENT '0 indicates the terminus itself',
+  PRIMARY KEY (id),
+  CONSTRAINT srchlnkrprsd_lnkbl_prtn_trmn_fkid_fk
+    FOREIGN KEY (search_linker_per_side_definition_id)
+    REFERENCES search_linker_per_side_definition_tbl (id)
+    ON DELETE CASCADE
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+COMMENT = 'Records for \"n\" and \"c\" terminus linkable';
+
+CREATE INDEX srchlnkrprsd_lnkbl_prtn_trmn_fkid_fk_idx ON search_linker_per_side_linkable_protein_termini_tbl (search_linker_per_side_definition_id ASC);
+
 
 
 DELIMITER $$
@@ -2421,4 +2483,8 @@ END$$
 
 
 DELIMITER ;
+
+SET SQL_MODE=@OLD_SQL_MODE;
+SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
+SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
 

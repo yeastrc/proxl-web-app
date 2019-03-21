@@ -5,23 +5,13 @@ import java.util.List;
 import org.yeastrc.xlink.dto.SearchLinkerDTO;
 
 
-public class SearchLinker_ForSearchId_Response {
+public class SearchLinkerDTO_ForSearchId_Response {
 
 	private List<SearchLinkerDTO> searchLinkerDTOList;
-	private List<String> linkerAbbreviationsForSearchIdList;
-
-	public List<String> getLinkerAbbreviationsForSearchIdList() {
-		return linkerAbbreviationsForSearchIdList;
-	}
-
-	public void setLinkerAbbreviationsForSearchIdList(List<String> linkerAbbreviationsForSearchIdList) {
-		this.linkerAbbreviationsForSearchIdList = linkerAbbreviationsForSearchIdList;
-	}
 
 	public List<SearchLinkerDTO> getSearchLinkerDTOList() {
 		return searchLinkerDTOList;
 	}
-
 	public void setSearchLinkerDTOList(List<SearchLinkerDTO> searchLinkerDTOList) {
 		this.searchLinkerDTOList = searchLinkerDTOList;
 	}

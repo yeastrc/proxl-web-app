@@ -108,12 +108,12 @@ public class ImageViewerData {
 		this.excludeType = excludeType;
 	}
 
-	public Map<Integer, Collection<Integer>> getLinkablePositions() {
+	public Map<Integer, Set<Integer>> getLinkablePositions() {
 		return linkablePositions;
 	}
 
 	public void setLinkablePositions(
-			Map<Integer, Collection<Integer>> linkablePositions) {
+			Map<Integer, Set<Integer>> linkablePositions) {
 		this.linkablePositions = linkablePositions;
 	}
 
@@ -210,7 +210,7 @@ public class ImageViewerData {
 	private Map<Integer, Map<Integer, Integer>> monolinkPSMCounts;
 
 
-	private Map<Integer, Collection<Integer>> linkablePositions;
+	private Map<Integer, Set<Integer>> linkablePositions;
 	
 	private boolean allLinkersSupportedForLinkablePositions;
 

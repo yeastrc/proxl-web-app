@@ -1,8 +1,8 @@
 package org.yeastrc.xlink.utils;
 
 
-import java.util.Collection;
 import java.util.HashSet;
+import java.util.Set;
 
 public class ProteinSequenceUtils {
 	
@@ -14,9 +14,9 @@ public class ProteinSequenceUtils {
 	 * @return
 	 * @throws Exception
 	 */
-	public static Collection<Integer> getPositionsOfResidueForProteinSequence( String proteinSequence, String residue ) throws Exception {
+	public static Set<Integer> getPositionsOfResidueForProteinSequence( String proteinSequence, String residue ) throws Exception {
 
-		Collection<Integer> positions = new HashSet<Integer>();
+		Set<Integer> positions = new HashSet<Integer>();
 		
 		int index = proteinSequence.indexOf( residue );
 		while (index >= 0) {

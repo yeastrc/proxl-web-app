@@ -27,6 +27,8 @@ import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.yeastrc.xlink.dto.PsmDTO;
+import org.yeastrc.xlink.linker_data_processing_base.ILinker_Main;
+import org.yeastrc.xlink.linker_data_processing_base.ILinkers_Main_ForSingleSearch;
 import org.yeastrc.xlink.linker_data_processing_base.linkers_builtin_root.Get_BuiltIn_Linker_From_Abbreviation_Factory;
 import org.yeastrc.xlink.linker_data_processing_base.linkers_builtin_root.linkers_builtin.ILinker_Builtin_Linker;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesRootLevel;
@@ -42,6 +44,8 @@ import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappInternalErrorException;
 import org.yeastrc.xlink.www.form_query_json_objects.MergedPeptideQueryJSONRoot;
 import org.yeastrc.xlink.www.forms.MergedSearchViewPeptidesForm;
+import org.yeastrc.xlink.www.linkable_positions.ILinker_Main_Objects_ForSearchId_Cached;
+import org.yeastrc.xlink.www.linkable_positions.ILinker_Main_Objects_ForSearchId_Cached.ILinker_Main_Objects_ForSearchId_Cached_Response;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
 import org.yeastrc.xlink.www.objects.PsmWebDisplayWebServiceResult;
 import org.yeastrc.xlink.www.objects.WebMergedProteinPosition;
@@ -49,11 +53,10 @@ import org.yeastrc.xlink.www.objects.WebMergedReportedPeptide;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
 import org.yeastrc.xlink.www.searcher.PsmWebDisplaySearcher;
 import org.yeastrc.xlink.www.searcher.ReportedPeptideIdsForSearchIdsUnifiedPeptideIdSearcher;
-import org.yeastrc.xlink.www.searcher_via_cached_data.cached_data_holders.Cached_SearchLinker_ForSearchId;
-import org.yeastrc.xlink.www.searcher_via_cached_data.return_objects_from_searchers_for_cached_data.SearchLinker_ForSearchId_Response;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
 import org.yeastrc.xlink.www.web_utils.SearchLinkerAndLinkerAbbreviationForLinkerMass_SingleSearch_Util;
+import org.yeastrc.xlink.www.web_utils.SearchLinkerAndLinkerAbbreviationForLinkerMass_SingleSearch_Util.SearchLinkerAndLinkerAbbreviationForLinkerMass_SingleSearch_Util_Response;
 
 /**
  * 
@@ -73,6 +76,7 @@ public class DownloadMergedPeptidesSkylineShulman extends Action {
 					  throws Exception {
 		
 		try {
+
 			// our form
 			MergedSearchViewPeptidesForm form = (MergedSearchViewPeptidesForm)actionForm;
 			request.setAttribute( "mergedSearchViewCrosslinkPeptideForm", form );
@@ -149,8 +153,176 @@ public class DownloadMergedPeptidesSkylineShulman extends Action {
 			});
 			Collections.sort( searchIds );
 			
-			OutputStreamWriter writer = null;
+			
+			//  If change to open in new tab, 
+			//  move following to just before write out main data and show error page where write error msg to response.
+			
+			//  Set Response Parameters
 			try {
+					// generate file name
+				String filename = "proxl-peptides-skyline-shulman-";
+				filename += StringUtils.join( searchIds, '-' );
+				DateTime dt = new DateTime();
+				DateTimeFormatter fmt = DateTimeFormat.forPattern( "yyyy-MM-dd");
+				filename += "-" + fmt.print( dt );
+				filename += ".txt";
+				response.setContentType("application/x-download");
+				response.setHeader("Content-Disposition", "attachment; filename=" + filename);
+				
+			} catch ( Exception e ) {
+				String msg = "Failed to create response parameters or set response parameters";
+				log.error( msg );
+				throw e;
+			}
+			
+			//  Crosslinker Chemical Formula - Only a Single value across all searches all linkers if this is set to a string.
+			String onlyOneCrosslinkerChemicalFormula_AllSearches_String = null;
+
+			//  Get and Cache ILinkers_Main_ForSingleSearch per search id
+			Map<Integer, ILinkers_Main_ForSingleSearch> iLinkers_Main_ForSingleSearch_KeySearchId = new HashMap<>();
+			
+			//  Get/Compute and Cache Crosslinker Chemical Formula for search ids where only one crosslinker formula for that search id
+			Map<Integer, String> onlyOneCrosslinkerChemicalFormulaString_ForSingleSearch_KeySearchId = new HashMap<>();
+			
+			Map<Integer, SearchLinkerAndLinkerAbbreviationForLinkerMass_SingleSearch_Util> searchLinkerAndLinkerAbbreviationForLinkerMass_SingleSearch_Util_KeySearchId = new HashMap<>();
+
+			{
+				boolean foundCrosslinkerChemicalFormulasForAllSearchesAllLinkers = true;
+	
+				//  Get Linker Data, including CrosslinkerFormula
+				try {
+					boolean singleCrosslinkerFormulaAcrossAllSearches = true;
+					String firstCrosslinkerFormula_AllSearches_String = null;
+					{
+						ILinker_Main_Objects_ForSearchId_Cached iLinker_Main_Objects_ForSearchId_Cached = ILinker_Main_Objects_ForSearchId_Cached.getInstance(); 
+						for( Integer searchId : searchIds ) {
+	
+							{
+								SearchLinkerAndLinkerAbbreviationForLinkerMass_SingleSearch_Util searchLinkerAndLinkerAbbreviationForLinkerMass_SingleSearch_Util = 
+										SearchLinkerAndLinkerAbbreviationForLinkerMass_SingleSearch_Util.getInstanceForSearchId( searchId );
+								searchLinkerAndLinkerAbbreviationForLinkerMass_SingleSearch_Util_KeySearchId.put( searchId, searchLinkerAndLinkerAbbreviationForLinkerMass_SingleSearch_Util );
+							}
+							
+							ILinker_Main_Objects_ForSearchId_Cached_Response iLinker_Main_Objects_ForSearchId_Cached_Response =
+									iLinker_Main_Objects_ForSearchId_Cached.getSearchLinkers_ForSearchId_Response( searchId );
+							ILinkers_Main_ForSingleSearch iLinkers_Main_ForSingleSearch = iLinker_Main_Objects_ForSearchId_Cached_Response.getiLinkers_Main_ForSingleSearch();
+							iLinkers_Main_ForSingleSearch_KeySearchId.put( searchId, iLinkers_Main_ForSingleSearch );
+							
+							{
+								boolean singleCrosslinkerFormulaAcrossSearch = true;
+								String firstCrosslinkerFormulaString_ForSingleSearch = null;
+								List<ILinker_Main> iLinkers_Main_List = iLinkers_Main_ForSingleSearch.getLinker_MainList();
+								if ( iLinkers_Main_List == null || iLinkers_Main_List.isEmpty() ) {
+									String msg = "iLinkers_Main_List == null || iLinkers_Main_List.isEmpty(), searchId: " + searchId ;
+									log.error( msg );
+									throw new ProxlWebappInternalErrorException(msg);
+								}
+								for ( ILinker_Main iLinker_Main : iLinkers_Main_List ) {
+									Set<String> crosslinkFormulasSet = iLinker_Main.getCrosslinkFormulas();
+									
+									if ( crosslinkFormulasSet == null || crosslinkFormulasSet.isEmpty() ) {
+										//  No Crosslinker Chemical Formulas for this linker
+										//     Set Flag and exit since cannot create this download
+										foundCrosslinkerChemicalFormulasForAllSearchesAllLinkers = false;
+										break;  //  EARLY LOOP EXIT
+									}
+									
+									if ( crosslinkFormulasSet.size() == 1 ) {
+										// Have only 1 chemical formula so process it for at search and across search tracking
+										
+										String singleCrosslinkerChemicalFormulaForLinker = crosslinkFormulasSet.iterator().next();
+										
+										if ( firstCrosslinkerFormulaString_ForSingleSearch == null ) {
+											//  Not saved for search yet so save for search
+											firstCrosslinkerFormulaString_ForSingleSearch = singleCrosslinkerChemicalFormulaForLinker;
+										} else if ( ! firstCrosslinkerFormulaString_ForSingleSearch.equals( singleCrosslinkerChemicalFormulaForLinker ) ) {
+											// Have more than 1 crosslinker formula for search
+											singleCrosslinkerFormulaAcrossSearch = false;
+										}
+									} else {
+										// Have > 1 chemical formula
+										singleCrosslinkerFormulaAcrossSearch = false;
+									}
+								}
+								if ( singleCrosslinkerFormulaAcrossSearch ) {
+									// Have a single crosslinker formula for the search so save it
+									onlyOneCrosslinkerChemicalFormulaString_ForSingleSearch_KeySearchId.put( searchId, firstCrosslinkerFormulaString_ForSingleSearch );
+
+									if ( firstCrosslinkerFormula_AllSearches_String == null ) {
+										//  crosslinker formula all searches not set yet
+										firstCrosslinkerFormula_AllSearches_String = firstCrosslinkerFormulaString_ForSingleSearch;
+									} else if ( ! firstCrosslinkerFormula_AllSearches_String.equals( firstCrosslinkerFormulaString_ForSingleSearch)  ) {
+										// first crosslinker formula all searches not match current crosslinker formula 
+										singleCrosslinkerFormulaAcrossAllSearches = false;
+									}
+								} else {
+									//  Since more than 1 crosslinker formula for this search, there is > 1 across all searches
+									singleCrosslinkerFormulaAcrossAllSearches = false;
+								}
+							}
+							
+							if ( ! foundCrosslinkerChemicalFormulasForAllSearchesAllLinkers ) {
+								//     Exit since cannot create this download.  Check for flag is false next and exit
+								break;  //  EARLY LOOP EXIT
+							}
+						}
+					}
+					
+					if ( singleCrosslinkerFormulaAcrossAllSearches ) {
+						//  Have Single Crosslinker Formula across all searches so copy to top level shared variable
+						onlyOneCrosslinkerChemicalFormula_AllSearches_String = firstCrosslinkerFormula_AllSearches_String;
+					}
+				} catch ( Exception e ) {
+					String msg = "Failed to get Linker data";
+					log.error( msg );
+					throw e;
+				}
+			
+				if ( ! foundCrosslinkerChemicalFormulasForAllSearchesAllLinkers ) {
+					
+					// Found at least one linker with no crosslinker Chemical formula.  Should not have shown this download link.
+					
+					String msg = "Found at least one linker with no crosslinker chemical formula.  Should not have shown this download link.  search ids: " + searchIds;
+					log.error( msg );
+					
+					OutputStreamWriter writer = null;
+					try {
+						ServletOutputStream out = response.getOutputStream();
+						BufferedOutputStream bos = new BufferedOutputStream(out);
+						writer = new OutputStreamWriter( bos , ServletOutputStreamCharacterSetConstant.outputStreamCharacterSet );
+						
+						writer.write( "Unable to create download.  " );
+						writer.write( "\n" );
+						writer.write( "Found at least one linker with no crosslinker chemical formula.  " );
+						writer.write( "\n" );
+						
+					} finally {
+						try {
+							if ( writer != null ) {
+								writer.close();
+							}
+						} catch ( Exception ex ) {
+							log.error( "writer.close():Exception " + ex.toString(), ex );
+						}
+						try {
+							response.flushBuffer();
+						} catch ( Exception ex ) {
+							log.error( "response.flushBuffer():Exception " + ex.toString(), ex );
+						}
+					}
+					
+					///////  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+					
+					//    EXIT Download Struts Action
+					
+					return null;  //  EARLY EXIT
+				}
+			}
+
+			Collection<String> downloadOutputLines = new HashSet<>();
+
+			try {
+				
 				////////     Get Merged Peptides
 				PeptidesMergedCommonPageDownloadResult peptidesMergedCommonPageDownloadResult =
 						PeptidesMergedCommonPageDownload.getInstance()
@@ -169,62 +341,6 @@ public class DownloadMergedPeptidesSkylineShulman extends Action {
 						peptidesMergedCommonPageDownloadResult.searcherCutoffValuesRootLevel;
 
 				
-				String crosslinkerFormulaString = null;
-				
-				// if there is only one possible formula, just use it no matter what
-				
-				{
-					Set<String> linkerAbbreviationsAllSearches = new HashSet<>(); // Accumulate distinct values for all searches
-					
-					Cached_SearchLinker_ForSearchId cached_SearchLinker_ForSearchId = Cached_SearchLinker_ForSearchId.getInstance();
-					
-					for ( Integer searchId : searchIds ) {
-					
-						SearchLinker_ForSearchId_Response searchLinker_ForSearchId_Response =
-								cached_SearchLinker_ForSearchId.getSearchLinkers_ForSearchId_Response( searchId );
-						
-						List<String> linkerAbbreviationsForSearchIdList = searchLinker_ForSearchId_Response.getLinkerAbbreviationsForSearchIdList();
-						if ( linkerAbbreviationsForSearchIdList == null || linkerAbbreviationsForSearchIdList.isEmpty() ) {
-							String msg = "No Linker abbreviations for searchId: " + searchId;
-							log.error( msg );
-							throw new ProxlWebappDataException(msg);
-						}
-						linkerAbbreviationsAllSearches.addAll( linkerAbbreviationsForSearchIdList );  //  Accumulate distinct values for all searches
-					}
-					
-					if( linkerAbbreviationsAllSearches.size() == 1 ) {
-						
-						String linkerAbbr = linkerAbbreviationsAllSearches.iterator().next();
-						
-						ILinker_Builtin_Linker linker = Get_BuiltIn_Linker_From_Abbreviation_Factory.getLinkerForAbbr( linkerAbbr );
-						
-						if ( linker == null ) {
-							//  No ILinker for Linker Abbreviation, is not a supported Linker for extra compute
-							//  Not valid to get here.  The download link should have been hidden
-							String msg = "No ILinker for linker abbreviation: '"
-									+ linkerAbbr
-									+ "'.  Should not get here.  The download link should have been hidden";
-							log.error( msg );
-							throw new ProxlWebappInternalErrorException( msg );
-						}
-						
-						if( linker.getCrosslinkFormulas().size() == 1 ) {
-							
-							crosslinkerFormulaString = linker.getCrosslinkFormula( 0.0 );
-						}
-					}
-				}
-				
-
-
-
-				Collection<String> lines = new HashSet<>();
-				
-				//  Cached Data
-				
-				Map<String, ILinker_Builtin_Linker> linkersCachedKeyLinkerAbbr = new HashMap<>();
-				
-				Map<Integer, SearchLinkerAndLinkerAbbreviationForLinkerMass_SingleSearch_Util> searchLinkerAndLinkerAbbreviationForLinkerMass_SingleSearch_Util_KEY_SearchId = new HashMap<>();
 				Map<Integer, SearcherCutoffValuesSearchLevel> searcherCutoffValuesSearchLevel_KEY_SearchId = new HashMap<>();
 				
 				//  Process Main Reported Peptides for Merged:
@@ -235,34 +351,35 @@ public class DownloadMergedPeptidesSkylineShulman extends Action {
 					if( !link.getLinkType().equals( XLinkUtils.CROSS_TYPE_STRING_UPPERCASE ) ) {
 						continue;
 					}
-										
-					String line = link.getPeptide1().getSequence() + "\t";
-					line += link.getPeptide1Position() + "\t";
-					line += link.getPeptide2().getSequence() + "\t";
-					line += link.getPeptide2Position() + "\t";
 
 					WebMergedProteinPosition pp1 = link.getPeptide1ProteinPositions().get( 0 );
 					WebMergedProteinPosition pp2 = link.getPeptide2ProteinPositions().get( 0 );
-					
-					line += pp1.getProtein().getName() + "(" + pp1.getPosition1() + ")";
-					line += "--";
-					line += pp2.getProtein().getName() + "(" + pp2.getPosition1() + ")";
-					
-					line += ":";
-					
-					line += link.getPeptide1().getSequence() + "--" + link.getPeptide2().getSequence() + "\t";
-					
+
+					String line = link.getPeptide1().getSequence() + "\t"
+							+ link.getPeptide1Position() + "\t"
+							+ link.getPeptide2().getSequence() + "\t"
+							+ link.getPeptide2Position() + "\t"
+
+							+ pp1.getProtein().getName() + "(" + pp1.getPosition1() + ")"
+							+ "--"
+							+ pp2.getProtein().getName() + "(" + pp2.getPosition1() + ")"
+
+							+ ":"
+
+							+ link.getPeptide1().getSequence() + "--" + link.getPeptide2().getSequence() + "\t";
+
+
 					// if there is only one possible formula, just use it no matter what
 					
-					if ( crosslinkerFormulaString != null ) {
+					if ( onlyOneCrosslinkerChemicalFormula_AllSearches_String != null ) {
 
-						lines.add( line + crosslinkerFormulaString );
+						downloadOutputLines.add( line + onlyOneCrosslinkerChemicalFormula_AllSearches_String );
 						
 						// go to next reported peptide
 						
 						continue;  //  EARLY CONTINUE
 					}
-					
+
 					
 					// iterate over PSMs for this reported peptide, get linker masses to find linker formula
 					int unifiedReportedPeptideId = link.getUnifiedReportedPeptideId();
@@ -270,15 +387,19 @@ public class DownloadMergedPeptidesSkylineShulman extends Action {
 					for ( SearchDTO search : searches ) {
 						int eachProjectSearchIdToProcess = search.getProjectSearchId();
 						Integer eachSearchIdToProcess = search.getSearchId();
-						
-						//  Linkers for Search
-						
-						//  Get from Cache, if not found, create
-						SearchLinkerAndLinkerAbbreviationForLinkerMass_SingleSearch_Util searchLinkerAndLinkerAbbreviationForLinkerMass_SingleSearch_Util =
-								searchLinkerAndLinkerAbbreviationForLinkerMass_SingleSearch_Util_KEY_SearchId.get(  eachSearchIdToProcess );
-						if ( searchLinkerAndLinkerAbbreviationForLinkerMass_SingleSearch_Util == null ) { 
-							searchLinkerAndLinkerAbbreviationForLinkerMass_SingleSearch_Util = SearchLinkerAndLinkerAbbreviationForLinkerMass_SingleSearch_Util.getInstanceForSearchId( eachSearchIdToProcess );
-							searchLinkerAndLinkerAbbreviationForLinkerMass_SingleSearch_Util_KEY_SearchId.put(  eachSearchIdToProcess, searchLinkerAndLinkerAbbreviationForLinkerMass_SingleSearch_Util );
+
+						{
+							String formulaForSearch = onlyOneCrosslinkerChemicalFormulaString_ForSingleSearch_KeySearchId.get( eachSearchIdToProcess );
+							if ( formulaForSearch != null ) {
+								
+								//  Have a single formula for search so use it
+
+								downloadOutputLines.add( line + formulaForSearch );
+							
+								//  Go to Next Search
+
+								continue;  //  EARLY CONTINUE
+							}
 						}
 						
 						//  Searcher cutoffs for getting Reported Peptides and PSMs
@@ -301,6 +422,10 @@ public class DownloadMergedPeptidesSkylineShulman extends Action {
 						
 						//  Process each search id, reported peptide id pair
 						for ( int reportedPeptideId : reportedPeptideIdList ) {
+
+							//  Only need to process a linker mass once
+							Set<BigDecimal> processedLinkerMasses = new HashSet<>();
+							
 							
 							//  Process Each search id/reported peptide id for the link
 							
@@ -315,15 +440,62 @@ public class DownloadMergedPeptidesSkylineShulman extends Action {
 
 							if ( psms.isEmpty() ) {
 								//  No PSMs after filter so skip this reported peptide
+								
+								String msg = "Should not get no PSMs after filtering. Peptide Query is incorrect then. searchId: " 
+										+ eachSearchIdToProcess
+										+ ", reportedPeptideId: " + reportedPeptideId;
+								log.warn( msg );
+								
 								continue;  //  EARLY CONINUE
 							}
 
+							//  Get Crosslinker Chemical Formula based on PSM Linker Mass and Search Id
+
 							for ( PsmWebDisplayWebServiceResult psm : psms ) {
-																
+									
 								PsmDTO psmDTO = psm.getPsmDTO();
 								BigDecimal psmLinkerMass = psmDTO.getLinkerMass();
 								
-								String linkerAbbr = searchLinkerAndLinkerAbbreviationForLinkerMass_SingleSearch_Util.getLinkerAbbreviationForLinkerMass( psmLinkerMass );
+								if ( ! processedLinkerMasses.add( psmLinkerMass ) ) {
+									//  Already processed this linker mass so continue to next PSM
+									
+									continue;  //  EARLY CONINUE
+								}
+								
+
+								SearchLinkerAndLinkerAbbreviationForLinkerMass_SingleSearch_Util searchLinkerAndLinkerAbbreviationForLinkerMass_SingleSearch_Util = 
+										searchLinkerAndLinkerAbbreviationForLinkerMass_SingleSearch_Util_KeySearchId.get( eachSearchIdToProcess );
+								if ( searchLinkerAndLinkerAbbreviationForLinkerMass_SingleSearch_Util == null ) {
+									final String msg = "searchLinkerAndLinkerAbbreviationForLinkerMass_SingleSearch_Util == null: get from map. eachSearchIdToProcess: " + eachSearchIdToProcess;
+									log.error( msg );
+									throw new ProxlWebappInternalErrorException(msg);
+								}
+								
+								//  Get Linker info for psmLinkerMass
+								SearchLinkerAndLinkerAbbreviationForLinkerMass_SingleSearch_Util_Response searchLinkerAndLinkerAbbreviationForLinkerMass_SingleSearch_Util_Response =
+										searchLinkerAndLinkerAbbreviationForLinkerMass_SingleSearch_Util
+										.get_SearchLinkerDTO_LinkerPerSearchCrosslinkMassDTO_ForLinkerMass( psmLinkerMass );
+								
+								if ( searchLinkerAndLinkerAbbreviationForLinkerMass_SingleSearch_Util_Response == null ) {
+									String msg = "No Linker Crosslink Mass record for psm id: " 
+											+ psmDTO.getId() 
+											+ ", search id: " + eachSearchIdToProcess
+											+ ", project search id: " + eachProjectSearchIdToProcess;
+									log.error( msg );
+									throw new ProxlWebappDataException( msg );
+								}
+								String crosslinkerChemicalFormulaFromDB = searchLinkerAndLinkerAbbreviationForLinkerMass_SingleSearch_Util_Response.getLinkerPerSearchCrosslinkMassDTO().getChemicalFormula();
+								
+								if ( crosslinkerChemicalFormulaFromDB != null ) {
+									// Use Crosslinker Chemical Formula From DB
+									downloadOutputLines.add( line + crosslinkerChemicalFormulaFromDB );
+									
+									continue;  //  EARLY CONINUE
+								}
+								
+								//  Try to get Crosslinker Chemical Formula From Built in crosslinker 
+								
+								String linkerAbbr = searchLinkerAndLinkerAbbreviationForLinkerMass_SingleSearch_Util_Response.getSearchLinkerDTO().getLinkerAbbr();
 								
 								if ( linkerAbbr == null ) {
 									String msg = "No Linker abbreviation for psm id: " 
@@ -334,46 +506,44 @@ public class DownloadMergedPeptidesSkylineShulman extends Action {
 									throw new ProxlWebappDataException( msg );
 								}
 								
-								ILinker_Builtin_Linker linker = linkersCachedKeyLinkerAbbr.get( linkerAbbr );
-										
+								ILinker_Builtin_Linker linker = Get_BuiltIn_Linker_From_Abbreviation_Factory.getLinkerForAbbr( linkerAbbr );
 								if ( linker == null ) {
-									linker = Get_BuiltIn_Linker_From_Abbreviation_Factory.getLinkerForAbbr( linkerAbbr );
-									if ( linker == null ) {
-										//  No ILinker for Linker Abbreviation, is not a supported Linker for extra compute
-										//  Not valid to get here.  The download link should have been hidden
-										String msg = "No ILinker for linker abbreviation: '"
-												+ linkerAbbr
-												+ "'.  Should not get here.  The download link should have been hidden";
-										log.error( msg );
-										throw new ProxlWebappInternalErrorException( msg );
-									}
+									//  No ILinker for Linker Abbreviation, is not a supported Linker for extra compute
+									//  Not valid to get here.  The download link should have been hidden
+									String msg = "No ILinker_Builtin_Linker for linker abbreviation: '"
+											+ linkerAbbr
+											+ "'.  Should not get here.  The download link should have been hidden";
+									log.error( msg );
+									throw new ProxlWebappInternalErrorException( msg );
 								}
 								
 								String formula = linker.getCrosslinkFormula( psmLinkerMass.doubleValue() );
 
-								lines.add( line + formula );
+								downloadOutputLines.add( line + formula );
 								
 							}
 						}
 					}
 				}  //  end iterating over reported peptides
 				
+			} catch ( Exception e ) {
+				String msg = "Exception:  RemoteAddr: " + request.getRemoteAddr()  
+						+ ", Exception caught: " + e.toString();
+				log.error( msg, e );
+				throw e;
+			}
+
+			OutputStreamWriter writer = null;
+			try {
+
 				
-				// generate file name
-				String filename = "proxl-peptides-skyline-shulman-";
-				filename += StringUtils.join( searchIds, '-' );
-				DateTime dt = new DateTime();
-				DateTimeFormatter fmt = DateTimeFormat.forPattern( "yyyy-MM-dd");
-				filename += "-" + fmt.print( dt );
-				filename += ".txt";
-				response.setContentType("application/x-download");
-				response.setHeader("Content-Disposition", "attachment; filename=" + filename);
 				ServletOutputStream out = response.getOutputStream();
 				BufferedOutputStream bos = new BufferedOutputStream(out);
 				writer = new OutputStreamWriter( bos , ServletOutputStreamCharacterSetConstant.outputStreamCharacterSet );
 				
-				for( String line : lines ) {
-					writer.write( line + "\n" );
+				for( String line : downloadOutputLines ) {
+					writer.write( line );
+					writer.write( "\n" ); 
 				}
 				
 				

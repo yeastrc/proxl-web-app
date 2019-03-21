@@ -1,57 +1,74 @@
 package org.yeastrc.xlink.www.linkable_positions;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.yeastrc.xlink.linker_data_processing_base.linkers_builtin_root.Get_BuiltIn_Linker_From_Abbreviation_Factory;
-import org.yeastrc.xlink.linker_data_processing_base.linkers_builtin_root.linkers_builtin.ILinker_Builtin_Linker;
+import org.apache.log4j.Logger;
+import org.yeastrc.xlink.linker_data_processing_base.ILinker_Main;
+import org.yeastrc.xlink.linker_data_processing_base.ILinkers_Main_ForSingleSearch;
+import org.yeastrc.xlink.www.exceptions.ProxlWebappInternalErrorException;
+import org.yeastrc.xlink.www.linkable_positions.ILinker_Main_Objects_ForSearchId_Cached.ILinker_Main_Objects_ForSearchId_Cached_Response;
 
+/**
+ * 
+ *
+ */
 public class GetLinkablePositionsForLinkers {
 
-
+	private static final Logger log = Logger.getLogger( GetLinkablePositionsForLinkers.class );
+	
 	/**
 	 * @param proteinSequence
-	 * @param linkerAbbrSet
+	 * @param searchId
 	 * @return
 	 * @throws Exception
 	 */
-	public static Set<Integer> getLinkablePositionsForProteinSequenceAndLinkerAbbrSet( String proteinSequence, Set<String> linkerAbbrSet ) throws Exception {
+	public static Set<Integer> getLinkablePositionsForProteinSequenceAndSearchId( String proteinSequence, int searchId ) throws Exception {
 
-		if ( linkerAbbrSet == null || linkerAbbrSet.isEmpty() ) {
-			throw new IllegalArgumentException( "linkerAbbrSet == null || linkerAbbrSet.isEmpty()" );
+		ILinker_Main_Objects_ForSearchId_Cached_Response iLinker_Main_Objects_ForSearchId_Cached_Response =
+				ILinker_Main_Objects_ForSearchId_Cached.getInstance().getSearchLinkers_ForSearchId_Response( searchId );
+		
+		ILinkers_Main_ForSingleSearch iLinkers_Main_ForSingleSearch =
+				iLinker_Main_Objects_ForSearchId_Cached_Response.getiLinkers_Main_ForSingleSearch();
+		
+		return getLinkablePositionsForProteinSequenceAndSearchIdAndILinkers_Main_ForSingleSearch( proteinSequence , searchId, iLinkers_Main_ForSingleSearch );
+	}
+	
+	/**
+	 * @param proteinSequence
+	 * @param searchId
+	 * @param iLinkers_Main_ForSingleSearch
+	 * @return
+	 * @throws Exception
+	 */
+	public static Set<Integer> getLinkablePositionsForProteinSequenceAndSearchIdAndILinkers_Main_ForSingleSearch( 
+			String proteinSequence, int searchId, ILinkers_Main_ForSingleSearch iLinkers_Main_ForSingleSearch ) throws Exception {
+
+		if ( ! iLinkers_Main_ForSingleSearch.isAllLinkersHave_LinkablePositions() ) {
+			// Not all linkers have linkable positions so return empty set
+			return new HashSet<>(); // EARLY EXIT
 		}
 		
-		Set<Integer> linkablePositions = new HashSet<>();
-
-		List<ILinker_Builtin_Linker> linkerObjects = new ArrayList<>( linkerAbbrSet.size() );
-		for( String linkerAbbr : linkerAbbrSet ) {
-			
-			ILinker_Builtin_Linker linker = Get_BuiltIn_Linker_From_Abbreviation_Factory.getLinkerForAbbr( linkerAbbr );
-			
-			//  linker == null is now a valid response that needs to be handled.
-			
-			if( linker == null ) {
-
-				//  No ILinker linker for linkerAbbr so no Linkable positions will be computed
-				
-				return linkablePositions;  //  EARLY RETURN
-				
-//				throw new Exception( "Invalid linker: " + linkerAbbr );
-			}
-			
-			if ( linker != null ) {
-				linkerObjects.add( linker );
-			}
-		}
+		List<ILinker_Main> linker_MainList = iLinkers_Main_ForSingleSearch.getLinker_MainList();
 		
-		for ( ILinker_Builtin_Linker linkerObject : linkerObjects ) {
+		if ( linker_MainList == null || linker_MainList.isEmpty() ) {
+			String msg = "linker_MainList == null || linker_MainList.isEmpty().  Should not get here. searchId: " + searchId;
+			log.error(msg);
+			throw new ProxlWebappInternalErrorException(msg);
+		}
+
+		Set<Integer> linkablePositions = null;
+		
+		for( ILinker_Main linker_Main : linker_MainList ) {
 			
-			Collection<Integer> linkablePositionsForLinker = linkerObject.getLinkablePositions( proteinSequence );
+			Set<Integer> linkablePositionsLocal = linker_Main.getLinkablePositions( proteinSequence );
 			
-			linkablePositions.addAll( linkablePositionsForLinker );
+			if ( linkablePositions == null ) {
+				linkablePositions = linkablePositionsLocal;
+			} else {
+				linkablePositions.addAll( linkablePositionsLocal );
+			}
 		}
 
 		return linkablePositions;

@@ -111,7 +111,7 @@ public class ViewMergedSearchCoverageReportAction extends Action {
 				for ( int projectSearchId : projectSearchIds ) {
 					msg += projectSearchId + ", ";
 				}
-				log.error( msg );
+				log.warn( msg );
 				return mapping.findForward( StrutsGlobalForwardNames.INVALID_REQUEST_DATA );
 			}
 			if ( projectIdsFromSearchIds.size() > 1 ) {

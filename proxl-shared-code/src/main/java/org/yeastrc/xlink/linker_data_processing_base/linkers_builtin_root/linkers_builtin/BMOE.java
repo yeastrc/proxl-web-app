@@ -1,7 +1,7 @@
 package org.yeastrc.xlink.linker_data_processing_base.linkers_builtin_root.linkers_builtin;
 
-import java.util.Collection;
 import java.util.HashSet;
+import java.util.Set;
 
 import org.yeastrc.xlink.utils.ProteinSequenceUtils;
 
@@ -27,9 +27,9 @@ public class BMOE implements ILinker_Builtin_Linker {
 	 * @throws Exception
 	 */
 	@Override
-	public Collection<Integer> getLinkablePositions(String proteinSequence) throws Exception {
+	public Set<Integer> getLinkablePositions(String proteinSequence) throws Exception {
 		
-		Collection<Integer> linkablePositions = ProteinSequenceUtils.getPositionsOfResidueForProteinSequence( proteinSequence, "C" );
+		Set<Integer> linkablePositions = ProteinSequenceUtils.getPositionsOfResidueForProteinSequence( proteinSequence, "C" );
 				
 		return linkablePositions;		
 	}
@@ -47,7 +47,7 @@ public class BMOE implements ILinker_Builtin_Linker {
 	 * @throws Exception
 	 */
 	@Override
-	public Collection<Integer> getLinkablePositions( String querySequence, String subjectSequence, int subjectPosition ) throws Exception {
+	public Set<Integer> getLinkablePositions( String querySequence, String subjectSequence, int subjectPosition ) throws Exception {
 
 		if( !subjectSequence.substring( subjectPosition - 1, subjectPosition ).equals( "C" ) )
 			return new HashSet<Integer>();
@@ -66,9 +66,9 @@ public class BMOE implements ILinker_Builtin_Linker {
 	}
 
 	@Override
-	public Collection<String> getCrosslinkFormulas() {
+	public Set<String> getCrosslinkFormulas() {
 		
-		Collection<String> formulas = new HashSet<>();
+		Set<String> formulas = new HashSet<>();
 		formulas.add( "C10H8N2O4" );
 		formulas.add( "C10H10N2O5" );
 		formulas.add( "C10H12N2O6" );

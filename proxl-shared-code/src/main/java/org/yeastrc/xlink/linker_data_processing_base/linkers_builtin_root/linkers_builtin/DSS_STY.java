@@ -1,7 +1,7 @@
 package org.yeastrc.xlink.linker_data_processing_base.linkers_builtin_root.linkers_builtin;
 
-import java.util.Collection;
 import java.util.HashSet;
+import java.util.Set;
 
 public class DSS_STY extends AmineLinkerSTY {
 
@@ -16,9 +16,9 @@ public class DSS_STY extends AmineLinkerSTY {
 	}
 	
 	@Override
-	public Collection<String> getCrosslinkFormulas() {
+	public Set<String> getCrosslinkFormulas() {
 		
-		Collection<String> formulas = new HashSet<>();
+		Set<String> formulas = new HashSet<>();
 		formulas.add( "C8H10O2" );
 		
 		return formulas;

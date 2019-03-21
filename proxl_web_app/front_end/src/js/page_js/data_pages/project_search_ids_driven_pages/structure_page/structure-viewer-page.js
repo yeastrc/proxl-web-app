@@ -334,23 +334,6 @@ var StructurePagePrimaryRootCodeClass = function() {
 		return _STRUCTURE;
 	}
 
-	this_OfOutermostObjectOfClass.getVariable__v_ = function() {
-		return XXXXXX;
-	}
-
-	this_OfOutermostObjectOfClass.getVariable__v_ = function() {
-		return XXXXXX;
-	}
-
-	this_OfOutermostObjectOfClass.getVariable__v_ = function() {
-		return XXXXXX;
-	}
-
-	this_OfOutermostObjectOfClass.getVariable__v_ = function() {
-		return XXXXXX;
-	}
-
-
 	////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////
 
@@ -3246,7 +3229,7 @@ var StructurePagePrimaryRootCodeClass = function() {
 		var url = "services/linkablePositions/getLinkablePositionsBetweenProteins";
 		
 		var requestData = {
-			linkers : getLinkerStringsAsArray(),
+			projectSearchIds : _projectSearchIds,
 			proteins : proteins
 		};
 		

@@ -82,7 +82,7 @@ public class QCPlotPsmCountsVsScoreService {
 			if ( projectIdsFromSearchIds.isEmpty() ) {
 				// should never happen
 				String msg = "No project ids for projectSearchId: " + projectSearchId;
-				log.error( msg );
+				log.warn( msg );
 				throw new WebApplicationException(
 						Response.status( WebServiceErrorMessageConstants.INVALID_SEARCH_LIST_NOT_IN_DB_STATUS_CODE )  //  Send HTTP code
 						.entity( WebServiceErrorMessageConstants.INVALID_SEARCH_LIST_NOT_IN_DB_TEXT ) // This string will be passed to the client

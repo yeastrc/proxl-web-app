@@ -16,7 +16,7 @@ import org.yeastrc.proxl.import_xml_to_db.dto.SearchReportedPeptideDynamicModLoo
 import org.yeastrc.proxl.import_xml_to_db.dto.SrchRepPeptProtSeqIdPosMonolinkDTO;
 import org.yeastrc.proxl.import_xml_to_db.dto.SrchRepPeptProtSeqIdPosUnlinkedDTO;
 import org.yeastrc.xlink.dto.SrchRepPeptPeptDynamicModDTO;
-import org.yeastrc.xlink.linker_data_processing_base.linkers_builtin_root.linkers_builtin.ILinker_Builtin_Linker;
+import org.yeastrc.xlink.linker_data_processing_base.ILinkers_Main_ForSingleSearch;
 import org.yeastrc.proxl.import_xml_to_db.dto.SrchRepPeptPeptideDTO;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterDataException;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterInteralException;
@@ -74,15 +74,13 @@ public class ProcessLinkTypeUnlinkedAsDefinedByProxl {
 	 * The PeptideDTO is saved to the DB in this step since used for Protein Mappings
 	 * 
 	 * @param reportedPeptide
-	 * @param linkerList - EMPTY if linker abbr in input is not in listed linkers
-	 * @param linkerListStringForErrorMsgs
+	 * @param linkers_Main_ForSingleSearch
 	 * @return
 	 * @throws Exception
 	 */
 	public GetUnlinkedProteinMappingsResult getUnlinkedroteinMappings( 
 			ReportedPeptide reportedPeptide, 
-			List<ILinker_Builtin_Linker> linkerList,
-			String linkerListStringForErrorMsgs
+			ILinkers_Main_ForSingleSearch linkers_Main_ForSingleSearch
 			) throws Exception {
 		
 		GetUnlinkedProteinMappingsResult getUnlinkedMappingsResult = new GetUnlinkedProteinMappingsResult();
@@ -120,7 +118,7 @@ public class ProcessLinkTypeUnlinkedAsDefinedByProxl {
 				.get_Unlinked_Dimer_PeptidePositionsInProteins( 
 						peptideDTO.getSequence(), 
 						peptideMonolinkPositions, 
-						linkerList, 
+						linkers_Main_ForSingleSearch, 
 						proteinMatches_Peptide,
 						reportedPeptide // For error reporting only
 						);
@@ -129,13 +127,10 @@ public class ProcessLinkTypeUnlinkedAsDefinedByProxl {
 			
 			String msg = null;
 			
-			if ( peptideMonolinkPositions != null && ( ! peptideMonolinkPositions.isEmpty() && ( ! linkerList.isEmpty()  ) ) ) {
+			if ( peptideMonolinkPositions != null && ( ! peptideMonolinkPositions.isEmpty() 
+					&& ( linkers_Main_ForSingleSearch.isAllLinkersHave_LinkablePositions()  ) ) ) {
 
-				List<String> linkersToStringArray = new ArrayList<>( linkerList.size() );
-				for ( ILinker_Builtin_Linker linkerItem : linkerList ) {
-					linkersToStringArray.add(  linkerItem.toString() );
-				}
-				String linkersToString = StringUtils.join( linkersToStringArray, "," );
+				String linkersToString = linkers_Main_ForSingleSearch.getLinkerAbbreviationsCommaDelim();
 				
 				msg = "Could not import this Proxl XML file. Either no protein in the Proxl XML contained this peptide sequence (" 
 						+ peptide.getSequence()

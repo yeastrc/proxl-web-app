@@ -13,7 +13,8 @@ import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterInteralExcepti
 import org.yeastrc.proxl.import_xml_to_db.objects.ProteinImporterContainer;
 import org.yeastrc.proxl.import_xml_to_db.utils.PeptideProteinSequenceForProteinInference;
 import org.yeastrc.proxl_import.api.xml_dto.ReportedPeptide;
-import org.yeastrc.xlink.linker_data_processing_base.linkers_builtin_root.linkers_builtin.ILinker_Builtin_Linker;
+import org.yeastrc.xlink.linker_data_processing_base.ILinker_Main;
+import org.yeastrc.xlink.linker_data_processing_base.ILinkers_Main_ForSingleSearch;
 
 /**
  * 
@@ -42,7 +43,7 @@ public class GetLinkableProteinsAndPositions {
 	 * @param peptideSequence
 	 * @param peptideCrossLinkPosition
 	 * @param peptideMonolinkPositions
-	 * @param linkerList - EMPTY if linker abbr in input is not in listed linkers
+	 * @param linkers_Main_ForSingleSearch
 	 * @param proteinImporterContainerCollection
 	 * @param reportedPeptide
 	 * @return
@@ -52,7 +53,7 @@ public class GetLinkableProteinsAndPositions {
 			String peptideSequence, 
 			int peptideCrossLinkPosition, 
 			Set<Integer> peptideMonolinkPositions,
-			List<ILinker_Builtin_Linker> linkerList, 
+			ILinkers_Main_ForSingleSearch linkers_Main_ForSingleSearch, 
 			Collection<ProteinImporterContainer> proteinImporterContainerCollection,
 			ReportedPeptide reportedPeptide // For error reporting only
 			) throws Exception {
@@ -77,17 +78,19 @@ public class GetLinkableProteinsAndPositions {
 			//  Get linkable positions for all the linkers
 			Collection<Integer> proteinLinkablePositionsCollection = new HashSet<Integer>();
 			
-			// linkerList: EMPTY if linker abbr in input is not in listed linkers
-			for ( ILinker_Builtin_Linker linker : linkerList ) {
-				Collection<Integer> proteinLinkablePositionsCollectionForLinker = linker.getLinkablePositions( proteinSequence );
-				proteinLinkablePositionsCollection.addAll( proteinLinkablePositionsCollectionForLinker );
+			if ( linkers_Main_ForSingleSearch.isAllLinkersHave_LinkablePositions() ) {
+				//  All Linkers have linkable positions so get the linkable positions
+				for ( ILinker_Main linker : linkers_Main_ForSingleSearch.getLinker_MainList() ) {
+					Collection<Integer> proteinLinkablePositionsCollectionForLinker = linker.getLinkablePositions( proteinSequence );
+					proteinLinkablePositionsCollection.addAll( proteinLinkablePositionsCollectionForLinker );
+				}
 			}
 			List<Integer> proteinPositionList = null;
 			for( Integer proteinCrosslinkedPosition : proteinCrosslinkedPositions ) {
 				boolean crosslinkAndMonolinksPositionsFoundInLinkablePositions = true; 
 				
-				if ( ! linkerList.isEmpty() ) {
-					//  ONLY Check if crosslink and monolink protein position is a linkable position SINCE Linkers provided (linker abbr in input is in listed linkers)
+				if ( linkers_Main_ForSingleSearch.isAllLinkersHave_LinkablePositions() ) {
+					//  All Linkers have linkable positions check if crosslink and monolink protein position is linkable
 
 					if( ! ( proteinLinkablePositionsCollection.contains( proteinCrosslinkedPosition ) ) ) {
 						crosslinkAndMonolinksPositionsFoundInLinkablePositions = false;
@@ -164,7 +167,7 @@ public class GetLinkableProteinsAndPositions {
 	 * @param peptideLooplinkPosition_1
 	 * @param peptideLooplinkPosition_2
 	 * @param peptideMonolinkPositions
-	 * @param linkerList - EMPTY if linker abbr in input is not in listed linkers
+	 * @param linkers_Main_ForSingleSearch
 	 * @param proteinImporterContainerCollection
 	 * @param reportedPeptide
 	 * @return
@@ -175,7 +178,7 @@ public class GetLinkableProteinsAndPositions {
 			int peptideLooplinkPosition_1, 
 			int peptideLooplinkPosition_2, 
 			Set<Integer> peptideMonolinkPositions,
-			List<ILinker_Builtin_Linker> linkerList, 
+			ILinkers_Main_ForSingleSearch linkers_Main_ForSingleSearch, 
 			Collection<ProteinImporterContainer> proteinImporterContainerCollection,
 			ReportedPeptide reportedPeptide // For error reporting only
 			) throws Exception {
@@ -204,10 +207,12 @@ public class GetLinkableProteinsAndPositions {
 			//  Get linkable positions for all the linkers
 			Collection<Integer> proteinLinkablePositionsCollection = new HashSet<Integer>();
 			
-			// linkerList: EMPTY if linker abbr in input is not in listed linkers
-			for ( ILinker_Builtin_Linker linker : linkerList ) {
-				Collection<Integer> linkablePositionsCollectionForLinker = linker.getLinkablePositions( proteinSequence );
-				proteinLinkablePositionsCollection.addAll( linkablePositionsCollectionForLinker );
+			if ( linkers_Main_ForSingleSearch.isAllLinkersHave_LinkablePositions() ) {
+				//  All Linkers have linkable positions so get the linkable positions
+				for ( ILinker_Main linker : linkers_Main_ForSingleSearch.getLinker_MainList() ) {
+					Collection<Integer> proteinLinkablePositionsCollectionForLinker = linker.getLinkablePositions( proteinSequence );
+					proteinLinkablePositionsCollection.addAll( proteinLinkablePositionsCollectionForLinker );
+				}
 			}
 			List<List<Integer>> proteinPosition_1_2_List = null;
 			for( List<Integer> linkedPositions_1_2 : proteinPositions ) {
@@ -215,8 +220,8 @@ public class GetLinkableProteinsAndPositions {
 				int looplinkProteinPosition_1 = linkedPositions_1_2.get( 0 );
 				int looplinkProteinPosition_2 = linkedPositions_1_2.get( 1 );
 
-				if ( ! linkerList.isEmpty() ) {
-					//  ONLY Check if looplink and monolink protein position is a linkable position SINCE Linkers provided (linker abbr in input is in listed linkers)
+				if ( linkers_Main_ForSingleSearch.isAllLinkersHave_LinkablePositions() ) {
+					//  All Linkers have linkable positions check if looplink and monolink protein position is linkable
 
 					if( ! ( proteinLinkablePositionsCollection.contains( looplinkProteinPosition_1 )
 							&& proteinLinkablePositionsCollection.contains( looplinkProteinPosition_2 ) ) ) {
@@ -290,7 +295,7 @@ public class GetLinkableProteinsAndPositions {
 	 * 
 	 * @param peptideSequence
 	 * @param peptideMonolinkPositions
-	 * @param linkerList - EMPTY if linker abbr in input is not in listed linkers
+	 * @param linkers_Main_ForSingleSearch
 	 * @param proteinImporterContainerCollection
 	 * @param reportedPeptide
 	 * @return
@@ -299,7 +304,7 @@ public class GetLinkableProteinsAndPositions {
 	public Map<ProteinImporterContainer, Collection<Integer>> get_Unlinked_Dimer_PeptidePositionsInProteins(
 			String peptideSequence, 
 			Set<Integer> peptideMonolinkPositions,
-			List<ILinker_Builtin_Linker> linkerList, 
+			ILinkers_Main_ForSingleSearch linkers_Main_ForSingleSearch, 
 			Collection<ProteinImporterContainer> proteinImporterContainerCollection,
 			ReportedPeptide reportedPeptide // For error reporting only
 			) throws Exception {
@@ -318,10 +323,12 @@ public class GetLinkableProteinsAndPositions {
 			//  Get linkable positions for all the linkers
 			Collection<Integer> proteinLinkablePositionsCollection = new HashSet<Integer>();
 			
-			// linkerList: EMPTY if linker abbr in input is not in listed linkers
-			for ( ILinker_Builtin_Linker linker : linkerList ) {
-				Collection<Integer> linkablePositionsCollectionForLinker = linker.getLinkablePositions( proteinSequence );
-				proteinLinkablePositionsCollection.addAll( linkablePositionsCollectionForLinker );
+			if ( linkers_Main_ForSingleSearch.isAllLinkersHave_LinkablePositions() ) {
+				//  All Linkers have linkable positions so get the linkable positions
+				for ( ILinker_Main linker : linkers_Main_ForSingleSearch.getLinker_MainList() ) {
+					Collection<Integer> proteinLinkablePositionsCollectionForLinker = linker.getLinkablePositions( proteinSequence );
+					proteinLinkablePositionsCollection.addAll( proteinLinkablePositionsCollectionForLinker );
+				}
 			}
 			List<Integer> peptidePositionInProteinList = null;
 			int fromIndex = 0;
@@ -331,8 +338,8 @@ public class GetLinkableProteinsAndPositions {
 //				int proteinEndPosition = proteinStartPosition + peptideSequence.length() - 1;
 				boolean monolinksFoundInLinkablePositions = true;
 
-				if ( ! linkerList.isEmpty() ) {
-					//  ONLY Check if monolink protein position is a linkable position SINCE Linkers provided (linker abbr in input is in listed linkers)
+				if ( linkers_Main_ForSingleSearch.isAllLinkersHave_LinkablePositions() ) {
+					//  All Linkers have linkable positions check if monolink protein position is linkable
 
 					if ( peptideMonolinkPositions != null && ( ! peptideMonolinkPositions.isEmpty() ) ) {
 

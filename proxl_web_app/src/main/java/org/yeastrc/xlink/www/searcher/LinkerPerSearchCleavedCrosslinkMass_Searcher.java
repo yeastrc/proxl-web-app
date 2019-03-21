@@ -18,7 +18,7 @@ public class LinkerPerSearchCleavedCrosslinkMass_Searcher {
 	public static LinkerPerSearchCleavedCrosslinkMass_Searcher getInstance() { return _INSTANCE; }
 	
 	/**
-	 * Get records in linker_per_search_cleaved_crosslink_mass for search id
+	 * Get records in linker_per_search_cleaved_crosslink_mass_tbl for search id
 	 * 
 	 * @param searchId
 	 * @return List<LinkerPerSearchCleavedCrosslinkMassDTO>

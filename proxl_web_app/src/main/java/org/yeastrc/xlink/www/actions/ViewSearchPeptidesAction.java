@@ -102,7 +102,7 @@ public class ViewSearchPeptidesAction extends Action {
 			if ( projectIdsFromSearchIds.isEmpty() ) {
 				// should never happen
 				String msg = "No project ids for projectSearchId: " + projectSearchId;
-				log.error( msg );
+				log.warn( msg );
 				return mapping.findForward( StrutsGlobalForwardNames.INVALID_REQUEST_DATA );
 			}
 			if ( projectIdsFromSearchIds.size() > 1 ) {

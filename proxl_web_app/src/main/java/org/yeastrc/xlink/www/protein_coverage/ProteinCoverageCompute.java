@@ -12,12 +12,16 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.yeastrc.xlink.www.factories.ProteinSequenceVersionObjectFactory;
 import org.yeastrc.xlink.www.linkable_positions.GetLinkablePositionsForLinkers;
+import org.yeastrc.xlink.www.linkable_positions.ILinker_Main_Objects_ForSearchId_Cached;
+import org.yeastrc.xlink.www.linkable_positions.ILinker_Main_Objects_ForSearchId_Cached.ILinker_Main_Objects_ForSearchId_Cached_Response;
 import org.yeastrc.xlink.www.objects.ProteinSequenceVersionObject;
 import org.yeastrc.xlink.www.constants.MinimumPSMsConstants;
 import org.yeastrc.xlink.www.dto.SearchDTO;
+import org.yeastrc.xlink.linker_data_processing_base.ILinkers_Main_ForSingleSearch;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesRootLevel;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
+import org.yeastrc.xlink.www.exceptions.ProxlWebappInternalErrorException;
 import org.yeastrc.xlink.www.linked_positions.CrosslinkLinkedPositions;
 import org.yeastrc.xlink.www.linked_positions.LinkedPositions_FilterExcludeLinksWith_Param;
 import org.yeastrc.xlink.www.linked_positions.MonolinkLinkedPositions;
@@ -37,10 +41,8 @@ import org.yeastrc.xlink.www.objects.SearchProteinMonolink;
 import org.yeastrc.xlink.www.objects.SearchProteinMonolinkWrapper;
 import org.yeastrc.xlink.www.objects.SearchProteinUnlinked;
 import org.yeastrc.xlink.www.objects.SearchProteinUnlinkedWrapper;
-import org.yeastrc.xlink.www.searcher_via_cached_data.cached_data_holders.Cached_SearchLinker_ForSearchId;
 import org.yeastrc.xlink.www.searcher_via_cached_data.cached_data_holders.Cached_TaxonomyIdsFor_ProtSeqVersionId_SearchId;
 import org.yeastrc.xlink.www.searcher_via_cached_data.request_objects_for_searchers_for_cached_data.TaxonomyIdsForProtSeqIdSearchId_Request;
-import org.yeastrc.xlink.www.searcher_via_cached_data.return_objects_from_searchers_for_cached_data.SearchLinker_ForSearchId_Response;
 import org.yeastrc.xlink.www.searcher_via_cached_data.return_objects_from_searchers_for_cached_data.TaxonomyIdsForProtSeqIdSearchId_Result;
 import org.yeastrc.xlink.www.web_utils.ExcludeOnTaxonomyForProteinSequenceVersionIdSearchId;
 
@@ -375,25 +377,7 @@ public class ProteinCoverageCompute {
 			wrappedLooplinksFiltered_MappedOnSearchId = wrappedLooplinks_MappedOnSearchId;
 			wrappedMonolinksFiltered_MappedOnSearchId = wrappedMonolinks_MappedOnSearchId;
 		}
-		//  Get the linker abbreviations for the searches
-		Set<String> linkerAbbrSet = new HashSet<>();
-		{
-			Cached_SearchLinker_ForSearchId cached_Linkers_ForSearchId = Cached_SearchLinker_ForSearchId.getInstance();
-			for ( SearchDTO search : searches ) {
-				int searchId = search.getSearchId();
-				SearchLinker_ForSearchId_Response linkers_ForSearchId_Response =
-						cached_Linkers_ForSearchId.getSearchLinkers_ForSearchId_Response( searchId );
-				List<String>  linkerAbbreviationList = linkers_ForSearchId_Response.getLinkerAbbreviationsForSearchIdList();
-				if ( linkerAbbreviationList == null || linkerAbbreviationList.isEmpty() ) {
-					String msg = "No linkers found for Search Id: " + searchId;
-					log.error( msg );
-					//			throw new Exception(msg);
-				}
-				for ( String linkerAbbreviation : linkerAbbreviationList ) {
-					linkerAbbrSet.add( linkerAbbreviation );
-				}
-			}
-		}
+
 		/////////////////
 		//   Get Sequence coverage for all proteins
 		Map<Integer, ProteinSequenceCoverage> proteinSequenceCoverage_KeyedOnProteinId_Map = new HashMap<>();
@@ -427,6 +411,25 @@ public class ProteinCoverageCompute {
 				proteinSequenceCoverage_KeyedOnProteinId_Map.put( proteinSequenceCoverages_Partial_Entry.getKey(), proteinSequenceCoverages_Partial_Entry.getValue() );
 			}
 		}
+
+		//////////
+		
+		//  Cache ILinkers_Main_ForSingleSearch per search id
+
+		Map<Integer, ILinkers_Main_ForSingleSearch> iLinkers_Main_ForSingleSearch_KeySearchId = new HashMap<>();
+		{
+			ILinker_Main_Objects_ForSearchId_Cached iLinker_Main_Objects_ForSearchId_Cached = ILinker_Main_Objects_ForSearchId_Cached.getInstance(); 
+			for( SearchDTO searchDTO : searches ) {
+				int searchId = searchDTO.getSearchId();
+
+				ILinker_Main_Objects_ForSearchId_Cached_Response iLinker_Main_Objects_ForSearchId_Cached_Response =
+						iLinker_Main_Objects_ForSearchId_Cached.getSearchLinkers_ForSearchId_Response( searchId );
+				ILinkers_Main_ForSingleSearch iLinkers_Main_ForSingleSearch = iLinker_Main_Objects_ForSearchId_Cached_Response.getiLinkers_Main_ForSingleSearch();
+
+				iLinkers_Main_ForSingleSearch_KeySearchId.put( searchId, iLinkers_Main_ForSingleSearch );
+			}
+		}
+		
 		// for each protein calculate statistics
 		for( MergedSearchProtein protein : proteins ) {
 			// skip this protein if it is an excluded taxonomy
@@ -487,7 +490,24 @@ public class ProteinCoverageCompute {
 			}
 			pcd.setSequenceCoverage( psc.getSequenceCoverage() );
 			totalCoveredResidues += (int)Math.round( pcd.getNumResidues() * psc.getSequenceCoverage() );
-			Set<Integer> linkablePositionsForProtein = GetLinkablePositionsForLinkers.getLinkablePositionsForProteinSequenceAndLinkerAbbrSet( proteinSequence, linkerAbbrSet );
+			
+			Set<Integer> linkablePositionsForProtein = null;
+			for ( SearchDTO search : protein.getSearchs() ) {
+				ILinkers_Main_ForSingleSearch iLinkers_Main_ForSingleSearch = iLinkers_Main_ForSingleSearch_KeySearchId.get( search.getSearchId() );
+				if ( iLinkers_Main_ForSingleSearch == null ) {
+					final String msg = "iLinkers_Main_ForSingleSearch == null after get from iLinkers_Main_ForSingleSearch_KeySearchId";
+					log.error( msg );
+					throw new ProxlWebappInternalErrorException( msg );
+				}
+				Set<Integer> linkablePositionsForProtein_ForSearch = 	
+						GetLinkablePositionsForLinkers.getLinkablePositionsForProteinSequenceAndSearchIdAndILinkers_Main_ForSingleSearch( proteinSequence, search.getSearchId(), iLinkers_Main_ForSingleSearch );
+				if ( linkablePositionsForProtein == null ) {
+					linkablePositionsForProtein = linkablePositionsForProtein_ForSearch;
+				} else {
+					linkablePositionsForProtein.addAll( linkablePositionsForProtein_ForSearch );
+				}
+			}
+			
 			// calculate and report number of modifiable residues
 			int numLinkableResidues = linkablePositionsForProtein.size();
 			totalLinkableResidues += numLinkableResidues;

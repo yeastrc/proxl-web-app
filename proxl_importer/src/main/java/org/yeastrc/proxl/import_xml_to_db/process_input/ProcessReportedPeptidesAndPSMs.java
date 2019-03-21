@@ -1,6 +1,5 @@
 package org.yeastrc.proxl.import_xml_to_db.process_input;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -34,8 +33,6 @@ import org.yeastrc.proxl.import_xml_to_db.objects.SearchProgramEntry;
 import org.yeastrc.proxl.import_xml_to_db.process_input.ProcessProxlInput.ReportedPeptideAndPsmFilterableAnnotationTypesOnId;
 import org.yeastrc.proxl.import_xml_to_db.unified_reported_peptide.main.InsertIfNotInDBUnifiedReportedPeptideAndChildren;
 import org.yeastrc.proxl_import.api.xml_dto.LinkType;
-import org.yeastrc.proxl_import.api.xml_dto.Linker;
-import org.yeastrc.proxl_import.api.xml_dto.Linkers;
 import org.yeastrc.proxl_import.api.xml_dto.MatchedProteins;
 import org.yeastrc.proxl_import.api.xml_dto.Peptide;
 import org.yeastrc.proxl_import.api.xml_dto.Peptides;
@@ -56,9 +53,9 @@ import org.yeastrc.xlink.dto.SrchRepPeptPeptDynamicModDTO;
 import org.yeastrc.xlink.dto.UnifiedReportedPeptideLookupDTO;
 import org.yeastrc.xlink.enum_classes.FilterDirectionType;
 import org.yeastrc.xlink.enum_classes.Yes_No__NOT_APPLICABLE_Enum;
-import org.yeastrc.xlink.exceptions.ProxlBaseDataException;
-import org.yeastrc.xlink.linker_data_processing_base.linkers_builtin_root.Get_BuiltIn_Linker_From_Abbreviation_Factory;
-import org.yeastrc.xlink.linker_data_processing_base.linkers_builtin_root.linkers_builtin.ILinker_Builtin_Linker;
+import org.yeastrc.xlink.linker_data_processing_base.ILinkers_Main_ForSingleSearch;
+import org.yeastrc.xlink.linker_data_processing_base.Linker_Main_LinkersForSingleSearch_Factory;
+import org.yeastrc.xlink.linker_data_processing_base.linker_db_data_per_search.LinkersDBDataSingleSearchRoot;
 import org.yeastrc.xlink.utils.XLinkUtils;
 
 /**
@@ -87,6 +84,7 @@ public class ProcessReportedPeptidesAndPSMs {
 	public void processReportedPeptides( 
 			ProxlInput proxlInput, 
 			SearchDTO_Importer search,
+			LinkersDBDataSingleSearchRoot linkersDBDataSingleSearchRoot,
 			DropPeptidePSMCutoffValues dropPeptidePSMCutoffValues,
 			Map<String, SearchProgramEntry> searchProgramEntryMap,
 			ReportedPeptideAndPsmFilterableAnnotationTypesOnId reportedPeptideAndPsmFilterableAnnotationTypesOnId,
@@ -96,50 +94,10 @@ public class ProcessReportedPeptidesAndPSMs {
 		// Put MatchedProteins in Singleton class GetProteinsForPeptides
 		MatchedProteins matchedProteinsFromProxlXML = proxlInput.getMatchedProteins();
 		GetProteinsForPeptide.getInstance().setMatchedProteinsFromProxlXML( matchedProteinsFromProxlXML );
-		Linkers proxlInputLinkers = proxlInput.getLinkers();
-		List<Linker> proxlInputLinkerList = proxlInputLinkers.getLinker();
-		
-		List<ILinker_Builtin_Linker> linkerList = new ArrayList<>();
-		String linkerListStringForErrorMsgs = null;
-		
-		for ( Linker proxlInputLinker : proxlInputLinkerList ) {
-			String proxlInputLinkerName = proxlInputLinker.getName();
-			
-			ILinker_Builtin_Linker linker = null;
-			try {
-				linker = Get_BuiltIn_Linker_From_Abbreviation_Factory.getLinkerForAbbr( proxlInputLinkerName );
-			} catch ( ProxlBaseDataException e ) {
-				log.error( "GetLinkerFactory.getLinkerForAbbr( linkerAbbr ); threw ProxlBaseDataException. Abbr: " + proxlInputLinkerName, e );
-				throw e;
-			} catch ( Exception e ) {
-				log.error( "GetLinkerFactory.getLinkerForAbbr( linkerAbbr ); threw Exception.  Abbr: " + proxlInputLinkerName, e );
-				throw e;
-			}
-			if ( linker == null ) {
-				String msg = "Could not get an ILinker for linker abbreviation: '" 
-						+ proxlInputLinkerName
-						+ "'.  No Linkers will be used for evaluation when mapping peptides to proteins.";
-					
-				log.warn( "processReportedPeptides(...): " + msg );
-//				throw new ProxlImporterDataException( msg );
-			}
-			
-			if ( linker == null ) {
-			
-				linkerList.clear(); //  REMOVE all Linkers and Exit Loop since found "Unsupported" Linker
-				
-				break;  //  EARLY LOOP EXIT
-			}
-			
-			linkerList.add( linker );
-			
-			if ( linkerListStringForErrorMsgs == null ) {
-				linkerListStringForErrorMsgs = proxlInputLinkerName;
-			} else {
-				linkerListStringForErrorMsgs += ", " + proxlInputLinkerName;
-			}
-		}
-		
+
+		//  Linker Data
+		ILinkers_Main_ForSingleSearch linkers_Main_ForSingleSearch = Linker_Main_LinkersForSingleSearch_Factory.getILinker_Main( linkersDBDataSingleSearchRoot );
+
 		Map<Integer, AnnotationTypeDTO> filterableReportedPeptideAnnotationTypesOnId = 
 				reportedPeptideAndPsmFilterableAnnotationTypesOnId.getFilterableReportedPeptideAnnotationTypesOnId();
 		Map<Integer, AnnotationTypeDTO> filterablePsmAnnotationTypesOnId = 
@@ -164,8 +122,7 @@ public class ProcessReportedPeptidesAndPSMs {
 					processSingleReportedPeptide( 
 							reportedPeptide, 
 							searchId, 
-							linkerList, 
-							linkerListStringForErrorMsgs, 
+							linkers_Main_ForSingleSearch, 
 							dropPeptidePSMCutoffValues, 
 							searchProgramEntryMap, 
 							filterableReportedPeptideAnnotationTypesOnId,
@@ -208,8 +165,7 @@ public class ProcessReportedPeptidesAndPSMs {
 	/**
 	 * @param reportedPeptide
 	 * @param searchId
-	 * @param linkerList - EMPTY if linker abbr in input is not in listed linkers
-	 * @param linkerListStringForErrorMsgs
+	 * @param linkers_Main_ForSingleSearch
 	 * @param dropPeptidePSMCutoffValues
 	 * @param searchProgramEntryMap
 	 * @param filterableReportedPeptideAnnotationTypesOnId
@@ -221,8 +177,7 @@ public class ProcessReportedPeptidesAndPSMs {
 	private void processSingleReportedPeptide(
 			ReportedPeptide reportedPeptide,
 			int searchId, 
-			List<ILinker_Builtin_Linker> linkerList,
-			String linkerListStringForErrorMsgs,
+			ILinkers_Main_ForSingleSearch linkers_Main_ForSingleSearch,
 			DropPeptidePSMCutoffValues dropPeptidePSMCutoffValues,
 			Map<String, SearchProgramEntry> searchProgramEntryMap,
 			Map<Integer, AnnotationTypeDTO> filterableReportedPeptideAnnotationTypesOnId,
@@ -271,8 +226,7 @@ public class ProcessReportedPeptidesAndPSMs {
 					ProcessLinkTypeCrosslink.getInstance()
 					.getCrosslinkProteinMappings( 
 							reportedPeptide, 				// from XML input 
-							linkerList, 
-							linkerListStringForErrorMsgs );
+							linkers_Main_ForSingleSearch );
 			if ( getCrosslinkProteinMappingsResult.isNoProteinMappings() ) {
 				noProteinMappings = true;
 			}
@@ -281,14 +235,13 @@ public class ProcessReportedPeptidesAndPSMs {
 					ProcessLinkTypeLooplink.getInstance()
 					.getLooplinkroteinMappings( 
 							reportedPeptide, 				// from XML input 
-							linkerList, 
-							linkerListStringForErrorMsgs );
+							linkers_Main_ForSingleSearch );
 			if ( getLooplinkProteinMappingsResult.isNoProteinMappings() ) {
 				noProteinMappings = true;
 			}
 		} else if ( linkTypeNumber == XLinkUtils.TYPE_UNLINKED ) {
 			getProteinMappings_For_XML_LinkType_Unlinked_Result =
-					getProteinMappings_For_XML_LinkType_Unlinked( reportedPeptide, linkerList, linkerListStringForErrorMsgs) ;
+					getProteinMappings_For_XML_LinkType_Unlinked( reportedPeptide, linkers_Main_ForSingleSearch) ;
 			if ( getProteinMappings_For_XML_LinkType_Unlinked_Result.noProteinMappings ) {
 				noProteinMappings = true;
 			}
@@ -537,15 +490,13 @@ public class ProcessReportedPeptidesAndPSMs {
 	
 	/**
 	 * @param reportedPeptide
-	 * @param linkerList - EMPTY if linker abbr in input is not in listed linkers
-	 * @param linkerListStringForErrorMsgs
+	 * @param linkers_Main_ForSingleSearch
 	 * @return
 	 * @throws Exception
 	 */
 	private GetProteinMappings_For_XML_LinkType_Unlinked_Result   getProteinMappings_For_XML_LinkType_Unlinked( 
 			ReportedPeptide reportedPeptide, 
-			List<ILinker_Builtin_Linker> linkerList,
-			String linkerListStringForErrorMsgs
+			ILinkers_Main_ForSingleSearch linkers_Main_ForSingleSearch
 			) throws Exception {
 		
 		GetProteinMappings_For_XML_LinkType_Unlinked_Result getProteinMappings_For_XML_LinkType_Unlinked_Result = new GetProteinMappings_For_XML_LinkType_Unlinked_Result();
@@ -568,8 +519,7 @@ public class ProcessReportedPeptidesAndPSMs {
 					ProcessLinkTypeUnlinkedAsDefinedByProxl.getInstance()
 					.getUnlinkedroteinMappings( 
 							reportedPeptide, 
-							linkerList, 
-							linkerListStringForErrorMsgs );
+							linkers_Main_ForSingleSearch );
 			if ( getProteinMappings_For_XML_LinkType_Unlinked_Result.getUnlinkedProteinMappingsResult.isNoProteinMappings() ) {
 				getProteinMappings_For_XML_LinkType_Unlinked_Result.noProteinMappings = true;
 			}
@@ -579,8 +529,7 @@ public class ProcessReportedPeptidesAndPSMs {
 					ProcessLinkTypeDimerAsDefinedByProxl.getInstance()
 					.getDimerProteinMappings( 
 							reportedPeptide, 
-							linkerList, 
-							linkerListStringForErrorMsgs );
+							linkers_Main_ForSingleSearch );
 			if ( getProteinMappings_For_XML_LinkType_Unlinked_Result.getDimerProteinMappingsResult.isNoProteinMappings() ) {
 				getProteinMappings_For_XML_LinkType_Unlinked_Result.noProteinMappings = true;
 			}

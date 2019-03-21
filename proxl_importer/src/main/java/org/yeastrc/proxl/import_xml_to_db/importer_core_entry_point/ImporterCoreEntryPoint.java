@@ -26,6 +26,7 @@ import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterDataException;
 import org.yeastrc.proxl.import_xml_to_db.objects.ProxlInputObjectContainer;
 import org.yeastrc.proxl.import_xml_to_db.objects.ScanFileFileContainer;
 import org.yeastrc.proxl.import_xml_to_db.pre_validate_xml.ValidateAnnotationTypeRecords;
+import org.yeastrc.proxl.import_xml_to_db.pre_validate_xml.ValidateLinkers;
 import org.yeastrc.proxl.import_xml_to_db.pre_validate_xml.ValidateMatchedProteinSection;
 import org.yeastrc.proxl.import_xml_to_db.pre_validate_xml.ValidatePsmPeptideRecordsUniqueIdOnPeptideRecord;
 import org.yeastrc.proxl.import_xml_to_db.pre_validate_xml.ValidateScanFilenamesInXMLAreOnCommandLine;
@@ -253,6 +254,8 @@ public class ImporterCoreEntryPoint {
 		}
 		ProcessProxlInput processProxlInput = null; 
 		try {
+			//   Throws ProxlImporterDataException if data error found
+			ValidateLinkers.getInstance().validateLinkers( proxlInputForImport );
 			//   Throws ProxlImporterDataException if data error found
 			ValidateAnnotationTypeRecords.getInstance().validateAnnotationTypeRecords( proxlInputForImport );
 			//   Throws ProxlImporterDataException if data error found

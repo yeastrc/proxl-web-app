@@ -26,8 +26,7 @@ import org.apache.log4j.Logger;
 import org.yeastrc.xlink.www.factories.ProteinSequenceVersionObjectFactory;
 import org.yeastrc.xlink.www.dao.SearchDAO;
 import org.yeastrc.xlink.www.dto.SearchDTO;
-import org.yeastrc.xlink.linker_data_processing_base.linkers_builtin_root.Get_BuiltIn_Linker_From_Abbreviation_Factory;
-import org.yeastrc.xlink.linker_data_processing_base.linkers_builtin_root.linkers_builtin.ILinker_Builtin_Linker;
+import org.yeastrc.xlink.linker_data_processing_base.ILinkers_Main_ForSingleSearch;
 import org.yeastrc.xlink.www.linked_positions.CrosslinkLinkedPositions;
 import org.yeastrc.xlink.www.linked_positions.LinkedPositions_FilterExcludeLinksWith_Param;
 import org.yeastrc.xlink.www.linked_positions.LooplinkLinkedPositions;
@@ -46,11 +45,11 @@ import org.yeastrc.xlink.www.objects.SearchProteinUnlinked;
 import org.yeastrc.xlink.www.objects.SearchProteinUnlinkedWrapper;
 import org.yeastrc.xlink.www.objects.SearchDTO_PartsForImageStructureWebservices.LinkerData;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
-import org.yeastrc.xlink.www.searcher_via_cached_data.cached_data_holders.Cached_SearchLinker_ForSearchId;
+import org.yeastrc.xlink.www.searcher_via_cached_data.cached_data_holders.Cached_SearchLinkerAbbreviations_ForSearchId;
 import org.yeastrc.xlink.www.searcher_via_cached_data.cached_data_holders.Cached_TaxonomyIdsFor_ProtSeqVersionId_SearchId;
 import org.yeastrc.xlink.www.searcher_via_cached_data.cached_data_holders.Cached_TaxonomyNameStringForTaxonomyId;
 import org.yeastrc.xlink.www.searcher_via_cached_data.request_objects_for_searchers_for_cached_data.TaxonomyIdsForProtSeqIdSearchId_Request;
-import org.yeastrc.xlink.www.searcher_via_cached_data.return_objects_from_searchers_for_cached_data.SearchLinker_ForSearchId_Response;
+import org.yeastrc.xlink.www.searcher_via_cached_data.return_objects_from_searchers_for_cached_data.SearchLinkerAbbreviations_ForSearchId_Response;
 import org.yeastrc.xlink.www.searcher_via_cached_data.return_objects_from_searchers_for_cached_data.TaxonomyIdsForProtSeqIdSearchId_Result;
 import org.yeastrc.xlink.www.searcher_via_cached_data.return_objects_from_searchers_for_cached_data.TaxonomyNameStringForTaxonomyId_Result;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesRootLevel;
@@ -58,11 +57,14 @@ import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValue
 import org.yeastrc.xlink.utils.XLinkUtils;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
+import org.yeastrc.xlink.www.exceptions.ProxlWebappInternalErrorException;
 import org.yeastrc.xlink.www.form_query_json_objects.CutoffValuesRootLevel;
 import org.yeastrc.xlink.www.form_query_json_objects.Z_CutoffValuesObjectsToOtherObjectsFactory;
 import org.yeastrc.xlink.www.form_query_json_objects.Z_CutoffValuesObjectsToOtherObjectsFactory.Z_CutoffValuesObjectsToOtherObjects_RootResult;
 import org.yeastrc.xlink.www.forms.PeptideProteinCommonForm;
 import org.yeastrc.xlink.www.linkable_positions.GetLinkablePositionsForLinkers;
+import org.yeastrc.xlink.www.linkable_positions.ILinker_Main_Objects_ForSearchId_Cached;
+import org.yeastrc.xlink.www.linkable_positions.ILinker_Main_Objects_ForSearchId_Cached.ILinker_Main_Objects_ForSearchId_Cached_Response;
 import org.yeastrc.xlink.www.objects.ImageViewerData;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
@@ -146,7 +148,7 @@ public class ViewerProteinDataService {
 				for ( int projectSearchId : projectSearchIdList ) {
 					msg += projectSearchId + ", ";
 				}				
-				log.error( msg );
+				log.warn( msg );
 				throw new WebApplicationException(
 						Response.status( WebServiceErrorMessageConstants.INVALID_SEARCH_LIST_NOT_IN_DB_STATUS_CODE )  //  Send HTTP code
 						.entity( WebServiceErrorMessageConstants.INVALID_SEARCH_LIST_NOT_IN_DB_TEXT ) // This string will be passed to the client
@@ -473,40 +475,28 @@ public class ViewerProteinDataService {
 				proteins = proteinsWithTaxonomyRemoved;  // Copy to original list for further processing
 			}
 			//  Map of linkablePositions where the key is the protein id and the value is the collection of linkable positions
-			Map<Integer, Collection<Integer>> proteinIdslinkablePositionsMap = new HashMap<Integer, Collection<Integer>>();
-
-			//  Get if all Linker Abbreviations have ILinker instances and thus can get Linkable Positions
+			Map<Integer, Set<Integer>> proteinIdslinkablePositionsMap = new HashMap<>();
 			
+			//////////
+			
+			//  Cache ILinkers_Main_ForSingleSearch per search id and set allLinkersSupportedForLinkablePositions
+
 			boolean allLinkersSupportedForLinkablePositions = true;
-
-			//  Get the linker abbreviations for the searches
-
-			Cached_SearchLinker_ForSearchId cached_Linkers_ForSearchId = Cached_SearchLinker_ForSearchId.getInstance();
 			
-			Set<String> linkerAbbrSet = new HashSet<>();
+			Map<Integer, ILinkers_Main_ForSingleSearch> iLinkers_Main_ForSingleSearch_KeySearchId = new HashMap<>();
 			{
-				for ( SearchDTO search : searchList ) {
-					int searchId = search.getSearchId();
-					SearchLinker_ForSearchId_Response linkers_ForSearchId_Response =
-							cached_Linkers_ForSearchId.getSearchLinkers_ForSearchId_Response( searchId );
-					List<String>  linkerAbbreviationList = linkers_ForSearchId_Response.getLinkerAbbreviationsForSearchIdList();
-					if ( linkerAbbreviationList == null || linkerAbbreviationList.isEmpty() ) {
-						String msg = "No linkers found for Search Id: " + searchId;
-						log.error( msg );
-						//			throw new Exception(msg);
-					} else {
-						for ( String linkerAbbreviation : linkerAbbreviationList ) {
-							linkerAbbrSet.add( linkerAbbreviation );
+				ILinker_Main_Objects_ForSearchId_Cached iLinker_Main_Objects_ForSearchId_Cached = ILinker_Main_Objects_ForSearchId_Cached.getInstance(); 
+				for( SearchDTO searchDTO : searchList ) {
+					int searchId = searchDTO.getSearchId();
 
-							ILinker_Builtin_Linker linker = Get_BuiltIn_Linker_From_Abbreviation_Factory.getLinkerForAbbr( linkerAbbreviation );
-							
-							if( linker == null ) {
+					ILinker_Main_Objects_ForSearchId_Cached_Response iLinker_Main_Objects_ForSearchId_Cached_Response =
+							iLinker_Main_Objects_ForSearchId_Cached.getSearchLinkers_ForSearchId_Response( searchId );
+					ILinkers_Main_ForSingleSearch iLinkers_Main_ForSingleSearch = iLinker_Main_Objects_ForSearchId_Cached_Response.getiLinkers_Main_ForSingleSearch();
 
-								//  No ILinker linker for linkerAbbr 
-								
-								allLinkersSupportedForLinkablePositions = false;
-							}
-						}
+					iLinkers_Main_ForSingleSearch_KeySearchId.put( searchId, iLinkers_Main_ForSingleSearch );
+
+					if ( ! iLinkers_Main_ForSingleSearch.isAllLinkersHave_LinkablePositions() ) {
+						allLinkersSupportedForLinkablePositions = false;
 					}
 				}
 			}
@@ -514,7 +504,22 @@ public class ViewerProteinDataService {
 			// add locations of all linkablePositions in the found proteins
 			for( MergedSearchProtein mp : proteins ) {
 				String proteinSequence = mp.getProteinSequenceVersionObject().getProteinSequenceObject().getSequence();
-				Collection<Integer> linkablePositionsForProtein = GetLinkablePositionsForLinkers.getLinkablePositionsForProteinSequenceAndLinkerAbbrSet( proteinSequence, linkerAbbrSet );
+
+				Set<Integer> linkablePositionsForProtein = null;
+				for ( SearchDTO search : mp.getSearchs() ) {
+					ILinkers_Main_ForSingleSearch iLinkers_Main_ForSingleSearch = iLinkers_Main_ForSingleSearch_KeySearchId.get( search.getSearchId() );
+					if ( iLinkers_Main_ForSingleSearch == null ) {
+						throw new ProxlWebappInternalErrorException( "iLinkers_Main_ForSingleSearch == null after get from iLinkers_Main_ForSingleSearch_KeySearchId" );
+					}
+					Set<Integer> linkablePositionsForProtein_ForSearch = 	
+							GetLinkablePositionsForLinkers.getLinkablePositionsForProteinSequenceAndSearchIdAndILinkers_Main_ForSingleSearch( proteinSequence, search.getSearchId(), iLinkers_Main_ForSingleSearch );
+					if ( linkablePositionsForProtein == null ) {
+						linkablePositionsForProtein = linkablePositionsForProtein_ForSearch;
+					} else {
+						linkablePositionsForProtein.addAll( linkablePositionsForProtein_ForSearch );
+					}
+				}
+				
 				proteinIdslinkablePositionsMap.put( mp.getProteinSequenceVersionObject().getProteinSequenceVersionId(), linkablePositionsForProtein );
 			}
 			ivd.setLinkablePositions( proteinIdslinkablePositionsMap ); 
@@ -544,12 +549,14 @@ public class ViewerProteinDataService {
 			for ( proteinSequenceVersionIdProteinName proteinSequenceVersionIdProteinName : proteinSequenceVersionIdProteinNameList ) {
 				proteinSequenceVersionIdsSortedOnProteinNameList.add( proteinSequenceVersionIdProteinName.proteinSequenceVersionId );
 			}
-			
+
+			Cached_SearchLinkerAbbreviations_ForSearchId cached_Linkers_ForSearchId = Cached_SearchLinkerAbbreviations_ForSearchId.getInstance();
+
 			List<SearchDTO_PartsForImageStructureWebservices> searchPartsList = new ArrayList<>( searchList.size() );
 			for ( SearchDTO search : searchList ) {
 				
 				int searchId = search.getSearchId();
-				SearchLinker_ForSearchId_Response linkers_ForSearchId_Response =
+				SearchLinkerAbbreviations_ForSearchId_Response linkers_ForSearchId_Response =
 						cached_Linkers_ForSearchId.getSearchLinkers_ForSearchId_Response( searchId );
 				List<String>  linkerAbbreviationList = linkers_ForSearchId_Response.getLinkerAbbreviationsForSearchIdList();
 				if ( linkerAbbreviationList == null || linkerAbbreviationList.isEmpty() ) {

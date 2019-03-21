@@ -15,7 +15,7 @@ public class Search_Linker_CrosslinkMass_Searcher {
 	public static Search_Linker_CrosslinkMass_Searcher getInstance() { return _INSTANCE; }
 	
 	private static final String sql = 
-			"SELECT id, search_linker_id, crosslink_mass_double, crosslink_mass_string"
+			"SELECT id, search_linker_id, crosslink_mass_double, crosslink_mass_string, chemical_formula "
 			+ " FROM linker_per_search_crosslink_mass_tbl WHERE search_id = ?";
 	
 
@@ -42,6 +42,7 @@ public class Search_Linker_CrosslinkMass_Searcher {
 				item.setSearchLinkerId( rs.getInt( "search_linker_id" ) );
 				item.setCrosslinkMassDouble( rs.getDouble( "crosslink_mass_double" ) );
 				item.setCrosslinkMassString( rs.getString( "crosslink_mass_string" ) );
+				item.setChemicalFormula( rs.getString( "chemical_formula" ) );
 				resultList.add( item );
 			}
 		} finally {

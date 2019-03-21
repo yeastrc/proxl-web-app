@@ -1,16 +1,16 @@
 package org.yeastrc.xlink.linker_data_processing_base.linkers_builtin_root.linkers_builtin;
 
-import java.util.Collection;
 import java.util.HashSet;
+import java.util.Set;
 
 import org.yeastrc.xlink.utils.ProteinSequenceUtils;
 
 public abstract class AmineLinker implements ILinker_Builtin_Linker {
 
 	@Override
-	public Collection<Integer> getLinkablePositions(String proteinSequence) throws Exception {
+	public Set<Integer> getLinkablePositions(String proteinSequence) throws Exception {
 		
-		Collection<Integer> linkablePositions = ProteinSequenceUtils.getPositionsOfResidueForProteinSequence( proteinSequence, "K" );
+		Set<Integer> linkablePositions = ProteinSequenceUtils.getPositionsOfResidueForProteinSequence( proteinSequence, "K" );
 		
 		// add the N-terminal residue, unless it's already been added
 		if( !proteinSequence.startsWith( "K" ) )
@@ -28,7 +28,7 @@ public abstract class AmineLinker implements ILinker_Builtin_Linker {
 	}
 	
 	@Override
-	public Collection<Integer> getLinkablePositions( String querySequence, String subjectSequence, int subjectPosition ) throws Exception {
+	public Set<Integer> getLinkablePositions( String querySequence, String subjectSequence, int subjectPosition ) throws Exception {
 		
 		if( !subjectSequence.substring( subjectPosition - 1, subjectPosition ).equals( "K" ) && subjectPosition != 1 && subjectPosition != 2 )
 			return new HashSet<Integer>();

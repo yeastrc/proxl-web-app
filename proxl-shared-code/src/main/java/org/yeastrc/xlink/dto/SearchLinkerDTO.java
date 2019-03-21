@@ -12,7 +12,14 @@ public class SearchLinkerDTO {
 	private int searchId;
 	
 	private String linkerAbbr;
-	private String linkerName;
+	private Double spacerArmLength;
+	private String spacerArmLengthString;
+	
+	@Override
+	public String toString() {
+		return "SearchLinkerDTO [id=" + id + ", searchId=" + searchId + ", linkerAbbr=" + linkerAbbr
+				+ ", spacerArmLength=" + spacerArmLength + ", spacerArmLengthString=" + spacerArmLengthString + "]";
+	}
 	
 	public int getSearchId() {
 		return searchId;
@@ -32,12 +39,17 @@ public class SearchLinkerDTO {
 	public void setLinkerAbbr(String linkerAbbr) {
 		this.linkerAbbr = linkerAbbr;
 	}
-	public String getLinkerName() {
-		return linkerName;
+	public Double getSpacerArmLength() {
+		return spacerArmLength;
 	}
-	public void setLinkerName(String linkerName) {
-		this.linkerName = linkerName;
+	public void setSpacerArmLength(Double spacerArmLength) {
+		this.spacerArmLength = spacerArmLength;
 	}
-	
+	public String getSpacerArmLengthString() {
+		return spacerArmLengthString;
+	}
+	public void setSpacerArmLengthString(String spacerArmLengthString) {
+		this.spacerArmLengthString = spacerArmLengthString;
+	}
 	
 }

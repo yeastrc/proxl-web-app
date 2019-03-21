@@ -16,7 +16,7 @@ import org.yeastrc.proxl.import_xml_to_db.dto.ProteinSequenceVersionDTO;
 import org.yeastrc.proxl.import_xml_to_db.dto.SearchReportedPeptideDynamicModLookupDTO;
 import org.yeastrc.proxl.import_xml_to_db.dto.SrchRepPeptProtSeqIdPosLooplinkDTO;
 import org.yeastrc.xlink.dto.SrchRepPeptPeptDynamicModDTO;
-import org.yeastrc.xlink.linker_data_processing_base.linkers_builtin_root.linkers_builtin.ILinker_Builtin_Linker;
+import org.yeastrc.xlink.linker_data_processing_base.ILinkers_Main_ForSingleSearch;
 import org.yeastrc.proxl.import_xml_to_db.dto.SrchRepPeptPeptideDTO;
 import org.yeastrc.proxl.import_xml_to_db.dto.SrchRepPeptProtSeqIdPosMonolinkDTO;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterDataException;
@@ -74,15 +74,13 @@ public class ProcessLinkTypeLooplink {
 	 * The PeptideDTO is saved to the DB in this step since used for Protein Mappings
 	 * 
 	 * @param reportedPeptide
-	 * @param linkerList - EMPTY if linker abbr in input is not in listed linkers
-	 * @param linkerListStringForErrorMsgs
+	 * @param linkers_Main_ForSingleSearch
 	 * @return
 	 * @throws Exception
 	 */
 	public GetLooplinkProteinMappingsResult getLooplinkroteinMappings( 
 			ReportedPeptide reportedPeptide, 
-			List<ILinker_Builtin_Linker> linkerList,
-			String linkerListStringForErrorMsgs
+			ILinkers_Main_ForSingleSearch linkers_Main_ForSingleSearch
 			) throws Exception {
 		
 		GetLooplinkProteinMappingsResult getLooplinkMappingsResult = new GetLooplinkProteinMappingsResult();
@@ -132,7 +130,7 @@ public class ProcessLinkTypeLooplink {
 						peptideLinkedPosition_1, 
 						peptideLinkedPosition_2,
 						peptideMonolinkPositions,
-						linkerList, 
+						linkers_Main_ForSingleSearch, 
 						proteinMatches_Peptide,
 						reportedPeptide // For error reporting only
 						);
@@ -155,8 +153,8 @@ public class ProcessLinkTypeLooplink {
 			Collections.sort( peptideLinkPositions );
 			
 
-			if ( linkerList.isEmpty() ) {
-				//  No linker abbr in input is not in listed linkers
+			if ( ! linkers_Main_ForSingleSearch.isAllLinkersHave_LinkablePositions() ) {
+				//  Not all Linkers have linkable positions
 
 				String msg = "Could not import this Proxl XML file. No protein in the Proxl XML contained this peptide sequence (" 
 						+ peptide.getSequence()
@@ -169,11 +167,7 @@ public class ProcessLinkTypeLooplink {
 				
 			} else {
 
-				List<String> linkersToStringArray = new ArrayList<>( linkerList.size() );
-				for ( ILinker_Builtin_Linker linkerItem : linkerList ) {
-					linkersToStringArray.add(  linkerItem.toString() );
-				}
-				String linkersToString = StringUtils.join( linkersToStringArray, "," );
+				String linkersToString = linkers_Main_ForSingleSearch.getLinkerAbbreviationsCommaDelim();
 	
 	
 				

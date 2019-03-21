@@ -11,12 +11,13 @@ public class LinkerPerSearchCrosslinkMassDTO {
 	private int searchId;
 	private double crosslinkMassDouble;
 	private String crosslinkMassString;
+	private String chemicalFormula;
 	
 	@Override
 	public String toString() {
 		return "LinkerPerSearchCrosslinkMassDTO [id=" + id + ", searchLinkerId=" + searchLinkerId + ", searchId="
 				+ searchId + ", crosslinkMassDouble=" + crosslinkMassDouble + ", crosslinkMassString="
-				+ crosslinkMassString + "]";
+				+ crosslinkMassString + ", chemicalFormula=" + chemicalFormula + "]";
 	}
 
 	public int getId() {
@@ -48,6 +49,14 @@ public class LinkerPerSearchCrosslinkMassDTO {
 	}
 	public void setSearchLinkerId(int searchLinkerId) {
 		this.searchLinkerId = searchLinkerId;
+	}
+
+	public String getChemicalFormula() {
+		return chemicalFormula;
+	}
+
+	public void setChemicalFormula(String chemicalFormula) {
+		this.chemicalFormula = chemicalFormula;
 	}
 
 }
