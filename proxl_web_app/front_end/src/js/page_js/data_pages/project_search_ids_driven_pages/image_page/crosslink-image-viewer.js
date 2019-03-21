@@ -56,22 +56,22 @@ import { webserviceDataParamsDistributionCommonCode } from 'page_js/data_pages/p
 
 import { computeCutPoints } from 'page_js/data_pages/project_search_ids_driven_pages/image_page/trypsinCutPointsForSequence.js';
 
-import { ImageProteinBarDataManagerContructor, ImageProteinBarData } from './crosslink-image-viewer-per-protein-bar-data.js';
+import { ImageProteinBarDataManagerContructor, ImageProteinBarData, ImageProteinBarDataManager_pass_imagePagePrimaryRootCodeObject } from './crosslink-image-viewer-per-protein-bar-data.js';
 
 import { indexManager } from './crosslink-image-viewer-index-manager.js';
-import { customRegionManager } from './crosslink-image-viewer-custom-region-manager.js';
+import { customRegionManager, customRegionManager_pass_imagePagePrimaryRootCodeObject } from './crosslink-image-viewer-custom-region-manager.js';
 
-import { proteinAnnotationStore, getDisorderedRegionsDisopred_2, getDisorderedRegionsDisopred_3, getSecondaryStructureRegions } from './crosslink-image-viewer-protein-annotation.js';
+import { proteinAnnotationStore, getDisorderedRegionsDisopred_2, getDisorderedRegionsDisopred_3, getSecondaryStructureRegions, proteinAnnotationStore_pass_imagePagePrimaryRootCodeObject } from './crosslink-image-viewer-protein-annotation.js';
 
 import { LinkExclusionDataManagerContructor } from './crosslink-image-viewer-link-exclusion-manager.js';
 
-import { ProteinBarRegionSelectionsOverlayCodeContructor } from './crosslink-image-viewer-region-selections.js';
-import { LinkExclusionSelectionsOverlayCodeContructor } from './crosslink-image-viewer-link-exclusion-selections.js';
+import { ProteinBarRegionSelectionsOverlayCodeContructor, proteinBarRegionSelectionsOverlayCode_pass_imagePagePrimaryRootCodeObject } from './crosslink-image-viewer-region-selections.js';
+import { LinkExclusionSelectionsOverlayCodeContructor, LinkExclusionSelectionsOverlayCode_pass_imagePagePrimaryRootCodeObject } from './crosslink-image-viewer-link-exclusion-selections.js';
 
-import { ColorManager } from './crosslink-image-viewer-color-manager.js';
-import { circlePlotViewer } from './circle-plot-viewer.js';
+import { ColorManager, ColorManager_pass_imagePagePrimaryRootCodeObject } from './crosslink-image-viewer-color-manager.js';
+import { circlePlotViewer, circlePlotViewer_pass_imagePagePrimaryRootCodeObject } from './circle-plot-viewer.js';
 
-import { LegacyJSONUpdater } from './crosslink-image-viewer-legacy-handler.js';
+import { LegacyJSONUpdater, LegacyJSONUpdater_pass_imagePagePrimaryRootCodeObject } from './crosslink-image-viewer-legacy-handler.js';
 
 import { getLooplinkDataForSpecificLinkInGraph, getCrosslinkDataForSpecificLinkInGraph, getMonolinkDataForSpecificLinkInGraph } from './crosslink-image-viewer-click-element-handlers.js';
 
@@ -6254,8 +6254,20 @@ var ImagePagePrimaryRootCodeClass = function() {
 
 }
 
-window.imagePagePrimaryRootCodeObject = new ImagePagePrimaryRootCodeClass();
+var imagePagePrimaryRootCodeObject = new ImagePagePrimaryRootCodeClass();
 
+//  Attach to window
+window.imagePagePrimaryRootCodeObject = imagePagePrimaryRootCodeObject;
+
+//  Pass imagePagePrimaryRootCodeObject to other JS files that use it
+proteinBarRegionSelectionsOverlayCode_pass_imagePagePrimaryRootCodeObject( imagePagePrimaryRootCodeObject );
+proteinAnnotationStore_pass_imagePagePrimaryRootCodeObject( imagePagePrimaryRootCodeObject );
+ImageProteinBarDataManager_pass_imagePagePrimaryRootCodeObject( imagePagePrimaryRootCodeObject );
+LinkExclusionSelectionsOverlayCode_pass_imagePagePrimaryRootCodeObject( imagePagePrimaryRootCodeObject );
+LegacyJSONUpdater_pass_imagePagePrimaryRootCodeObject( imagePagePrimaryRootCodeObject );
+customRegionManager_pass_imagePagePrimaryRootCodeObject( imagePagePrimaryRootCodeObject );
+ColorManager_pass_imagePagePrimaryRootCodeObject( imagePagePrimaryRootCodeObject );
+circlePlotViewer_pass_imagePagePrimaryRootCodeObject( imagePagePrimaryRootCodeObject );
 
 ///////////
 /**
@@ -6307,7 +6319,7 @@ window.imageViewerPageObject = {
 
 $(document).ready(function()  { 
 	try {
-		window.imagePagePrimaryRootCodeObject.call__initPage();
+		imagePagePrimaryRootCodeObject.call__initPage();
 	} catch( e ) {
 		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
 		throw e;

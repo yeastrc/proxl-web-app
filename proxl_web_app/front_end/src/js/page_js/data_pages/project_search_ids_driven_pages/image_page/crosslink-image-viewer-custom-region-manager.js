@@ -1,5 +1,17 @@
+/**
+ * Javascript for the viewMergedImage.jsp page
 
+ * !!! The following variables passed in from "crosslink-image-viewer.js" are used in this file:
+ * 
+ *    imagePagePrimaryRootCodeObject
+ */
 "use strict";
+
+
+
+var imagePagePrimaryRootCodeObject = undefined; // passed in from "crosslink-image-viewer.js"
+
+
 
 /**
  * The custom region manager manages loading/saving/changing and
@@ -97,7 +109,7 @@ customRegionManager.prototype.handleSuccessfulSave = function( params, regionDat
     this.hideAllDialogs();
     this.showSuccess( "Data saved to database." );
 
-    window.imagePagePrimaryRootCodeObject.call__drawSvg();
+    imagePagePrimaryRootCodeObject.call__drawSvg();
 
 }
 
@@ -157,8 +169,8 @@ customRegionManager.prototype.validateRegionData = function ( regionArray, prote
             this.showError( "End position must be greater than start position. (Region #" + ( i + 1 ) + ")" );
             return false;
         }
-        if( endPosition > window.imagePagePrimaryRootCodeObject.getVariable__v_proteinLengths().getProteinLength( proteinId ) ) {
-            this.showError( "End position is passed the end of the protein. Protein length is: " +  window.imagePagePrimaryRootCodeObject.getVariable__v_proteinLengths().getProteinLength( proteinId ) + " (Region #" + ( i + 1 ) + ")" );
+        if( endPosition > imagePagePrimaryRootCodeObject.getVariable__v_proteinLengths().getProteinLength( proteinId ) ) {
+            this.showError( "End position is passed the end of the protein. Protein length is: " +  imagePagePrimaryRootCodeObject.getVariable__v_proteinLengths().getProteinLength( proteinId ) + " (Region #" + ( i + 1 ) + ")" );
             return false;
         }
 
@@ -257,15 +269,15 @@ customRegionManager.prototype.populateProteinList  = function(  ) {
 
     var proteinListContainer = $("#custom_region_manager_protein_list");
     
-    for( var i = 0; i < window.imagePagePrimaryRootCodeObject.getVariable__v_proteins().length; i++ ) {
+    for( var i = 0; i < imagePagePrimaryRootCodeObject.getVariable__v_proteins().length; i++ ) {
 
-        var proteinId = window.imagePagePrimaryRootCodeObject.getVariable__v_proteins()[ i ];
-        var proteinName = window.imagePagePrimaryRootCodeObject.getVariable__v_proteinNames()[ proteinId ];
+        var proteinId = imagePagePrimaryRootCodeObject.getVariable__v_proteins()[ i ];
+        var proteinName = imagePagePrimaryRootCodeObject.getVariable__v_proteinNames()[ proteinId ];
 
         var html = "<div data-protein-id=\"" + proteinId + "\" ";
         html += "class=\"custom-region-manager-protein-item";
         
-        if( i === window.imagePagePrimaryRootCodeObject.getVariable__v_proteins().length - 1 ) {
+        if( i === imagePagePrimaryRootCodeObject.getVariable__v_proteins().length - 1 ) {
             html += " last-item";
         }
         
@@ -633,7 +645,7 @@ customRegionManager.prototype.getCustomRegionDataForProteinsViaAjaxForViewerDisp
             console.log( objectThis._customRegionAnnotationData );
 
             decrementSpinner();
-            window.imagePagePrimaryRootCodeObject.call__loadDataAndDraw( doDraw );
+            imagePagePrimaryRootCodeObject.call__loadDataAndDraw( doDraw );
             
 		},
         failure: function(errMsg) {
@@ -660,7 +672,7 @@ customRegionManager.prototype.validateAndSaveRegionsToDatabase = function( param
     var proteinId = params.proteinId;
 
     // need to validate against protein length--need to make sure we know how long it is
-    if( !window.imagePagePrimaryRootCodeObject.getVariable__v_proteinLengths()._proteinLengthsInternal[ proteinId ] ) {
+    if( !imagePagePrimaryRootCodeObject.getVariable__v_proteinLengths()._proteinLengthsInternal[ proteinId ] ) {
 
         var callback = function( _params ) {
             objectThis.validateAndSaveRegionsToDatabase( _params );
@@ -748,7 +760,7 @@ customRegionManager.prototype.loadProteinSequenceDataForProtein = function( para
 	        		for ( var keysIndex = 0; keysIndex < returnedProteinIdsAndSequences_Keys.length; keysIndex++ ) {
 	        			var proteinId = returnedProteinIdsAndSequences_Keys[ keysIndex ];
 	        			_proteinSequences[ proteinId ] = returnedProteinIdsAndSequences[ proteinId ];
-	        			window.imagePagePrimaryRootCodeObject.getVariable__v_proteinLengths().setProteinLength( proteinId, returnedProteinIdsAndSequences[ proteinId ].length )
+	        			imagePagePrimaryRootCodeObject.getVariable__v_proteinLengths().setProteinLength( proteinId, returnedProteinIdsAndSequences[ proteinId ].length )
 	        		}
 
 	        		callback( params );
@@ -788,4 +800,12 @@ customRegionManager.prototype.isAnInteger = function( x ) {
 }
 
 
-export { customRegionManager } 
+/**
+ * Called from "crosslink-image-viewer.js" to populate local copy of imagePagePrimaryRootCodeObject
+ */
+var customRegionManager_pass_imagePagePrimaryRootCodeObject = function( imagePagePrimaryRootCodeObject_Param ) {
+	imagePagePrimaryRootCodeObject = imagePagePrimaryRootCodeObject_Param;
+}
+
+
+export { customRegionManager, customRegionManager_pass_imagePagePrimaryRootCodeObject } 

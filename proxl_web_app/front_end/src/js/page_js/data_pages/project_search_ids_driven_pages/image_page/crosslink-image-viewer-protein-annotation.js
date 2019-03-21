@@ -2,6 +2,10 @@
  * crosslink-image-viewer-protein-annotation.js
  * 
  * Protein Annotation Store
+ * 
+ * !!! The following variables passed in from "crosslink-image-viewer.js" are used in this file:
+ * 
+ *    imagePagePrimaryRootCodeObject
  */
 
 //////////////////////////////////
@@ -16,6 +20,11 @@ var DEBUG_CONFIRMS = false;
 // var CONSOLE_LOGGING = false;  //  
 
 var CONSOLE_LOGGING = true;  //  Set to true to get logging, console.log(....)
+
+
+
+var imagePagePrimaryRootCodeObject = undefined; // passed in from "crosslink-image-viewer.js"
+
 
 // /////////////////////////////////////////
 /**
@@ -816,8 +825,8 @@ function getSecondaryStructureRegions( proteinId ) {
 	for ( var dataIndex = 0; dataIndex < secondaryStructureDataEntries.length; dataIndex++ ) {
 		var entry = secondaryStructureDataEntries[ dataIndex ];
 		var type = entry.type;
-		if ( type === window.imagePagePrimaryRootCodeObject.getVariable__v_BETA_SHEET() || 
-				type === window.imagePagePrimaryRootCodeObject.getVariable__v_ALPHA_HELIX() ) {
+		if ( type === imagePagePrimaryRootCodeObject.getVariable__v_BETA_SHEET() || 
+				type === imagePagePrimaryRootCodeObject.getVariable__v_ALPHA_HELIX() ) {
 			var position = entry.position;
 			if ( type !== prevType || position > ( endPosition + 1 )  ) {
 				if ( startPosition !== startPositionInitializationValue ) {
@@ -837,4 +846,11 @@ function getSecondaryStructureRegions( proteinId ) {
 	return ssBlocks;
 }
 
-export { proteinAnnotationStore, getDisorderedRegionsDisopred_2, getDisorderedRegionsDisopred_3, getSecondaryStructureRegions }
+/**
+ * Called from "crosslink-image-viewer.js" to populate local copy of imagePagePrimaryRootCodeObject
+ */
+var proteinAnnotationStore_pass_imagePagePrimaryRootCodeObject = function( imagePagePrimaryRootCodeObject_Param ) {
+	imagePagePrimaryRootCodeObject = imagePagePrimaryRootCodeObject_Param;
+}
+
+export { proteinAnnotationStore, getDisorderedRegionsDisopred_2, getDisorderedRegionsDisopred_3, getSecondaryStructureRegions, proteinAnnotationStore_pass_imagePagePrimaryRootCodeObject }

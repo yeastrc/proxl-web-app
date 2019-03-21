@@ -7,10 +7,9 @@
  * 
  * This file also handles protein bar highlighting/selecting and de-selecting
  *  
- * !!! The following global variables from "crosslink-image-viewer.js" are used in this file:
+ * !!! The following variables passed in from "crosslink-image-viewer.js" are used in this file:
  * 
- * 	  window.imagePagePrimaryRootCodeObject.getVariable__v_indexManager()
- *    window.imagePagePrimaryRootCodeObject.getVariable__v_proteinLengths()
+ *    imagePagePrimaryRootCodeObject
  */
 
 // JavaScript directive:   all variables have to be declared with "var", maybe other things
@@ -72,13 +71,13 @@ ImageProteinBarDataManager.prototype.addEntry = function( uid, entry ) {
 		if ( entry ) {
 			entry.setContainingImageProteinBarDataManager( { containingImageProteinBarDataManager : this } );
 			entry.uid = uid;
-			entry.pid = window.imagePagePrimaryRootCodeObject.getVariable__v_indexManager().getProteinIdForUID( uid );
+			entry.pid = imagePagePrimaryRootCodeObject.getVariable__v_indexManager().getProteinIdForUID( uid );
 			this.barData[ uid ] = entry;
 		} else {
 			var newEntry = ImageProteinBarData.constructEmptyImageProteinBarData();
 			newEntry.setContainingImageProteinBarDataManager( { containingImageProteinBarDataManager : this } );
 			newEntry.uid = uid;
-			newEntry.pid = window.imagePagePrimaryRootCodeObject.getVariable__v_indexManager().getProteinIdForUID( uid );
+			newEntry.pid = imagePagePrimaryRootCodeObject.getVariable__v_indexManager().getProteinIdForUID( uid );
 			this.barData[ uid ] = newEntry;
 		}
 };
@@ -102,7 +101,7 @@ ImageProteinBarDataManager.prototype.getItemByUID = function( uid ) {
 };
 
 /**
- * Remove all invalid UIDs--that is, UIDs not found in the window.imagePagePrimaryRootCodeObject.getVariable__v_indexManager()
+ * Remove all invalid UIDs--that is, UIDs not found in the imagePagePrimaryRootCodeObject.getVariable__v_indexManager()
  */
 ImageProteinBarDataManager.prototype.removeInvalidEntries = function() {
 		
@@ -111,7 +110,7 @@ ImageProteinBarDataManager.prototype.removeInvalidEntries = function() {
 	var UIDsToRemove = [ ];
 	
 	for( var i = 0; i < kl; i++ ) {
-		if( !(window.imagePagePrimaryRootCodeObject.getVariable__v_indexManager().containsUID( keys[ i ] )) ) {
+		if( !(imagePagePrimaryRootCodeObject.getVariable__v_indexManager().containsUID( keys[ i ] )) ) {
 			UIDsToRemove.push( keys[ i ] );
 		}
 	}
@@ -126,7 +125,7 @@ ImageProteinBarDataManager.prototype.removeInvalidEntries = function() {
  */
 ImageProteinBarDataManager.prototype.getItemByIndex = function( index ) {
 	
-	var entry = window.imagePagePrimaryRootCodeObject.getVariable__v_indexManager().getProteinArray()[ index ];
+	var entry = imagePagePrimaryRootCodeObject.getVariable__v_indexManager().getProteinArray()[ index ];
 	if ( ! entry ) {
 		throw Error( "entry not found in barData for index: " + index );
 	}
@@ -684,7 +683,7 @@ ImageProteinBarData.prototype.getProteinId = function() {
  * 
  */
 ImageProteinBarData.prototype.getProteinLength = function() {
-	return window.imagePagePrimaryRootCodeObject.getVariable__v_proteinLengths().getProteinLength( this.getProteinId() );
+	return imagePagePrimaryRootCodeObject.getVariable__v_proteinLengths().getProteinLength( this.getProteinId() );
 };
 
 /**
@@ -1095,4 +1094,11 @@ ProteinBarHighlightedRegion.constructEmptyProteinBarHighlightedRegion = function
 	return proteinBarHighlightedRegion;
 };
 
-export { ImageProteinBarDataManagerContructor, ImageProteinBarData, ProteinBarHighlightedRegion }
+/**
+ * Called from "crosslink-image-viewer.js" to populate local copy of imagePagePrimaryRootCodeObject
+ */
+var ImageProteinBarDataManager_pass_imagePagePrimaryRootCodeObject = function( imagePagePrimaryRootCodeObject_Param ) {
+	imagePagePrimaryRootCodeObject = imagePagePrimaryRootCodeObject_Param;
+}
+
+export { ImageProteinBarDataManagerContructor, ImageProteinBarData, ProteinBarHighlightedRegion, ImageProteinBarDataManager_pass_imagePagePrimaryRootCodeObject }

@@ -9,11 +9,9 @@
  * 
  * The method of selecting links to exclude is to choose a pair of ( selected protein and/or selected protein region )
  *  
- * !!! The following global variables from "crosslink-image-viewer.js" are used in this file:
+ * !!! The following variables passed in from "crosslink-image-viewer.js" are used in this file:
  * 
- * 	window.imagePagePrimaryRootCodeObject.call__updateURLHash( ... );
- *  window.imagePagePrimaryRootCodeObject.call__loadDataAndDraw( ... );
- * 	  
+ *    imagePagePrimaryRootCodeObject
  */
 
 
@@ -27,6 +25,9 @@
 /////     Link Exclusion Data Overlay code
 
 import { ProteinBarHighlightedRegion } from './crosslink-image-viewer-per-protein-bar-data.js';
+
+
+var imagePagePrimaryRootCodeObject = undefined; // passed in from "crosslink-image-viewer.js"
 
 
 
@@ -130,8 +131,8 @@ LinkExclusionSelectionsOverlayCode.prototype.closeOverlay = function( ) {
 	
 	if ( this.dataChanged ) {
 
-		window.imagePagePrimaryRootCodeObject.call__updateURLHash( false /* useSearchForm */ );
-		window.imagePagePrimaryRootCodeObject.call__loadDataAndDraw( true /* doDraw */ );
+		imagePagePrimaryRootCodeObject.call__updateURLHash( false /* useSearchForm */ );
+		imagePagePrimaryRootCodeObject.call__loadDataAndDraw( true /* doDraw */ );
 	}
 };
 
@@ -268,7 +269,7 @@ LinkExclusionSelectionsOverlayCode.prototype._getProteinAndRegionInfo = function
 	}
 	var proteinId = imageProteinBarDataItem.getProteinId();
 	var proteinLength = imageProteinBarDataItem.getProteinLength();
-	var proteinName = window.imagePagePrimaryRootCodeObject.getVariable__v_proteinNames()[ proteinId ];
+	var proteinName = imagePagePrimaryRootCodeObject.getVariable__v_proteinNames()[ proteinId ];
 	var regionRange = undefined;
 	if ( regionUID ) {
 		var regionEntry = imageProteinBarDataItem.getRegionFromRegionUID( { regionUID : regionUID } );
@@ -324,7 +325,7 @@ LinkExclusionSelectionsOverlayCode.prototype._populateExcludeChoiceItems = funct
 		}
 		var proteinId = imageProteinBarDataItem.getProteinId();
 		var proteinLength = imageProteinBarDataItem.getProteinLength();
-		var proteinName = window.imagePagePrimaryRootCodeObject.getVariable__v_proteinNames()[ proteinId ];
+		var proteinName = imagePagePrimaryRootCodeObject.getVariable__v_proteinNames()[ proteinId ];
 		
 		//  First add Protein without Regions
 		//  singleExclusionChoiceContext is for Handlebars template to put info on the overlay on the page
@@ -584,7 +585,7 @@ LinkExclusionSelectionsOverlayCode.prototype.addExclusion = function( params ) {
 	
 	this._clearExcludeChoicesBothLists( );
 	
-	window.imagePagePrimaryRootCodeObject.call__updateURLHash( false /* useSearchForm */ );
+	imagePagePrimaryRootCodeObject.call__updateURLHash( false /* useSearchForm */ );
 
 };
 
@@ -620,6 +621,15 @@ LinkExclusionSelectionsOverlayCode.prototype._getExcludeChoice = function( param
 };
 
 
-export { LinkExclusionSelectionsOverlayCodeContructor }
+
+/**
+ * Called from "crosslink-image-viewer.js" to populate local copy of imagePagePrimaryRootCodeObject
+ */
+var LinkExclusionSelectionsOverlayCode_pass_imagePagePrimaryRootCodeObject = function( imagePagePrimaryRootCodeObject_Param ) {
+	imagePagePrimaryRootCodeObject = imagePagePrimaryRootCodeObject_Param;
+}
+
+
+export { LinkExclusionSelectionsOverlayCodeContructor, LinkExclusionSelectionsOverlayCode_pass_imagePagePrimaryRootCodeObject }
 
 

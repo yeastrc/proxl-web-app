@@ -1,18 +1,27 @@
 "use strict";
 
 /**
+ * Javascript for the viewMergedImage.jsp page
+ * 
+ * The color manager hands out colors to be used for protein bars and links
+ * in the image viewer.
+ * 
+ * !!! The following variables passed in from "crosslink-image-viewer.js" are used in this file:
+ * 
+ *    imagePagePrimaryRootCodeObject
+ */
+
+
+
+var imagePagePrimaryRootCodeObject = undefined; // passed in from "crosslink-image-viewer.js"
+
+
+/**
  * The color manager hands out colors to be used for protein bars and links
  * in the image viewer.
  * 
  * @constructor
  * @author Michael Riffle <mriffle@uw.edu>
- * 
- * !!! The following global variables from "crosslink-image-viewer.js" are used in this file:
- * 
- * window.imagePagePrimaryRootCodeObject.getVariable__v_indexManager()
- * window.imagePagePrimaryRootCodeObject.getVariable__v_imageProteinBarDataManager()
- * window.imagePagePrimaryRootCodeObject.getVariable__v_linkExclusionDataManager()
- * 
  */
 var ColorManager = function() {	
 	
@@ -80,7 +89,7 @@ ColorManager.prototype.getColorForRegion = function( region ) {
  * 
  */
 ColorManager.prototype.getColorForIndex = function( index ) {
-	var uid = window.imagePagePrimaryRootCodeObject.getVariable__v_indexManager().getUIDForIndex( index );
+	var uid = imagePagePrimaryRootCodeObject.getVariable__v_indexManager().getUIDForIndex( index );
 	return this.getColorForUID( uid );
 }
 
@@ -207,20 +216,20 @@ ColorManager.PrettyTheme.prototype.getColorForLink = function( link ) {
 	ColorManager.validateLink( link );
 	
 	// if no highlighting is going on, just return the normal color
-	if( !window.imagePagePrimaryRootCodeObject.getVariable__v_imageProteinBarDataManager().isAnyProteinBarsHighlighted() ) {	
+	if( !imagePagePrimaryRootCodeObject.getVariable__v_imageProteinBarDataManager().isAnyProteinBarsHighlighted() ) {	
 		return this.getColorForHighlightedLink( link );		
 	}
 	
 	//  Check exclusions
 	if( link.type === "crosslink" ) {
-		if ( window.imagePagePrimaryRootCodeObject.getVariable__v_linkExclusionDataManager().isLinkExcludedForProteinUIDProteinPosition( {
+		if ( imagePagePrimaryRootCodeObject.getVariable__v_linkExclusionDataManager().isLinkExcludedForProteinUIDProteinPosition( {
 				proteinUID_1 : link.uid1, proteinPosition_1 : link.position1,
 				proteinUID_2 : link.uid2, proteinPosition_2 : link.position2 } ) ) {
 			return this.getColorForNonHighlightedItem();
 		}		
 	}
 	if( link.type === "looplink" ) {
-		if ( window.imagePagePrimaryRootCodeObject.getVariable__v_linkExclusionDataManager().isLinkExcludedForProteinUIDProteinPosition( {
+		if ( imagePagePrimaryRootCodeObject.getVariable__v_linkExclusionDataManager().isLinkExcludedForProteinUIDProteinPosition( {
 			proteinUID_1 : link.uid1, proteinPosition_1 : link.position1,
 			proteinUID_2 : link.uid1, proteinPosition_2 : link.position2 } ) ) {
 			return this.getColorForNonHighlightedItem();
@@ -228,10 +237,10 @@ ColorManager.PrettyTheme.prototype.getColorForLink = function( link ) {
 	}
 
 	
-	var barEntry1 = window.imagePagePrimaryRootCodeObject.getVariable__v_imageProteinBarDataManager().getItemByUID( link.uid1 );
+	var barEntry1 = imagePagePrimaryRootCodeObject.getVariable__v_imageProteinBarDataManager().getItemByUID( link.uid1 );
 	var barEntry2 = undefined;			//undefined if monolink or looplink
 	if( link.type === "crosslink" ) {
-		barEntry2 = window.imagePagePrimaryRootCodeObject.getVariable__v_imageProteinBarDataManager().getItemByUID( link.uid2 );		
+		barEntry2 = imagePagePrimaryRootCodeObject.getVariable__v_imageProteinBarDataManager().getItemByUID( link.uid2 );		
 	}
 	
 	// whether only one region is highlighted, or if multiple, monolinks
@@ -331,11 +340,11 @@ ColorManager.PrettyTheme.prototype.getColorForLink = function( link ) {
  */
 ColorManager.PrettyTheme.prototype.getColorForUIDAnnotation = function( uid ) {
 	
-	var barData = window.imagePagePrimaryRootCodeObject.getVariable__v_imageProteinBarDataManager().getItemByUID( uid );
+	var barData = imagePagePrimaryRootCodeObject.getVariable__v_imageProteinBarDataManager().getItemByUID( uid );
 	
-	if( window.imagePagePrimaryRootCodeObject.getVariable__v_colorLinesBy() !== window.imagePagePrimaryRootCodeObject.getVariable__v_SELECT_ELEMENT_COLOR_BY_REGION() ) {
+	if( imagePagePrimaryRootCodeObject.getVariable__v_colorLinesBy() !== imagePagePrimaryRootCodeObject.getVariable__v_SELECT_ELEMENT_COLOR_BY_REGION() ) {
 		
-		if( !window.imagePagePrimaryRootCodeObject.getVariable__v_imageProteinBarDataManager().isAnyProteinBarsHighlighted() || 
+		if( !imagePagePrimaryRootCodeObject.getVariable__v_imageProteinBarDataManager().isAnyProteinBarsHighlighted() || 
 			barData.isAllOfProteinBarHighlighted() ||
 			barData.isAnyOfProteinBarHighlighted() ) {
 			
@@ -357,9 +366,9 @@ ColorManager.PrettyTheme.prototype.getColorForUIDAnnotation = function( uid ) {
  */
 ColorManager.PrettyTheme.prototype.getColorForUID = function( uid ) {
 	
-	if( window.imagePagePrimaryRootCodeObject.getVariable__v_imageProteinBarDataManager().isAnyProteinBarsHighlighted() ) {
+	if( imagePagePrimaryRootCodeObject.getVariable__v_imageProteinBarDataManager().isAnyProteinBarsHighlighted() ) {
 		
-		var barData = window.imagePagePrimaryRootCodeObject.getVariable__v_imageProteinBarDataManager().getItemByUID( uid );
+		var barData = imagePagePrimaryRootCodeObject.getVariable__v_imageProteinBarDataManager().getItemByUID( uid );
 		
 		if( !barData ) {
 			throw Error( "Could not find protein bar data for uid: " + uid );
@@ -368,13 +377,13 @@ ColorManager.PrettyTheme.prototype.getColorForUID = function( uid ) {
 		if( barData.isAllOfProteinBarHighlighted() ) {
 			
 			// if we're coloring by region, treat this protein bar as a region
-			if( window.imagePagePrimaryRootCodeObject.getVariable__v_colorLinesBy() === window.imagePagePrimaryRootCodeObject.getVariable__v_SELECT_ELEMENT_COLOR_BY_REGION() ) {
+			if( imagePagePrimaryRootCodeObject.getVariable__v_colorLinesBy() === imagePagePrimaryRootCodeObject.getVariable__v_SELECT_ELEMENT_COLOR_BY_REGION() ) {
 				
 				var region = { };
 				
 				region.uid = uid;
 				region.start = 1;
-				region.end = window.imagePagePrimaryRootCodeObject.getVariable__v_proteinLengths().getProteinLength( window.imagePagePrimaryRootCodeObject.getVariable__v_indexManager().getProteinIdForUID( uid ) );
+				region.end = imagePagePrimaryRootCodeObject.getVariable__v_proteinLengths().getProteinLength( imagePagePrimaryRootCodeObject.getVariable__v_indexManager().getProteinIdForUID( uid ) );
 				
 				return this.getColorForRegion( region );				
 				
@@ -402,11 +411,11 @@ ColorManager.PrettyTheme.prototype.getColorForHighlightedLink = function( link )
 	var color;
 	
 	// color by search
-	if( window.imagePagePrimaryRootCodeObject.getVariable__v_colorLinesBy() === window.imagePagePrimaryRootCodeObject.getVariable__v_SELECT_ELEMENT_COLOR_BY_SEARCH() ) {
+	if( imagePagePrimaryRootCodeObject.getVariable__v_colorLinesBy() === imagePagePrimaryRootCodeObject.getVariable__v_SELECT_ELEMENT_COLOR_BY_SEARCH() ) {
 
 		color =  this.getColorForLinkUsingSearch( link );
 		
-	} else if( window.imagePagePrimaryRootCodeObject.getVariable__v_colorLinesBy() === window.imagePagePrimaryRootCodeObject.getVariable__v_SELECT_ELEMENT_COLOR_BY_REGION() ) {
+	} else if( imagePagePrimaryRootCodeObject.getVariable__v_colorLinesBy() === imagePagePrimaryRootCodeObject.getVariable__v_SELECT_ELEMENT_COLOR_BY_REGION() ) {
 
 		color =  this.getColorForLinkUsingRegions( link );
 	} else {
@@ -455,9 +464,9 @@ ColorManager.PrettyTheme.prototype.getColorForLinkUsingSearch = function ( link 
 	
 	var searches;
 	
-	if( link.type === "crosslink" ) { searches = window.imagePagePrimaryRootCodeObject.call__findSearchesForCrosslink( link.protein1, link.protein2, link.position1, link.position2 ); }
-	else if( link.type === "looplink" ) { searches = window.imagePagePrimaryRootCodeObject.call__findSearchesForLooplink( link.protein1, link.position1, link.position2 ); }
-	else if( link.type === "monolink" ) { searches = window.imagePagePrimaryRootCodeObject.call__findSearchesForMonolink( link.protein1, link.position1 ); }
+	if( link.type === "crosslink" ) { searches = imagePagePrimaryRootCodeObject.call__findSearchesForCrosslink( link.protein1, link.protein2, link.position1, link.position2 ); }
+	else if( link.type === "looplink" ) { searches = imagePagePrimaryRootCodeObject.call__findSearchesForLooplink( link.protein1, link.position1, link.position2 ); }
+	else if( link.type === "monolink" ) { searches = imagePagePrimaryRootCodeObject.call__findSearchesForMonolink( link.protein1, link.position1 ); }
 	
 	if( !searches || searches.length < 1 ) {
 		throw Error( "Unable to find searches for link: " + link );
@@ -520,9 +529,9 @@ ColorManager.PrettyTheme.prototype.getColorForSearches = function( searches ) {
 	
 	var colorIndex = "";
 	
-	for ( var i = 0; i < window.imagePagePrimaryRootCodeObject.getVariable__v_searches().length; i++ ) {
+	for ( var i = 0; i < imagePagePrimaryRootCodeObject.getVariable__v_searches().length; i++ ) {
 		for ( var k = 0; k < searches.length; k++ ) {
-			if ( window.imagePagePrimaryRootCodeObject.getVariable__v_searches()[i]['id'] === searches[ k ] ) {
+			if ( imagePagePrimaryRootCodeObject.getVariable__v_searches()[i]['id'] === searches[ k ] ) {
 				colorIndex += ( i + 1 );
 				break;
 			}
@@ -542,13 +551,13 @@ ColorManager.PrettyTheme.prototype.getColorForSearches = function( searches ) {
  */
 ColorManager.PrettyTheme.prototype.getColorForHighlightedUID = function( uid ) {
 		
-	var index = window.imagePagePrimaryRootCodeObject.getVariable__v_indexManager().getIndexForUID( uid );
+	var index = imagePagePrimaryRootCodeObject.getVariable__v_indexManager().getIndexForUID( uid );
 		
 	if( index < 0 ) {
 		throw Error( "Could not find uid: " + uid + " in index manager." );
 	}
 	
-	var number = window.imagePagePrimaryRootCodeObject.getVariable__v_indexManager().getProteinList().length;
+	var number = imagePagePrimaryRootCodeObject.getVariable__v_indexManager().getProteinList().length;
 	
 	var hueDivider = 360 / number;
 	var saturation = 0.39;
@@ -574,7 +583,7 @@ ColorManager.PrettyTheme.prototype.getColorForHighlightedUID = function( uid ) {
  */
 ColorManager.PrettyTheme.prototype.getColorForRegion = function( region ) {
 		
-	if( window.imagePagePrimaryRootCodeObject.getVariable__v_colorLinesBy() !== window.imagePagePrimaryRootCodeObject.getVariable__v_SELECT_ELEMENT_COLOR_BY_REGION() ) {
+	if( imagePagePrimaryRootCodeObject.getVariable__v_colorLinesBy() !== imagePagePrimaryRootCodeObject.getVariable__v_SELECT_ELEMENT_COLOR_BY_REGION() ) {
 		return this.getColorForHighlightedUID( region.uid );
 	}
 	
@@ -633,18 +642,18 @@ ColorManager.PrettyTheme.prototype.getColorForNonHighlightedItem = function() {
 ColorManager.getRegionForUIDAndPosition = function( uid, position ) {
 	
 	// if nothing is explicitly highlighted, everything is highlighted
-	if( !window.imagePagePrimaryRootCodeObject.getVariable__v_imageProteinBarDataManager().isAnyProteinBarsHighlighted() ) {
+	if( !imagePagePrimaryRootCodeObject.getVariable__v_imageProteinBarDataManager().isAnyProteinBarsHighlighted() ) {
 		
 		var region = { };
 		
 		region.uid = uid;
 		region.start = 1;
-		region.end = window.imagePagePrimaryRootCodeObject.getVariable__v_proteinLengths().getProteinLength( window.imagePagePrimaryRootCodeObject.getVariable__v_indexManager().getProteinIdForUID( uid ) );
+		region.end = imagePagePrimaryRootCodeObject.getVariable__v_proteinLengths().getProteinLength( imagePagePrimaryRootCodeObject.getVariable__v_indexManager().getProteinIdForUID( uid ) );
 			
 		return region;
 	}
 	
-	var barData = window.imagePagePrimaryRootCodeObject.getVariable__v_imageProteinBarDataManager().getItemByUID( uid );	
+	var barData = imagePagePrimaryRootCodeObject.getVariable__v_imageProteinBarDataManager().getItemByUID( uid );	
 	
 	if( !barData ) {
 		throw Error( "Unable to find protein bar data for uid: " + uid );
@@ -656,7 +665,7 @@ ColorManager.getRegionForUIDAndPosition = function( uid, position ) {
 			
 		region.uid = uid;
 		region.start = 1;
-		region.end = window.imagePagePrimaryRootCodeObject.getVariable__v_proteinLengths().getProteinLength( window.imagePagePrimaryRootCodeObject.getVariable__v_indexManager().getProteinIdForUID( uid ) );
+		region.end = imagePagePrimaryRootCodeObject.getVariable__v_proteinLengths().getProteinLength( imagePagePrimaryRootCodeObject.getVariable__v_indexManager().getProteinIdForUID( uid ) );
 			
 		return region;
 	}
@@ -694,11 +703,11 @@ ColorManager.getRegionForUIDAndPosition = function( uid, position ) {
 ColorManager.isLinkedPositionHighlighted = function( uid, position ) {
 
 	// if nothing is explicitly highlighted, everything is highlighted
-	if( !window.imagePagePrimaryRootCodeObject.getVariable__v_imageProteinBarDataManager().isAnyProteinBarsHighlighted() ) {	
+	if( !imagePagePrimaryRootCodeObject.getVariable__v_imageProteinBarDataManager().isAnyProteinBarsHighlighted() ) {	
 		return true;
 	}
 	
-	var barData = window.imagePagePrimaryRootCodeObject.getVariable__v_imageProteinBarDataManager().getItemByUID( uid );	
+	var barData = imagePagePrimaryRootCodeObject.getVariable__v_imageProteinBarDataManager().getItemByUID( uid );	
 	
 	if( !barData ) {
 		throw Error( "Unable to find protein bar data for uid: " + uid );
@@ -727,7 +736,7 @@ ColorManager.isLinkedPositionHighlighted = function( uid, position ) {
  */
 ColorManager.getAllRegions = function() {
 
-	var entries = window.imagePagePrimaryRootCodeObject.getVariable__v_indexManager().getProteinArray();
+	var entries = imagePagePrimaryRootCodeObject.getVariable__v_indexManager().getProteinArray();
 	var regions = [ ];
 	
 	for( var i = 0; i < entries.length; i++ ) {
@@ -736,12 +745,12 @@ ColorManager.getAllRegions = function() {
 		var pid = entries [ i ].pid;
 		
 		// if nothing is explicitly highlighted, everything is highlighted
-		if( !window.imagePagePrimaryRootCodeObject.getVariable__v_imageProteinBarDataManager().isAnyProteinBarsHighlighted() ) {	
+		if( !imagePagePrimaryRootCodeObject.getVariable__v_imageProteinBarDataManager().isAnyProteinBarsHighlighted() ) {	
 			var region = { };
 			
 			region.uid = uid;
 			region.start = 1;
-			region.end = window.imagePagePrimaryRootCodeObject.getVariable__v_proteinLengths().getProteinLength( pid );
+			region.end = imagePagePrimaryRootCodeObject.getVariable__v_proteinLengths().getProteinLength( pid );
 			
 			if( !region.end ) {
 				throw Error( "Unable to find protein length for protein: " + pid );
@@ -751,7 +760,7 @@ ColorManager.getAllRegions = function() {
 
 		} else {
 		
-			var barData = window.imagePagePrimaryRootCodeObject.getVariable__v_imageProteinBarDataManager().getItemByUID( uid );		
+			var barData = imagePagePrimaryRootCodeObject.getVariable__v_imageProteinBarDataManager().getItemByUID( uid );		
 			
 			if( !barData ) {
 				throw Error( "Unable to find protein bar data for uid: " + uid );
@@ -768,7 +777,7 @@ ColorManager.getAllRegions = function() {
 				
 				region.uid = uid;
 				region.start = 1;
-				region.end = window.imagePagePrimaryRootCodeObject.getVariable__v_proteinLengths().getProteinLength( pid );
+				region.end = imagePagePrimaryRootCodeObject.getVariable__v_proteinLengths().getProteinLength( pid );
 				
 				if( !region.end ) {
 					throw Error( "Unable to find protein length for protein: " + pid );
@@ -852,23 +861,23 @@ ColorManager.getOpacityForHighlightedLink = function( link ) {
 		try {
 			if( link.type == 'crosslink' ) {
 
-				numPsms = window.imagePagePrimaryRootCodeObject.getVariable__v_linkPSMCounts()[ 'crosslink' ][ link.protein1 ][ link.protein2 ][ link.position1 ][ link.position2 ];				
+				numPsms = imagePagePrimaryRootCodeObject.getVariable__v_linkPSMCounts()[ 'crosslink' ][ link.protein1 ][ link.protein2 ][ link.position1 ][ link.position2 ];				
 
 			} else if( link.type == 'looplink' ) {
 
 				try {
-					numPsms = window.imagePagePrimaryRootCodeObject.getVariable__v_linkPSMCounts()[ 'looplink' ][ link.protein1 ][ link.protein1 ][ link.position1 ][ link.position2 ];
+					numPsms = imagePagePrimaryRootCodeObject.getVariable__v_linkPSMCounts()[ 'looplink' ][ link.protein1 ][ link.protein1 ][ link.position1 ][ link.position2 ];
 				} catch( err ) { }
 				
 				if( !numPsms ) {
 					try {
-						numPsms = window.imagePagePrimaryRootCodeObject.getVariable__v_linkPSMCounts()[ 'looplink' ][ link.protein1 ][ link.protein1 ][ link.position2 ][ link.position1 ];
+						numPsms = imagePagePrimaryRootCodeObject.getVariable__v_linkPSMCounts()[ 'looplink' ][ link.protein1 ][ link.protein1 ][ link.position2 ][ link.position1 ];
 					} catch( err ) { }
 				}
 
 			} else if( link.type == 'monolink' ) {
 
-				numPsms = window.imagePagePrimaryRootCodeObject.getVariable__v_linkPSMCounts()[ 'monolink' ][ link.protein1 ][ link.position1 ];	
+				numPsms = imagePagePrimaryRootCodeObject.getVariable__v_linkPSMCounts()[ 'monolink' ][ link.protein1 ][ link.position1 ];	
 
 			} else {
 
@@ -923,11 +932,11 @@ ColorManager.validateLink = function( link ) {
 	if( !link.hasOwnProperty( "uid1" ) ) {
 		throw Error( "uid1 does not exist." );
 	} else {
-		if( !window.imagePagePrimaryRootCodeObject.getVariable__v_indexManager().containsUID( link.uid1 ) ) {
+		if( !imagePagePrimaryRootCodeObject.getVariable__v_indexManager().containsUID( link.uid1 ) ) {
 			throw Error( "invalid uid1 sent: " + link.uid1 );
 		}
 		
-		if( !window.imagePagePrimaryRootCodeObject.getVariable__v_imageProteinBarDataManager().getItemByUID( link.uid1 ) ) {
+		if( !imagePagePrimaryRootCodeObject.getVariable__v_imageProteinBarDataManager().getItemByUID( link.uid1 ) ) {
 			throw Error( "no protein bar data for uid1: " + link.uid1 );
 		}
 	}
@@ -939,8 +948,8 @@ ColorManager.validateLink = function( link ) {
 			throw Error( "position1 must be a number" );
 		} else {
 			var uidForPosition1 = link.uid1;
-			var proteinIdForPosition1 = window.imagePagePrimaryRootCodeObject.getVariable__v_indexManager().getProteinIdForUID( uidForPosition1 );
-			var proteinLengthForPosition1 = window.imagePagePrimaryRootCodeObject.getVariable__v_proteinLengths().getProteinLength( proteinIdForPosition1 );
+			var proteinIdForPosition1 = imagePagePrimaryRootCodeObject.getVariable__v_indexManager().getProteinIdForUID( uidForPosition1 );
+			var proteinLengthForPosition1 = imagePagePrimaryRootCodeObject.getVariable__v_proteinLengths().getProteinLength( proteinIdForPosition1 );
 			if( link.position1 < 1 || link.position1 > proteinLengthForPosition1 ) {
 				throw Error( "position 1 is not in the valid range for uid (1-" + 
 						proteinLengthForPosition1 + "), uid: " + uidForPosition1 );
@@ -953,10 +962,10 @@ ColorManager.validateLink = function( link ) {
 		if( link.type === "crosslink" && !link.hasOwnProperty( "uid2" ) ) {
 			throw Error( "uid2 does not exist." );
 		} else if( link.type === "crosslink" ) {
-			if( !window.imagePagePrimaryRootCodeObject.getVariable__v_indexManager().containsUID( link.uid2 ) ) {
+			if( !imagePagePrimaryRootCodeObject.getVariable__v_indexManager().containsUID( link.uid2 ) ) {
 				throw Error( "invalid uid2 sent: " + link.uid2 );
 			}
-			if( !window.imagePagePrimaryRootCodeObject.getVariable__v_imageProteinBarDataManager().getItemByUID( link.uid2 ) ) {
+			if( !imagePagePrimaryRootCodeObject.getVariable__v_imageProteinBarDataManager().getItemByUID( link.uid2 ) ) {
 				throw Error( "no protein bar data for uid2: " + link.uid2 );
 			}
 		}
@@ -971,8 +980,8 @@ ColorManager.validateLink = function( link ) {
 				if ( link.type ==="looplink" && uidForPosition2 === undefined ) {
 					uidForPosition2 = link.uid1; //  uid for position 2 for looplink
 				}
-				var proteinIdForPosition2 = window.imagePagePrimaryRootCodeObject.getVariable__v_indexManager().getProteinIdForUID( uidForPosition2 );
-				var proteinLengthForPosition2 = window.imagePagePrimaryRootCodeObject.getVariable__v_proteinLengths().getProteinLength( proteinIdForPosition2 );
+				var proteinIdForPosition2 = imagePagePrimaryRootCodeObject.getVariable__v_indexManager().getProteinIdForUID( uidForPosition2 );
+				var proteinLengthForPosition2 = imagePagePrimaryRootCodeObject.getVariable__v_proteinLengths().getProteinLength( proteinIdForPosition2 );
 				if( link.position2 < 1 || link.position2 > proteinLengthForPosition2 ) {
 					throw Error( "position 2 is not in the valid range for uid (1-" + 
 							proteinLengthForPosition2 + "), uid: " + uidForPosition2 );
@@ -983,6 +992,17 @@ ColorManager.validateLink = function( link ) {
 	}
 }
 
-export { ColorManager }
+
+
+
+/**
+ * Called from "crosslink-image-viewer.js" to populate local copy of imagePagePrimaryRootCodeObject
+ */
+var ColorManager_pass_imagePagePrimaryRootCodeObject = function( imagePagePrimaryRootCodeObject_Param ) {
+	imagePagePrimaryRootCodeObject = imagePagePrimaryRootCodeObject_Param;
+}
+
+
+export { ColorManager, ColorManager_pass_imagePagePrimaryRootCodeObject }
 
 
