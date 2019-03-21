@@ -35,9 +35,9 @@ import { cutoffProcessingCommonCode } from 'page_js/data_pages/project_search_id
 import { webserviceDataParamsDistributionCommonCode } from 'page_js/data_pages/project_search_ids_driven_pages/common/webserviceDataParamsDistribution.js';
 
 
-import { getLooplinkDataForSpecificLinkInGraph, getCrosslinkDataForSpecificLinkInGraph, getMonolinkDataForSpecificLinkInGraph } from './structure-viewer-click-element-handlers.js';
-import { LinkColorHandler } from './structure-viewer-color-handler.js';
-import { attachPDBMapProteinOverlayClickHandlers } from './structure-viewer-map-protein.js';
+import { getLooplinkDataForSpecificLinkInGraph, getCrosslinkDataForSpecificLinkInGraph, getMonolinkDataForSpecificLinkInGraph, structure_viewer_click_element_handlers_pass_structurePagePrimaryRootCodeObject } from './structure-viewer-click-element-handlers.js';
+import { LinkColorHandler, LinkColorHandler_pass_structurePagePrimaryRootCodeObject } from './structure-viewer-color-handler.js';
+import { attachPDBMapProteinOverlayClickHandlers, attachPDBMapProteinOverlayClickHandlers_pass_structurePagePrimaryRootCodeObject } from './structure-viewer-map-protein.js';
 import { attachPDBUploadOverlayClickHandlers, attachPDBFileUploadHandlers } from './structure-viewer-pdb-upload.js';
 
 import { getProteinSequenceVersionIdsForNrseqProteinIds } from 'page_js/data_pages/project_search_ids_driven_pages/image_page__structure_page__shared/nrseqProteinIdToProteinSequenceVersionIdLookup.js';
@@ -6861,8 +6861,16 @@ var StructurePagePrimaryRootCodeClass = function() {
 
 }
 
-window.structurePagePrimaryRootCodeObject = new StructurePagePrimaryRootCodeClass();
+var structurePagePrimaryRootCodeObject = new StructurePagePrimaryRootCodeClass();
 
+
+window.structurePagePrimaryRootCodeObject = structurePagePrimaryRootCodeObject;
+
+
+//   Pass structurePagePrimaryRootCodeObject to other JS files that use it
+structure_viewer_click_element_handlers_pass_structurePagePrimaryRootCodeObject( structurePagePrimaryRootCodeObject );
+LinkColorHandler_pass_structurePagePrimaryRootCodeObject( structurePagePrimaryRootCodeObject );
+attachPDBMapProteinOverlayClickHandlers_pass_structurePagePrimaryRootCodeObject( structurePagePrimaryRootCodeObject );
 
 
 

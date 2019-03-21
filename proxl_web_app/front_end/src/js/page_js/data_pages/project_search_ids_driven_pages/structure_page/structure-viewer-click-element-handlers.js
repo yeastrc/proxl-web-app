@@ -1,8 +1,18 @@
-
-//  structure-viewer-click-element-handlers.js
+/**
+ * structure-viewer-click-element-handlers.js
+ * 
+ * Javascript for the viewMergedStructure.jsp page
+ *  
+ * !!! The following variables passed in from "structure-viewer-page.js" are used in this file:
+ * 
+ *    structurePagePrimaryRootCodeObject
+ */
 
 
 import { getLooplinkDataCommon, getCrosslinkDataCommon, getMonolinkDataCommon, attachViewLinkInfoOverlayClickHandlers } from 'page_js/data_pages/project_search_ids_driven_pages/image_page__structure_page__shared/image_structure_click_element_common.js';
+
+
+var structurePagePrimaryRootCodeObject = undefined; // passed in from "structure-viewer-page.js"
 
 
 ///////////////////////////////////////////////////////////////////////////
@@ -28,7 +38,7 @@ function getLooplinkDataForSpecificLinkInGraph( params, link ) {
 			searchesArray : link.searchIds,
 			
 			from_protein_id : link.protein1,
-			from_protein_name : window.structurePagePrimaryRootCodeObject.getVariable__v_proteinNames()[ link.protein1 ],
+			from_protein_name : structurePagePrimaryRootCodeObject.getVariable__v_proteinNames()[ link.protein1 ],
 			protein_position_1 : link.position1,
 			protein_position_2 : link.position2,
 			
@@ -67,9 +77,9 @@ function getCrosslinkDataForSpecificLinkInGraph( params, link ) {
 	
 	incrementSpinner();				// create spinner
 
-	var from_protein_name = window.structurePagePrimaryRootCodeObject.getVariable__v_proteinNames()[ link.protein1 ];
+	var from_protein_name = structurePagePrimaryRootCodeObject.getVariable__v_proteinNames()[ link.protein1 ];
 	var from_protein_position = link.position1;
-	var to_protein_name = window.structurePagePrimaryRootCodeObject.getVariable__v_proteinNames()[ link.protein2 ];
+	var to_protein_name = structurePagePrimaryRootCodeObject.getVariable__v_proteinNames()[ link.protein2 ];
 	var to_protein_position = link.position2;
 
 	var from_protein_id = link.protein1;
@@ -179,7 +189,7 @@ function getMonolinkDataForSpecificLinkInGraph( params, link ) {
 			
 			searchesArray : link.searchIds,
 			
-			from_protein_name : window.structurePagePrimaryRootCodeObject.getVariable__v_proteinNames()[ link.protein1 ],
+			from_protein_name : structurePagePrimaryRootCodeObject.getVariable__v_proteinNames()[ link.protein1 ],
 			from_protein_id : link.protein1,
 			protein_position : link.position1
 	};
@@ -195,4 +205,12 @@ function getMonolinkDataForSpecificLinkInGraph( params, link ) {
 }
 
 
-export { getLooplinkDataForSpecificLinkInGraph, getCrosslinkDataForSpecificLinkInGraph, getMonolinkDataForSpecificLinkInGraph }
+/**
+ * Called from "structure-viewer-page.js" to populate local copy of structurePagePrimaryRootCodeObject
+ */
+var structure_viewer_click_element_handlers_pass_structurePagePrimaryRootCodeObject = function( structurePagePrimaryRootCodeObject_Param ) {
+	structurePagePrimaryRootCodeObject = structurePagePrimaryRootCodeObject_Param;
+}
+
+
+export { getLooplinkDataForSpecificLinkInGraph, getCrosslinkDataForSpecificLinkInGraph, getMonolinkDataForSpecificLinkInGraph, structure_viewer_click_element_handlers_pass_structurePagePrimaryRootCodeObject }
