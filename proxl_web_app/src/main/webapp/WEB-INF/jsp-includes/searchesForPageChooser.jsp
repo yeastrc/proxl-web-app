@@ -104,7 +104,29 @@
 <%--  Keep at end since requires everything on the DOM first --%>
 <script type="text/javascript" >
 	try {
-		searchesForPageChooser.init();
+		if ( window.searchesForPageChooser ) {
+			window.searchesForPageChooser.init();
+		} else {
+			if ( window.$ ) {
+				$(document).ready(function()  { 
+					try {
+						window.searchesForPageChooser.init();
+					} catch( e ) {
+						reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+						throw e;
+					}
+				});
+			} else {
+				window.setTimeout( function() {
+					try {
+						window.searchesForPageChooser.init();
+					} catch( e ) {
+						reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+						throw e;
+					}
+				}, 5000 ); // delay for 5 seconds
+			}
+		}
 	} catch( e ) {
 		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
 		throw e;

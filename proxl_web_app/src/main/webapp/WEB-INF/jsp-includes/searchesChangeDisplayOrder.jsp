@@ -83,7 +83,29 @@
 <%--  Keep at end since requires everything on the DOM first --%>
 <script type="text/javascript" >
 	try {
-		searchesChangeDisplayOrder.init();
+		if ( window.searchesChangeDisplayOrder ) {
+			window.searchesChangeDisplayOrder.init();
+		} else {
+			if ( window.$ ) {
+				$(document).ready(function()  { 
+					try {
+						window.searchesChangeDisplayOrder.init();
+					} catch( e ) {
+						reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+						throw e;
+					}
+				});
+			} else {
+				window.setTimeout( function() {
+					try {
+						window.searchesChangeDisplayOrder.init();
+					} catch( e ) {
+						reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+						throw e;
+					}
+				}, 5000 ); // delay for 5 seconds
+			}
+		}
 	} catch( e ) {
 		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
 		throw e;
