@@ -1,5 +1,18 @@
 "use strict";
 
+/**
+ * Javascript for the viewMergedStructure.jsp page
+ *  
+ * !!! The following variables passed in from "structure-viewer-page.js" are used in this file:
+ * 
+ *    structurePagePrimaryRootCodeObject (copied to local variable structurePagePrimaryRootCodeObject_LocalCopy)
+ */
+
+
+
+var structurePagePrimaryRootCodeObject_LocalCopy = undefined; // passed in from "structure-viewer-page.js"
+
+
 
 var _MAX_PDB_FILESIZE_IN_MB = 200; 
 var _MAX_PDB_FILESIZE = _MAX_PDB_FILESIZE_IN_MB * 1000 * 1000;
@@ -186,8 +199,8 @@ window.uploadPDBFile = function() {
 
     			closePDBUploadOverlay();
 
-    			var pdbFileId = window.structurePagePrimaryRootCodeObject.call__getSelectedPDBFile().id;
-    			window.structurePagePrimaryRootCodeObject.call__loadPDBFiles( pdbFileId );
+    			var pdbFileId = structurePagePrimaryRootCodeObject_LocalCopy.call__getSelectedPDBFile().id;
+    			structurePagePrimaryRootCodeObject_LocalCopy.call__loadPDBFiles( pdbFileId );
 
     		} else {
 
@@ -207,4 +220,12 @@ window.uploadPDBFile = function() {
 
 }
 
-export { attachPDBUploadOverlayClickHandlers, attachPDBFileUploadHandlers }
+/**
+ * Called from "structure-viewer-page.js" to populate local copy of structurePagePrimaryRootCodeObject
+ */
+var PdbUpload_pass_structurePagePrimaryRootCodeObject = function( structurePagePrimaryRootCodeObject_LocalCopy_Param ) {
+	structurePagePrimaryRootCodeObject_LocalCopy = structurePagePrimaryRootCodeObject_LocalCopy_Param;
+}
+
+
+export { attachPDBUploadOverlayClickHandlers, attachPDBFileUploadHandlers, PdbUpload_pass_structurePagePrimaryRootCodeObject }

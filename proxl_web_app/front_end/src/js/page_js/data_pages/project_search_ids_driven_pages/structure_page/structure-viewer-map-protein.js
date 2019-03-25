@@ -5,8 +5,13 @@
  *  
  * !!! The following variables passed in from "structure-viewer-page.js" are used in this file:
  * 
- *    structurePagePrimaryRootCodeObject
+ *    structurePagePrimaryRootCodeObject_LocalCopy
  */
+
+
+
+var structurePagePrimaryRootCodeObject_LocalCopy = undefined; // passed in from "structure-viewer-page.js"
+
 
 
 //initialize the pdb upload overlay - Moved to main JS file
@@ -122,7 +127,7 @@ window.showProteinSelectInOverlay = function( chainId ) {
 	var content = $("#pdb-map-protein-overlay-protein-step-one" ).html();
 	
 	// get all protein sequence ids already mapped to this chain
-	var alignments = structurePagePrimaryRootCodeObject.call__getAllAlignmentsForChain( chainId );
+	var alignments = structurePagePrimaryRootCodeObject_LocalCopy.call__getAllAlignmentsForChain( chainId );
 	var alignedProteins = new Array();
 	if( alignments && alignments.length > 0 ) {
 		for( var i = 0; i < alignments.length; i++ ) {
@@ -144,18 +149,18 @@ window.showProteinSelectInOverlay = function( chainId ) {
 	
 	//  Only show proteins that are not already mapped to this chain
 	
-	for( var i = 0; i < structurePagePrimaryRootCodeObject.getVariable__v_proteins().length; i++ ) {
+	for( var i = 0; i < structurePagePrimaryRootCodeObject_LocalCopy.getVariable__v_proteins().length; i++ ) {
 		
 		var found = false;
 		for( var k = 0; k < alignedProteins.length; k++ ) {
-			if( structurePagePrimaryRootCodeObject.getVariable__v_proteins()[ i ] == alignedProteins[ k ] ) { 
+			if( structurePagePrimaryRootCodeObject_LocalCopy.getVariable__v_proteins()[ i ] == alignedProteins[ k ] ) { 
 				found = true; 
 				break; 
 			}
 		}
 
 		if( !found ) {
-			content += "<option value=\"" + structurePagePrimaryRootCodeObject.getVariable__v_proteins()[ i ] + "\">" + structurePagePrimaryRootCodeObject.getVariable__v_proteinNames()[ structurePagePrimaryRootCodeObject.getVariable__v_proteins()[ i ] ] + "</option>\n";
+			content += "<option value=\"" + structurePagePrimaryRootCodeObject_LocalCopy.getVariable__v_proteins()[ i ] + "\">" + structurePagePrimaryRootCodeObject_LocalCopy.getVariable__v_proteinNames()[ structurePagePrimaryRootCodeObject_LocalCopy.getVariable__v_proteins()[ i ] ] + "</option>\n";
 		}
 	}
 	
@@ -210,7 +215,7 @@ window.showProteinSelectInOverlay = function( chainId ) {
 
 window.showAlignment = function( alignment, showSave ) {
 		
-	var pdbFile = structurePagePrimaryRootCodeObject.call__getSelectedPDBFile();
+	var pdbFile = structurePagePrimaryRootCodeObject_LocalCopy.call__getSelectedPDBFile();
 	
 	
 	closePDBMapProteinOverlay();
@@ -226,19 +231,19 @@ window.showAlignment = function( alignment, showSave ) {
 		saveButtonHTML = "<input type=\"button\" value=\"Save\" id=\"saveAlignmentButton\" />";
 	}
 	
-	if( structurePagePrimaryRootCodeObject.getVariable__v_PDB_FILES()[ pdbFile.id ][ 'canEdit' ] ) {
+	if( structurePagePrimaryRootCodeObject_LocalCopy.getVariable__v_PDB_FILES()[ pdbFile.id ][ 'canEdit' ] ) {
 		editButtonHTML = "<input type=\"button\" value=\"Edit\" id=\"editAlignmentButton\" />";
 	}
 	
 	
-	var proteinNameForProteinId = structurePagePrimaryRootCodeObject.getVariable__v_proteinNames()[ alignment.proteinSequenceVersionId ];
+	var proteinNameForProteinId = structurePagePrimaryRootCodeObject_LocalCopy.getVariable__v_proteinNames()[ alignment.proteinSequenceVersionId ];
 	
 	var chainDisplayName = alignment.chainId;
 	if( chainDisplayName === "_" ) { chainDisplayName = "Default"; }
 
 	var html = 
 		"<div style=\"margin-top:20px;margin-bottom:20px;font-size:14pt;\">Showing alignment for "
-		+ structurePagePrimaryRootCodeObject.getVariable__v_proteinNames()[ alignment.proteinSequenceVersionId ] 
+		+ structurePagePrimaryRootCodeObject_LocalCopy.getVariable__v_proteinNames()[ alignment.proteinSequenceVersionId ] 
 		+ " and " 
 		+ pdbFile.name + " (Chain " + chainDisplayName + "):</div>\n"
 	
@@ -290,12 +295,12 @@ window.showAlignment = function( alignment, showSave ) {
 
 window.showEditAlignmentOverlay = function( alignment ) {
 	
-	var pdbFile = structurePagePrimaryRootCodeObject.call__getSelectedPDBFile();
+	var pdbFile = structurePagePrimaryRootCodeObject_LocalCopy.call__getSelectedPDBFile();
 	
 	var $overlayDiv = $("#pdb-show-alignment-overlay-body");
 	$overlayDiv.empty();
 	
-	var proteinNameForAlignment  = structurePagePrimaryRootCodeObject.getVariable__v_proteinNames()[ alignment.proteinSequenceVersionId ];
+	var proteinNameForAlignment  = structurePagePrimaryRootCodeObject_LocalCopy.getVariable__v_proteinNames()[ alignment.proteinSequenceVersionId ];
 	
 	var chainDisplayName = alignment.chainId;
 	if( chainDisplayName === "_" ) { chainDisplayName = "Default"; }
@@ -375,7 +380,7 @@ window.saveEditedAlignment = function( alignment ) {
 	
 	var rawExperimentalSequence = alignment.alignedExperimentalSequence.replace( /-/g, "" );
 	if( tmpExperimentalSequence !== rawExperimentalSequence ) {
-		var proteinName = structurePagePrimaryRootCodeObject.getVariable__v_proteinNames()[ alignment.proteinSequenceVersionId ];
+		var proteinName = structurePagePrimaryRootCodeObject_LocalCopy.getVariable__v_proteinNames()[ alignment.proteinSequenceVersionId ];
 		
 		alert( "Sequence given for " + proteinName + " does not match sequence on file for that protein." );
 		return;
@@ -415,7 +420,7 @@ window.saveAlignment = function( alignment ) {
 	        success: function(data)	{
 	        	try {
 	        		closePDBShowAlignmentOverlay();
-	        		structurePagePrimaryRootCodeObject.call__loadPDBFileAlignments( structurePagePrimaryRootCodeObject.getVariable__v_listChains() );
+	        		structurePagePrimaryRootCodeObject_LocalCopy.call__loadPDBFileAlignments( structurePagePrimaryRootCodeObject_LocalCopy.getVariable__v_listChains() );
 	        	} catch( e ) {
 	        		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
 	        		throw e;
@@ -435,7 +440,7 @@ window.saveAlignment = function( alignment ) {
 window.submitProteinForAlignment = function( chainId ) {
 
 	var proteinId = $("#pdb-map-protein-overlay-protein-select").val();
-	var pdbFileId = structurePagePrimaryRootCodeObject.call__getSelectedPDBFile().id;
+	var pdbFileId = structurePagePrimaryRootCodeObject_LocalCopy.call__getSelectedPDBFile().id;
 	
 	var url = "services/psa/alignSequences";
 	url += "?pdbFileId=" + pdbFileId;
@@ -479,7 +484,7 @@ window.showStructureInOverlay = function ( chainId ) {
 	
 	var overLayViewer = pv.Viewer(document.getElementById('pdb-map-protein-overlay-structure'), options);
 	
-	var STRUCTURE = structurePagePrimaryRootCodeObject.getVariable__v_STRUCTURE();
+	var STRUCTURE = structurePagePrimaryRootCodeObject_LocalCopy.getVariable__v_STRUCTURE();
 
 	var chains = STRUCTURE.chains();
 	for( var i = 0; i < chains.length; i++ ) {
@@ -502,8 +507,8 @@ window.showStructureInOverlay = function ( chainId ) {
 /**
  * Called from "structure-viewer-page.js" to populate local copy of structurePagePrimaryRootCodeObject
  */
-var attachPDBMapProteinOverlayClickHandlers_pass_structurePagePrimaryRootCodeObject = function( structurePagePrimaryRootCodeObject_Param ) {
-	structurePagePrimaryRootCodeObject = structurePagePrimaryRootCodeObject_Param;
+var attachPDBMapProteinOverlayClickHandlers_pass_structurePagePrimaryRootCodeObject = function( structurePagePrimaryRootCodeObject_LocalCopy_Param ) {
+	structurePagePrimaryRootCodeObject_LocalCopy = structurePagePrimaryRootCodeObject_LocalCopy_Param;
 }
 
 

@@ -38,7 +38,7 @@ import { webserviceDataParamsDistributionCommonCode } from 'page_js/data_pages/p
 import { getLooplinkDataForSpecificLinkInGraph, getCrosslinkDataForSpecificLinkInGraph, getMonolinkDataForSpecificLinkInGraph, structure_viewer_click_element_handlers_pass_structurePagePrimaryRootCodeObject } from './structure-viewer-click-element-handlers.js';
 import { LinkColorHandler, LinkColorHandler_pass_structurePagePrimaryRootCodeObject } from './structure-viewer-color-handler.js';
 import { attachPDBMapProteinOverlayClickHandlers, attachPDBMapProteinOverlayClickHandlers_pass_structurePagePrimaryRootCodeObject } from './structure-viewer-map-protein.js';
-import { attachPDBUploadOverlayClickHandlers, attachPDBFileUploadHandlers } from './structure-viewer-pdb-upload.js';
+import { attachPDBUploadOverlayClickHandlers, attachPDBFileUploadHandlers, PdbUpload_pass_structurePagePrimaryRootCodeObject } from './structure-viewer-pdb-upload.js';
 
 import { getProteinSequenceVersionIdsForNrseqProteinIds } from 'page_js/data_pages/project_search_ids_driven_pages/image_page__structure_page__shared/nrseqProteinIdToProteinSequenceVersionIdLookup.js';
 import { getLooplinkDataCommon, getCrosslinkDataCommon, getMonolinkDataCommon, attachViewLinkInfoOverlayClickHandlers } from 'page_js/data_pages/project_search_ids_driven_pages/image_page__structure_page__shared/image_structure_click_element_common.js';
@@ -6871,7 +6871,7 @@ window.structurePagePrimaryRootCodeObject = structurePagePrimaryRootCodeObject;
 structure_viewer_click_element_handlers_pass_structurePagePrimaryRootCodeObject( structurePagePrimaryRootCodeObject );
 LinkColorHandler_pass_structurePagePrimaryRootCodeObject( structurePagePrimaryRootCodeObject );
 attachPDBMapProteinOverlayClickHandlers_pass_structurePagePrimaryRootCodeObject( structurePagePrimaryRootCodeObject );
-
+PdbUpload_pass_structurePagePrimaryRootCodeObject( structurePagePrimaryRootCodeObject );
 
 
 ///////////
