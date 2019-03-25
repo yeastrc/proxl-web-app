@@ -6,7 +6,7 @@
  *  
  * !!! The following variables passed in from "crosslink-image-viewer.js" are used in this file:
  * 
- *    imagePagePrimaryRootCodeObject
+ *    imagePagePrimaryRootCodeObject (copied to local variable imagePagePrimaryRootCodeObject_LocalCopy)
  * 
  */
 
@@ -21,7 +21,7 @@ import { proteinAnnotationStore, getDisorderedRegionsDisopred_2, getDisorderedRe
 
 
 
-var imagePagePrimaryRootCodeObject = undefined; // passed in from "crosslink-image-viewer.js"
+var imagePagePrimaryRootCodeObject_LocalCopy = undefined; // passed in from "crosslink-image-viewer.js"
 
 
 
@@ -84,7 +84,7 @@ circlePlotViewer.prototype.draw  = function(  ) {
 		return;
 	}
 	
-	imagePagePrimaryRootCodeObject.set_Variable__v_GLOBAL_SNAP_SVG_OBJECT( svgRootSnapSVGObject );
+	imagePagePrimaryRootCodeObject_LocalCopy.set_Variable__v_GLOBAL_SNAP_SVG_OBJECT( svgRootSnapSVGObject );
 	
 	this.setViewerDimensions( svgRootSnapSVGObject );
 	
@@ -141,7 +141,7 @@ circlePlotViewer.prototype.draw  = function(  ) {
  * @param svgRootSnapSVGObject
  */
 circlePlotViewer.prototype.drawFeatureAnnotationData = function( svgRootSnapSVGObject ) {
-	var selectedProteins = imagePagePrimaryRootCodeObject.getVariable__v_indexManager().getProteinArray();
+	var selectedProteins = imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_indexManager().getProteinArray();
 	var annoType = $("#annotation_type").val();	
 	var radii = this.getFeatureAnnotationRadii();		// the radii to use for drawing the feature annotation curved bars
 	
@@ -151,21 +151,21 @@ circlePlotViewer.prototype.drawFeatureAnnotationData = function( svgRootSnapSVGO
 		var uid = selectedProteins[ i ].uid;
 		
 		var segments;
-		if( annoType === imagePagePrimaryRootCodeObject.getVariable__v_SELECT_ELEMENT_ANNOTATION_TYPE_DISOPRED3() ) {
+		if( annoType === imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_SELECT_ELEMENT_ANNOTATION_TYPE_DISOPRED3() ) {
 		
 			segments = getDisorderedRegionsDisopred_3( pid );
 
-		} else if( annoType === imagePagePrimaryRootCodeObject.getVariable__v_SELECT_ELEMENT_ANNOTATION_TYPE_PSIPRED3() ) {
+		} else if( annoType === imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_SELECT_ELEMENT_ANNOTATION_TYPE_PSIPRED3() ) {
 			
 			segments = getSecondaryStructureRegions( pid );
 			
-		} else if( annoType === imagePagePrimaryRootCodeObject.getVariable__v_SELECT_ELEMENT_ANNOTATION_TYPE_SEQUENCE_COVERAGE() ) {
+		} else if( annoType === imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_SELECT_ELEMENT_ANNOTATION_TYPE_SEQUENCE_COVERAGE() ) {
 			
-			segments = imagePagePrimaryRootCodeObject.getVariable__v_ranges()[ pid ];
+			segments = imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_ranges()[ pid ];
 
-		} else if( annoType === imagePagePrimaryRootCodeObject.getVariable__v_SELECT_ELEMENT_ANNOTATION_TYPE_CUSTOM() ) {
+		} else if( annoType === imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_SELECT_ELEMENT_ANNOTATION_TYPE_CUSTOM() ) {
 
-			segments = imagePagePrimaryRootCodeObject.getVariable__v_customRegionManager()._customRegionAnnotationData[ pid ];
+			segments = imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_customRegionManager()._customRegionAnnotationData[ pid ];
 			if( segments === undefined ) { segments = [ ]; }
 			
 		} else {
@@ -190,15 +190,15 @@ circlePlotViewer.prototype.drawFeatureAnnotationData = function( svgRootSnapSVGO
 			
 			// get the color to use for this segment
 			var color;
-			if( annoType === imagePagePrimaryRootCodeObject.getVariable__v_SELECT_ELEMENT_ANNOTATION_TYPE_DISOPRED3() ) {
+			if( annoType === imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_SELECT_ELEMENT_ANNOTATION_TYPE_DISOPRED3() ) {
 				
 				color = this.CONSTANTS._DISOPRED_COLOR;
 				
 				toolTipText = 'Disordered Region: start: ' + segment.startPosition + ', end: ' + segment.endPosition;
 
-			} else if( annoType === imagePagePrimaryRootCodeObject.getVariable__v_SELECT_ELEMENT_ANNOTATION_TYPE_PSIPRED3() ) {
+			} else if( annoType === imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_SELECT_ELEMENT_ANNOTATION_TYPE_PSIPRED3() ) {
 				
-				if ( segment.type === imagePagePrimaryRootCodeObject.getVariable__v_BETA_SHEET() ) {
+				if ( segment.type === imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_BETA_SHEET() ) {
 					color = this.CONSTANTS._PSIPRED_BETA_COLOR;
 					
 					toolTipText = '&#946; sheet: start: ' + segment.startPosition + ', end: ' + segment.endPosition;
@@ -210,13 +210,13 @@ circlePlotViewer.prototype.drawFeatureAnnotationData = function( svgRootSnapSVGO
 
 				}
 								
-			} else if( annoType === imagePagePrimaryRootCodeObject.getVariable__v_SELECT_ELEMENT_ANNOTATION_TYPE_SEQUENCE_COVERAGE() ) {
+			} else if( annoType === imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_SELECT_ELEMENT_ANNOTATION_TYPE_SEQUENCE_COVERAGE() ) {
 				
-				color = imagePagePrimaryRootCodeObject.getVariable__v_colorManager().getColorForUIDAnnotation( uid ).hex;
+				color = imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_colorManager().getColorForUIDAnnotation( uid ).hex;
 				
 				toolTipText = 'Sequence coverage segment: start: ' + segment.start + ', end: ' + segment.end;
 				
-			} else if( annoType === imagePagePrimaryRootCodeObject.getVariable__v_SELECT_ELEMENT_ANNOTATION_TYPE_CUSTOM() ) {
+			} else if( annoType === imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_SELECT_ELEMENT_ANNOTATION_TYPE_CUSTOM() ) {
 
 				color = segment.annotationColor;
 				
@@ -226,7 +226,7 @@ circlePlotViewer.prototype.drawFeatureAnnotationData = function( svgRootSnapSVGO
 			
 			// draw this segment
 			var pathText;
-			if( annoType === imagePagePrimaryRootCodeObject.getVariable__v_SELECT_ELEMENT_ANNOTATION_TYPE_SEQUENCE_COVERAGE() ) {
+			if( annoType === imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_SELECT_ELEMENT_ANNOTATION_TYPE_SEQUENCE_COVERAGE() ) {
 				pathText = this.getPathForFeatureAnnotationSegment( i, segment.start, segment.end );			
 			} else {
 				pathText = this.getPathForFeatureAnnotationSegment( i, segment.startPosition, segment.endPosition )
@@ -346,7 +346,7 @@ circlePlotViewer.prototype.drawLegend = function( svgRootSnapSVGObject ) {
 	// get all possible combination of searches as arrays
 	var searchArrays = [ ];
 
-	var _searches = imagePagePrimaryRootCodeObject.getVariable__v_searches();
+	var _searches = imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_searches();
 	
 	for( var i = 0; i < _searches.length; i++ ) {
 		searchArrays.push( [ _searches[ i ].id ] );
@@ -371,7 +371,7 @@ circlePlotViewer.prototype.drawLegend = function( svgRootSnapSVGObject ) {
 	// draw each legend item
 	for( var i = 0; i < searchArrays.length; i++ ) {
 		
-		var color = imagePagePrimaryRootCodeObject.getVariable__v_colorManager().getColorForSearches( searchArrays[ i ] ).hex;
+		var color = imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_colorManager().getColorForSearches( searchArrays[ i ] ).hex;
 		
 		var y = this.CONSTANTS._LEGEND_HEADER_HEIGHT + this.CONSTANTS._LEGEND_GAP;
 		y += i * ( this.CONSTANTS._LEGEND_FONT_HEIGHT + this.CONSTANTS._LEGEND_GAP );
@@ -392,7 +392,7 @@ circlePlotViewer.prototype.drawLegend = function( svgRootSnapSVGObject ) {
 		// the left edge of the associated text
 		var textX = x + (this.CONSTANTS._LEGEND_RADIUS * 2 ) + this.CONSTANTS._LEGEND_INDENT;
 		
-		var searchArraysSearchIds = imagePagePrimaryRootCodeObject.call__convertProjectSearchIdArrayToSearchIdArray( searchArrays[ i ] );
+		var searchArraysSearchIds = imagePagePrimaryRootCodeObject_LocalCopy.call__convertProjectSearchIdArrayToSearchIdArray( searchArrays[ i ] );
 		var text = searchArraysSearchIds.join( ", " );
 		if( searchArrays[ i ].length < 2 ) {
 			text = "Search " + text;
@@ -425,7 +425,7 @@ circlePlotViewer.prototype.drawLegend = function( svgRootSnapSVGObject ) {
 circlePlotViewer.prototype.drawScaleBars = function( svgRootSnapSVGObject ) {
 	
 	var center = this.getCenterCoords();
-	var selectedProteins = imagePagePrimaryRootCodeObject.getVariable__v_indexManager().getProteinArray();
+	var selectedProteins = imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_indexManager().getProteinArray();
 	var degreesPerResidue = this.getDegreesPerResidue();
 	
 	// determine frequency and factor of tic marks
@@ -454,9 +454,9 @@ circlePlotViewer.prototype.drawScaleBars = function( svgRootSnapSVGObject ) {
 
 		
 		var startAngle = this.getAngleForProteinPosition( i, 1 );
-		var endAngle = this.getAngleForProteinPosition( i, imagePagePrimaryRootCodeObject.getVariable__v_proteinLengths().getProteinLength( proteinId ) );
+		var endAngle = this.getAngleForProteinPosition( i, imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_proteinLengths().getProteinLength( proteinId ) );
 		
-		var color = imagePagePrimaryRootCodeObject.getVariable__v_colorManager().getColorForUIDAnnotation( uid );
+		var color = imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_colorManager().getColorForUIDAnnotation( uid );
 		
 		
 		// draw base line of scale bar
@@ -527,7 +527,7 @@ circlePlotViewer.prototype.drawScaleBars = function( svgRootSnapSVGObject ) {
 		group.add( path );
 		
 		
-		var proteinLengthForProteinId = imagePagePrimaryRootCodeObject.getVariable__v_proteinLengths().getProteinLength( proteinId );
+		var proteinLengthForProteinId = imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_proteinLengths().getProteinLength( proteinId );
 
 		
 		// draw interval ticks
@@ -604,14 +604,14 @@ circlePlotViewer.prototype.drawScaleBars = function( svgRootSnapSVGObject ) {
  * @param svgRootSnapSVGObject
  */
 circlePlotViewer.prototype.drawTrypticPositions = function( svgRootSnapSVGObject ) {
-	var selectedProteins = imagePagePrimaryRootCodeObject.getVariable__v_indexManager().getProteinList();
+	var selectedProteins = imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_indexManager().getProteinList();
 	var radius = this.getProteinBarRadii();
 	var center = this.getCenterCoords();
 	
 	for( var i = 0; i < selectedProteins.length; i++ ) {
 		var proteinId = selectedProteins[ i ];
 		
-		var positions = imagePagePrimaryRootCodeObject.getVariable__v_proteinSequenceTrypsinCutPoints()[ proteinId ];
+		var positions = imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_proteinSequenceTrypsinCutPoints()[ proteinId ];
 		if( positions != undefined ) {
 			
 			for( var p = 0; p < positions.length; p++ ) {
@@ -641,14 +641,14 @@ circlePlotViewer.prototype.drawTrypticPositions = function( svgRootSnapSVGObject
  * @param svgRootSnapSVGObject
  */
 circlePlotViewer.prototype.drawLinkablePositions = function( svgRootSnapSVGObject ) {
-	var selectedProteins = imagePagePrimaryRootCodeObject.getVariable__v_indexManager().getProteinList();
+	var selectedProteins = imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_indexManager().getProteinList();
 	var radius = this.getProteinBarRadii();
 	var center = this.getCenterCoords();
 	
 	for( var i = 0; i < selectedProteins.length; i++ ) {
 		var proteinId = selectedProteins[ i ];
 		
-		var positions = imagePagePrimaryRootCodeObject.getVariable__v_linkablePositions()[ proteinId ];
+		var positions = imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_linkablePositions()[ proteinId ];
 		if( positions != undefined ) {
 			
 			for( var p = 0; p < positions.length; p++ ) {
@@ -676,19 +676,19 @@ circlePlotViewer.prototype.drawLinkablePositions = function( svgRootSnapSVGObjec
  * @param svgRootSnapSVGObject
  */
 circlePlotViewer.prototype.drawMonolinks = function( svgRootSnapSVGObject ) {
-	var selectedProteins = imagePagePrimaryRootCodeObject.getVariable__v_indexManager().getProteinList();
+	var selectedProteins = imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_indexManager().getProteinList();
 	
 	// this shouldn't happen, but does...
-	if( !imagePagePrimaryRootCodeObject.getVariable__v_proteinMonolinkPositions() ) { return; }
+	if( !imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_proteinMonolinkPositions() ) { return; }
 	
 	for( var i = 0; i < selectedProteins.length; i++ ) {
 		var proteinId = selectedProteins[ i ];
 		
-		if ( imagePagePrimaryRootCodeObject.getVariable__v_proteinMonolinkPositions()[ proteinId ] == undefined ) { 
+		if ( imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_proteinMonolinkPositions()[ proteinId ] == undefined ) { 
 			continue; //  skip processing this selected protein 
 		}
 
-		var positions = Object.keys( imagePagePrimaryRootCodeObject.getVariable__v_proteinMonolinkPositions()[ selectedProteins[ i ] ] );
+		var positions = Object.keys( imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_proteinMonolinkPositions()[ selectedProteins[ i ] ] );
 		for( var k = 0; k < positions.length; k++ ) {
 			var position = positions[ k ];
 			
@@ -696,7 +696,7 @@ circlePlotViewer.prototype.drawMonolinks = function( svgRootSnapSVGObject ) {
 			link.type = "monolink";
 			link.protein1 = proteinId;
 			link.position1 = parseInt( position );				// looks like monolink positions are strings?
-			link.uid1 = imagePagePrimaryRootCodeObject.getVariable__v_indexManager().getUIDForIndex( i );
+			link.uid1 = imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_indexManager().getUIDForIndex( i );
 			
 			
 			this.drawMonolink( i, link, svgRootSnapSVGObject );
@@ -727,9 +727,9 @@ circlePlotViewer.prototype.drawMonolink = function( index, link, svgRootSnapSVGO
 	
 	var path = svgRootSnapSVGObject.path( pathString );
 		
-    var lsearches = imagePagePrimaryRootCodeObject.getVariable__v_proteinMonolinkPositions()[ link.protein1 ][ link.position1 ];
+    var lsearches = imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_proteinMonolinkPositions()[ link.protein1 ][ link.position1 ];
 	
-    var color = imagePagePrimaryRootCodeObject.getVariable__v_colorManager().getColorForLink( link );
+    var color = imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_colorManager().getColorForLink( link );
     
     path.attr( {
 		stroke:color.hex,
@@ -737,20 +737,20 @@ circlePlotViewer.prototype.drawMonolink = function( index, link, svgRootSnapSVGO
 		"stroke-dasharray":"4,2",
 		fill:"none",
 		'from_protein_id':link.protein1,
-		'fromp': imagePagePrimaryRootCodeObject.getVariable__v_proteinNames()[ link.protein1 ],
+		'fromp': imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_proteinNames()[ link.protein1 ],
 		'frompp': link.position1,
 		'searches': lsearches,
 		'linktype' : 'monolink'
 	});
     
     
-    var searchIdsForLink = imagePagePrimaryRootCodeObject.call__convertProjectSearchIdArrayToSearchIdArray( lsearches );
+    var searchIdsForLink = imagePagePrimaryRootCodeObject_LocalCopy.call__convertProjectSearchIdArrayToSearchIdArray( lsearches );
     
     // add a tooltip to this drawn link
     
     var text = "";
     
-	text = 'Monolink: ' + imagePagePrimaryRootCodeObject.getVariable__v_proteinNames()[ link.protein1 ] + " (" + link.position1 + ")<br>Searches: " + searchIdsForLink;
+	text = 'Monolink: ' + imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_proteinNames()[ link.protein1 ] + " (" + link.position1 + ")<br>Searches: " + searchIdsForLink;
     
 	var pathSVGObject = path.node;
 	var $pathSVGObject = $( pathSVGObject );		// jquery variable
@@ -769,7 +769,7 @@ circlePlotViewer.prototype.drawMonolink = function( index, link, svgRootSnapSVGO
 	// add click event
 	$pathSVGObject.click( function(  ) { 
 		try {
-			imagePagePrimaryRootCodeObject.call__processClickOnLink( this ); 
+			imagePagePrimaryRootCodeObject_LocalCopy.call__processClickOnLink( this ); 
 		} catch( e ) {
 			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
 			throw e;
@@ -783,22 +783,22 @@ circlePlotViewer.prototype.drawMonolink = function( index, link, svgRootSnapSVGO
  * @param svgRootSnapSVGObject
  */
 circlePlotViewer.prototype.drawLooplinks = function( svgRootSnapSVGObject ) {
-	var selectedProteins = imagePagePrimaryRootCodeObject.getVariable__v_indexManager().getProteinList();
+	var selectedProteins = imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_indexManager().getProteinList();
 	
 	for( var i = 0; i < selectedProteins.length; i++ ) {
 		var proteinId = selectedProteins[ i ];
 		
 		var drawnLinks = { };
 		
-		if ( imagePagePrimaryRootCodeObject.getVariable__v_proteinLooplinkPositions()[ proteinId ] == undefined ) { continue; }
-		if ( imagePagePrimaryRootCodeObject.getVariable__v_proteinLooplinkPositions()[ proteinId ][ proteinId ] == undefined ) { continue; }
+		if ( imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_proteinLooplinkPositions()[ proteinId ] == undefined ) { continue; }
+		if ( imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_proteinLooplinkPositions()[ proteinId ][ proteinId ] == undefined ) { continue; }
 		
-		var fromPositions = Object.keys( imagePagePrimaryRootCodeObject.getVariable__v_proteinLooplinkPositions()[ proteinId ][ proteinId ] );
+		var fromPositions = Object.keys( imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_proteinLooplinkPositions()[ proteinId ][ proteinId ] );
 		
 		for( var fromPositionIndex = 0; fromPositionIndex < fromPositions.length; fromPositionIndex++ ) {
 			var fromPosition = parseInt( fromPositions[ fromPositionIndex ] );
 			
-			var toPositions = Object.keys( imagePagePrimaryRootCodeObject.getVariable__v_proteinLooplinkPositions()[ proteinId ][ proteinId ][ fromPosition ] );
+			var toPositions = Object.keys( imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_proteinLooplinkPositions()[ proteinId ][ proteinId ][ fromPosition ] );
 			
 			for( var toPositionIndex = 0; toPositionIndex < toPositions.length; toPositionIndex++ ) {
 				var toPosition = parseInt( toPositions [ toPositionIndex ] );
@@ -820,7 +820,7 @@ circlePlotViewer.prototype.drawLooplinks = function( svgRootSnapSVGObject ) {
 				link.protein1 = proteinId;
 				link.position1 = fromPosition;
 				link.position2 = toPosition;
-				link.uid1 = imagePagePrimaryRootCodeObject.getVariable__v_indexManager().getUIDForIndex( i );
+				link.uid1 = imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_indexManager().getUIDForIndex( i );
 				
 				var looplink = this.drawCrosslink( i, fromPosition, i, toPosition, link, svgRootSnapSVGObject );
 				looplink.attr( { "stroke-dasharray":"4,2" });
@@ -836,26 +836,26 @@ circlePlotViewer.prototype.drawLooplinks = function( svgRootSnapSVGObject ) {
  * @param svgRootSnapSVGObject
  */
 circlePlotViewer.prototype.drawCrosslinks = function( svgRootSnapSVGObject ) {
-	var selectedProteins = imagePagePrimaryRootCodeObject.getVariable__v_indexManager().getProteinList();
+	var selectedProteins = imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_indexManager().getProteinList();
 	
 	for( var i = 0; i < selectedProteins.length; i++ ) {
 		var proteinId1 = selectedProteins[ i ];
 		
-		if ( imagePagePrimaryRootCodeObject.getVariable__v_proteinLinkPositions()[ proteinId1 ] == undefined ) { continue; }
+		if ( imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_proteinLinkPositions()[ proteinId1 ] == undefined ) { continue; }
 		
 		for( var j = 0; j < selectedProteins.length; j++ ) {
 			if( j <= i ) { continue; }
 			
 			var proteinId2 = selectedProteins[ j ]
 			
-			if ( imagePagePrimaryRootCodeObject.getVariable__v_proteinLinkPositions()[ proteinId1 ][ proteinId2 ] == undefined ) { continue; }
+			if ( imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_proteinLinkPositions()[ proteinId1 ][ proteinId2 ] == undefined ) { continue; }
 			
-			var fromPositions = Object.keys( imagePagePrimaryRootCodeObject.getVariable__v_proteinLinkPositions()[ proteinId1 ][ proteinId2 ] );
+			var fromPositions = Object.keys( imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_proteinLinkPositions()[ proteinId1 ][ proteinId2 ] );
 			
 			for( var fromPositionIndex = 0; fromPositionIndex < fromPositions.length; fromPositionIndex++ ) {
 				var fromPosition = parseInt( fromPositions[ fromPositionIndex ] );
 				
-				var toPositions = Object.keys( imagePagePrimaryRootCodeObject.getVariable__v_proteinLinkPositions()[ proteinId1 ][ proteinId2 ][ fromPosition ] );
+				var toPositions = Object.keys( imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_proteinLinkPositions()[ proteinId1 ][ proteinId2 ][ fromPosition ] );
 				
 				for( var toPositionIndex = 0; toPositionIndex < toPositions.length; toPositionIndex++ ) {
 					var toPosition = parseInt( toPositions [ toPositionIndex ] );
@@ -866,8 +866,8 @@ circlePlotViewer.prototype.drawCrosslinks = function( svgRootSnapSVGObject ) {
 					link.position1 = fromPosition;
 					link.protein2 = proteinId2;
 					link.position2 = toPosition;
-					link.uid1 = imagePagePrimaryRootCodeObject.getVariable__v_indexManager().getUIDForIndex( i );
-					link.uid2 = imagePagePrimaryRootCodeObject.getVariable__v_indexManager().getUIDForIndex( j );
+					link.uid1 = imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_indexManager().getUIDForIndex( i );
+					link.uid2 = imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_indexManager().getUIDForIndex( j );
 					
 					this.drawCrosslink( i, fromPosition, j, toPosition, link, svgRootSnapSVGObject );				
 				}
@@ -887,24 +887,24 @@ circlePlotViewer.prototype.drawCrosslinks = function( svgRootSnapSVGObject ) {
  * @param svgRootSnapSVGObject
  */
 circlePlotViewer.prototype.drawSelfCrosslinks = function( svgRootSnapSVGObject ) {
-	var selectedProteins = imagePagePrimaryRootCodeObject.getVariable__v_indexManager().getProteinList();
+	var selectedProteins = imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_indexManager().getProteinList();
 		
 	for( var i = 0; i < selectedProteins.length; i++ ) {
 		var proteinId = selectedProteins[ i ];
 				
 		var drawnLinks = { };
 		
-		if ( imagePagePrimaryRootCodeObject.getVariable__v_proteinLinkPositions()[ proteinId ] == undefined ) { continue; }
-		if ( imagePagePrimaryRootCodeObject.getVariable__v_proteinLinkPositions()[ proteinId ][ proteinId ] == undefined ) { continue; }
+		if ( imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_proteinLinkPositions()[ proteinId ] == undefined ) { continue; }
+		if ( imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_proteinLinkPositions()[ proteinId ][ proteinId ] == undefined ) { continue; }
 		
 		
 		
-		var fromPositions = Object.keys( imagePagePrimaryRootCodeObject.getVariable__v_proteinLinkPositions()[ proteinId ][ proteinId ] );		
+		var fromPositions = Object.keys( imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_proteinLinkPositions()[ proteinId ][ proteinId ] );		
 		
 		for( var fromPositionIndex = 0; fromPositionIndex < fromPositions.length; fromPositionIndex++ ) {
 			var fromPosition = parseInt( fromPositions[ fromPositionIndex ] );
 						
-			var toPositions = Object.keys( imagePagePrimaryRootCodeObject.getVariable__v_proteinLinkPositions()[ proteinId ][ proteinId ][ fromPosition ] );
+			var toPositions = Object.keys( imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_proteinLinkPositions()[ proteinId ][ proteinId ][ fromPosition ] );
 						
 			for( var toPositionIndex = 0; toPositionIndex < toPositions.length; toPositionIndex++ ) {
 				var toPosition = parseInt( toPositions [ toPositionIndex ] );
@@ -926,7 +926,7 @@ circlePlotViewer.prototype.drawSelfCrosslinks = function( svgRootSnapSVGObject )
 				link.protein2 = proteinId;
 				link.position1 = fromPosition;
 				link.position2 = toPosition;
-				link.uid1 = imagePagePrimaryRootCodeObject.getVariable__v_indexManager().getUIDForIndex( i );
+				link.uid1 = imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_indexManager().getUIDForIndex( i );
 				link.uid2 = link.uid1;
 				
 				this.drawCrosslink( i, fromPosition, i, toPosition, link, svgRootSnapSVGObject );				
@@ -978,7 +978,7 @@ circlePlotViewer.prototype.drawCrosslink = function( fromIndex, fromPosition, to
     pathString += "Q" + loopPeakCoordinates.x + "," + loopPeakCoordinates.y;
     pathString += " " + toCoords.x + "," + toCoords.y;
     
-    var color = imagePagePrimaryRootCodeObject.getVariable__v_colorManager().getColorForLink( link );
+    var color = imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_colorManager().getColorForLink( link );
     
     var path = svgRootSnapSVGObject.path( pathString );
     path.attr( {
@@ -993,15 +993,15 @@ circlePlotViewer.prototype.drawCrosslink = function( fromIndex, fromPosition, to
     
     if( link.type === "looplink" ) {	
     	
-		var lsearches = imagePagePrimaryRootCodeObject.getVariable__v_proteinLooplinkPositions()[ link.protein1 ][ link.protein1 ][ link.position1 ][ link.position2 ];
+		var lsearches = imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_proteinLooplinkPositions()[ link.protein1 ][ link.protein1 ][ link.position1 ][ link.position2 ];
 	    
-	    var searchIdsForLink = imagePagePrimaryRootCodeObject.call__convertProjectSearchIdArrayToSearchIdArray( lsearches );
+	    var searchIdsForLink = imagePagePrimaryRootCodeObject_LocalCopy.call__convertProjectSearchIdArrayToSearchIdArray( lsearches );
 	    
-		text = 'Looplink: ' + imagePagePrimaryRootCodeObject.getVariable__v_proteinNames()[ link.protein1 ] + " (" + link.position1 + "," + link.position2 + ")<br>Searches: " + searchIdsForLink;
+		text = 'Looplink: ' + imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_proteinNames()[ link.protein1 ] + " (" + link.position1 + "," + link.position2 + ")<br>Searches: " + searchIdsForLink;
 		
 	    path.attr( {
 			'from_protein_id': link.protein1,
-			'fromp': imagePagePrimaryRootCodeObject.getVariable__v_proteinNames()[ link.protein1 ],
+			'fromp': imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_proteinNames()[ link.protein1 ],
 			'frompp': link.position1,
 			'topp': link.position2,
 			'searches': lsearches,
@@ -1009,17 +1009,17 @@ circlePlotViewer.prototype.drawCrosslink = function( fromIndex, fromPosition, to
 		});
 		
     } else {
-		var lsearches = imagePagePrimaryRootCodeObject.getVariable__v_proteinLinkPositions()[ link.protein1 ][ link.protein2 ][ link.position1 ][ link.position2 ];
+		var lsearches = imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_proteinLinkPositions()[ link.protein1 ][ link.protein2 ][ link.position1 ][ link.position2 ];
 		
-	    var searchIdsForLink = imagePagePrimaryRootCodeObject.call__convertProjectSearchIdArrayToSearchIdArray( lsearches );
+	    var searchIdsForLink = imagePagePrimaryRootCodeObject_LocalCopy.call__convertProjectSearchIdArrayToSearchIdArray( lsearches );
 	    
-		text = 'Crosslink: ' + imagePagePrimaryRootCodeObject.getVariable__v_proteinNames()[ link.protein1 ] + " (" + link.position1 + ") - " + imagePagePrimaryRootCodeObject.getVariable__v_proteinNames()[ link.protein2 ] + " (" + link.position2 + ")<br>Searches: " + searchIdsForLink;
+		text = 'Crosslink: ' + imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_proteinNames()[ link.protein1 ] + " (" + link.position1 + ") - " + imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_proteinNames()[ link.protein2 ] + " (" + link.position2 + ")<br>Searches: " + searchIdsForLink;
 		
 	    path.attr( {
 			'from_protein_id':link.protein1,
 			'to_protein_id':link.protein2,
-			'fromp': imagePagePrimaryRootCodeObject.getVariable__v_proteinNames()[ link.protein1 ],
-			'top': imagePagePrimaryRootCodeObject.getVariable__v_proteinNames()[ link.protein2 ],
+			'fromp': imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_proteinNames()[ link.protein1 ],
+			'top': imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_proteinNames()[ link.protein2 ],
 			'frompp': link.position1,
 			'topp': link.position2,
 			'searches': lsearches,
@@ -1045,7 +1045,7 @@ circlePlotViewer.prototype.drawCrosslink = function( fromIndex, fromPosition, to
 	// add click effects
 	$pathSVGObject.click( function(  ) { 
 		try {
-			imagePagePrimaryRootCodeObject.call__processClickOnLink( this ); 
+			imagePagePrimaryRootCodeObject_LocalCopy.call__processClickOnLink( this ); 
 		} catch( e ) {
 			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
 			throw e;
@@ -1067,7 +1067,7 @@ circlePlotViewer.prototype.drawCrosslink = function( fromIndex, fromPosition, to
  * @returns
  */
 circlePlotViewer.prototype.getCrosslinkTerminus = function( proteinIndex, position ) {
-	var selectedProteins = imagePagePrimaryRootCodeObject.getVariable__v_indexManager().getProteinList();
+	var selectedProteins = imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_indexManager().getProteinList();
 	
 	var center = this.getCenterCoords();
 	
@@ -1076,7 +1076,7 @@ circlePlotViewer.prototype.getCrosslinkTerminus = function( proteinIndex, positi
 	
 	var totalProteinLength = 0;
 	for( var i = 0; i < selectedProteins.length; i++ ) {
-		totalProteinLength += imagePagePrimaryRootCodeObject.getVariable__v_proteinLengths().getProteinLength( selectedProteins[ i ] );
+		totalProteinLength += imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_proteinLengths().getProteinLength( selectedProteins[ i ] );
 	}
 	
 	// number of degrees per protein residue
@@ -1098,7 +1098,7 @@ circlePlotViewer.prototype.getCrosslinkTerminus = function( proteinIndex, positi
 			 
 
 		} else {
-			var totalLengthProportion = imagePagePrimaryRootCodeObject.getVariable__v_proteinLengths().getProteinLength( selectedProteins[ i ] ) / totalProteinLength;
+			var totalLengthProportion = imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_proteinLengths().getProteinLength( selectedProteins[ i ] ) / totalProteinLength;
 			var rotationDegrees = workingDegrees * totalLengthProportion;
 			currentStartDegrees += this.CONSTANTS._GAP_BETWEEN_BARS + rotationDegrees;
 		}
@@ -1114,14 +1114,14 @@ circlePlotViewer.prototype.getCrosslinkTerminus = function( proteinIndex, positi
  * @returns {Number}
  */
 circlePlotViewer.prototype.getAngleForProteinPosition = function( proteinIndex, position ) {
-	var selectedProteins = imagePagePrimaryRootCodeObject.getVariable__v_indexManager().getProteinList();
+	var selectedProteins = imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_indexManager().getProteinList();
 	
 	var totalGapDegrees = selectedProteins.length * this.CONSTANTS._GAP_BETWEEN_BARS;
 	var workingDegrees = 360 - totalGapDegrees;
 	
 	var totalProteinLength = 0;
 	for( var i = 0; i < selectedProteins.length; i++ ) {
-		totalProteinLength += imagePagePrimaryRootCodeObject.getVariable__v_proteinLengths().getProteinLength( selectedProteins[ i ] );
+		totalProteinLength += imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_proteinLengths().getProteinLength( selectedProteins[ i ] );
 	}
 	
 	// number of degrees per protein residue
@@ -1138,7 +1138,7 @@ circlePlotViewer.prototype.getAngleForProteinPosition = function( proteinIndex, 
 			return degrees;
 
 		} else {
-			var totalLengthProportion = imagePagePrimaryRootCodeObject.getVariable__v_proteinLengths().getProteinLength( selectedProteins[ i ] ) / totalProteinLength;
+			var totalLengthProportion = imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_proteinLengths().getProteinLength( selectedProteins[ i ] ) / totalProteinLength;
 			var rotationDegrees = workingDegrees * totalLengthProportion;
 			currentStartDegrees += this.CONSTANTS._GAP_BETWEEN_BARS + rotationDegrees;
 		}
@@ -1154,13 +1154,13 @@ circlePlotViewer.prototype.getAngleForProteinPosition = function( proteinIndex, 
  */
 circlePlotViewer.prototype.drawProteinBars = function( svgRootSnapSVGObject, isTransparent ) {
 	
-	var selectedProteins = imagePagePrimaryRootCodeObject.getVariable__v_indexManager().getProteinArray();
+	var selectedProteins = imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_indexManager().getProteinArray();
 	var totalGapDegrees = selectedProteins.length * this.CONSTANTS._GAP_BETWEEN_BARS;
 	var workingDegrees = 360 - totalGapDegrees;
 	
 	var totalProteinLength = 0;
 	for( var i = 0; i < selectedProteins.length; i++ ) {
-		totalProteinLength += imagePagePrimaryRootCodeObject.getVariable__v_proteinLengths().getProteinLength( selectedProteins[ i ].pid );
+		totalProteinLength += imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_proteinLengths().getProteinLength( selectedProteins[ i ].pid );
 	}
 	
 	var currentStartDegrees = 0;
@@ -1168,14 +1168,14 @@ circlePlotViewer.prototype.drawProteinBars = function( svgRootSnapSVGObject, isT
 		var pid = selectedProteins[ i ].pid;		// protein sequence id
 		var uid = selectedProteins[ i ].uid;		// unique id
 		
-		var totalLengthProportion = imagePagePrimaryRootCodeObject.getVariable__v_proteinLengths().getProteinLength( pid ) / totalProteinLength;
+		var totalLengthProportion = imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_proteinLengths().getProteinLength( pid ) / totalProteinLength;
 		var rotationDegrees = workingDegrees * totalLengthProportion;
-		var barEntry = imagePagePrimaryRootCodeObject.getVariable__v_imageProteinBarDataManager().getItemByUID( uid );
+		var barEntry = imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_imageProteinBarDataManager().getItemByUID( uid );
 		
 		this.drawProteinBar( svgRootSnapSVGObject, isTransparent, pid, i, currentStartDegrees, rotationDegrees );
 		
 		// draw protein regions if necessary
-		if( !isTransparent && imagePagePrimaryRootCodeObject.getVariable__v_imageProteinBarDataManager().isAnyProteinBarsHighlighted() && !barEntry.isAllOfProteinBarHighlighted() && barEntry.isAnyOfProteinBarHighlighted() ) {
+		if( !isTransparent && imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_imageProteinBarDataManager().isAnyProteinBarsHighlighted() && !barEntry.isAllOfProteinBarHighlighted() && barEntry.isAnyOfProteinBarHighlighted() ) {
 			
 			var regions = barEntry.getProteinBarHighlightedRegionsArray();
 			
@@ -1205,9 +1205,9 @@ circlePlotViewer.prototype.drawProteinBars = function( svgRootSnapSVGObject, isT
 
 circlePlotViewer.prototype.drawRegion = function( svgRootSnapSVGObject, region ) {
 	
-	var index = imagePagePrimaryRootCodeObject.getVariable__v_indexManager().getIndexForUID( region.uid );
+	var index = imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_indexManager().getIndexForUID( region.uid );
 	var path = this.getPathForProteinSegment( index, region.start, region.end );
-	var color = imagePagePrimaryRootCodeObject.getVariable__v_colorManager().getColorForRegion( region );
+	var color = imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_colorManager().getColorForRegion( region );
 	
 	var svgPath = svgRootSnapSVGObject.path( path );
 	
@@ -1249,7 +1249,7 @@ circlePlotViewer.prototype.drawProteinBar = function( svgRootSnapSVGObject, isTr
 		
 	} else {
 		svgPath.attr( {
-			fill:imagePagePrimaryRootCodeObject.getVariable__v_colorManager().getColorForIndex( index ).hex,
+			fill:imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_colorManager().getColorForIndex( index ).hex,
 		});
 	}	
 };
@@ -1277,7 +1277,7 @@ circlePlotViewer.prototype.drawProteinBarLabel = function( svgRootSnapSVGObject,
 		stroke:"none",
 	})
 	
-	var proteinLabelTextSnapSVGObject = svgRootSnapSVGObject.text( 0, 0, imagePagePrimaryRootCodeObject.getVariable__v_proteinNames()[ proteinId ] );
+	var proteinLabelTextSnapSVGObject = svgRootSnapSVGObject.text( 0, 0, imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_proteinNames()[ proteinId ] );
 	
 	proteinLabelTextSnapSVGObject.attr({
 		fill:"#ffffff",
@@ -1313,12 +1313,12 @@ circlePlotViewer.prototype.processClickOnProteinBar = function( e, svgRootSnapSV
 	this.removeProteinPositionIndicator();
 	
 	if( e.shiftKey ) { 		// shift + click				
-		imagePagePrimaryRootCodeObject.call__toggleHighlightedProtein( index, false );
-		imagePagePrimaryRootCodeObject.call__updateURLHash( false );
+		imagePagePrimaryRootCodeObject_LocalCopy.call__toggleHighlightedProtein( index, false );
+		imagePagePrimaryRootCodeObject_LocalCopy.call__updateURLHash( false );
 
 	} else {				// normal click
-		imagePagePrimaryRootCodeObject.call__toggleHighlightedProtein( index, true );
-		imagePagePrimaryRootCodeObject.call__updateURLHash( false );
+		imagePagePrimaryRootCodeObject_LocalCopy.call__toggleHighlightedProtein( index, true );
+		imagePagePrimaryRootCodeObject_LocalCopy.call__updateURLHash( false );
 	}
 	
 }
@@ -1331,7 +1331,7 @@ circlePlotViewer.prototype.processClickOnProteinBar = function( e, svgRootSnapSV
  */
 circlePlotViewer.prototype.addMouseOverHandlerToProteinBar = function( svgRootSnapSVGObject, svgPath, proteinId, index ) {
 	
-	svgPath.addClass( imagePagePrimaryRootCodeObject.getVariable__v_PROTEIN_BAR_OVERLAY_RECTANGLE_LABEL_CLASS() );
+	svgPath.addClass( imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_PROTEIN_BAR_OVERLAY_RECTANGLE_LABEL_CLASS() );
 	
 	var proteinBarPlainSVGObject = svgPath.node;
 	var $proteinBarPlainSVGObject = $( proteinBarPlainSVGObject );		// jquery variable
@@ -1360,8 +1360,8 @@ circlePlotViewer.prototype.addMouseOverHandlerToProteinBar = function( svgRootSn
 		var proteinPositionOneBased = _THIS.getProteinIndexPosition( index, svgCoords );
 		var proteinPositionZeroBased = proteinPositionOneBased - 1;
 		
-		var proteinName = imagePagePrimaryRootCodeObject.call__getProteinName( proteinId );
-		var proteinSequence = imagePagePrimaryRootCodeObject.getVariable__v_proteinSequences()[ proteinId ];
+		var proteinName = imagePagePrimaryRootCodeObject_LocalCopy.call__getProteinName( proteinId );
+		var proteinSequence = imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_proteinSequences()[ proteinId ];
 		var proteinSequenceLength  = proteinSequence.length;
 		
 		var sequenceAtPosition = proteinSequence.charAt( ( proteinPositionZeroBased ) );  
@@ -1402,7 +1402,7 @@ circlePlotViewer.prototype.addMouseOverHandlerToProteinBar = function( svgRootSn
 		var cutPointBetweenFirstRightAndSecondRight = false;
 		var cutPointBetweenSecondRightAndThirdRight = false;
 		
-		var proteinSequenceTrypsinCutPoints = imagePagePrimaryRootCodeObject.getVariable__v_proteinSequenceTrypsinCutPoints()[ proteinId ];
+		var proteinSequenceTrypsinCutPoints = imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_proteinSequenceTrypsinCutPoints()[ proteinId ];
 
 		for ( var proteinSequenceTrypsinCutPointsIndex = 0; proteinSequenceTrypsinCutPointsIndex < proteinSequenceTrypsinCutPoints.length; proteinSequenceTrypsinCutPointsIndex++ ) {
 			
@@ -1451,7 +1451,7 @@ circlePlotViewer.prototype.addMouseOverHandlerToProteinBar = function( svgRootSn
 		
 		
 		
-		var linkablePositionsForProtein = imagePagePrimaryRootCodeObject.getVariable__v_linkablePositions()[ proteinId ];
+		var linkablePositionsForProtein = imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_linkablePositions()[ proteinId ];
 		
 		
 		for ( var linkablePositionsForProteinIndex = 0; linkablePositionsForProteinIndex < linkablePositionsForProtein.length; linkablePositionsForProteinIndex++ ) {
@@ -1528,7 +1528,7 @@ circlePlotViewer.prototype.addMouseOverHandlerToProteinBar = function( svgRootSn
 		};
 		
 		//  Use Handlebars libary to convert the template into HTML, performing substitutions using tooltipDataObject
-		var tooltipContentsHTML = imagePagePrimaryRootCodeObject.getVariable__v_proteinBarToolTip_template_HandlebarsTemplate()( tooltipDataObject );
+		var tooltipContentsHTML = imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_proteinBarToolTip_template_HandlebarsTemplate()( tooltipDataObject );
 
 
 		
@@ -1670,7 +1670,7 @@ circlePlotViewer.prototype.inializeSVGObject = function() {
 	
 	
 	
-	var selectedProteins = imagePagePrimaryRootCodeObject.getVariable__v_indexManager().getProteinList();
+	var selectedProteins = imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_indexManager().getProteinList();
 	
 	if ( selectedProteins === undefined || selectedProteins.length < 1 ) { 
 		
@@ -1684,7 +1684,7 @@ circlePlotViewer.prototype.inializeSVGObject = function() {
 	
 	
 	
-	if ( imagePagePrimaryRootCodeObject.getVariable__v_proteins().length < 1 ) {
+	if ( imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_proteins().length < 1 ) {
 		
 		//  No Proteins Data loaded
 		var newHeightContainingDivEmpty = 4;
@@ -1972,14 +1972,14 @@ circlePlotViewer.prototype.isFeatureAnnotationShown  = function() {
  * @returns {Number}
  */
 circlePlotViewer.prototype.getDegreesPerResidue = function() {
-	var selectedProteins = imagePagePrimaryRootCodeObject.getVariable__v_indexManager().getProteinList();
+	var selectedProteins = imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_indexManager().getProteinList();
 	
 	var totalGapDegrees = selectedProteins.length * this.CONSTANTS._GAP_BETWEEN_BARS;
 	var workingDegrees = 360 - totalGapDegrees;
 	
 	var totalProteinLength = 0;
 	for( var i = 0; i < selectedProteins.length; i++ ) {
-		totalProteinLength += imagePagePrimaryRootCodeObject.getVariable__v_proteinLengths().getProteinLength( selectedProteins[ i ] );
+		totalProteinLength += imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_proteinLengths().getProteinLength( selectedProteins[ i ] );
 	}
 	
 	// number of degrees per protein residue
@@ -2022,10 +2022,10 @@ circlePlotViewer.prototype.setUserDiameter = function( d ) {
 
 
 /**
- * Called from "crosslink-image-viewer.js" to populate local copy of imagePagePrimaryRootCodeObject
+ * Called from "crosslink-image-viewer.js" to populate local copy of imagePagePrimaryRootCodeObject_LocalCopy
  */
-var circlePlotViewer_pass_imagePagePrimaryRootCodeObject = function( imagePagePrimaryRootCodeObject_Param ) {
-	imagePagePrimaryRootCodeObject = imagePagePrimaryRootCodeObject_Param;
+var circlePlotViewer_pass_imagePagePrimaryRootCodeObject = function( imagePagePrimaryRootCodeObject_LocalCopy_Param ) {
+	imagePagePrimaryRootCodeObject_LocalCopy = imagePagePrimaryRootCodeObject_LocalCopy_Param;
 }
 
 

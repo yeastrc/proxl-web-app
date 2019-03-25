@@ -11,7 +11,7 @@
  *  
  * !!! The following variables passed in from "crosslink-image-viewer.js" are used in this file:
  * 
- *    imagePagePrimaryRootCodeObject
+ *    imagePagePrimaryRootCodeObject (copied to local variable imagePagePrimaryRootCodeObject_LocalCopy)
  */
 
 
@@ -27,7 +27,7 @@
 import { ProteinBarHighlightedRegion } from './crosslink-image-viewer-per-protein-bar-data.js';
 
 
-var imagePagePrimaryRootCodeObject = undefined; // passed in from "crosslink-image-viewer.js"
+var imagePagePrimaryRootCodeObject_LocalCopy = undefined; // passed in from "crosslink-image-viewer.js"
 
 
 
@@ -131,8 +131,8 @@ LinkExclusionSelectionsOverlayCode.prototype.closeOverlay = function( ) {
 	
 	if ( this.dataChanged ) {
 
-		imagePagePrimaryRootCodeObject.call__updateURLHash( false /* useSearchForm */ );
-		imagePagePrimaryRootCodeObject.call__loadDataAndDraw( true /* doDraw */ );
+		imagePagePrimaryRootCodeObject_LocalCopy.call__updateURLHash( false /* useSearchForm */ );
+		imagePagePrimaryRootCodeObject_LocalCopy.call__loadDataAndDraw( true /* doDraw */ );
 	}
 };
 
@@ -269,7 +269,7 @@ LinkExclusionSelectionsOverlayCode.prototype._getProteinAndRegionInfo = function
 	}
 	var proteinId = imageProteinBarDataItem.getProteinId();
 	var proteinLength = imageProteinBarDataItem.getProteinLength();
-	var proteinName = imagePagePrimaryRootCodeObject.getVariable__v_proteinNames()[ proteinId ];
+	var proteinName = imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_proteinNames()[ proteinId ];
 	var regionRange = undefined;
 	if ( regionUID ) {
 		var regionEntry = imageProteinBarDataItem.getRegionFromRegionUID( { regionUID : regionUID } );
@@ -325,7 +325,7 @@ LinkExclusionSelectionsOverlayCode.prototype._populateExcludeChoiceItems = funct
 		}
 		var proteinId = imageProteinBarDataItem.getProteinId();
 		var proteinLength = imageProteinBarDataItem.getProteinLength();
-		var proteinName = imagePagePrimaryRootCodeObject.getVariable__v_proteinNames()[ proteinId ];
+		var proteinName = imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_proteinNames()[ proteinId ];
 		
 		//  First add Protein without Regions
 		//  singleExclusionChoiceContext is for Handlebars template to put info on the overlay on the page
@@ -585,7 +585,7 @@ LinkExclusionSelectionsOverlayCode.prototype.addExclusion = function( params ) {
 	
 	this._clearExcludeChoicesBothLists( );
 	
-	imagePagePrimaryRootCodeObject.call__updateURLHash( false /* useSearchForm */ );
+	imagePagePrimaryRootCodeObject_LocalCopy.call__updateURLHash( false /* useSearchForm */ );
 
 };
 
@@ -623,10 +623,10 @@ LinkExclusionSelectionsOverlayCode.prototype._getExcludeChoice = function( param
 
 
 /**
- * Called from "crosslink-image-viewer.js" to populate local copy of imagePagePrimaryRootCodeObject
+ * Called from "crosslink-image-viewer.js" to populate local copy of imagePagePrimaryRootCodeObject_LocalCopy
  */
-var LinkExclusionSelectionsOverlayCode_pass_imagePagePrimaryRootCodeObject = function( imagePagePrimaryRootCodeObject_Param ) {
-	imagePagePrimaryRootCodeObject = imagePagePrimaryRootCodeObject_Param;
+var LinkExclusionSelectionsOverlayCode_pass_imagePagePrimaryRootCodeObject = function( imagePagePrimaryRootCodeObject_LocalCopy_Param ) {
+	imagePagePrimaryRootCodeObject_LocalCopy = imagePagePrimaryRootCodeObject_LocalCopy_Param;
 }
 
 

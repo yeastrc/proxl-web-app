@@ -6257,7 +6257,7 @@ var ImagePagePrimaryRootCodeClass = function() {
 var imagePagePrimaryRootCodeObject = new ImagePagePrimaryRootCodeClass();
 
 //  Attach to window
-window.imagePagePrimaryRootCodeObject = imagePagePrimaryRootCodeObject;
+window.imagePagePrimaryRootCodeObject_OnWindow = imagePagePrimaryRootCodeObject;
 
 //  Pass imagePagePrimaryRootCodeObject to other JS files that use it
 proteinBarRegionSelectionsOverlayCode_pass_imagePagePrimaryRootCodeObject( imagePagePrimaryRootCodeObject );

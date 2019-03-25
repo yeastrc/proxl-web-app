@@ -7,7 +7,7 @@
  *  
  * !!! The following variables passed in from "crosslink-image-viewer.js" are used in this file:
  * 
- *    imagePagePrimaryRootCodeObject
+ *    imagePagePrimaryRootCodeObject (copied to local variable imagePagePrimaryRootCodeObject_LocalCopy)
  */
 
 //  JavaScript directive:   all variables have to be declared with "var", maybe other things
@@ -16,7 +16,7 @@
 import { ProteinBarHighlightedRegion } from './crosslink-image-viewer-per-protein-bar-data.js';
 
 
-var imagePagePrimaryRootCodeObject = undefined; // passed in from "crosslink-image-viewer.js"
+var imagePagePrimaryRootCodeObject_LocalCopy = undefined; // passed in from "crosslink-image-viewer.js"
 
 
 /**
@@ -151,7 +151,7 @@ ProteinBarRegionSelectionsOverlayCode.prototype._populate = function( params ) {
 		}
 		var proteinId = imageProteinBarDataItem.getProteinId();
 		var proteinLength = imageProteinBarDataItem.getProteinLength();
-		var proteinName = imagePagePrimaryRootCodeObject.getVariable__v_proteinNames()[ proteinId ];
+		var proteinName = imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_proteinNames()[ proteinId ];
 		//  singleBarContext is for Handlebars template to put info for this bar on the overlay on the page
 		var singleBarContext = {
 				uid : uid,
@@ -390,8 +390,8 @@ ProteinBarRegionSelectionsOverlayCode.prototype.save = function( params ) {
 		}
 	}
 	//  Update the Hash and redraw
-	imagePagePrimaryRootCodeObject.call__updateURLHash( false /* useSearchForm */ );	 // save the new selection to the URL hash
-	imagePagePrimaryRootCodeObject.call__drawSvg();
+	imagePagePrimaryRootCodeObject_LocalCopy.call__updateURLHash( false /* useSearchForm */ );	 // save the new selection to the URL hash
+	imagePagePrimaryRootCodeObject_LocalCopy.call__drawSvg();
 	this.closeOverlay();
 };
 
@@ -419,10 +419,10 @@ ProteinBarRegionSelectionsOverlayCode.prototype._getRegionStartEnd = function( p
 
 
 /**
- * Called from "crosslink-image-viewer.js" to populate local copy of imagePagePrimaryRootCodeObject
+ * Called from "crosslink-image-viewer.js" to populate local copy of imagePagePrimaryRootCodeObject_LocalCopy
  */
-var proteinBarRegionSelectionsOverlayCode_pass_imagePagePrimaryRootCodeObject = function( imagePagePrimaryRootCodeObject_Param ) {
-	imagePagePrimaryRootCodeObject = imagePagePrimaryRootCodeObject_Param;
+var proteinBarRegionSelectionsOverlayCode_pass_imagePagePrimaryRootCodeObject = function( imagePagePrimaryRootCodeObject_LocalCopy_Param ) {
+	imagePagePrimaryRootCodeObject_LocalCopy = imagePagePrimaryRootCodeObject_LocalCopy_Param;
 }
 
 
