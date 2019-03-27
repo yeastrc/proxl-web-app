@@ -3279,7 +3279,7 @@ var StructurePagePrimaryRootCodeClass = function() {
 				});
 
 			} else {
-				alert("At least one linker on the page does not have a chemical formula for linkable positions defined. Cannot run report." );
+				alert("At least one linker on the page does not have a chemical formula or linkable positions defined. Cannot run report." );
 			}
 		});
 	};
