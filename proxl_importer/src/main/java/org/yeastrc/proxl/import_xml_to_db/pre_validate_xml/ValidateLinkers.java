@@ -1,5 +1,6 @@
 package org.yeastrc.proxl.import_xml_to_db.pre_validate_xml;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.HashSet;
 import java.util.List;
@@ -111,10 +112,16 @@ public class ValidateLinkers {
 
 			List<CrosslinkMass> crosslinkMassList = crosslinkMasses.getCrosslinkMass();
 			if ( ! crosslinkMassList.isEmpty() ) {
+				Set<BigDecimal> crosslinkerMasses = new HashSet<>();
 				boolean foundAnyChemicalFormula = false;
 				boolean allHaveChemicalFormula = true;
 				for ( CrosslinkMass crosslinkMass : crosslinkMassList ) {
-					// crosslinkMass.getMass();
+					if ( ! crosslinkerMasses.add( crosslinkMass.getMass() ) ) {
+						// CrosslinkerMass: same mass in more than one entry
+						String msg = "More than one <crosslink_mass> has same value for 'mass'. 'mass': " + crosslinkMass.getMass() + ",  Linker Name: " + proxlInputLinkerName;
+						log.error( msg );
+						throw new ProxlImporterDataException( msg );
+					}
 					if ( StringUtils.isNotEmpty( crosslinkMass.getChemicalFormula() ) ) {
 						foundAnyChemicalFormula = true;
 					} else {
@@ -131,9 +138,16 @@ public class ValidateLinkers {
 
 			List<CleavedCrosslinkMass> cleavedCrosslinkMassList = crosslinkMasses.getCleavedCrosslinkMass();
 			if ( ! cleavedCrosslinkMassList.isEmpty() ) {
+				Set<BigDecimal> cleavedCrosslinkMasses = new HashSet<>();
 				boolean foundAnyChemicalFormula = false;
 				boolean allHaveChemicalFormula = true;
 				for ( CleavedCrosslinkMass cleavedCrosslinkMass : cleavedCrosslinkMassList ) {
+					if ( ! cleavedCrosslinkMasses.add( cleavedCrosslinkMass.getMass() ) ) {
+						// CleavedCrosslinkMass: same mass in more than one entry
+						String msg = "More than one <cleaved_crosslink_mass> has same value for 'mass'. 'mass': " + cleavedCrosslinkMass.getMass() + ",  Linker Name: " + proxlInputLinkerName;
+						log.error( msg );
+						throw new ProxlImporterDataException( msg );
+					}
 					// cleavedCrosslinkMass.getMass();
 					if ( StringUtils.isNotEmpty( cleavedCrosslinkMass.getChemicalFormula() ) ) {
 						foundAnyChemicalFormula = true;

@@ -2349,6 +2349,7 @@ CREATE TABLE  linker_per_search_cleaved_crosslink_mass_tbl (
   search_id INT UNSIGNED NOT NULL,
   cleaved_crosslink_mass_double DOUBLE NOT NULL,
   cleaved_crosslink_mass_string VARCHAR(200) NOT NULL,
+  chemical_formula VARCHAR(1000) NULL,
   PRIMARY KEY (id),
   CONSTRAINT lnkr_pr_sch_clvd_crslnk_mss_tbl_srch_linker_fk
     FOREIGN KEY (search_linker_id)
@@ -2464,6 +2465,10 @@ COMMENT = 'Records for \"n\" and \"c\" terminus linkable';
 CREATE INDEX srchlnkrprsd_lnkbl_prtn_trmn_fkid_fk_idx ON search_linker_per_side_linkable_protein_termini_tbl (search_linker_per_side_definition_id ASC);
 
 
+SET SQL_MODE=@OLD_SQL_MODE;
+SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
+SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
+
 
 DELIMITER $$
 
@@ -2483,8 +2488,4 @@ END$$
 
 
 DELIMITER ;
-
-SET SQL_MODE=@OLD_SQL_MODE;
-SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
-SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
 

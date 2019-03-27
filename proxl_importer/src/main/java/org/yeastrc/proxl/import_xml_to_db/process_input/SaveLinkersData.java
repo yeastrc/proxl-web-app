@@ -184,6 +184,7 @@ public class SaveLinkersData {
 					linkerPerSearchCleavedCrosslinkMassDTO.setSearchId(  searchDTO.getId() );
 					linkerPerSearchCleavedCrosslinkMassDTO.setCleavedCrosslinkMassDouble( cleavedCrosslinkMass.getMass().doubleValue() );
 					linkerPerSearchCleavedCrosslinkMassDTO.setCleavedCrosslinkMassString( cleavedCrosslinkMass.getMass().toString() );
+					linkerPerSearchCleavedCrosslinkMassDTO.setChemicalFormula( cleavedCrosslinkMass.getChemicalFormula() );
 					DB_Insert_LinkerPerSearchCleavedCrosslinkMassDAO.getInstance().save( linkerPerSearchCleavedCrosslinkMassDTO );
 					linkerPerSearchCleavedCrosslinkMassDTOList.add( linkerPerSearchCleavedCrosslinkMassDTO );
 				}

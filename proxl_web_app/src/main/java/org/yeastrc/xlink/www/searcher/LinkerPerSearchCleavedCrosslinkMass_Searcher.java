@@ -44,6 +44,7 @@ public class LinkerPerSearchCleavedCrosslinkMass_Searcher {
 				result.setSearchId( rs.getInt( "search_id" ) );
 				result.setCleavedCrosslinkMassDouble( rs.getDouble( "cleaved_crosslink_mass_double" ) );
 				result.setCleavedCrosslinkMassString( rs.getString( "cleaved_crosslink_mass_string" ) );
+				result.setChemicalFormula( rs.getString( "chemical_formula" ) );
 				results.add( result );
 			}
 		} catch ( Exception e ) {

@@ -24,8 +24,8 @@ public class DB_Insert_LinkerPerSearchCleavedCrosslinkMassDAO {
 
 	private final String INSERT_SQL = 
 			"INSERT INTO linker_per_search_cleaved_crosslink_mass_tbl "
-			+ "(search_linker_id, search_id, cleaved_crosslink_mass_double, cleaved_crosslink_mass_string) "
-			+ "VALUES (?, ?, ?, ?)";
+			+ "(search_linker_id, search_id, cleaved_crosslink_mass_double, cleaved_crosslink_mass_string, chemical_formula) "
+			+ "VALUES (?, ?, ?, ?, ?)";
 	
 	  
 	public void save( LinkerPerSearchCleavedCrosslinkMassDTO item ) throws Exception {
@@ -52,6 +52,8 @@ public class DB_Insert_LinkerPerSearchCleavedCrosslinkMassDAO {
 			pstmt.setDouble( counter, item.getCleavedCrosslinkMassDouble() );
 			counter++;
 			pstmt.setString( counter, item.getCleavedCrosslinkMassString() );
+			counter++;
+			pstmt.setString( counter, item.getChemicalFormula() );
 
 			
 			pstmt.executeUpdate();
