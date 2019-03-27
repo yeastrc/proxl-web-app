@@ -47,6 +47,13 @@ public interface ILinker_Builtin_Linker {
 	 * @return
 	 */
 	public Set<String> getCrosslinkFormulas();
+
+	/**
+	 * Get the formulae of the sides of the cross-linker after it has been cleaved.
+	 *
+	 * @return
+	 */
+	public Set<String> getCleavedCrosslinkFormulas();
 	
 	/**
 	 * Attempt to get the cross link formula for the given mass. For linkers with
@@ -60,6 +67,18 @@ public interface ILinker_Builtin_Linker {
 	 * @throws Exception
 	 */
 	public String getCrosslinkFormula( double mass ) throws Exception;
+
+	/**
+	 * Attempt to get the cross link formula for the given mass for the possible
+	 * sides of a cleavable cross-linker.
+	 *
+	 * For linkers with only one formula, that formula is always returned.
+	 *
+	 * @param mass
+	 * @return
+	 * @throws Exception
+	 */
+	public String getCleavedCrosslinkFormula( double mass ) throws Exception;
 
 	/**
 	 * Return true if this is a cleavable cross-linker, false if not. Cleavable cross-linkers

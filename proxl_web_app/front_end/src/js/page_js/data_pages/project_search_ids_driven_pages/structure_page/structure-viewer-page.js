@@ -44,6 +44,7 @@ import { getProteinSequenceVersionIdsForNrseqProteinIds } from 'page_js/data_pag
 import { getLooplinkDataCommon, getCrosslinkDataCommon, getMonolinkDataCommon, attachViewLinkInfoOverlayClickHandlers } from 'page_js/data_pages/project_search_ids_driven_pages/image_page__structure_page__shared/image_structure_click_element_common.js';
 
 import { downloadStringAsFile } from 'page_js/data_pages/project_search_ids_driven_pages/common/download-string-as-file.js';
+import { downloadStringAsFile_OnlyJS } from 'page_js/data_pages/project_search_ids_driven_pages/common/download-string-as-file-only-js.js';
 
 import { LinkExclusionHandler } from './link-exclusion-handler.js';
 
@@ -3222,53 +3223,247 @@ var StructurePagePrimaryRootCodeClass = function() {
 	/**
 	 * Sends the request out for a lookup
 	 */
-	var doLinkablePositionsLookup = function( proteins, onlyShortest ) {
-			
-		incrementSpinner();				// create spinner
-		
-		var url = "services/linkablePositions/getLinkablePositionsBetweenProteins";
-		
-		var requestData = {
-			projectSearchIds : _projectSearchIds,
-			proteins : proteins
-		};
-		
-		$.ajax({
+	var doLinkablePositionsLookup = function( proteins ) {
+
+		return new Promise( (resolve, reject ) => {
+
+			incrementSpinner();				// create spinner
+
+			const url = "services/linkablePositions/getLinkablePositionsBetweenProteins";
+
+			const requestData = {
+				projectSearchIds: _projectSearchIds,
+				proteins: proteins
+			};
+
+			$.ajax({
 				type: "GET",
 				url: url,
 				traditional: true,  //  Force traditional serialization of the data sent
 				//   One thing this means is that arrays are sent as the object property instead of object property followed by "[]".
 				//   So proteinIdsToGetSequence array is passed as "proteinIdsToGetSequence=<value>" which is what Jersey expects
-				data : requestData,
+				data: requestData,
 				dataType: "json",
-				success: function(data)	{
-					
-					try {
-
-						decrementSpinner();
-						answerLinkablePositionsLookup( data, onlyShortest );
-						
-					} catch( e ) {
-						reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
-						throw e;
-					}
-
-				},
-				failure: function(errMsg) {
+				success: function (data) {
 					decrementSpinner();
-					handleAJAXFailure( errMsg );
+					resolve( data );
 				},
-				error: function(jqXHR, textStatus, errorThrown) {	
-						decrementSpinner();
-						handleAJAXError( jqXHR, textStatus, errorThrown );
+				failure: function (errMsg) {
+					decrementSpinner();
+					handleAJAXFailure(errMsg);
+					reject();
+				},
+				error: function (jqXHR, textStatus, errorThrown) {
+					decrementSpinner();
+					handleAJAXError(jqXHR, textStatus, errorThrown);
+					reject();
 				}
+			});
+		});
+	};
+
+	this_OfOutermostObjectOfClass.beginSkylinePeptideReport = function() {
+
+		const queryPromise = getAllLinkersSupportedForSkylineReport();
+
+		queryPromise.then( (queryResults) => {
+
+			if( queryResults[0] === true ) {
+
+				const lookupPromise = doCleavageLookupForSkyline();
+
+				lookupPromise.then( (results) => {
+
+					generateSkylinePeptideReport( results );
+
+				});
+
+			} else {
+				alert("At least one linker on the page does not have a chemical formula for linkable positions defined. Cannot run report." );
+			}
+		});
+	};
+
+	var generateSkylinePeptideReport = function( results ) {
+
+		let lines = [ ];
+		let i = 0;
+		for( const result of results ) {
+
+			const distance = getShortestDistanceForProteinPair( result[ 'proteinPositionPair' ] );
+
+			if( distance !== -1 ) {
+				lines[ i ] = [result[ 'reportLine' ], "\t", distance ].join("");
+				i++;
+			}
+		}
+
+		downloadStringAsFile_OnlyJS( "peptides-for-all-mappable-udrs-skyline.txt", "text/plain", lines.join( "\n" ) );
+	};
+
+	var getShortestDistanceForProteinPair = function( proteinPairObject ) {
+
+		const protein1 =  parseInt( proteinPairObject[ 'protein1' ] );
+		const protein2 =  parseInt( proteinPairObject[ 'protein2' ] );
+
+		const position1 = parseInt( proteinPairObject[ 'position1' ] );
+		const position2 = parseInt( proteinPairObject[ 'position2' ] );
+
+		const visibleProteinsMap = getVisibleProteins();
+		const chains1 = visibleProteinsMap[ protein1 ];
+		const chains2 = visibleProteinsMap[ protein2 ];
+
+		let shortestLink = 0;
+
+		if( !chains1 || chains1 == undefined || chains1.length < 1 ) {
+			console.log( "ERROR: Got no chains for protein: " + protein1 );
+			return -1;
+		}
+
+		if( !chains2 || chains2 == undefined || chains2.length < 1 ) {
+			console.log( "ERROR: Got no chains for protein: " + protein2 );
+			return -1;
+		}
+
+		for( var j = 0; j < chains1.length; j++ ) {
+			var chain1 = chains1[ j ];
+
+			var coordsArray1 = findCACoords( protein1, position1, [ chain1 ] );
+			if( coordsArray1 == undefined || coordsArray1.length < 1 ) { continue; }
+
+			for( var k = 0; k < chains2.length; k++ ) {
+				var chain2 = chains2[ k ];
+
+				if( chain1 == chain2 && protein1 == protein2 && position1 == position2 ) { continue; }
+
+				var coordsArray2 = findCACoords( protein2, position2, [ chain2 ] );
+				if( coordsArray1 == undefined || coordsArray2.length < 1 ) { continue; }
+
+				var distance = calculateDistance( coordsArray1[ 0 ], coordsArray2[ 0 ] );
+
+				if( !shortestLink || shortestLink[ 'distance' ] > distance ) {
+
+					shortestLink = {
+						'chain1' : chain1,
+						'chain2' : chain2,
+						'protein1' : protein1,
+						'protein2' : protein2,
+						'position1' : position1,
+						'position2' : position2,
+						'distance' : distance
+					};
+				}
+
+			}
+		}
+
+		if( shortestLink ) {
+
+			return shortestLink.distance;
+		}
+
+		return -1;
+	};
+
+	/**
+	 * Sends the request out for a lookup
+	 */
+	var getAllLinkersSupportedForSkylineReport = function( ) {
+
+		return new Promise( (resolve, reject ) => {
+
+			incrementSpinner();				// create spinner
+
+			const url = "services/cleavageProductLookup/allLinkersAreSupported";
+
+			const requestData = {
+				projectSearchIds: _projectSearchIds,
+			};
+
+			const requestDataJSON = JSON.stringify( requestData );
+
+			$.ajax({
+				type: "POST",
+				url: url,
+				data: requestDataJSON,
+				dataType: "json",
+				contentType: "application/json; charset=utf-8",
+				success: function (data) {
+					decrementSpinner();
+					resolve( data );
+				},
+				failure: function (errMsg) {
+					decrementSpinner();
+					handleAJAXFailure(errMsg);
+					reject();
+				},
+				error: function (jqXHR, textStatus, errorThrown) {
+					decrementSpinner();
+					handleAJAXError(jqXHR, textStatus, errorThrown);
+					reject();
+				}
+			});
+		});
+	};
+
+	/**
+	 * Sends the request out for a lookup
+	 */
+	var doCleavageLookupForSkyline = function( ) {
+
+		return new Promise( (resolve, reject ) => {
+
+			const visibleProteinsMap = getVisibleProteins();
+
+			if( !visibleProteinsMap || visibleProteinsMap == undefined || visibleProteinsMap.length < 1 ) { return; }
+
+			const visibleProteins = Object.keys( visibleProteinsMap );
+
+			let proteinNameMap = { };
+			for( const proteinId of Object.keys( visibleProteinsMap ) ) {
+				proteinNameMap[ proteinId ] = _proteinNames[ proteinId ];
+			}
+
+			incrementSpinner();				// create spinner
+
+			const url = "services/cleavageProductLookup/getCleavageProductsForSkyline";
+
+			const requestData = {
+				projectSearchIds: _projectSearchIds,
+				proteinSequenceVersionIds: visibleProteins,
+				proteinNameMap: proteinNameMap
+			};
+
+			const requestDataJSON = JSON.stringify( requestData );
+
+			$.ajax({
+				type: "POST",
+				url: url,
+				data: requestDataJSON,
+				dataType: "json",
+				contentType: "application/json; charset=utf-8",
+				success: function (data) {
+					decrementSpinner();
+					resolve( data );
+				},
+				failure: function (errMsg) {
+					decrementSpinner();
+					handleAJAXFailure(errMsg);
+					reject();
+				},
+				error: function (jqXHR, textStatus, errorThrown) {
+					decrementSpinner();
+					handleAJAXError(jqXHR, textStatus, errorThrown);
+					reject();
+				}
+			});
 		});
 	};
 
 	/**
 	 * Answers the request for the lookup
 	 */
-	var answerLinkablePositionsLookup = function( data, onlyShortest ) {
+	var generateAllUDRsReport = function( data, onlyShortest ) {
 		
 		var response = "";
 		var visibleProteinsMap = getVisibleProteins();
@@ -3351,15 +3546,21 @@ var StructurePagePrimaryRootCodeClass = function() {
 	};
 
 
-	this_OfOutermostObjectOfClass.downloadAllLinkablePositions = function( onlyShortest) {	
-		var visibleProteinsMap = getVisibleProteins();
-		
-		if( !visibleProteinsMap || visibleProteinsMap == undefined || visibleProteinsMap.length < 1 ) { return; }
-		
-		var visibleProteins = Object.keys( visibleProteinsMap );
-		doLinkablePositionsLookup( visibleProteins, onlyShortest );
-	};
+	this_OfOutermostObjectOfClass.downloadUDRsAsProteinPairs = function(onlyShortest) {
 
+		var visibleProteinsMap = getVisibleProteins();
+
+		if( !visibleProteinsMap || visibleProteinsMap == undefined || visibleProteinsMap.length < 1 ) { return; }
+
+		var visibleProteins = Object.keys( visibleProteinsMap );
+
+		const lookupPromise = doLinkablePositionsLookup( visibleProteins );
+
+		lookupPromise.then( (data) => {
+			generateAllUDRsReport( data, onlyShortest);
+		});
+
+	};
 
 	this_OfOutermostObjectOfClass.downloadShownUDRsForRosetta = function() {
 		var response = "";
@@ -3604,8 +3805,9 @@ var StructurePagePrimaryRootCodeClass = function() {
 		html += "<div style=\"font-size:12pt;margin-left:20px;\"><a href=\"javascript:\" onclick=\"window.structurePagePrimaryRootCodeObject.downloadPSMsForAllShownUDRLinks()\">PSMs for all shown UDRs</a></div>";
 
 		
-		html += "<div style=\"font-size:12pt;margin-left:20px;\"><a href=\"javascript:\" onclick=\"window.structurePagePrimaryRootCodeObject.downloadAllLinkablePositions(0)\">All possible UDRs (all possible points on structure)</a></div>";
-		html += "<div style=\"font-size:12pt;margin-left:20px;\"><a href=\"javascript:\" onclick=\"window.structurePagePrimaryRootCodeObject.downloadAllLinkablePositions(1)\">All possible UDRs (shortest-only)</a></div>";
+		html += "<div style=\"font-size:12pt;margin-left:20px;\"><a href=\"javascript:\" onclick=\"window.structurePagePrimaryRootCodeObject.downloadUDRsAsProteinPairs(0)\">All possible UDRs (all possible points on structure)</a></div>";
+		html += "<div style=\"font-size:12pt;margin-left:20px;\"><a href=\"javascript:\" onclick=\"window.structurePagePrimaryRootCodeObject.downloadUDRsAsProteinPairs(1)\">All possible UDRs (shortest-only)</a></div>";
+		html += "<div style=\"font-size:12pt;margin-left:20px;\"><a href=\"javascript:\" onclick=\"window.structurePagePrimaryRootCodeObject.beginSkylinePeptideReport()\">All theoretical peptides for all possible UDRs (Skyline format)</a></div>";
 		html += "<div style=\"font-size:12pt;margin-left:20px;\"><a href=\"javascript:\" onclick=\"window.structurePagePrimaryRootCodeObject.downloadShownUDRsForRosetta()\">Download Rosetta Constraints File</a></div>";
 		
 		$distanceReportDiv.html( html );

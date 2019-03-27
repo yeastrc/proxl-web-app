@@ -33,4 +33,14 @@ public class DSS_STY extends AmineLinkerSTY {
 	public boolean isCleavable() {
 		return false;
 	}
+
+	@Override
+	public Set<String> getCleavedCrosslinkFormulas() {
+		return null;
+	}
+
+	@Override
+	public String getCleavedCrosslinkFormula(double mass) throws Exception {
+		return null;
+	}
 }

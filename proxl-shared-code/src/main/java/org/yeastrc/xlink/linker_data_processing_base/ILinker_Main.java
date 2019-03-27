@@ -15,7 +15,7 @@ import org.yeastrc.xlink.dto.LinkerPerSearchMonolinkMassDTO;
  */
 public interface ILinker_Main {
 
-	
+
 	/**
 	 * @return
 	 */
@@ -68,7 +68,7 @@ public interface ILinker_Main {
 	 * @return Null if not available for Search or for Linker in Search
 	 */
 	public Set<String> getCrosslinkFormulas();
-	
+
 	/**
 	 * Attempt to get the cross link formula for the given queryMass. For linkers with
 	 * multiple cross-link masses, an attempt is made to find the correct formula
@@ -82,7 +82,6 @@ public interface ILinker_Main {
 	 */
 	public String getCrosslinkFormula( double queryMass ) throws Exception;
 
-	
 	//  Commented out until determined if needed.  The Builtin Linkers have this method.
 	/**
 	 * Return true if this is a cleavable cross-linker, false if not. Cleavable cross-linkers

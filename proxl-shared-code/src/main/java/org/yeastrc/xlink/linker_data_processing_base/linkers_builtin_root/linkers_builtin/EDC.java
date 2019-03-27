@@ -115,4 +115,14 @@ public class EDC implements ILinker_Builtin_Linker {
 		return false;
 	}
 
+	@Override
+	public Set<String> getCleavedCrosslinkFormulas() {
+		return null;
+	}
+
+	@Override
+	public String getCleavedCrosslinkFormula(double mass) throws Exception {
+		return null;
+	}
+
 }

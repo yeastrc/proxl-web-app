@@ -75,7 +75,17 @@ public class BMOE implements ILinker_Builtin_Linker {
 		
 		return formulas;
 	}
-	
+
+	@Override
+	public Set<String> getCleavedCrosslinkFormulas() {
+		return null;
+	}
+
+	@Override
+	public String getCleavedCrosslinkFormula(double mass) throws Exception {
+		return null;
+	}
+
 	public String getCrosslinkFormula( double mass ) throws Exception {
 		
 		int roundedMass = (int)mass;

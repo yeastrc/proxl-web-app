@@ -217,7 +217,7 @@ public class LinkablePositionsService {
 							
 							for( int position1 : linker_Main.getLinkablePositions( proteinSequence_1 ) ) {
 								for( int position2 : linker_Main.getLinkablePositions( proteinSequence_2, proteinSequence_1, position1 ) ) {					
-									positionPairs.add( new ProteinPositionPair( proteinId1, position1, proteinId2, position2 ) );					
+									positionPairs.add( new ProteinPositionPair( proteinId1, position1, proteinId2, position2 ) );
 								}
 							}
 						}

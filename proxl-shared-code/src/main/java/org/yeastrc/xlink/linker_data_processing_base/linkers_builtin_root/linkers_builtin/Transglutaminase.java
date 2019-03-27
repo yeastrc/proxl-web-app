@@ -67,4 +67,14 @@ public class Transglutaminase implements ILinker_Builtin_Linker {
 	public boolean isCleavable() {
 		return false;
 	}
+
+	@Override
+	public Set<String> getCleavedCrosslinkFormulas() {
+		return null;
+	}
+
+	@Override
+	public String getCleavedCrosslinkFormula(double mass) throws Exception {
+		return null;
+	}
 }
