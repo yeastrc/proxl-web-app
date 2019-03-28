@@ -2,6 +2,10 @@ package org.yeastrc.xlink.www.constants;
 
 public class StrutsActionPathsConstants {
 
+	public static final String BROWSER_INTERNET_EXPLORER_NOT_SUPPORTED_MESSAGE_PAGE = 
+			"/internet_explorer_not_supported.do";
+	
+	
 	public static final String USER_LOGIN = "/user_login.do";
 
 	public static final String USER_RESET_PASSWORD_PROCESS_CODE = "/user_resetPasswordProcessCode.do";

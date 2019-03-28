@@ -53,6 +53,13 @@
   
     <action-mappings>
     	
+		<action path="/internet_explorer_not_supported"
+				type="org.yeastrc.xlink.www.actions.InternetExplorerNotSupportedAction"
+				scope="request"
+				validate="false">
+		    <forward name="Success" path="/WEB-INF/jsp-pages/InternetExplorer_NotSupported_Error.jsp" redirect="false"/>
+		</action>		
+		
 		<action path="/qc_Scan_MS1_All_IntensityHeatmapImage"
 				type="org.yeastrc.xlink.www.actions.QC_Scan_MS1_All_IntensityHeatmapImageAction"
 				scope="request"

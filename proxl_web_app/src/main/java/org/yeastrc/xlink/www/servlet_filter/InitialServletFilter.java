@@ -8,9 +8,11 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.yeastrc.xlink.www.browser_type_logging.LogIfBrowserIsInternetExplorer;
+import org.yeastrc.xlink.www.browser_type_checking.IsBrowserIsInternetExplorer;
+import org.yeastrc.xlink.www.constants.StrutsActionPathsConstants;
 //import org.apache.log4j.Logger;
 import org.yeastrc.xlink.www.constants.WebConstants;
 import org.yeastrc.xlink.www.servlet_context.CurrentContext;
@@ -33,7 +35,7 @@ public class InitialServletFilter implements Filter {
 	public void doFilter(ServletRequest request, ServletResponse response,
 			FilterChain chain) throws IOException, ServletException {
 		HttpServletRequest httpRequest = (HttpServletRequest) request;
-//		HttpServletResponse httpResponse = (HttpServletResponse) response;
+		HttpServletResponse httpResponse = (HttpServletResponse) response;
 		HttpSession httpSession = httpRequest.getSession();
 		String requestURL = httpRequest.getRequestURL().toString();
 		String queryString = httpRequest.getQueryString();
@@ -60,7 +62,20 @@ public class InitialServletFilter implements Filter {
 			}
 		}
 		
-		LogIfBrowserIsInternetExplorer.getSingletonInstance().logBrowserIsInternetExplorerIfConfigured( request );
+		if ( requestURL.contains(".do") ) {
+			// Only do for struts actions
+			if ( IsBrowserIsInternetExplorer.getSingletonInstance().isBrowserIsInternetExplorer( request ) ) {
+
+				if ( ! requestURL.contains( StrutsActionPathsConstants.BROWSER_INTERNET_EXPLORER_NOT_SUPPORTED_MESSAGE_PAGE ) )  {
+					//  Only if URL not what redirecting to
+					final String redirectURL = 
+							httpRequest.getContextPath() 
+							+ StrutsActionPathsConstants.BROWSER_INTERNET_EXPLORER_NOT_SUPPORTED_MESSAGE_PAGE;
+					httpResponse.sendRedirect( redirectURL );
+					return;
+				}
+			}
+		}
 				
 		chain.doFilter(request, response);
 	}
