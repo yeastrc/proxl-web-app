@@ -21,9 +21,13 @@ import java.util.Vector;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Level;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;import org.slf4j.Logger;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.core.LoggerContext;
+import org.apache.logging.log4j.core.config.Configuration;
+import org.apache.logging.log4j.core.config.LoggerConfig;
+
 import org.yeastrc.proxl.import_xml_to_db.constants.DataErrorsFileConstants;
 import org.yeastrc.proxl.import_xml_to_db.constants.ImporterProgramExitCodes;
 import org.yeastrc.proxl.import_xml_to_db.constants.ScanFilenameConstants;
@@ -68,7 +72,7 @@ import org.yeastrc.xlink.exceptions.ProxlBaseDataException;
  */
 public class ImporterDefaultMainProgramEntry {
 	
-	private static final Logger log = Logger.getLogger(ImporterDefaultMainProgramEntry.class);
+	private static final Logger log = LoggerFactory.getLogger( ImporterDefaultMainProgramEntry.class);
 	
 	///////  !!!!!!!!!!!!!!!!!!!
 	//   Importer program exit codes moved to class ImporterProgramExitCodes
@@ -255,14 +259,26 @@ public class ImporterDefaultMainProgramEntry {
 				importResults.setProgramExitCode( ImporterProgramExitCodes.PROGRAM_EXIT_CODE_INVALID_COMMAND_LINE_PARAMETER_VALUES );
 				return importResults;  //  EARLY EXIT
 			}
+			
+			// !!!! Tied to Log4j2.  Need to update if change logger  !!!!!
+			
 			Boolean verbose = (Boolean) cmdLineParser.getOptionValue(verboseOpt, Boolean.FALSE);
 			Boolean debugValue = (Boolean) cmdLineParser.getOptionValue(debugOpt, Boolean.FALSE);
 			if ( verbose != null &&  verbose ) {
-				LogManager.getRootLogger().setLevel(Level.INFO);
+				LoggerContext context = (LoggerContext) LogManager.getContext(false);
+				Configuration config = context.getConfiguration();
+				LoggerConfig rootConfig = config.getLoggerConfig(LogManager.ROOT_LOGGER_NAME);
+				rootConfig.setLevel(Level.INFO);
 			}
 			if ( debugValue != null &&  debugValue ) {
-				LogManager.getRootLogger().setLevel(Level.DEBUG);
+				LoggerContext context = (LoggerContext) LogManager.getContext(false);
+				Configuration config = context.getConfiguration();
+				LoggerConfig rootConfig = config.getLoggerConfig(LogManager.ROOT_LOGGER_NAME);
+				rootConfig.setLevel(Level.DEBUG);
 			}
+			
+			/////////
+			
 			if ( log.isInfoEnabled() ) {
 				System.out.println( "Processing " + args.length + " command line arguments." );
 				System.out.println( "Processing the following command line arguments:" );
@@ -1141,7 +1157,7 @@ public class ImporterDefaultMainProgramEntry {
 	 */
 	public static class ImportProgramShutdownThread extends Thread {
 		
-		private static final Logger logImportProgramShutdownThread = Logger.getLogger(ImportProgramShutdownThread.class);
+		private static final Logger logImportProgramShutdownThread = LoggerFactory.getLogger(ImportProgramShutdownThread.class);
 		private final static int WAIT_TIME_FOR_MAIN_THREAD_TO_EXIT_IF_NORMAL_COMPLETION_REACHED = 2 * 1000; // 2 seconds
 		private volatile Thread mainThread;
 		private volatile boolean normalProgramCompletionReached = false;

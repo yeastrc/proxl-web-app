@@ -1,13 +1,13 @@
 package org.yeastrc.xlink.www.annotation_display;
 import java.util.Set;
-//import org.apache.log4j.Logger;
+//import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 /**
  * Remove exclude AnnTypeId from the annotationTypeIds Set
  *
  */
 public class RemoveExcludeAnnTypeIdFromAnnotationTypeIdSet {
 	
-//	private static final Logger log = Logger.getLogger(RemoveExcludeAnnTypeIdFromAnnotationTypeIdSet.class);
+//	private static final Logger log = LoggerFactory.getLogger( RemoveExcludeAnnTypeIdFromAnnotationTypeIdSet.class);
 	private RemoveExcludeAnnTypeIdFromAnnotationTypeIdSet() { }
 	public static RemoveExcludeAnnTypeIdFromAnnotationTypeIdSet getInstance() { return new RemoveExcludeAnnTypeIdFromAnnotationTypeIdSet(); }
 	/**

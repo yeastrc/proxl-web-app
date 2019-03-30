@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.dto.AnnotationDataBaseDTO;
 import org.yeastrc.xlink.dto.PsmAnnotationDTO;
@@ -33,7 +33,7 @@ import org.yeastrc.xlink.www.objects.WebReportedPeptide;
  */
 public class ReportedPeptidesForUnifiedPeptIdSearchIdsSearcher {
 	
-	private static final Logger log = Logger.getLogger(ReportedPeptidesForUnifiedPeptIdSearchIdsSearcher.class);
+	private static final Logger log = LoggerFactory.getLogger( ReportedPeptidesForUnifiedPeptIdSearchIdsSearcher.class);
 	private ReportedPeptidesForUnifiedPeptIdSearchIdsSearcher() { }
 	public static ReportedPeptidesForUnifiedPeptIdSearchIdsSearcher getInstance() { return new ReportedPeptidesForUnifiedPeptIdSearchIdsSearcher(); }
 	/**

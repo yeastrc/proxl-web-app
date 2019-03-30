@@ -9,7 +9,9 @@ import java.net.URL;
 import java.util.Properties;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+
 import org.yeastrc.proxl.import_xml_to_db_submit_pgm.constants.ConfigPropertiesConstants;
 import org.yeastrc.proxl.import_xml_to_db_submit_pgm.exceptions.ProxlSubImportConfigException;
 
@@ -21,7 +23,7 @@ import org.yeastrc.proxl.import_xml_to_db_submit_pgm.exceptions.ProxlSubImportCo
 public class ConfigParams {
 
 
-	private static final Logger log = Logger.getLogger( ConfigParams.class );
+	private static final Logger log = LoggerFactory.getLogger(  ConfigParams.class );
 
 	private static final ConfigParams instance = new ConfigParams();
 

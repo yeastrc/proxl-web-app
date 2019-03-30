@@ -4,7 +4,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.Properties;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 
 /**
  * 
@@ -12,7 +12,7 @@ import org.apache.log4j.Logger;
  */
 public class DBSet_JNDI_Name_FromConfigFile {
 	
-	private static final Logger log = Logger.getLogger(DBSet_JNDI_Name_FromConfigFile.class);
+	private static final Logger log = LoggerFactory.getLogger( DBSet_JNDI_Name_FromConfigFile.class);
 	
 	public static String DB_CONFIG_FILENAME = "database_connection.properties";
 	private static String PROPERTY_NAME__PROXL_JNDI_NAME = "proxl.jndi.name";

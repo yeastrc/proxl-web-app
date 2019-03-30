@@ -2,7 +2,7 @@ package org.yeastrc.xlink.www.internal_services;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.auth.dto.AuthUserDTO;
 import org.yeastrc.auth.exceptions.AuthSharedObjectRecordNotFoundException;
 import org.yeastrc.xlink.www.objects.UserDisplay;
@@ -14,7 +14,7 @@ import org.yeastrc.xlink.www.searcher.UsersForSharedObjectIdSearcher;
  */
 public class GetUserDisplayListForSharedObjectId {
 	
-	private static final Logger log = Logger.getLogger(GetUserDisplayListForSharedObjectId.class);
+	private static final Logger log = LoggerFactory.getLogger( GetUserDisplayListForSharedObjectId.class);
 	//  private constructor
 	private GetUserDisplayListForSharedObjectId() { }
 	/**

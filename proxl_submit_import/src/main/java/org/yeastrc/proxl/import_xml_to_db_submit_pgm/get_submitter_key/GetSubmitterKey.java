@@ -4,7 +4,9 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 
-//import org.apache.log4j.Logger;
+//import org.slf4j.LoggerFactory;
+//import org.slf4j.Logger;
+
 import org.yeastrc.proxl.import_xml_to_db_submit_pgm.constants.ProxlXMLFileUploadSubmitterPgmSameMachineConstants;
 import org.yeastrc.proxl.import_xml_to_db_submit_pgm.exceptions.ProxlSubImportReportedErrorException;
 
@@ -17,7 +19,7 @@ import org.yeastrc.proxl.import_xml_to_db_submit_pgm.exceptions.ProxlSubImportRe
 public class GetSubmitterKey {
 
 
-//	private static final Logger log = Logger.getLogger(GetSubmitterKey.class);
+//	private static final Logger log = LoggerFactory.getLogger( GetSubmitterKey.class);
 
 
 	private static final GetSubmitterKey instance = new GetSubmitterKey();

@@ -1,7 +1,7 @@
 package org.yeastrc.xlink.www.internal_services;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.auth.dao.AuthUserDAO;
 import org.yeastrc.auth.dto.AuthUserDTO;
 import org.yeastrc.xlink.www.dto.XLinkUserDTO;
@@ -17,7 +17,7 @@ import org.yeastrc.xlink.www.user_mgmt_webapp_access.UserMgmtGetUserDataResponse
  */
 public class GetXLinkUserDTOListForUsers {
 
-	private static final Logger log = Logger.getLogger(GetXLinkUserDTOListForUsers.class);
+	private static final Logger log = LoggerFactory.getLogger( GetXLinkUserDTOListForUsers.class);
 	//  private constructor
 	private GetXLinkUserDTOListForUsers() { }
 	/**

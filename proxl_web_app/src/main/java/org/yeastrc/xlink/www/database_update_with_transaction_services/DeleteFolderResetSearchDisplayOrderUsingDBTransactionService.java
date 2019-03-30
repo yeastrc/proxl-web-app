@@ -1,7 +1,7 @@
 package org.yeastrc.xlink.www.database_update_with_transaction_services;
 
 import java.sql.Connection;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.www.dao.FolderForProjectDAO;
 import org.yeastrc.xlink.www.dao.ProjectSearchDAO;
@@ -12,7 +12,7 @@ import org.yeastrc.xlink.www.dao.ProjectSearchDAO;
  */
 public class DeleteFolderResetSearchDisplayOrderUsingDBTransactionService {
 
-	private static final Logger log = Logger.getLogger(DeleteFolderResetSearchDisplayOrderUsingDBTransactionService.class);
+	private static final Logger log = LoggerFactory.getLogger( DeleteFolderResetSearchDisplayOrderUsingDBTransactionService.class);
 	DeleteFolderResetSearchDisplayOrderUsingDBTransactionService() { }
 	private static DeleteFolderResetSearchDisplayOrderUsingDBTransactionService _INSTANCE = new DeleteFolderResetSearchDisplayOrderUsingDBTransactionService();
 	public static DeleteFolderResetSearchDisplayOrderUsingDBTransactionService getInstance() { return _INSTANCE; }

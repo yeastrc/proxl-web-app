@@ -1,6 +1,6 @@
 package org.yeastrc.xlink.www.default_page_view;
 
-//import org.apache.log4j.Logger;
+//import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.www.servlet_context.CurrentContext;
 
 /**
@@ -9,7 +9,7 @@ import org.yeastrc.xlink.www.servlet_context.CurrentContext;
  */
 public class GetDefaultURLFromPageURL {
 
-	//	private static final Logger log = Logger.getLogger(GetDefaultURLFromPageURL.class);
+	//	private static final Logger log = LoggerFactory.getLogger( GetDefaultURLFromPageURL.class);
 	//  private constructor
 	private GetDefaultURLFromPageURL() { }
 	/**

@@ -3,7 +3,7 @@ package org.yeastrc.xlink.www.cached_data_in_file;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappInternalErrorException;
 import org.yeastrc.xlink.www.qc_data.psm_error_estimates.main.PPM_Error_Histogram_For_PSMPeptideCutoffs_CachedResultManager;
 import org.yeastrc.xlink.www.qc_data.psm_error_estimates.main.PPM_Error_Vs_M_over_Z_ScatterPlot_For_PSMPeptideCutoffs_CachedResultManager;
@@ -31,7 +31,7 @@ import org.yeastrc.xlink.www.webservices_cache_response.ViewerSequenceCoverageSe
  */
 public class CachedDataInFileMgmtRegistration {
 
-	private static final Logger log = Logger.getLogger( CachedDataInFileMgmtRegistration.class);
+	private static final Logger log = LoggerFactory.getLogger(  CachedDataInFileMgmtRegistration.class);
 
 	private static final CachedDataInFileMgmtRegistration instance = new CachedDataInFileMgmtRegistration();
 

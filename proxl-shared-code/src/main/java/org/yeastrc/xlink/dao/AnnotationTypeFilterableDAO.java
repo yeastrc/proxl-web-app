@@ -5,7 +5,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+
 import org.yeastrc.xlink.base.constants.Database_OneTrueZeroFalse_Constants;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.dto.AnnotationTypeFilterableDTO;
@@ -17,7 +19,7 @@ import org.yeastrc.xlink.enum_classes.FilterDirectionType;
  */
 public class AnnotationTypeFilterableDAO {
 	
-	private static final Logger log = Logger.getLogger(AnnotationTypeFilterableDAO.class);
+	private static final Logger log = LoggerFactory.getLogger( AnnotationTypeFilterableDAO.class);
 
 	private AnnotationTypeFilterableDAO() { }
 	public static AnnotationTypeFilterableDAO getInstance() { return new AnnotationTypeFilterableDAO(); }

@@ -3,7 +3,7 @@ package org.yeastrc.xlink.www.dao;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.joda.time.DateTime;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.www.dto.PDBFileDTO;
@@ -13,7 +13,7 @@ import org.yeastrc.xlink.www.dto.PDBFileDTO;
  */
 public class PDBFileDAO {
 	
-	private static final Logger log = Logger.getLogger(PDBFileDAO.class);
+	private static final Logger log = LoggerFactory.getLogger( PDBFileDAO.class);
 	private PDBFileDAO() { }
 	private static final PDBFileDAO _INSTANCE = new PDBFileDAO();
 	public static PDBFileDAO getInstance() { return _INSTANCE; }

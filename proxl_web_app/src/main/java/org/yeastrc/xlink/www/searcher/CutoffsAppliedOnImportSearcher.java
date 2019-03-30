@@ -5,7 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.dto.CutoffsAppliedOnImportDTO;
 
@@ -16,7 +16,7 @@ import org.yeastrc.xlink.dto.CutoffsAppliedOnImportDTO;
  */
 public class CutoffsAppliedOnImportSearcher {
 
-	private static final Logger log = Logger.getLogger(CutoffsAppliedOnImportSearcher.class);
+	private static final Logger log = LoggerFactory.getLogger( CutoffsAppliedOnImportSearcher.class);
 	private CutoffsAppliedOnImportSearcher() { }
 	private static final CutoffsAppliedOnImportSearcher _INSTANCE = new CutoffsAppliedOnImportSearcher();
 	public static CutoffsAppliedOnImportSearcher getInstance() { return _INSTANCE; }

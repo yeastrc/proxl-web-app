@@ -3,7 +3,7 @@ package org.yeastrc.xlink.www.config_system_table;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 
 /**
  * Registry for classes that need notification when then the config_system values change 
@@ -12,7 +12,7 @@ import org.apache.log4j.Logger;
  */
 public class ConfigSystemChangesRegistry {
 
-	private static final Logger log = Logger.getLogger( ConfigSystemChangesRegistry.class );
+	private static final Logger log = LoggerFactory.getLogger(  ConfigSystemChangesRegistry.class );
 
 	private static final ConfigSystemChangesRegistry instance = new ConfigSystemChangesRegistry();
 

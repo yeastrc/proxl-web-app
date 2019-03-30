@@ -3,7 +3,7 @@ package org.yeastrc.xlink.www.spectral_storage_service_interface;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.spectral_storage.get_data_webapp.shared_server_client.webservice_request_response.main.Get_SummaryDataPerScanLevel_Request;
 import org.yeastrc.spectral_storage.get_data_webapp.shared_server_client.webservice_request_response.main.Get_SummaryDataPerScanLevel_Response;
 import org.yeastrc.spectral_storage.get_data_webapp.shared_server_client.webservice_request_response.sub_parts.SingleScanLevelSummaryData_SubResponse;
@@ -15,7 +15,7 @@ import org.yeastrc.spectral_storage.get_data_webapp.webservice_connect.main.Call
  */
 public class Call_Get_GetSummaryDataPerScanLevel_FromSpectralStorageService {
 
-	private static final Logger log = Logger.getLogger(Call_Get_GetSummaryDataPerScanLevel_FromSpectralStorageService.class);
+	private static final Logger log = LoggerFactory.getLogger( Call_Get_GetSummaryDataPerScanLevel_FromSpectralStorageService.class);
 
 	private static final Call_Get_GetSummaryDataPerScanLevel_FromSpectralStorageService instance = new Call_Get_GetSummaryDataPerScanLevel_FromSpectralStorageService();
 	private Call_Get_GetSummaryDataPerScanLevel_FromSpectralStorageService() { }

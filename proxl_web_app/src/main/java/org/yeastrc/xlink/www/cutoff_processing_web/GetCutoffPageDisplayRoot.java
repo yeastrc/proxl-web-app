@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.dto.AnnotationTypeDTO;
 import org.yeastrc.xlink.dto.AnnotationTypeFilterableDTO;
 import org.yeastrc.xlink.dto.SearchProgramsPerSearchDTO;
@@ -32,7 +32,7 @@ import org.yeastrc.xlink.www.searcher_via_cached_data.return_objects_from_search
  */
 public class GetCutoffPageDisplayRoot {
 	
-	private static final Logger log = Logger.getLogger( GetCutoffPageDisplayRoot.class );
+	private static final Logger log = LoggerFactory.getLogger(  GetCutoffPageDisplayRoot.class );
 	//  private constructor
 	private GetCutoffPageDisplayRoot() { }
 	/**

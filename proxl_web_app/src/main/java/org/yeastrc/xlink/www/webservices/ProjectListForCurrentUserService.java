@@ -11,7 +11,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.auth.dto.AuthUserDTO;
 import org.yeastrc.xlink.www.internal_services.UpdateAuthUserUserAccessLevelEnabled;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
@@ -26,7 +26,7 @@ import org.yeastrc.xlink.www.web_utils.GetProjectListForCurrentLoggedInUser;
 @Path("/project")
 public class ProjectListForCurrentUserService {
 
-	private static final Logger log = Logger.getLogger(ProjectListForCurrentUserService.class);
+	private static final Logger log = LoggerFactory.getLogger( ProjectListForCurrentUserService.class);
 	
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)

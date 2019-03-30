@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.dbcp.DelegatingPreparedStatement;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.www.constants.PeptideViewLinkTypesConstants;
 import org.yeastrc.xlink.www.dao.SearchDAO;
 import org.yeastrc.xlink.db.DBConnectionFactory;
@@ -43,7 +43,7 @@ import org.yeastrc.xlink.www.searcher_utils.DefaultCutoffsExactlyMatchAnnTypeDat
  */
 public class SearchPeptideNoLinkInfo_ForNoLinkInfoPeptideWS_Searcher {
 	
-	private static final Logger log = Logger.getLogger(SearchPeptideNoLinkInfo_ForNoLinkInfoPeptideWS_Searcher.class);
+	private static final Logger log = LoggerFactory.getLogger( SearchPeptideNoLinkInfo_ForNoLinkInfoPeptideWS_Searcher.class);
 	private SearchPeptideNoLinkInfo_ForNoLinkInfoPeptideWS_Searcher() { }
 	private static final SearchPeptideNoLinkInfo_ForNoLinkInfoPeptideWS_Searcher _INSTANCE = new SearchPeptideNoLinkInfo_ForNoLinkInfoPeptideWS_Searcher();
 	public static SearchPeptideNoLinkInfo_ForNoLinkInfoPeptideWS_Searcher getInstance() { return _INSTANCE; }

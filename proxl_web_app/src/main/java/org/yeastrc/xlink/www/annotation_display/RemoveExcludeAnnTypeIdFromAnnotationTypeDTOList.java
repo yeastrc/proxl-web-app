@@ -2,7 +2,7 @@ package org.yeastrc.xlink.www.annotation_display;
 
 import java.util.Iterator;
 import java.util.List;
-//import org.apache.log4j.Logger;
+//import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.dto.AnnotationTypeDTO;
 /**
  * Remove exclude AnnTypeId from the AnnotationTypeDTO List
@@ -10,7 +10,7 @@ import org.yeastrc.xlink.dto.AnnotationTypeDTO;
  */
 public class RemoveExcludeAnnTypeIdFromAnnotationTypeDTOList {
 	
-//	private static final Logger log = Logger.getLogger(RemoveExcludeAnnTypeIdFromAnnotationTypeDTOList.class);
+//	private static final Logger log = LoggerFactory.getLogger( RemoveExcludeAnnTypeIdFromAnnotationTypeDTOList.class);
 	private RemoveExcludeAnnTypeIdFromAnnotationTypeDTOList() { }
 	public static RemoveExcludeAnnTypeIdFromAnnotationTypeDTOList getInstance() { return new RemoveExcludeAnnTypeIdFromAnnotationTypeDTOList(); }
 	/**

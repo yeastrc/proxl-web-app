@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;import org.slf4j.Logger;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterDataException;
 import org.yeastrc.proxl_import.api.xml_dto.AnnotationCutoffsOnImport;
 import org.yeastrc.proxl_import.api.xml_dto.FilterablePeptideAnnotationType;
@@ -30,7 +30,7 @@ import org.yeastrc.xlink.enum_classes.FilterDirectionType;
  */
 public class DropPeptidePSMPopulateFromProxlXMLInput {
 
-	private static final Logger log = Logger.getLogger(DropPeptidePSMPopulateFromProxlXMLInput.class);
+	private static final Logger log = LoggerFactory.getLogger( DropPeptidePSMPopulateFromProxlXMLInput.class);
 
 	//  private constructor
 	private DropPeptidePSMPopulateFromProxlXMLInput() { }

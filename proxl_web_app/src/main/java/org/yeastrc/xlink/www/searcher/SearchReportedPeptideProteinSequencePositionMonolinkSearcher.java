@@ -5,7 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.www.dto.SrchRepPeptProtSeqIdPosMonolinkDTO;
 /**
@@ -14,7 +14,7 @@ import org.yeastrc.xlink.www.dto.SrchRepPeptProtSeqIdPosMonolinkDTO;
  */
 public class SearchReportedPeptideProteinSequencePositionMonolinkSearcher {
 	
-	private static final Logger log = Logger.getLogger( SearchReportedPeptideProteinSequencePositionMonolinkSearcher.class );
+	private static final Logger log = LoggerFactory.getLogger(  SearchReportedPeptideProteinSequencePositionMonolinkSearcher.class );
 	private SearchReportedPeptideProteinSequencePositionMonolinkSearcher() { }
 	private static final SearchReportedPeptideProteinSequencePositionMonolinkSearcher _INSTANCE = new SearchReportedPeptideProteinSequencePositionMonolinkSearcher();
 	public static SearchReportedPeptideProteinSequencePositionMonolinkSearcher getInstance() { return _INSTANCE; }

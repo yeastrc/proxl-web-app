@@ -5,7 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.HashSet;
 import java.util.Set;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 
 /**
@@ -14,7 +14,7 @@ import org.yeastrc.xlink.db.DBConnectionFactory;
  */
 public class TaxonomyIdsForProtSeqIdSearchIdSearcher {
 
-	private static final Logger log = Logger.getLogger( TaxonomyIdsForProtSeqIdSearchIdSearcher.class );
+	private static final Logger log = LoggerFactory.getLogger(  TaxonomyIdsForProtSeqIdSearchIdSearcher.class );
 	private TaxonomyIdsForProtSeqIdSearchIdSearcher() { }
 	public static TaxonomyIdsForProtSeqIdSearchIdSearcher getInstance() { return new TaxonomyIdsForProtSeqIdSearchIdSearcher(); }
 	

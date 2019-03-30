@@ -3,7 +3,7 @@ package org.yeastrc.xlink.www.searcher;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.enum_classes.SearchRecordStatus;
 
@@ -13,7 +13,7 @@ import org.yeastrc.xlink.enum_classes.SearchRecordStatus;
  */
 public class ProjectSearchIdAssocSearchIdInProjectIdSearcher {
 
-	private static final Logger log = Logger.getLogger(ProjectSearchIdAssocSearchIdInProjectIdSearcher.class);
+	private static final Logger log = LoggerFactory.getLogger( ProjectSearchIdAssocSearchIdInProjectIdSearcher.class);
 	ProjectSearchIdAssocSearchIdInProjectIdSearcher() { }
 	private static ProjectSearchIdAssocSearchIdInProjectIdSearcher _INSTANCE = new ProjectSearchIdAssocSearchIdInProjectIdSearcher();
 	public static ProjectSearchIdAssocSearchIdInProjectIdSearcher getInstance() { return _INSTANCE; }

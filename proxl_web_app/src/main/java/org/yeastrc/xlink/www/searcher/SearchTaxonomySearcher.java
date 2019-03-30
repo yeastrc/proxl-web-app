@@ -6,7 +6,7 @@ import java.sql.ResultSet;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 
 /**
@@ -16,7 +16,7 @@ import org.yeastrc.xlink.db.DBConnectionFactory;
  */
 public class SearchTaxonomySearcher {
 	
-	private static final Logger log = Logger.getLogger( SearchTaxonomySearcher.class );
+	private static final Logger log = LoggerFactory.getLogger(  SearchTaxonomySearcher.class );
 	private SearchTaxonomySearcher() { }
 	public static SearchTaxonomySearcher getInstance() { return new SearchTaxonomySearcher(); }
 	

@@ -3,7 +3,9 @@ package org.yeastrc.xlink.searcher_psm_peptide_cutoff_utils;
 import java.util.List;
 
 import org.yeastrc.xlink.dto.AnnotationTypeDTO;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesAnnotationLevel;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
 
@@ -13,7 +15,7 @@ import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValue
  */
 public class CreateSearcherCutoffValuesSearchLevelFromDefaultsInTypeRecords {
 
-	private static final Logger log = Logger.getLogger( CreateSearcherCutoffValuesSearchLevelFromDefaultsInTypeRecords.class );
+	private static final Logger log = LoggerFactory.getLogger(  CreateSearcherCutoffValuesSearchLevelFromDefaultsInTypeRecords.class );
 	
 	/**
 	 * private constructor

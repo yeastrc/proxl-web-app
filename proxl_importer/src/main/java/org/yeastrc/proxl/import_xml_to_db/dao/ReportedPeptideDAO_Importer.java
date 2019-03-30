@@ -4,7 +4,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.dto.ReportedPeptideDTO;
 
@@ -14,7 +16,7 @@ import org.yeastrc.xlink.dto.ReportedPeptideDTO;
  */
 public class ReportedPeptideDAO_Importer {
 	
-	private static final Logger log = Logger.getLogger(ReportedPeptideDAO_Importer.class);
+	private static final Logger log = LoggerFactory.getLogger( ReportedPeptideDAO_Importer.class);
 	private ReportedPeptideDAO_Importer() { }
 	public static ReportedPeptideDAO_Importer getInstance() { return new ReportedPeptideDAO_Importer(); }
 	

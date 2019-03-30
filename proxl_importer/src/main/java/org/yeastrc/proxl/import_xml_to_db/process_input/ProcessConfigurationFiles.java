@@ -1,7 +1,7 @@
 package org.yeastrc.proxl.import_xml_to_db.process_input;
 
 import java.util.List;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;import org.slf4j.Logger;
 import org.yeastrc.proxl_import.api.xml_dto.ConfigurationFile;
 import org.yeastrc.proxl_import.api.xml_dto.ConfigurationFiles;
 import org.yeastrc.proxl_import.api.xml_dto.ProxlInput;
@@ -17,7 +17,7 @@ import org.yeastrc.xlink.dto.SearchFileProjectSearchDTO;
  */
 public class ProcessConfigurationFiles {
 
-	private static final Logger log = Logger.getLogger( ProcessConfigurationFiles.class );
+	private static final Logger log = LoggerFactory.getLogger(  ProcessConfigurationFiles.class );
 	/**
 	 * private constructor
 	 */

@@ -5,7 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 /**
  * Return a list of users in the database that match the access level
@@ -14,7 +14,7 @@ import org.yeastrc.xlink.db.DBConnectionFactory;
  */
 public class UserSearcherForAccessLevel {
 	
-	private static final Logger log = Logger.getLogger(UserSearcherForAccessLevel.class);
+	private static final Logger log = LoggerFactory.getLogger( UserSearcherForAccessLevel.class);
 	private UserSearcherForAccessLevel() { }
 	private static final UserSearcherForAccessLevel _INSTANCE = new UserSearcherForAccessLevel();
 	public static UserSearcherForAccessLevel getInstance() { return _INSTANCE; }

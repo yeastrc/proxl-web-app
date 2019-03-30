@@ -8,7 +8,9 @@ import java.io.File;
 import java.io.InputStreamReader;
 import java.util.Date;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+
 import org.yeastrc.proxl.import_xml_to_db.dao.ConfigSystemDAO;
 import org.yeastrc.proxl.import_xml_to_db.db.DBConnectionParametersProviderFromPropertiesFile;
 import org.yeastrc.proxl.import_xml_to_db.db.DBConnectionParametersProviderPropertiesFileErrorException;
@@ -24,7 +26,7 @@ import org.yeastrc.xlink.base.config_system_table_common_access.ConfigSystemTabl
  */
 public class ImporterRunnerProgram {
 
-	private static final Logger log = Logger.getLogger(ImporterRunnerProgram.class);
+	private static final Logger log = LoggerFactory.getLogger( ImporterRunnerProgram.class);
 //	private static final int PROGRAM_EXIT_CODE_DEFAULT_NO_SYTEM_EXIT_CALLED = 0;
 	private static final int PROGRAM_EXIT_CODE_INVALID_INPUT = 1;
 	private static final int PROGRAM_EXIT_CODE_HELP = 1;

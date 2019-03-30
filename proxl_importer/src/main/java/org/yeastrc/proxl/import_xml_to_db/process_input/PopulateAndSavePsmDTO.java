@@ -3,7 +3,7 @@ package org.yeastrc.proxl.import_xml_to_db.process_input;
 import java.math.BigDecimal;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;import org.slf4j.Logger;
 import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_PsmDAO;
 import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_SearchScanFilenameDAO;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterDataException;
@@ -21,7 +21,7 @@ import org.yeastrc.xlink.utils.XLinkUtils;
  */
 public class PopulateAndSavePsmDTO {
 
-	private static final Logger log = Logger.getLogger( PopulateAndSavePsmDTO.class );
+	private static final Logger log = LoggerFactory.getLogger(  PopulateAndSavePsmDTO.class );
 	/**
 	 * private constructor
 	 */

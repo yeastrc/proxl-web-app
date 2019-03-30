@@ -4,7 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.auth.db.AuthLibraryDBConnectionFactory;
 import org.yeastrc.auth.dto.AuthUserDTO;
 import org.yeastrc.xlink.base.constants.Database_OneTrueZeroFalse_Constants;
@@ -16,7 +16,7 @@ import org.yeastrc.xlink.www.exceptions.ProxlWebappInternalErrorException;
  */
 public class AuthUserDAO implements Runnable {
 
-	private static final Logger log = Logger.getLogger(AuthUserDAO.class);
+	private static final Logger log = LoggerFactory.getLogger( AuthUserDAO.class);
 	private AuthUserDAO() { }
 	public static AuthUserDAO getInstance() { return new AuthUserDAO(); }
 	/**

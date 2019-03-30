@@ -6,7 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesRootLevel;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
 import org.yeastrc.xlink.www.dto.SearchDTO;
@@ -21,7 +21,7 @@ import org.yeastrc.xlink.www.searcher.PeptideProteinPositionsForCutoffsAndProtSe
  */
 public class ProteinSequenceCoverageFactory {
 	
-	private static final Logger log = Logger.getLogger( ProteinSequenceCoverageFactory.class );
+	private static final Logger log = LoggerFactory.getLogger(  ProteinSequenceCoverageFactory.class );
 	
 	private ProteinSequenceCoverageFactory() { }
 	public static ProteinSequenceCoverageFactory getInstance() { return new ProteinSequenceCoverageFactory(); }

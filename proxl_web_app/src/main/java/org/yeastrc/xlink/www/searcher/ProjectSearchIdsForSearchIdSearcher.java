@@ -6,7 +6,7 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.enum_classes.SearchRecordStatus;
 
@@ -16,7 +16,7 @@ import org.yeastrc.xlink.enum_classes.SearchRecordStatus;
  */
 public class ProjectSearchIdsForSearchIdSearcher {
 
-	private static final Logger log = Logger.getLogger(ProjectSearchIdsForSearchIdSearcher.class);
+	private static final Logger log = LoggerFactory.getLogger( ProjectSearchIdsForSearchIdSearcher.class);
 
 	private ProjectSearchIdsForSearchIdSearcher() { }
 	private static final ProjectSearchIdsForSearchIdSearcher _INSTANCE = new ProjectSearchIdsForSearchIdSearcher();

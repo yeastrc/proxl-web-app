@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;import org.slf4j.Logger;
 import org.yeastrc.proxl.import_xml_to_db.dao.ProteinImporterContainerDAO;
 import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_SearchReportedPeptideDynamicModLookupDAO;
 import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_SrchRepPeptProtSeqIdPosDimerDAO;
@@ -37,7 +37,7 @@ import org.yeastrc.xlink.utils.XLinkUtils;
  */
 public class ProcessLinkTypeDimerAsDefinedByProxl {
 	
-	private static final Logger log = Logger.getLogger(ProcessLinkTypeDimerAsDefinedByProxl.class);
+	private static final Logger log = LoggerFactory.getLogger( ProcessLinkTypeDimerAsDefinedByProxl.class);
 	//  private constructor
 	private ProcessLinkTypeDimerAsDefinedByProxl() { }
 	public static ProcessLinkTypeDimerAsDefinedByProxl getInstance() { return new ProcessLinkTypeDimerAsDefinedByProxl(); }

@@ -3,7 +3,9 @@ package org.yeastrc.proxl.import_xml_to_db_runner_pgm.http_reponse_code_validati
 import org.apache.http.HttpStatus;
 import org.yeastrc.proxl.import_xml_to_db_runner_pgm.exceptions.ProxlSubImportServerReponseException;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+
 
 
 /**
@@ -13,7 +15,7 @@ import org.apache.log4j.Logger;
 public class A_ProcessHTTP_StatusCode {
 
 
-	private static final Logger log = Logger.getLogger(A_ProcessHTTP_StatusCode.class);
+	private static final Logger log = LoggerFactory.getLogger( A_ProcessHTTP_StatusCode.class);
 
 
 	private static final A_ProcessHTTP_StatusCode instance = new A_ProcessHTTP_StatusCode();

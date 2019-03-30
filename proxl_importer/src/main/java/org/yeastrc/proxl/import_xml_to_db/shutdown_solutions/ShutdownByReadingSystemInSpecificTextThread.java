@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Date;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;import org.slf4j.Logger;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 
 /**
@@ -29,7 +29,7 @@ import org.yeastrc.xlink.db.DBConnectionFactory;
 @Deprecated
 public class ShutdownByReadingSystemInSpecificTextThread extends Thread {
 	
-//	private static final Logger log = Logger.getLogger(ShutdownByReadingSystemInSpecificTextThread.class);
+//	private static final Logger log = LoggerFactory.getLogger( ShutdownByReadingSystemInSpecificTextThread.class);
 //
 //	private byte[] systemInStringForShutdown;
 //

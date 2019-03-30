@@ -10,7 +10,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.dto.AnnotationDataBaseDTO;
 import org.yeastrc.xlink.dto.AnnotationTypeDTO;
@@ -33,7 +33,7 @@ import org.yeastrc.xlink.www.searcher_utils.DefaultCutoffsExactlyMatchAnnTypeDat
  */
 public class SearchPeptideCrosslink_LinkedPosition_Searcher {
 	
-	private static final Logger log = Logger.getLogger(SearchPeptideCrosslink_LinkedPosition_Searcher.class);
+	private static final Logger log = LoggerFactory.getLogger( SearchPeptideCrosslink_LinkedPosition_Searcher.class);
 	private SearchPeptideCrosslink_LinkedPosition_Searcher() { }
 	private static final SearchPeptideCrosslink_LinkedPosition_Searcher _INSTANCE = new SearchPeptideCrosslink_LinkedPosition_Searcher();
 	public static SearchPeptideCrosslink_LinkedPosition_Searcher getInstance() { return _INSTANCE; }

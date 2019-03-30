@@ -3,7 +3,7 @@ package org.yeastrc.proxl.import_xml_to_db.process_input;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;import org.slf4j.Logger;
 import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_LinkerPerSearchCleavedCrosslinkMassDAO;
 import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_LinkerPerSearchCrosslinkMassDAO;
 import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_LinkerPerSearchMonolinkMassDAO;
@@ -47,7 +47,7 @@ import org.yeastrc.xlink.linker_data_processing_base.linker_db_data_per_search.S
  */
 public class SaveLinkersData {
 
-	private static final Logger log = Logger.getLogger( SavePerPeptideData.class );
+	private static final Logger log = LoggerFactory.getLogger(  SavePerPeptideData.class );
 	/**
 	 * private constructor
 	 */

@@ -6,7 +6,7 @@ import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.dto.LinkerPerSearchCleavedCrosslinkMassDTO;
 import org.yeastrc.xlink.linker_data_processing_base.ILinker_Main;
 import org.yeastrc.xlink.linker_data_processing_base.ILinkers_Main_ForSingleSearch;
@@ -26,7 +26,7 @@ import org.yeastrc.xlink.www.searcher.LinkerPerSearchCleavedCrosslinkMass_Search
  */
 public class IsShowDownloadLinks_Skyline_SetRequestParameters {
 
-	private static final Logger log = Logger.getLogger(IsShowDownloadLinks_Skyline_SetRequestParameters.class);
+	private static final Logger log = LoggerFactory.getLogger( IsShowDownloadLinks_Skyline_SetRequestParameters.class);
 	private static final IsShowDownloadLinks_Skyline_SetRequestParameters instance = new IsShowDownloadLinks_Skyline_SetRequestParameters();
 	private IsShowDownloadLinks_Skyline_SetRequestParameters() { }
 	public static IsShowDownloadLinks_Skyline_SetRequestParameters getInstance() { return instance; }

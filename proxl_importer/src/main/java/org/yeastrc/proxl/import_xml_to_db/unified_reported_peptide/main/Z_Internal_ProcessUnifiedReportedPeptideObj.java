@@ -7,7 +7,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;import org.slf4j.Logger;
 import org.yeastrc.xlink.base.constants.UnifiedReportedPeptideConstants;
 import org.yeastrc.xlink.dao.IsotopeLabelDAO;
 import org.yeastrc.xlink.dto.IsotopeLabelDTO;
@@ -31,7 +31,7 @@ import org.yeastrc.xlink.utils.XLinkUtils;
  */
 class Z_Internal_ProcessUnifiedReportedPeptideObj {
 
-	private static final Logger log = Logger.getLogger(Z_Internal_ProcessUnifiedReportedPeptideObj.class);
+	private static final Logger log = LoggerFactory.getLogger( Z_Internal_ProcessUnifiedReportedPeptideObj.class);
 
 
 	//  add the formatted peptides with the separator

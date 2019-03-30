@@ -19,7 +19,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.dto.PsmAnnotationDTO;
 import org.yeastrc.xlink.enum_classes.FilterDirectionType;
 import org.yeastrc.xlink.enum_classes.FilterableDescriptiveAnnotationType;
@@ -64,7 +64,7 @@ import org.yeastrc.xlink.www.web_utils.DeserializeCutoffForWebservices;
 @Path("/data")
 public class PsmsService {
 
-	private static final Logger log = Logger.getLogger(PsmsService.class);
+	private static final Logger log = LoggerFactory.getLogger( PsmsService.class);
 	
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)

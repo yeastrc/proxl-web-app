@@ -17,7 +17,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.dao.ScanFileDAO;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
 import org.yeastrc.xlink.www.project_search__search__mapping.MapProjectSearchIdToSearchId;
@@ -30,7 +30,7 @@ import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
 @Path("/utils")
 public class ScanFilesForProjectSearchIdService {
 	
-	private static final Logger log = Logger.getLogger(ScanFilesForProjectSearchIdService.class);
+	private static final Logger log = LoggerFactory.getLogger( ScanFilesForProjectSearchIdService.class);
 	
 	/**
 	 * @param projectSearchId

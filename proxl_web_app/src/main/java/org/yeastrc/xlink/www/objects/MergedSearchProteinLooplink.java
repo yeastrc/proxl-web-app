@@ -4,13 +4,13 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesRootLevel;
 
 public class MergedSearchProteinLooplink implements IProteinLooplink, IMergedSearchLink {
 	
-	private static final Logger log = Logger.getLogger( MergedSearchProteinLooplink.class );
+	private static final Logger log = LoggerFactory.getLogger(  MergedSearchProteinLooplink.class );
 
 	/* 
 	 * The searches for the records that were found for this specific set of query keys

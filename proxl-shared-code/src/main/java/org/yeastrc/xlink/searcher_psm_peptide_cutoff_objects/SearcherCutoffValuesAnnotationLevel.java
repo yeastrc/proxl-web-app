@@ -1,6 +1,8 @@
 package org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects;
 
-//import org.apache.log4j.Logger;
+//import org.slf4j.LoggerFactory;
+//import org.slf4j.Logger;
+
 import org.yeastrc.xlink.dto.AnnotationTypeDTO;
 
 
@@ -12,7 +14,7 @@ public class SearcherCutoffValuesAnnotationLevel {
 
 	//  Warning:  Has equals(...) and hashCode() that need to be updated if properties change
 	
-//	private static final Logger log = Logger.getLogger(SearcherCutoffValuesAnnotationLevel.class);
+//	private static final Logger log = LoggerFactory.getLogger( SearcherCutoffValuesAnnotationLevel.class);
 	
 	private int annotationTypeId;
 	private double annotationCutoffValue;

@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;import org.slf4j.Logger;
 import org.yeastrc.proxl.import_xml_to_db.objects.SearchProgramEntry;
 import org.yeastrc.proxl_import.api.xml_dto.DescriptivePeptideAnnotationType;
 import org.yeastrc.proxl_import.api.xml_dto.DescriptivePeptideAnnotationTypes;
@@ -39,7 +39,7 @@ import org.yeastrc.xlink.enum_classes.PsmPeptideAnnotationType;
  */
 public class ProcessSearchProgramEntries {
 	
-	private static final Logger log = Logger.getLogger( ProcessSearchProgramEntries.class );
+	private static final Logger log = LoggerFactory.getLogger(  ProcessSearchProgramEntries.class );
 	/**
 	 * private constructor
 	 */

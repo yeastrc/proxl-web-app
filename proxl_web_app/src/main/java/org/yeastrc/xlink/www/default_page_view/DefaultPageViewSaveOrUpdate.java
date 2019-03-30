@@ -1,6 +1,6 @@
 package org.yeastrc.xlink.www.default_page_view;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.www.constants.DefaultPageViewConstants;
 import org.yeastrc.xlink.www.dao.DefaultPageViewGenericDAO;
 import org.yeastrc.xlink.www.dto.DefaultPageViewGenericDTO;
@@ -11,7 +11,7 @@ import org.yeastrc.xlink.www.dto.DefaultPageViewGenericDTO;
  */
 public class DefaultPageViewSaveOrUpdate {
 
-	private static final Logger log = Logger.getLogger(DefaultPageViewSaveOrUpdate.class);
+	private static final Logger log = LoggerFactory.getLogger( DefaultPageViewSaveOrUpdate.class);
 	//  private constructor
 	private DefaultPageViewSaveOrUpdate() { }
 	/**

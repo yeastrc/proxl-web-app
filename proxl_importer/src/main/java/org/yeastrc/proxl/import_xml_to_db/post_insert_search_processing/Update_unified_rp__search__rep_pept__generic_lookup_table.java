@@ -6,7 +6,7 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;import org.slf4j.Logger;
 import org.yeastrc.proxl.import_xml_to_db.dao.UnifiedRepPep_Search_ReportedPeptide__Generic_Lookup__DAO;
 import org.yeastrc.proxl.import_xml_to_db.db.ImportDBConnectionFactory;
 import org.yeastrc.proxl.import_xml_to_db.dto.SearchDTO_Importer;
@@ -20,7 +20,7 @@ import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValue
  */
 public class Update_unified_rp__search__rep_pept__generic_lookup_table {
 
-	private static final Logger log = Logger.getLogger( Update_unified_rp__search__rep_pept__generic_lookup_table.class );
+	private static final Logger log = LoggerFactory.getLogger(  Update_unified_rp__search__rep_pept__generic_lookup_table.class );
 	/**
 	 * private constructor
 	 */

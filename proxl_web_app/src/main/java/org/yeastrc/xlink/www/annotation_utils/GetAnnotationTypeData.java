@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.dto.AnnotationTypeDTO;
 import org.yeastrc.xlink.enum_classes.FilterableDescriptiveAnnotationType;
 import org.yeastrc.xlink.enum_classes.PsmPeptideAnnotationType;
@@ -32,7 +32,7 @@ import com.google.common.cache.LoadingCache;
  */
 public class GetAnnotationTypeData implements CachedDataCommonIF {
 	
-	private static final Logger log = Logger.getLogger(GetAnnotationTypeData.class);
+	private static final Logger log = LoggerFactory.getLogger( GetAnnotationTypeData.class);
 	
 	private static final int CACHE_MAX_SIZE_FULL_SIZE = 8000;
 	private static final int CACHE_MAX_SIZE_SMALL_FEW = 500;

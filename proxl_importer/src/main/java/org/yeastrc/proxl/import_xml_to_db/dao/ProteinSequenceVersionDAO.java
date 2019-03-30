@@ -5,7 +5,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+
 import org.yeastrc.proxl.import_xml_to_db.dto.ProteinSequenceVersionDTO;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterInteralException;
 import org.yeastrc.xlink.db.DBConnectionFactory;
@@ -16,7 +18,7 @@ import org.yeastrc.xlink.db.DBConnectionFactory;
  */
 public class ProteinSequenceVersionDAO {
 
-	private static final Logger log = Logger.getLogger(ProteinSequenceVersionDAO.class);
+	private static final Logger log = LoggerFactory.getLogger( ProteinSequenceVersionDAO.class);
 	private ProteinSequenceVersionDAO() { }
 	public static ProteinSequenceVersionDAO getInstance() { return new ProteinSequenceVersionDAO(); }
 

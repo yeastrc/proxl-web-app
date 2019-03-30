@@ -2,7 +2,7 @@ package org.yeastrc.xlink.www.web_utils;
 
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.dto.IsotopeLabelDTO;
 import org.yeastrc.xlink.dto.UnifiedRepPepIsotopeLabelLookupDTO;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
@@ -14,7 +14,7 @@ import org.yeastrc.xlink.www.searcher_via_cached_data.cached_data_holders.Cached
  */
 public class FormatIsotopeLablesToString {
 	
-	private static final Logger log = Logger.getLogger( FormatIsotopeLablesToString.class );
+	private static final Logger log = LoggerFactory.getLogger(  FormatIsotopeLablesToString.class );
 	
 	/**
 	 * @param unifiedRpDynamicModListPeptide

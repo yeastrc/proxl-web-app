@@ -7,7 +7,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.www.dao.PsmDAO;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.dto.AnnotationTypeDTO;
@@ -25,7 +25,7 @@ import org.yeastrc.xlink.www.web_utils.RetentionTimeScalingAndRounding;
  */
 public class PsmWebDisplaySearcher {
 	
-	private static final Logger log = Logger.getLogger(PsmWebDisplaySearcher.class);
+	private static final Logger log = LoggerFactory.getLogger( PsmWebDisplaySearcher.class);
 	private PsmWebDisplaySearcher() { }
 	private static final PsmWebDisplaySearcher _INSTANCE = new PsmWebDisplaySearcher();
 	public static PsmWebDisplaySearcher getInstance() { return _INSTANCE; }

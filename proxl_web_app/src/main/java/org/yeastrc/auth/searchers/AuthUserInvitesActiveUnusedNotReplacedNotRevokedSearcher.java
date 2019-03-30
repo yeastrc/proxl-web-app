@@ -5,7 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.auth.dao.AuthUserInviteTrackingDAO;
 import org.yeastrc.auth.db.AuthLibraryDBConnectionFactory;
 import org.yeastrc.auth.dto.AuthUserInviteTrackingDTO;
@@ -15,7 +15,7 @@ import org.yeastrc.auth.dto.AuthUserInviteTrackingDTO;
  */
 public class AuthUserInvitesActiveUnusedNotReplacedNotRevokedSearcher {
 	
-	private static final Logger log = Logger.getLogger(AuthUserInvitesActiveUnusedNotReplacedNotRevokedSearcher.class);
+	private static final Logger log = LoggerFactory.getLogger( AuthUserInvitesActiveUnusedNotReplacedNotRevokedSearcher.class);
 	//  private constructor
 	private AuthUserInvitesActiveUnusedNotReplacedNotRevokedSearcher() { }
 	/**

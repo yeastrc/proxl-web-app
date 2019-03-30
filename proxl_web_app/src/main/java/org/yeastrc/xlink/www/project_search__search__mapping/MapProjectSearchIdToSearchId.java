@@ -2,7 +2,7 @@ package org.yeastrc.xlink.www.project_search__search__mapping;
 
 import java.util.concurrent.TimeUnit;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.www.cached_data_mgmt.CacheCurrentSizeMaxSizeResult;
 import org.yeastrc.xlink.www.cached_data_mgmt.CachedDataCentralRegistry;
 import org.yeastrc.xlink.www.cached_data_mgmt.CachedDataCommonIF;
@@ -19,7 +19,7 @@ import com.google.common.cache.LoadingCache;
  */
 public class MapProjectSearchIdToSearchId implements CachedDataCommonIF {
 
-	private static final Logger log = Logger.getLogger(MapProjectSearchIdToSearchId.class);
+	private static final Logger log = LoggerFactory.getLogger( MapProjectSearchIdToSearchId.class);
 	
 	private static final int CACHE_MAX_SIZE = 2000;
 	private static final int CACHE_TIMEOUT = 50; // in days

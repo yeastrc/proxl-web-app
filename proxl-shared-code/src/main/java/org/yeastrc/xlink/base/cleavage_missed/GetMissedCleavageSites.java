@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+
 import org.yeastrc.xlink.base.cleavage_sites_peptide_protein.GetTrypsinCleavageSites;
 
 /**
@@ -13,7 +15,7 @@ import org.yeastrc.xlink.base.cleavage_sites_peptide_protein.GetTrypsinCleavageS
  */
 public class GetMissedCleavageSites {
 
-	private static final Logger log = Logger.getLogger( GetMissedCleavageSites.class );
+	private static final Logger log = LoggerFactory.getLogger(  GetMissedCleavageSites.class );
 
 	/**
 	 * private constructor

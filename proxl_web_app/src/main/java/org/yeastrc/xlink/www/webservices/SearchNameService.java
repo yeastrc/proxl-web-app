@@ -15,7 +15,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.www.dao.ProjectSearchDAO;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappInternalErrorException;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
@@ -30,7 +30,7 @@ import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
 @Path("/searchName")
 public class SearchNameService {
 	
-	private static final Logger log = Logger.getLogger(SearchNameService.class);
+	private static final Logger log = LoggerFactory.getLogger( SearchNameService.class);
 	
 	@POST
 	@Consumes( MediaType.APPLICATION_FORM_URLENCODED )

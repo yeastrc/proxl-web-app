@@ -6,7 +6,7 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.www.constants.PropertyFileNames;
 /**
  * 
@@ -14,7 +14,7 @@ import org.yeastrc.xlink.www.constants.PropertyFileNames;
  */
 public class GetMessageTextFromKeyFrom_web_app_application_properties {
 	
-	private static Logger log = Logger.getLogger(GetMessageTextFromKeyFrom_web_app_application_properties.class);
+	private static final Logger log = LoggerFactory.getLogger( GetMessageTextFromKeyFrom_web_app_application_properties.class);
 	
 	private Properties configProps = null;
 	private Map<String, String> retrievedProperties = new HashMap<String, String>();

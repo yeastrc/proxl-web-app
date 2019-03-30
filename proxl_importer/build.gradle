@@ -22,6 +22,15 @@ plugins {
 sourceCompatibility = 1.8      //    defaults to currently installed JVM
 // targetCompatibility  = 1.8  //    defaults to sourceCompatibility
 
+configurations.all {
+	//  Exclude default logger for Spring Boot 'logback'
+   exclude group:"ch.qos.logback", module:"logback-core"
+   exclude group:"ch.qos.logback", module:"logback-classic"
+   	//  Exclude Routing of log4j to slf4j since using opposite (slf4j to log4j) and including this would create a circular reference
+   exclude group:'org.apache.logging.log4j', module: 'log4j-to-slf4j'
+//   exclude group:'org.apache.logging.log4j', module: 'log4j-api'
+}
+
 // Define the main class for the application
 mainClassName = 'org.yeastrc.proxl.import_xml_to_db.program_default.ImporterDefaultMainProgramEntry'
 
@@ -40,20 +49,21 @@ dependencies {
 	// https://mvnrepository.com/artifact/mysql/mysql-connector-java
 	// compile group: 'mysql', name: 'mysql-connector-java', version: '5.1.45'
 	
+	
 	//  Logging
 	
-	// compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.11.0'
-	// compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.11.0'	
+	compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.11.0'
+	compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.11.0'	
 	
 	// https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-slf4j-impl
-	// compile group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version: '2.11.0'
+	compile group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version: '2.11.0'
 	
 	//  Jakarta Commons Logging to SLF4J
-	// compile group: 'org.slf4j', name: 'jcl-over-slf4j', version: '1.7.25'
+	compile group: 'org.slf4j', name: 'jcl-over-slf4j', version: '1.7.25'
 	
 	//  Log4j 1 to 2 bridge
-	// compile group: 'org.apache.logging.log4j', name: 'log4j-1.2-api', version: '2.2'
-	
+	compile group: 'org.apache.logging.log4j', name: 'log4j-1.2-api', version: '2.2'
+		
 
 	//  NOT FOUND  either jcenter() or mavenCentral()
 	

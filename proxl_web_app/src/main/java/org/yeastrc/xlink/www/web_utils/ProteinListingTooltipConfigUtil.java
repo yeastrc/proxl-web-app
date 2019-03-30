@@ -2,7 +2,7 @@ package org.yeastrc.xlink.www.web_utils;
 
 import java.util.Collection;
 import javax.servlet.http.HttpServletRequest;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.www.config_system_table.ConfigSystemCaching;
 import org.yeastrc.xlink.www.constants.ConfigSystemsKeysConstants;
 /**
@@ -11,7 +11,7 @@ import org.yeastrc.xlink.www.constants.ConfigSystemsKeysConstants;
  */
 public class ProteinListingTooltipConfigUtil {
 	
-	private static final Logger log = Logger.getLogger(ProteinListingTooltipConfigUtil.class);
+	private static final Logger log = LoggerFactory.getLogger( ProteinListingTooltipConfigUtil.class);
 	private ProteinListingTooltipConfigUtil() { }
 	public static ProteinListingTooltipConfigUtil getInstance() { return new ProteinListingTooltipConfigUtil(); }
 	/**

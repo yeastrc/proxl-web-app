@@ -11,7 +11,9 @@ import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.entity.ContentType;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+
 import org.yeastrc.proxl.import_xml_to_db_runner_pgm.config.ImporterRunnerConfigData;
 import org.yeastrc.proxl.import_xml_to_db_runner_pgm.constants.JSONStringCharsetConstants;
 import org.yeastrc.proxl.import_xml_to_db_runner_pgm.http_reponse_code_validation.A_ProcessHTTP_StatusCode;
@@ -25,7 +27,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class OnImprtFnshCllWbSrvc {
 
-	private static Logger log = Logger.getLogger( OnImprtFnshCllWbSrvc.class );
+	private static final Logger log = LoggerFactory.getLogger(  OnImprtFnshCllWbSrvc.class );
 	
 	
 	public static final String SUB_URL = "/services/runImport/onFinish";

@@ -5,7 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.www.dto.SrchRepPeptProtSeqIdPosUnlinkedDTO;
 /**
@@ -15,7 +15,7 @@ import org.yeastrc.xlink.www.dto.SrchRepPeptProtSeqIdPosUnlinkedDTO;
  */
 public class SearchReportedPeptideProteinSequencePositionUnlinkedSearcher {
 
-	private static final Logger log = Logger.getLogger( SearchReportedPeptideProteinSequencePositionUnlinkedSearcher.class );
+	private static final Logger log = LoggerFactory.getLogger(  SearchReportedPeptideProteinSequencePositionUnlinkedSearcher.class );
 	private SearchReportedPeptideProteinSequencePositionUnlinkedSearcher() { }
 	private static final SearchReportedPeptideProteinSequencePositionUnlinkedSearcher _INSTANCE = new SearchReportedPeptideProteinSequencePositionUnlinkedSearcher();
 	public static SearchReportedPeptideProteinSequencePositionUnlinkedSearcher getInstance() { return _INSTANCE; }

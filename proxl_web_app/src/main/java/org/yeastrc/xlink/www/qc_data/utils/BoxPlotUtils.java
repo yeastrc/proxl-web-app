@@ -3,7 +3,7 @@ package org.yeastrc.xlink.www.qc_data.utils;
 import java.util.List;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappInternalErrorException;
 
 /**
@@ -12,7 +12,7 @@ import org.yeastrc.xlink.www.exceptions.ProxlWebappInternalErrorException;
  */
 public class BoxPlotUtils {
 
-	private static final Logger log = Logger.getLogger(BoxPlotUtils.class);
+	private static final Logger log = LoggerFactory.getLogger( BoxPlotUtils.class);
 
 	private static final int MEDIAN_PERCENTILE = 50;
 	private static final int FIRST_QUARTER_PERCENTILE = 25;

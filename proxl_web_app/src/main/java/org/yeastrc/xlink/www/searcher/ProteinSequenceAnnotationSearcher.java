@@ -6,7 +6,7 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Collection;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.dao.ProteinSequenceAnnotationDAO;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.dto.ProteinSequenceAnnotationDTO;
@@ -19,7 +19,7 @@ import org.yeastrc.xlink.dto.ProteinSequenceAnnotationDTO;
  */
 public class ProteinSequenceAnnotationSearcher {
 
-	private static final Logger log = Logger.getLogger(ProteinSequenceAnnotationSearcher.class);
+	private static final Logger log = LoggerFactory.getLogger( ProteinSequenceAnnotationSearcher.class);
 	private ProteinSequenceAnnotationSearcher() { }
 	private static final ProteinSequenceAnnotationSearcher _INSTANCE = new ProteinSequenceAnnotationSearcher();
 	public static ProteinSequenceAnnotationSearcher getInstance() { return _INSTANCE; }

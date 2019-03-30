@@ -6,7 +6,9 @@ import java.lang.ProcessBuilder.Redirect;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterConfigException;
 
 
@@ -18,7 +20,7 @@ import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterConfigExceptio
 public class RunSystemCommand {
 
 
-	private static Logger log = Logger.getLogger(RunSystemCommand.class);
+	private static final Logger log = LoggerFactory.getLogger( RunSystemCommand.class );
 
 	//  private constructor
 	private RunSystemCommand() { }

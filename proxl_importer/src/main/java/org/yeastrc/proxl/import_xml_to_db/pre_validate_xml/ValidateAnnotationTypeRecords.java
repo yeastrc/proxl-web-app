@@ -3,7 +3,7 @@ package org.yeastrc.proxl.import_xml_to_db.pre_validate_xml;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;import org.slf4j.Logger;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterDataException;
 import org.yeastrc.proxl_import.api.xml_dto.DescriptivePeptideAnnotationType;
 import org.yeastrc.proxl_import.api.xml_dto.DescriptivePeptideAnnotationTypes;
@@ -28,7 +28,7 @@ import org.yeastrc.proxl_import.api.xml_dto.SearchPrograms;
  */
 public class ValidateAnnotationTypeRecords {
 	
-	private static final Logger log = Logger.getLogger( ValidateAnnotationTypeRecords.class );
+	private static final Logger log = LoggerFactory.getLogger(  ValidateAnnotationTypeRecords.class );
 	private ValidateAnnotationTypeRecords() { }
 	public static ValidateAnnotationTypeRecords getInstance() {
 		return new ValidateAnnotationTypeRecords();

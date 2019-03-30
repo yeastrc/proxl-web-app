@@ -3,7 +3,7 @@ package org.yeastrc.proxl.import_xml_to_db.process_input;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-//import org.apache.log4j.Logger;
+//import org.slf4j.LoggerFactory;import org.slf4j.Logger;
 import org.yeastrc.proxl_import.api.xml_dto.Modification;
 import org.yeastrc.proxl_import.api.xml_dto.Modifications;
 import org.yeastrc.proxl_import.api.xml_dto.Peptide;
@@ -14,7 +14,7 @@ import org.yeastrc.proxl_import.api.xml_dto.Peptide;
  */
 public class GetPeptideMonolinkPositions {
 
-	//	private static final Logger log = Logger.getLogger(GetPeptideMonolinkPositions.class);
+	//	private static final Logger log = LoggerFactory.getLogger( GetPeptideMonolinkPositions.class);
 	//  private constructor
 	private GetPeptideMonolinkPositions() {  }
 	private static final GetPeptideMonolinkPositions _INSTANCE = new GetPeptideMonolinkPositions(); 

@@ -4,14 +4,14 @@ import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.auth.dto.AuthUserDTO;
 import org.yeastrc.xlink.www.constants.WebConstants;
 import org.yeastrc.xlink.www.user_account.UserSessionObject;
 
 public class IsBrowserIsInternetExplorer {
 
-	private static final Logger log = Logger.getLogger(IsBrowserIsInternetExplorer.class);
+	private static final Logger log = LoggerFactory.getLogger( IsBrowserIsInternetExplorer.class);
 
 	private static IsBrowserIsInternetExplorer _INSTANCE = new IsBrowserIsInternetExplorer();
 

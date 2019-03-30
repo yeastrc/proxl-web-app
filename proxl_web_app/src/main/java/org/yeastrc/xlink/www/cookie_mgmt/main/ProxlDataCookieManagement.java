@@ -7,7 +7,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.www.constants.JSONStringCharsetConstants;
 import org.yeastrc.xlink.www.constants.WebConstants;
 import org.yeastrc.xlink.www.cookie_mgmt.dto.ProxlDataCookieRootDTO;
@@ -18,7 +18,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class ProxlDataCookieManagement {
 	
-	private static final Logger log = Logger.getLogger(ProxlDataCookieManagement.class);
+	private static final Logger log = LoggerFactory.getLogger( ProxlDataCookieManagement.class);
 	
 	//   !!!!!!!!!!!!!!!!!!!   Rewrite to use JSON in Cookie   Using ProxlDataCookieRootDTO
 	/////        Need to build the cookie string independently so the login web service can add the cookie string to the response

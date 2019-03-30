@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.dao.SearchProgramsPerSearchDAO;
 import org.yeastrc.xlink.dto.AnnotationTypeDTO;
 import org.yeastrc.xlink.dto.AnnotationTypeFilterableDTO;
@@ -25,7 +25,7 @@ import org.yeastrc.xlink.www.searcher.ScoreCountFromPsmTblSearcher.LinkType;
  */
 public class CreatePsmCountsVsScoreQCPlotData {
 
-	private static final Logger log = Logger.getLogger(CreatePsmCountsVsScoreQCPlotData.class);
+	private static final Logger log = LoggerFactory.getLogger( CreatePsmCountsVsScoreQCPlotData.class);
 	
 	private static final int BIN_COUNT = 100;  //  Number of points on the chart
 	

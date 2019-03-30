@@ -8,7 +8,9 @@ import java.io.InputStream;
 import java.util.Properties;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+
 import org.yeastrc.proxl.import_xml_to_db_submit_pgm.exceptions.ProxlSubImportUsernamePasswordFileException;
 
 /**
@@ -17,7 +19,7 @@ import org.yeastrc.proxl.import_xml_to_db_submit_pgm.exceptions.ProxlSubImportUs
  */
 public class UsernamePasswordFileContents {
 
-	private static final Logger log = Logger.getLogger( UsernamePasswordFileContents.class );
+	private static final Logger log = LoggerFactory.getLogger(  UsernamePasswordFileContents.class );
 
 	private static final UsernamePasswordFileContents instance = new UsernamePasswordFileContents();
 

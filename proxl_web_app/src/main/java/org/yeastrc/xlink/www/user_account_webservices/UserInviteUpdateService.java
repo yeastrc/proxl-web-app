@@ -14,7 +14,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.auth.dao.AuthUserInviteTrackingDAO;
 import org.yeastrc.auth.dto.AuthUserInviteTrackingDTO;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
@@ -31,7 +31,7 @@ import org.yeastrc.xlink.www.user_web_utils.ValidateUserAccessLevel;
 @Path("/user")
 public class UserInviteUpdateService {
 
-	private static final Logger log = Logger.getLogger(UserInviteUpdateService.class);
+	private static final Logger log = LoggerFactory.getLogger( UserInviteUpdateService.class);
 	
 	
 	

@@ -26,7 +26,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.base.file_import_proxl_xml_scans.constants.ProxlXMLFileUploadCommonConstants;
 import org.yeastrc.xlink.base.file_import_proxl_xml_scans.dto.ProxlXMLFileImportTrackingDTO;
 import org.yeastrc.xlink.base.file_import_proxl_xml_scans.dto.ProxlXMLFileImportTrackingSingleFileDTO;
@@ -61,7 +61,7 @@ import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
 @Path("/file_import_proxl_xml_scans")
 public class ProxlXMLFileImportUploadSubmitService {
 	
-	private static final Logger log = Logger.getLogger(ProxlXMLFileImportUploadSubmitService.class);
+	private static final Logger log = LoggerFactory.getLogger( ProxlXMLFileImportUploadSubmitService.class);
 	
 	@POST
 	@Consumes( MediaType.APPLICATION_JSON )

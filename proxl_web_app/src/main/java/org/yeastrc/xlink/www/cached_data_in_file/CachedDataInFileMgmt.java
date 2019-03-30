@@ -9,7 +9,7 @@ import java.text.DecimalFormat;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.base.config_system_table_common_access.ConfigSystemsKeysSharedConstants;
 import org.yeastrc.xlink.www.async_action_via_executor_service.AsyncActionViaExecutorService;
 import org.yeastrc.xlink.www.async_action_via_executor_service.AsyncItemToRun;
@@ -28,7 +28,7 @@ import org.yeastrc.xlink.www.exceptions.ProxlWebappInternalErrorException;
  */
 public class CachedDataInFileMgmt {
 
-	private static final Logger log = Logger.getLogger(CachedDataInFileMgmt.class);
+	private static final Logger log = LoggerFactory.getLogger( CachedDataInFileMgmt.class);
 	
 	/**
 	 * If YES, always save even if already exists

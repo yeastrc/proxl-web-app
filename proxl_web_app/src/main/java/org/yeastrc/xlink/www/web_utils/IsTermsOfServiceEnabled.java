@@ -1,6 +1,6 @@
 package org.yeastrc.xlink.www.web_utils;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.base.config_system_table_common_access.ConfigSystemsKeysSharedConstants;
 import org.yeastrc.xlink.base.config_system_table_common_access.ConfigSystemsValuesSharedConstants;
 import org.yeastrc.xlink.www.config_system_table.ConfigSystemCaching;
@@ -10,7 +10,7 @@ import org.yeastrc.xlink.www.config_system_table.ConfigSystemCaching;
  */
 public class IsTermsOfServiceEnabled {
 	
-	private static final Logger log = Logger.getLogger(IsTermsOfServiceEnabled.class);
+	private static final Logger log = LoggerFactory.getLogger( IsTermsOfServiceEnabled.class);
 	private static final IsTermsOfServiceEnabled instance = new IsTermsOfServiceEnabled();
 	private IsTermsOfServiceEnabled() { }
 	public static IsTermsOfServiceEnabled getInstance() { return instance; }

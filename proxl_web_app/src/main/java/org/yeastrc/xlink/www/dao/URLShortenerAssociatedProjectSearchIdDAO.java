@@ -5,7 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 //import java.sql.Statement;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.www.dto.URLShortenerAssociatedProjectSearchIdDTO;
 
@@ -15,7 +15,7 @@ import org.yeastrc.xlink.www.dto.URLShortenerAssociatedProjectSearchIdDTO;
  */
 public class URLShortenerAssociatedProjectSearchIdDAO {
 	
-	private static final Logger log = Logger.getLogger(URLShortenerAssociatedProjectSearchIdDAO.class);
+	private static final Logger log = LoggerFactory.getLogger( URLShortenerAssociatedProjectSearchIdDAO.class);
 	//  private constructor
 	private URLShortenerAssociatedProjectSearchIdDAO() { }
 	/**

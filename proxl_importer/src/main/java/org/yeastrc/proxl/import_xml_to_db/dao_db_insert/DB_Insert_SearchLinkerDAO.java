@@ -5,7 +5,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.dto.SearchLinkerDTO;
 
@@ -15,7 +17,7 @@ import org.yeastrc.xlink.dto.SearchLinkerDTO;
  */
 public class DB_Insert_SearchLinkerDAO {
 	
-	private static final Logger log = Logger.getLogger(DB_Insert_SearchLinkerDAO.class);
+	private static final Logger log = LoggerFactory.getLogger( DB_Insert_SearchLinkerDAO.class);
 
 	private DB_Insert_SearchLinkerDAO() { }
 	public static DB_Insert_SearchLinkerDAO getInstance() { return new DB_Insert_SearchLinkerDAO(); }

@@ -5,7 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.www.objects.ProteinSequenceVersionIdProteinAnnotationName;
 
@@ -14,7 +14,7 @@ import org.yeastrc.xlink.www.objects.ProteinSequenceVersionIdProteinAnnotationNa
  */
 public class ProteinSequenceVersionIdAnnotationNameSearcher {
 
-	private static final Logger log = Logger.getLogger(ProteinSequenceVersionIdAnnotationNameSearcher.class);
+	private static final Logger log = LoggerFactory.getLogger( ProteinSequenceVersionIdAnnotationNameSearcher.class);
 	private ProteinSequenceVersionIdAnnotationNameSearcher() { }
 	private static final ProteinSequenceVersionIdAnnotationNameSearcher _INSTANCE = new ProteinSequenceVersionIdAnnotationNameSearcher();
 	public static ProteinSequenceVersionIdAnnotationNameSearcher getInstance() { return _INSTANCE; }

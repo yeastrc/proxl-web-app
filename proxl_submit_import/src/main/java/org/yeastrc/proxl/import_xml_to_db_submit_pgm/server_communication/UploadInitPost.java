@@ -11,7 +11,9 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.message.BasicNameValuePair;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+
 import org.yeastrc.proxl.import_xml_to_db_submit_pgm.constants.JSONStringCharsetConstants;
 import org.yeastrc.proxl.import_xml_to_db_submit_pgm.exceptions.ProxlSubImportServerReponseException;
 
@@ -24,7 +26,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class UploadInitPost {
 	
 
-	private static final Logger log = Logger.getLogger(UploadInitPost.class);
+	private static final Logger log = LoggerFactory.getLogger( UploadInitPost.class);
 
 
 	private static final UploadInitPost instance = new UploadInitPost();

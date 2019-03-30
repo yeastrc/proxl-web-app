@@ -2,7 +2,10 @@ package org.yeastrc.proxl.import_xml_to_db.database_update_with_transaction_serv
 
 import java.sql.Connection;
 
-import org.apache.log4j.Logger;
+
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+
 import org.yeastrc.proxl.import_xml_to_db.dao.ProxlXMLFileImportTrackingRun_For_ImporterRunner_DAO;
 import org.yeastrc.proxl.import_xml_to_db.dao.ProxlXMLFileImportTracking_For_ImporterRunner_DAO;
 import org.yeastrc.xlink.base.file_import_proxl_xml_scans.dto.ProxlXMLFileImportTrackingRunDTO;
@@ -15,7 +18,7 @@ import org.yeastrc.xlink.db.DBConnectionFactory;
  */
 public class UpdateTrackingTrackingRunRecordsDBTransaction {
 
-	private static final Logger log = Logger.getLogger(UpdateTrackingTrackingRunRecordsDBTransaction.class);
+	private static final Logger log = LoggerFactory.getLogger( UpdateTrackingTrackingRunRecordsDBTransaction.class);
 	
 	private UpdateTrackingTrackingRunRecordsDBTransaction() { }
 	public static UpdateTrackingTrackingRunRecordsDBTransaction getInstance() { 

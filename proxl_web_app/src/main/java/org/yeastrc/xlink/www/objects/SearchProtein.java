@@ -1,6 +1,6 @@
 package org.yeastrc.xlink.www.objects;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.www.objects.ProteinSequenceVersionObject;
 import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.www.searcher_via_cached_data.cached_data_holders.Cached_ProteinDescriptionFor_SearchProtein;
@@ -12,7 +12,7 @@ import org.yeastrc.xlink.www.searcher_via_cached_data.return_objects_from_search
 
 public class SearchProtein implements IProtein {
 
-	private static final Logger log = Logger.getLogger(SearchProtein.class);
+	private static final Logger log = LoggerFactory.getLogger( SearchProtein.class);
 	
 	// Instantiate SearchProtein
 	public SearchProtein( SearchDTO search, ProteinSequenceVersionObject protein ) {

@@ -1,7 +1,7 @@
 package org.yeastrc.xlink.www.dto;
 
 import java.util.List;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.yeastrc.xlink.dao.SearchFileProjectSearchDAO;
@@ -15,7 +15,7 @@ import org.yeastrc.xlink.www.searcher.SearchWebLinksSearcher;
  *
  */
 public class SearchDTO implements Comparable<SearchDTO> {
-	private static final Logger log = Logger.getLogger(SearchDTO.class);
+	private static final Logger log = LoggerFactory.getLogger( SearchDTO.class);
 
 	//  equals(...) on projectSearchId and searchId 
 	private int projectSearchId;

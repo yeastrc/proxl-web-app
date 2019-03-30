@@ -14,7 +14,7 @@ import org.apache.commons.fileupload.FileUploadBase.FileSizeLimitExceededExcepti
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -45,7 +45,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class UploadFileForImportWebserviceAction extends Action {
 
-	private static Logger log = Logger.getLogger( UploadFileForImportWebserviceAction.class );
+	private static final Logger log = LoggerFactory.getLogger(  UploadFileForImportWebserviceAction.class );
 	
 	//  Keep all these Strings in sync with the class SendToServerConstants in subdir proxl_submit_import
 	

@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;import org.slf4j.Logger;
 import org.yeastrc.proxl.import_xml_to_db.dao.ProjectSearchDAO_Importer;
 import org.yeastrc.proxl.import_xml_to_db.dao.SearchDAO_Importer;
 import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_LinkerPerSearchCleavedCrosslinkMassDAO;
@@ -58,7 +58,7 @@ import org.yeastrc.xlink.linker_data_processing_base.linker_db_data_per_search.L
  */
 public class ProcessProxlInput {
 	
-	private static final Logger log = Logger.getLogger( ProcessProxlInput.class );
+	private static final Logger log = LoggerFactory.getLogger(  ProcessProxlInput.class );
 	/**
 	 * private constructor
 	 */

@@ -1,6 +1,6 @@
 package org.yeastrc.xlink.www.web_utils;
 
-//import org.apache.log4j.Logger;
+//import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.www.user_account.UserSessionObject;
 /**
  * 
@@ -8,7 +8,7 @@ import org.yeastrc.xlink.www.user_account.UserSessionObject;
  */
 public class TestIsUserSignedIn {
 
-//	private static final Logger log = Logger.getLogger(TestIsUserSignedIn.class);
+//	private static final Logger log = LoggerFactory.getLogger( TestIsUserSignedIn.class);
 	private TestIsUserSignedIn() { }
 	private static final TestIsUserSignedIn _INSTANCE = new TestIsUserSignedIn();
 	public static TestIsUserSignedIn getInstance() { return _INSTANCE; }

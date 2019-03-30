@@ -6,7 +6,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.dto.ScanFileHeaderDTO;
 
@@ -17,7 +19,7 @@ import org.yeastrc.xlink.dto.ScanFileHeaderDTO;
  */
 public class ScanFileHeaderDAO {
 	
-	private static final Logger log = Logger.getLogger(ScanFileHeaderDAO.class);
+	private static final Logger log = LoggerFactory.getLogger( ScanFileHeaderDAO.class);
 
 	
 

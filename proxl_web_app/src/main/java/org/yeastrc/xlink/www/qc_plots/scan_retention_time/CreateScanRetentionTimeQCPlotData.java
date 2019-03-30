@@ -11,7 +11,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.spectral_storage.get_data_webapp.shared_server_client.webservice_request_response.sub_parts.Single_ScanRetentionTime_ScanNumber_SubResponse;
 import org.yeastrc.xlink.dao.ScanFileDAO;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesRootLevel;
@@ -39,7 +39,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class CreateScanRetentionTimeQCPlotData {
 
-	private static final Logger log = Logger.getLogger(CreateScanRetentionTimeQCPlotData.class);
+	private static final Logger log = LoggerFactory.getLogger( CreateScanRetentionTimeQCPlotData.class);
 	
 	public enum ForDownload { YES, NO }
 	

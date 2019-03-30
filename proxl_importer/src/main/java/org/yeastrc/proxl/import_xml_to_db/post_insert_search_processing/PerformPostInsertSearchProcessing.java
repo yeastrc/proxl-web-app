@@ -1,7 +1,7 @@
 package org.yeastrc.proxl.import_xml_to_db.post_insert_search_processing;
 
 import org.yeastrc.proxl.import_xml_to_db.dto.SearchDTO_Importer;
-//import org.apache.log4j.Logger;
+//import org.slf4j.LoggerFactory;import org.slf4j.Logger;
 import org.yeastrc.proxl.import_xml_to_db.process_input.ProcessProxlInput.ReportedPeptideAndPsmFilterableAnnotationTypesOnId;
 
 /**
@@ -10,7 +10,7 @@ import org.yeastrc.proxl.import_xml_to_db.process_input.ProcessProxlInput.Report
  */
 public class PerformPostInsertSearchProcessing {
 	
-//	private static final Logger log = Logger.getLogger( PerformPostInsertSearchProcessing.class );
+//	private static final Logger log = LoggerFactory.getLogger(  PerformPostInsertSearchProcessing.class );
 	/**
 	 * private constructor
 	 */

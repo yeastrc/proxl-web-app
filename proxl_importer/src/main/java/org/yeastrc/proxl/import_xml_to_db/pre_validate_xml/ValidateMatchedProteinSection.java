@@ -3,7 +3,7 @@ package org.yeastrc.proxl.import_xml_to_db.pre_validate_xml;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;import org.slf4j.Logger;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterDataException;
 import org.yeastrc.proxl.import_xml_to_db.utils.ProteinAnnotationNameTruncationUtil;
 import org.yeastrc.proxl_import.api.xml_dto.MatchedProteins;
@@ -19,7 +19,7 @@ import org.yeastrc.proxl_import.api.xml_dto.Protein.ProteinIsotopeLabels.Protein
  */
 public class ValidateMatchedProteinSection {
 	
-	private static final Logger log = Logger.getLogger( ValidateMatchedProteinSection.class );
+	private static final Logger log = LoggerFactory.getLogger(  ValidateMatchedProteinSection.class );
 	private ValidateMatchedProteinSection() { }
 	public static ValidateMatchedProteinSection getInstance() {
 		return new ValidateMatchedProteinSection();

@@ -1,6 +1,6 @@
 package org.yeastrc.xlink.www.internal_services;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.auth.dao.AuthUserDAO;
 import org.yeastrc.auth.dto.AuthUserDTO;
 
@@ -11,7 +11,7 @@ import org.yeastrc.auth.dto.AuthUserDTO;
 public class UpdateAuthUserUserAccessLevelEnabled {
 
 
-	private static final Logger log = Logger.getLogger(UpdateAuthUserUserAccessLevelEnabled.class);
+	private static final Logger log = LoggerFactory.getLogger( UpdateAuthUserUserAccessLevelEnabled.class);
 	UpdateAuthUserUserAccessLevelEnabled() { }
 	private static UpdateAuthUserUserAccessLevelEnabled _INSTANCE = new UpdateAuthUserUserAccessLevelEnabled();
 	public static UpdateAuthUserUserAccessLevelEnabled getInstance() { return _INSTANCE; }

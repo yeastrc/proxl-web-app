@@ -8,7 +8,9 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.entity.ContentType;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+
 import org.yeastrc.proxl.import_xml_to_db_submit_pgm.constants.JSONStringCharsetConstants;
 import org.yeastrc.proxl.import_xml_to_db_submit_pgm.exceptions.ProxlSubImportServerReponseException;
 
@@ -21,7 +23,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class UploadSubmitPost {
 	
 
-	private static final Logger log = Logger.getLogger(UploadSubmitPost.class);
+	private static final Logger log = LoggerFactory.getLogger( UploadSubmitPost.class);
 
 
 	private static final UploadSubmitPost instance = new UploadSubmitPost();

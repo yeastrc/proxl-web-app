@@ -13,7 +13,7 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.www.config_system_table.ConfigSystemCaching;
 import org.yeastrc.xlink.www.constants.ConfigSystemsKeysConstants;
 import org.yeastrc.xlink.www.constants.JSONStringCharsetConstants;
@@ -27,7 +27,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class CaptchaGoogleValidateUserResponseToken {
 	
-	private static final Logger log = Logger.getLogger(CaptchaGoogleValidateUserResponseToken.class);
+	private static final Logger log = LoggerFactory.getLogger( CaptchaGoogleValidateUserResponseToken.class);
 	private static final CaptchaGoogleValidateUserResponseToken instance = new CaptchaGoogleValidateUserResponseToken();
 	private CaptchaGoogleValidateUserResponseToken() { }
 	public static CaptchaGoogleValidateUserResponseToken getInstance() { return instance; }

@@ -16,7 +16,9 @@ import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.entity.mime.content.StringBody;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+
 import org.yeastrc.proxl.import_xml_to_db_submit_pgm.constants.JSONStringCharsetConstants;
 import org.yeastrc.proxl.import_xml_to_db_submit_pgm.constants.SendToServerConstants;
 import org.yeastrc.proxl.import_xml_to_db_submit_pgm.exceptions.ProxlSubImportServerReponseException;
@@ -29,7 +31,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class UploadFilePost {
 	
-	private static final Logger log = Logger.getLogger(UploadFilePost.class);
+	private static final Logger log = LoggerFactory.getLogger( UploadFilePost.class);
 
 	private static final UploadFilePost instance = new UploadFilePost();
 	private UploadFilePost() { }

@@ -16,7 +16,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.www.dao.SearchDAO;
 import org.yeastrc.xlink.dto.AnnotationTypeDTO;
 import org.yeastrc.xlink.www.objects.ProteinSequenceVersionObject;
@@ -64,7 +64,7 @@ import org.yeastrc.xlink.www.web_utils.DeserializeCutoffForWebservices;
 @Path("/data")
 public class ProteinsService {
 	
-	private static final Logger log = Logger.getLogger(ProteinsService.class);
+	private static final Logger log = LoggerFactory.getLogger( ProteinsService.class);
 	
 	/**
 	 * @param projectSearchIdList

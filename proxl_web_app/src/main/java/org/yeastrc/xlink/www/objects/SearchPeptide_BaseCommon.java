@@ -3,7 +3,7 @@ package org.yeastrc.xlink.www.objects;
 import java.security.InvalidParameterException;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.base_searcher.PsmCountForSearchIdReportedPeptideIdSearcher;
 import org.yeastrc.xlink.base_searcher.PsmCountForUniquePSM_SearchIdReportedPeptideId_Searcher;
 import org.yeastrc.xlink.dto.ReportedPeptideDTO;
@@ -21,7 +21,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  */
 public class SearchPeptide_BaseCommon {
 
-	private static final Logger log = Logger.getLogger( SearchPeptide_BaseCommon.class );
+	private static final Logger log = LoggerFactory.getLogger(  SearchPeptide_BaseCommon.class );
 
 	/**
 	 * Called to update numPsms to remove the number of non-unique PSMs.

@@ -3,7 +3,7 @@ package org.yeastrc.xlink.www.servlet_context;
 import java.util.Properties;
 import javax.servlet.*;
 import javax.servlet.http.*;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.auth.db.AuthLibraryDBConnectionFactory;
 import org.yeastrc.session_mgmt.main.YRCSessionMgmtMain;
 import org.yeastrc.user_mgmt_central.main_code.db.UserMgmtCentralMainDBConnectionFactory;
@@ -30,7 +30,7 @@ import org.yeastrc.xlink.www.web_utils.GetJsCssCacheBustString;
  */
 public class ServletContextAppListener extends HttpServlet implements ServletContextListener {
 	
-	private static Logger log = Logger.getLogger( ServletContextAppListener.class );
+	private static final Logger log = LoggerFactory.getLogger(  ServletContextAppListener.class );
 	private static final long serialVersionUID = 1L;
 	
 	/* (non-Javadoc)

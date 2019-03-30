@@ -4,7 +4,7 @@ import java.util.Calendar;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.dao.IsotopeLabelDAO;
 import org.yeastrc.xlink.dto.IsotopeLabelDTO;
 import org.yeastrc.xlink.www.cached_data_mgmt.CacheCurrentSizeMaxSizeResult;
@@ -26,7 +26,7 @@ import com.google.common.cache.LoadingCache;
  */
 public class Cached_IsotopeLabel implements CachedDataCommonIF {
 
-	private static final Logger log = Logger.getLogger( Cached_IsotopeLabel.class );
+	private static final Logger log = LoggerFactory.getLogger(  Cached_IsotopeLabel.class );
 
 	private static final int CACHE_MAX_SIZE_FULL_SIZE = 100;
 //	private static final int CACHE_MAX_SIZE_SMALL = 10;

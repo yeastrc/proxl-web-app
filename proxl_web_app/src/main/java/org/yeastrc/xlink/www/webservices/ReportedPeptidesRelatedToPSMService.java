@@ -14,7 +14,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
 import org.yeastrc.xlink.www.objects.ReportedPeptidesForAssociatedScanId_From_PsmId_SearchId_SearcherResultItem;
@@ -49,7 +49,7 @@ import org.yeastrc.xlink.www.web_utils.SearchPeptideWebserviceCommonCode.SearchP
 @Path("/reportedPeptidesRelatedToPSMService")
 public class ReportedPeptidesRelatedToPSMService {
 
-	private static final Logger log = Logger.getLogger(ReportedPeptidesRelatedToPSMService.class);
+	private static final Logger log = LoggerFactory.getLogger( ReportedPeptidesRelatedToPSMService.class);
 	
 	/**
 	 * @param searchId

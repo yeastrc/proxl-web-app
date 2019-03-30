@@ -1,13 +1,15 @@
 package org.yeastrc.xlink.base.config_system_table_common_access;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+
 
 /**
  * Singleton Instance
  */
 public class ConfigSystemTableGetValueCommon {
 
-	private static final Logger log = Logger.getLogger( ConfigSystemTableGetValueCommon.class );
+	private static final Logger log = LoggerFactory.getLogger(  ConfigSystemTableGetValueCommon.class );
 	
 	/**
 	 * private constructor

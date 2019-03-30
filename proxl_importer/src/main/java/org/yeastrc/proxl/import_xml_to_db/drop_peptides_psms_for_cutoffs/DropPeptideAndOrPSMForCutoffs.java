@@ -3,7 +3,7 @@ package org.yeastrc.proxl.import_xml_to_db.drop_peptides_psms_for_cutoffs;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;import org.slf4j.Logger;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterDataException;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterInteralException;
 import org.yeastrc.proxl_import.api.xml_dto.FilterablePsmAnnotation;
@@ -21,7 +21,7 @@ import org.yeastrc.xlink.enum_classes.FilterDirectionType;
  */
 public class DropPeptideAndOrPSMForCutoffs {
 
-	private static final Logger log = Logger.getLogger(DropPeptideAndOrPSMForCutoffs.class);
+	private static final Logger log = LoggerFactory.getLogger( DropPeptideAndOrPSMForCutoffs.class);
 	//  private constructor
 	private DropPeptideAndOrPSMForCutoffs() { }
 	public static DropPeptideAndOrPSMForCutoffs getInstance() { return new DropPeptideAndOrPSMForCutoffs(); }

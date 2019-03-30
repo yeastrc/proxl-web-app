@@ -13,7 +13,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.www.factories.ProteinSequenceVersionObjectFactory;
 import org.yeastrc.xlink.www.objects.ProteinSequenceVersionObject;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
@@ -23,7 +23,7 @@ import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
 @Path("/proteinSequence")
 public class ViewerProteinSequenceService {
 
-	private static final Logger log = Logger.getLogger(ViewerProteinSequenceService.class);
+	private static final Logger log = LoggerFactory.getLogger( ViewerProteinSequenceService.class);
 	
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)

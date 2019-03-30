@@ -1,6 +1,6 @@
 package org.yeastrc.xlink.www.internal_services;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.auth.dao.AuthUserDAO;
 import org.yeastrc.auth.dto.AuthUserDTO;
 import org.yeastrc.auth.exceptions.AuthSharedObjectRecordNotFoundException;
@@ -19,7 +19,7 @@ import org.yeastrc.xlink.www.user_mgmt_webapp_access.UserMgmtGetUserDataResponse
  */
 public class GetUserDisplayDTOFromAuthUserIdSharedObjectId {
 	
-	private static final Logger log = Logger.getLogger(GetUserDisplayDTOFromAuthUserIdSharedObjectId.class);
+	private static final Logger log = LoggerFactory.getLogger( GetUserDisplayDTOFromAuthUserIdSharedObjectId.class);
 
 	//  private constructor
 	private GetUserDisplayDTOFromAuthUserIdSharedObjectId() { }

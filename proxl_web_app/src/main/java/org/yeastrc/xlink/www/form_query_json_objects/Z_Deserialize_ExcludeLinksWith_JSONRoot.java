@@ -3,7 +3,7 @@ package org.yeastrc.xlink.www.form_query_json_objects;
 import java.io.IOException;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
 
 import com.fasterxml.jackson.core.JsonParseException;
@@ -16,7 +16,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class Z_Deserialize_ExcludeLinksWith_JSONRoot {
 
-	private static final Logger log = Logger.getLogger(Z_Deserialize_ExcludeLinksWith_JSONRoot.class);
+	private static final Logger log = LoggerFactory.getLogger( Z_Deserialize_ExcludeLinksWith_JSONRoot.class);
 	private Z_Deserialize_ExcludeLinksWith_JSONRoot() { }
 	public static Z_Deserialize_ExcludeLinksWith_JSONRoot getInstance() { return new Z_Deserialize_ExcludeLinksWith_JSONRoot(); }
 	

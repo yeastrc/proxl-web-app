@@ -14,7 +14,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.auth.dao.AuthUserDAO;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
@@ -28,7 +28,7 @@ import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
 @Path("/user")
 public class UpdateUserEnabledFlagService {
 
-	private static final Logger log = Logger.getLogger(UpdateUserEnabledFlagService.class);
+	private static final Logger log = LoggerFactory.getLogger( UpdateUserEnabledFlagService.class);
 	
 	
 	

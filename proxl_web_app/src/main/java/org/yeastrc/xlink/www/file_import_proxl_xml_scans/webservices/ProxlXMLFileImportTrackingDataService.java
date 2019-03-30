@@ -17,7 +17,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.auth.dao.AuthUserDAO;
 import org.yeastrc.xlink.base.file_import_proxl_xml_scans.dao.ProxlXMLFileImportTrackingSingleFileDAO;
 import org.yeastrc.xlink.base.file_import_proxl_xml_scans.dao.ProxlXMLFileImportTracking_Base_DAO;
@@ -48,7 +48,7 @@ import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
 @Path("/file_import_proxl_xml_scans")
 public class ProxlXMLFileImportTrackingDataService {
 	
-	private static final Logger log = Logger.getLogger(ProxlXMLFileImportTrackingDataService.class);
+	private static final Logger log = LoggerFactory.getLogger( ProxlXMLFileImportTrackingDataService.class);
 	
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)

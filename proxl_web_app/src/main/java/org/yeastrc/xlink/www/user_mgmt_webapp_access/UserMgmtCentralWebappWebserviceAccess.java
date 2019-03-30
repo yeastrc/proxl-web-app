@@ -1,7 +1,7 @@
 package org.yeastrc.xlink.www.user_mgmt_webapp_access;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.user_mgmt_central.webservice_connect.main.CallUserAccountMgmtWebservice;
 import org.yeastrc.user_mgmt_central.webservice_connect.main.CallUserAccountMgmtWebserviceInitParameters;
 import org.yeastrc.user_mgmt_central.main_code.user_mgmt_embedded_facade.UserMgmtCentral_Embedded_Facade;
@@ -32,7 +32,7 @@ import org.yeastrc.xlink.www.config_properties_file.ProxlConfigFileValues;
  *
  */
 public class UserMgmtCentralWebappWebserviceAccess {
-	private static Logger log = Logger.getLogger( UserMgmtCentralWebappWebserviceAccess.class );
+	private static final Logger log = LoggerFactory.getLogger(  UserMgmtCentralWebappWebserviceAccess.class );
 	
 	private static final UserMgmtCentralWebappWebserviceAccess instance = new UserMgmtCentralWebappWebserviceAccess();
 	

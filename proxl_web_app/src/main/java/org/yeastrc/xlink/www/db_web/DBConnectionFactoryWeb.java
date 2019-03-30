@@ -10,7 +10,7 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.db.IDBConnectionFactory;
 
@@ -20,7 +20,7 @@ import org.yeastrc.xlink.db.IDBConnectionFactory;
  */
 public class DBConnectionFactoryWeb implements IDBConnectionFactory {
 
-	private static final Logger log = Logger.getLogger( DBConnectionFactoryWeb.class );
+	private static final Logger log = LoggerFactory.getLogger(  DBConnectionFactoryWeb.class );
 
 	private static final String JNDI_NAME_PREFIX = "java:comp/env/jdbc/";
 	private static final String JNDI_NAME_SUFFIX_proxl = "proxl";

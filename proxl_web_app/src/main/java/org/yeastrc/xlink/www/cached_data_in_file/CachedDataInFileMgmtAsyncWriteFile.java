@@ -2,7 +2,7 @@ package org.yeastrc.xlink.www.cached_data_in_file;
 
 import java.security.InvalidParameterException;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.www.cached_data_in_file.CachedDataInFileMgmt.SaveCachedDataFileContentsActualParameters;
 
 /**
@@ -11,7 +11,7 @@ import org.yeastrc.xlink.www.cached_data_in_file.CachedDataInFileMgmt.SaveCached
  */
 public class CachedDataInFileMgmtAsyncWriteFile implements Runnable {
 
-	private static final Logger log = Logger.getLogger( CachedDataInFileMgmtAsyncWriteFile.class);
+	private static final Logger log = LoggerFactory.getLogger(  CachedDataInFileMgmtAsyncWriteFile.class);
 
 	// private constructor
 	private CachedDataInFileMgmtAsyncWriteFile() {}

@@ -6,7 +6,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.lang3.mutable.MutableDouble;
-//import org.apache.log4j.Logger;
+//import org.slf4j.LoggerFactory;
+//import org.slf4j.Logger;
+
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -18,7 +20,7 @@ import org.yeastrc.xlink.ms1_binned_summed_intensities.objects.MS1_IntensitiesBi
  */
 public class MS1_BinnedSummedIntensitiesProcessing {
 
-//	private static final Logger log = Logger.getLogger(MS1_BinnedSummedIntensitiesProcessing.class);
+//	private static final Logger log = LoggerFactory.getLogger( MS1_BinnedSummedIntensitiesProcessing.class);
 	private MS1_BinnedSummedIntensitiesProcessing() { }
 	public static MS1_BinnedSummedIntensitiesProcessing getInstance() { return new MS1_BinnedSummedIntensitiesProcessing(); }
 

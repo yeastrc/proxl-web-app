@@ -6,7 +6,7 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.dto.LinkerPerSearchMonolinkMassDTO;
 
@@ -16,7 +16,7 @@ import org.yeastrc.xlink.dto.LinkerPerSearchMonolinkMassDTO;
  */
 public class LinkerPerSearchMonolinkMass_Searcher {
 
-	private static final Logger log = Logger.getLogger(LinkerPerSearchMonolinkMass_Searcher.class);
+	private static final Logger log = LoggerFactory.getLogger( LinkerPerSearchMonolinkMass_Searcher.class);
 	private LinkerPerSearchMonolinkMass_Searcher() { }
 	private static final LinkerPerSearchMonolinkMass_Searcher _INSTANCE = new LinkerPerSearchMonolinkMass_Searcher();
 	public static LinkerPerSearchMonolinkMass_Searcher getInstance() { return _INSTANCE; }

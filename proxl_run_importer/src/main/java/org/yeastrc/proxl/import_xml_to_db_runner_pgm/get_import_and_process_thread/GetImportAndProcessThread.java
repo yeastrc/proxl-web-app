@@ -1,6 +1,8 @@
 package org.yeastrc.proxl.import_xml_to_db_runner_pgm.get_import_and_process_thread;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+
 import org.yeastrc.proxl.import_xml_to_db.database_update_with_transaction_services.GetNextTrackingToProcessDBTransaction;
 import org.yeastrc.proxl.import_xml_to_db_runner_pgm.config.ImporterRunnerConfigData;
 import org.yeastrc.proxl.import_xml_to_db_runner_pgm.process_import.ProcessProxlXMLImport;
@@ -17,7 +19,7 @@ public class GetImportAndProcessThread extends Thread {
 	private static final int WAIT_TIME_TO_GET_SOMETHING_TO_PROCESS_DEFAULT = 5; // in seconds
 	private static final int WAIT_TIME_WHEN_GET_EXCEPTION = 5 * 60; // in seconds
 	
-	private static Logger log = Logger.getLogger(GetImportAndProcessThread.class);
+	private static final Logger log = LoggerFactory.getLogger( GetImportAndProcessThread.class);
 	
 	private volatile boolean keepRunning = true;
 	private volatile ProcessProxlXMLImport processProxlXMLImport;

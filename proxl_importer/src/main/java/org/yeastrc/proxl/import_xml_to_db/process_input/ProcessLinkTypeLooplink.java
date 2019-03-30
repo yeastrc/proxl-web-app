@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;import org.slf4j.Logger;
 import org.yeastrc.proxl.import_xml_to_db.dao.ProteinImporterContainerDAO;
 import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_SearchReportedPeptideDynamicModLookupDAO;
 import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_SrchRepPeptProtSeqIdPosLooplinkDAO;
@@ -40,7 +40,7 @@ import org.yeastrc.xlink.utils.XLinkUtils;
  */
 public class ProcessLinkTypeLooplink {
 	
-	private static final Logger log = Logger.getLogger(ProcessLinkTypeLooplink.class);
+	private static final Logger log = LoggerFactory.getLogger( ProcessLinkTypeLooplink.class);
 	//  private constructor
 	private ProcessLinkTypeLooplink() { }
 	public static ProcessLinkTypeLooplink getInstance() { return new ProcessLinkTypeLooplink(); }

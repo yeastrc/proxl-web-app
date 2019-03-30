@@ -1,6 +1,6 @@
 package org.yeastrc.xlink.www.config_system_table;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.www.captcha_google_api.IsGoogleRecaptchaConfigured;
 import org.yeastrc.xlink.www.constants.ConfigSystemsKeysConstants;
 import org.yeastrc.xlink.www.file_import_proxl_xml_scans.utils.IsProxlXMLFileImportFullyConfigured;
@@ -14,7 +14,7 @@ import org.yeastrc.xlink.www.web_utils.IsTermsOfServiceEnabled;
  */
 public class AppContextConfigSystemValuesRetrieval {
 	
-	private static final Logger log = Logger.getLogger(AppContextConfigSystemValuesRetrieval.class);
+	private static final Logger log = LoggerFactory.getLogger( AppContextConfigSystemValuesRetrieval.class);
 	/**
 	 * @return
 	 */

@@ -5,7 +5,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.dto.PsmFilterableAnnotationGenericLookupDTO;
 import org.yeastrc.xlink.utils.XLinkUtils;
@@ -16,7 +18,7 @@ import org.yeastrc.xlink.utils.XLinkUtils;
  */
 public class PsmFilterableAnnotationGenericLookupDAO {
 	
-	private static final Logger log = Logger.getLogger(PsmFilterableAnnotationGenericLookupDAO.class);
+	private static final Logger log = LoggerFactory.getLogger( PsmFilterableAnnotationGenericLookupDAO.class);
 
 	private PsmFilterableAnnotationGenericLookupDAO() { }
 	public static PsmFilterableAnnotationGenericLookupDAO getInstance() { return new PsmFilterableAnnotationGenericLookupDAO(); }

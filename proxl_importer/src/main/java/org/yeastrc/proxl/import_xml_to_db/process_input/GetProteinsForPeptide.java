@@ -5,7 +5,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;import org.slf4j.Logger;
 import org.yeastrc.proxl.import_xml_to_db.objects.ProteinImporterContainer;
 import org.yeastrc.proxl.import_xml_to_db.utils.GetIsotopeLabelIdFor_Protein_or_Peptide_FromProxlXMLFile;
 import org.yeastrc.proxl.import_xml_to_db.utils.PeptideProteinSequenceForProteinInference;
@@ -22,7 +22,7 @@ import org.yeastrc.xlink.exceptions.ProxlBaseDataException;
  */
 public class GetProteinsForPeptide {
 
-	private static final Logger log = Logger.getLogger(GetProteinsForPeptide.class);
+	private static final Logger log = LoggerFactory.getLogger( GetProteinsForPeptide.class);
 	private static final GetProteinsForPeptide instance = new GetProteinsForPeptide();
 	private GetProteinsForPeptide() { }
 	/**

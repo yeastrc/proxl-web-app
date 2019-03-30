@@ -1,7 +1,7 @@
 package org.yeastrc.xlink.www.file_import_proxl_xml_scans.utils;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.base.config_system_table_common_access.ConfigSystemsKeysSharedConstants;
 import org.yeastrc.xlink.www.config_system_table.ConfigSystemCaching;
 /**
@@ -10,7 +10,7 @@ import org.yeastrc.xlink.www.config_system_table.ConfigSystemCaching;
  */
 public class IsProxlXMLFileImportFullyConfigured {
 
-	private static final Logger log = Logger.getLogger(IsProxlXMLFileImportFullyConfigured.class);
+	private static final Logger log = LoggerFactory.getLogger( IsProxlXMLFileImportFullyConfigured.class);
 	private static final IsProxlXMLFileImportFullyConfigured instance = new IsProxlXMLFileImportFullyConfigured();
 	private IsProxlXMLFileImportFullyConfigured() { }
 	public static IsProxlXMLFileImportFullyConfigured getInstance() { return instance; }

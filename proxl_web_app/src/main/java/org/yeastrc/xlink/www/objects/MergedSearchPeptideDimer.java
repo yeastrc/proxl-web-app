@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.www.dao.PeptideDAO;
 import org.yeastrc.xlink.dao.UnifiedReportedPeptideLookupDAO;
 import org.yeastrc.xlink.dao.UnifiedRepPepDynamicModLookupDAO;
@@ -29,7 +29,7 @@ import org.yeastrc.xlink.www.web_utils.FormatIsotopeLablesToString;
 
 public class MergedSearchPeptideDimer implements IMergedSearchLink {
 
-	private static final Logger log = Logger.getLogger(MergedSearchPeptideDimer.class);
+	private static final Logger log = LoggerFactory.getLogger( MergedSearchPeptideDimer.class);
 	
 	
 

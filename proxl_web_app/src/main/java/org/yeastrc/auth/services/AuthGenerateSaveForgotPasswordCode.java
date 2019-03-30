@@ -1,7 +1,7 @@
 package org.yeastrc.auth.services;
 
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.auth.dao.AuthForgotPasswordTrackingDAO;
 import org.yeastrc.auth.dto.AuthForgotPasswordTrackingDTO;
 import org.yeastrc.auth.utils.GenerateRandomStringForCode;
@@ -13,7 +13,7 @@ import org.yeastrc.auth.utils.GenerateRandomStringForCode;
  */
 public class AuthGenerateSaveForgotPasswordCode {
 	
-	private static final Logger log = Logger.getLogger(AuthGenerateSaveForgotPasswordCode.class);
+	private static final Logger log = LoggerFactory.getLogger( AuthGenerateSaveForgotPasswordCode.class);
 	
 	private AuthGenerateSaveForgotPasswordCode() { }
 	private static final AuthGenerateSaveForgotPasswordCode _INSTANCE = new AuthGenerateSaveForgotPasswordCode();

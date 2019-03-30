@@ -5,14 +5,16 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+
 import org.joda.time.DateTime;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.dto.SearchCommentDTO;
 
 public class SearchCommentDAO {
 	
-	private static final Logger log = Logger.getLogger(SearchCommentDAO.class);
+	private static final Logger log = LoggerFactory.getLogger( SearchCommentDAO.class);
 
 	private SearchCommentDAO() { }
 	public static SearchCommentDAO getInstance() { return new SearchCommentDAO(); }

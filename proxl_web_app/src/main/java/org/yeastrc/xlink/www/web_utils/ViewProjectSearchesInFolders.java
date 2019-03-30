@@ -6,7 +6,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.www.dao.FolderForProjectDAO;
 import org.yeastrc.xlink.www.dao.FolderProjectSearchDAO;
 import org.yeastrc.xlink.www.dto.FolderForProjectDTO;
@@ -23,7 +23,7 @@ import org.yeastrc.xlink.www.searcher.SearchSearcher;
  */
 public class ViewProjectSearchesInFolders {
 	
-	private static final Logger log = Logger.getLogger( ViewProjectSearchesInFolders.class );
+	private static final Logger log = LoggerFactory.getLogger(  ViewProjectSearchesInFolders.class );
 	// private constructor
 	private ViewProjectSearchesInFolders() { }
 	public static ViewProjectSearchesInFolders getInstance() {

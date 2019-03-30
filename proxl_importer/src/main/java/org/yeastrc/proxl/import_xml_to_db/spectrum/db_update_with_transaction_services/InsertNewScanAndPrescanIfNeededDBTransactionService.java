@@ -6,7 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;import org.slf4j.Logger;
 import org.yeastrc.xlink.dao.ScanDAO;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.dto.ScanDTO;
@@ -22,7 +22,7 @@ import org.yeastrc.proxl.import_xml_to_db.utils.RoundDecimalFieldsIfNecessary;
  */
 public class InsertNewScanAndPrescanIfNeededDBTransactionService {
 	
-	private static final Logger log = Logger.getLogger(InsertNewScanAndPrescanIfNeededDBTransactionService.class);
+	private static final Logger log = LoggerFactory.getLogger( InsertNewScanAndPrescanIfNeededDBTransactionService.class);
 	
 	InsertNewScanAndPrescanIfNeededDBTransactionService() { }
 	private static InsertNewScanAndPrescanIfNeededDBTransactionService _INSTANCE = new InsertNewScanAndPrescanIfNeededDBTransactionService();

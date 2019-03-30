@@ -13,7 +13,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.auth.services.AuthSharedObjectAdminPublicAccessCodeAndEnabled;
 import org.yeastrc.xlink.www.dao.ProjectDAO;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
@@ -30,7 +30,7 @@ import org.yeastrc.xlink.www.web_utils.GetProjectPublicAccessData;
 @Path("/project/publicAccessAdmin")
 public class ProjectPublicAccessAdminService {
 
-	private static final Logger log = Logger.getLogger(ProjectPublicAccessAdminService.class);
+	private static final Logger log = LoggerFactory.getLogger( ProjectPublicAccessAdminService.class);
 	
 	/**
 	 * @param projectId

@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.dbcp.DelegatingPreparedStatement;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.base.constants.Database_OneTrueZeroFalse_Constants;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.dto.AnnotationTypeDTO;
@@ -28,7 +28,7 @@ import org.yeastrc.xlink.www.constants.PeptideViewLinkTypesConstants;
  */
 public class PreMZ_For_PSMPeptideCutoffsSearcher {
 
-	private static final Logger log = Logger.getLogger(PreMZ_For_PSMPeptideCutoffsSearcher.class);
+	private static final Logger log = LoggerFactory.getLogger( PreMZ_For_PSMPeptideCutoffsSearcher.class);
 	private PreMZ_For_PSMPeptideCutoffsSearcher() { }
 	private static final PreMZ_For_PSMPeptideCutoffsSearcher _INSTANCE = new PreMZ_For_PSMPeptideCutoffsSearcher();
 	public static PreMZ_For_PSMPeptideCutoffsSearcher getInstance() { return _INSTANCE; }

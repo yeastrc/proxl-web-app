@@ -6,7 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.www.objects.ProjectToCopyToResultItem;
 
@@ -17,7 +17,7 @@ import org.yeastrc.xlink.www.objects.ProjectToCopyToResultItem;
  */
 public class ProjectToCopyToSearcher {
 
-	private static final Logger log = Logger.getLogger(ProjectToCopyToSearcher.class);
+	private static final Logger log = LoggerFactory.getLogger( ProjectToCopyToSearcher.class);
 	private ProjectToCopyToSearcher() { }
 	private static final ProjectToCopyToSearcher _INSTANCE = new ProjectToCopyToSearcher();
 	public static ProjectToCopyToSearcher getInstance() { return _INSTANCE; }

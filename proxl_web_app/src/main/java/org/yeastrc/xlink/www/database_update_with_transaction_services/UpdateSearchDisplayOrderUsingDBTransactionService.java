@@ -1,7 +1,7 @@
 package org.yeastrc.xlink.www.database_update_with_transaction_services;
 
 import java.sql.Connection;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.www.dao.ProjectSearchDAO;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 
@@ -11,7 +11,7 @@ import org.yeastrc.xlink.db.DBConnectionFactory;
  */
 public class UpdateSearchDisplayOrderUsingDBTransactionService {
 
-	private static final Logger log = Logger.getLogger(UpdateSearchDisplayOrderUsingDBTransactionService.class);
+	private static final Logger log = LoggerFactory.getLogger( UpdateSearchDisplayOrderUsingDBTransactionService.class);
 	UpdateSearchDisplayOrderUsingDBTransactionService() { }
 	private static UpdateSearchDisplayOrderUsingDBTransactionService _INSTANCE = new UpdateSearchDisplayOrderUsingDBTransactionService();
 	public static UpdateSearchDisplayOrderUsingDBTransactionService getInstance() { return _INSTANCE; }

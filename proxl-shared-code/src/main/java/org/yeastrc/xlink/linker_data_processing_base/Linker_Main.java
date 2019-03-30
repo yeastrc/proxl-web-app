@@ -6,7 +6,9 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+
 import org.yeastrc.xlink.dto.LinkerPerSearchCleavedCrosslinkMassDTO;
 import org.yeastrc.xlink.dto.LinkerPerSearchCrosslinkMassDTO;
 import org.yeastrc.xlink.dto.LinkerPerSearchMonolinkMassDTO;
@@ -27,7 +29,7 @@ import org.yeastrc.xlink.linker_data_processing_base.linkers_builtin_root.linker
  */
 class Linker_Main implements ILinker_Main {
 
-	private static final Logger log = Logger.getLogger( Linker_Main.class );
+	private static final Logger log = LoggerFactory.getLogger(  Linker_Main.class );
 
 	/////////
 	

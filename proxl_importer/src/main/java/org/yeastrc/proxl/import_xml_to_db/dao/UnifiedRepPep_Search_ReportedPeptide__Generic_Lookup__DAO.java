@@ -4,7 +4,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+
 import org.yeastrc.xlink.db.DBConnectionFactory;
 
 /**
@@ -13,7 +15,7 @@ import org.yeastrc.xlink.db.DBConnectionFactory;
  */
 public class UnifiedRepPep_Search_ReportedPeptide__Generic_Lookup__DAO {
 
-	private static final Logger log = Logger.getLogger(UnifiedRepPep_Search_ReportedPeptide__Generic_Lookup__DAO.class);
+	private static final Logger log = LoggerFactory.getLogger( UnifiedRepPep_Search_ReportedPeptide__Generic_Lookup__DAO.class);
 	private UnifiedRepPep_Search_ReportedPeptide__Generic_Lookup__DAO() { }
 	public static UnifiedRepPep_Search_ReportedPeptide__Generic_Lookup__DAO getInstance() { return new UnifiedRepPep_Search_ReportedPeptide__Generic_Lookup__DAO(); }
 	

@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.www.cutoff_processing_web.GetDefaultPsmPeptideCutoffs;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
 import org.yeastrc.xlink.www.form_query_json_objects.A_QueryBase_JSONRoot;
@@ -24,7 +24,7 @@ import org.yeastrc.xlink.www.form_query_json_objects.CutoffValuesSearchLevel;
  */
 public class Update__A_QueryBase_JSONRoot__ForCurrentSearchIds {
 
-	private static final Logger log = Logger.getLogger(Update__A_QueryBase_JSONRoot__ForCurrentSearchIds.class);
+	private static final Logger log = LoggerFactory.getLogger( Update__A_QueryBase_JSONRoot__ForCurrentSearchIds.class);
 	/**
 	 * Static get instance
 	 * @return

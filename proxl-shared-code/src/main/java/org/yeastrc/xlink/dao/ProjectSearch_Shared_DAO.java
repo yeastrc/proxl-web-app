@@ -4,7 +4,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.dto.ProjectSearch_Shared_DTO;
 
@@ -16,7 +18,7 @@ import org.yeastrc.xlink.dto.ProjectSearch_Shared_DTO;
  */
 public class ProjectSearch_Shared_DAO {
 
-	private static final Logger log = Logger.getLogger(ProjectSearch_Shared_DAO.class);
+	private static final Logger log = LoggerFactory.getLogger( ProjectSearch_Shared_DAO.class);
 	
 	private ProjectSearch_Shared_DAO() { }
 	public static ProjectSearch_Shared_DAO getInstance() { return new ProjectSearch_Shared_DAO(); }

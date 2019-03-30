@@ -6,7 +6,7 @@ import java.util.List;
 import org.yeastrc.xlink.www.cached_data_in_file.CachedDataInFileMgmt;
 import org.yeastrc.xlink.www.cached_data_in_file.CachedDataInFileMgmt.IdParamType;
 import org.yeastrc.xlink.www.cached_data_in_file.CachedDataInFileMgmt.ReplaceExistingValue;
-//import org.apache.log4j.Logger;
+//import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.www.cached_data_in_file.CachedDataInFileMgmtRegistration;
 import org.yeastrc.xlink.www.cached_data_in_file.CachedDataInFileMgmtRegistrationIF;
 
@@ -21,7 +21,7 @@ import org.yeastrc.xlink.www.cached_data_in_file.CachedDataInFileMgmtRegistratio
  */
 public class MS1_All_IntensityHeatmapImageCachedResultImageManager implements CachedDataInFileMgmtRegistrationIF {
 
-//	private static final Logger log = Logger.getLogger( MS1_All_IntensityHeatmapImageCachedResultImageManager.class);
+//	private static final Logger log = LoggerFactory.getLogger(  MS1_All_IntensityHeatmapImageCachedResultImageManager.class);
 	
 	private static final String PREFIX_FOR_CACHING = "MS1_All_IntensityHeatmapImage_";
 	private static final String PREFIX_FOR_CACHING_ADDITION_FULL_IMAGE = "FULL_IMAGE_";

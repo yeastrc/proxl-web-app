@@ -15,7 +15,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.dao.CustomProteinRegionAnnotationDAO;
 import org.yeastrc.xlink.www.dto.CustomProteinRegionAnnotationDTO;
@@ -28,7 +28,7 @@ import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
 
 public class CustomProteinRegionAnnotationServices {
 
-	private static final Logger log = Logger.getLogger(CustomProteinRegionAnnotationServices.class);
+	private static final Logger log = LoggerFactory.getLogger( CustomProteinRegionAnnotationServices.class);
 	
 	@POST
 	@Consumes( MediaType.APPLICATION_JSON )
@@ -231,7 +231,8 @@ public class CustomProteinRegionAnnotationServices {
 					webServiceRequest.getRegionData()
 					);
 		} catch( Exception e ) {
-			log.error( e );
+			log.error( "Thrown exception from CustomProteinRegionAnnotationDAO.getInstance().insertNewListOfRegionAnnotationsForProteinAndProject(...): ProjectId: " 
+					+ webServiceRequest.getProjectId(),  e );
 			throw e;
 		}
 		

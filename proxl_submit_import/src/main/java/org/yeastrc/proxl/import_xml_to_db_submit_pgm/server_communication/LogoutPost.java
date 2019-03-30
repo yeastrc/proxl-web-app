@@ -10,7 +10,9 @@ import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+
 import org.yeastrc.proxl.import_xml_to_db_submit_pgm.constants.JSONStringCharsetConstants;
 import org.yeastrc.proxl.import_xml_to_db_submit_pgm.exceptions.ProxlSubImportServerReponseException;
 
@@ -21,7 +23,7 @@ import org.yeastrc.proxl.import_xml_to_db_submit_pgm.exceptions.ProxlSubImportSe
 public class LogoutPost {
 	
 
-	private static final Logger log = Logger.getLogger(LogoutPost.class);
+	private static final Logger log = LoggerFactory.getLogger( LogoutPost.class);
 
 
 	private static final LogoutPost instance = new LogoutPost();

@@ -10,7 +10,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.base.file_import_proxl_xml_scans.dao.ProxlXMLFileImportTracking_Base_DAO;
 import org.yeastrc.xlink.base.file_import_proxl_xml_scans.dto.ProxlXMLFileImportTrackingDTO;
 import org.yeastrc.xlink.base.file_import_proxl_xml_scans.enum_classes.ProxlXMLFileImportStatus;
@@ -26,7 +26,7 @@ import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
 @Path("/file_import_proxl_xml_scans")
 public class ProxlXMLFileImportTrackingItemDeleteItemService {
 	
-	private static final Logger log = Logger.getLogger(ProxlXMLFileImportTrackingItemDeleteItemService.class);
+	private static final Logger log = LoggerFactory.getLogger( ProxlXMLFileImportTrackingItemDeleteItemService.class);
 	
 	@POST
 	@Consumes( MediaType.APPLICATION_FORM_URLENCODED )

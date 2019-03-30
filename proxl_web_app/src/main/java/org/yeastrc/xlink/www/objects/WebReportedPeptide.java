@@ -3,7 +3,7 @@ package org.yeastrc.xlink.www.objects;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.base_searcher.PsmCountForSearchIdReportedPeptideIdSearcher;
 import org.yeastrc.xlink.base_searcher.PsmCountForUniquePSM_SearchIdReportedPeptideId_Searcher;
 import org.yeastrc.xlink.dto.PeptideDTO;
@@ -22,7 +22,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  */
 public class WebReportedPeptide implements SearchPeptideCommonLinkWebserviceResultIF{
 
-	private static final Logger log = Logger.getLogger(WebReportedPeptide.class);
+	private static final Logger log = LoggerFactory.getLogger( WebReportedPeptide.class);
 
 	/**
 	 * Called to update numPsms to remove the number of non-unique PSMs.

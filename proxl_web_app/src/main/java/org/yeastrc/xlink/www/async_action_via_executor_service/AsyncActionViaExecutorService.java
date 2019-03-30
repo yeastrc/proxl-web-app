@@ -3,7 +3,7 @@ package org.yeastrc.xlink.www.async_action_via_executor_service;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 
 /**
  * Class that uses an ExecutorService for running things asynchronously.
@@ -18,7 +18,7 @@ import org.apache.log4j.Logger;
  */
 public class AsyncActionViaExecutorService {
 
-	private static final Logger log = Logger.getLogger( AsyncActionViaExecutorService.class);
+	private static final Logger log = LoggerFactory.getLogger(  AsyncActionViaExecutorService.class);
 	
 	private static final int DEFAULT_THREAD_POOL_SIZE = 1;
 	

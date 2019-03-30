@@ -2,7 +2,9 @@ package org.yeastrc.proxl.import_xml_to_db_submit_pgm.server_communication;
 
 import org.apache.http.HttpStatus;
 
-//import org.apache.log4j.Logger;
+//import org.slf4j.LoggerFactory;
+//import org.slf4j.Logger;
+
 
 
 import org.yeastrc.proxl.import_xml_to_db_submit_pgm.config.ConfigParams;
@@ -15,7 +17,7 @@ import org.yeastrc.proxl.import_xml_to_db_submit_pgm.exceptions.ProxlSubImportSe
 public class A_ProcessHTTP_StatusCode {
 
 
-//	private static final Logger log = Logger.getLogger(A_ProcessHTTP_StatusCode.class);
+//	private static final Logger log = LoggerFactory.getLogger( A_ProcessHTTP_StatusCode.class);
 
 
 	private static final A_ProcessHTTP_StatusCode instance = new A_ProcessHTTP_StatusCode();

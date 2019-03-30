@@ -1,6 +1,6 @@
 package org.yeastrc.xlink.www.cached_data_in_file;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 
 /**
  * Run on webapp startup
@@ -9,7 +9,7 @@ import org.apache.log4j.Logger;
  */
 public class CachedDataInFileMgmtCleanupOnWebAppStartRunnable implements Runnable {
 
-	private static final Logger log = Logger.getLogger( CachedDataInFileMgmtCleanupOnWebAppStartRunnable.class);
+	private static final Logger log = LoggerFactory.getLogger(  CachedDataInFileMgmtCleanupOnWebAppStartRunnable.class);
 
 	private CachedDataInFileMgmtCleanupOnWebAppStartRunnable() {}
 	public static CachedDataInFileMgmtCleanupOnWebAppStartRunnable getNewInstance() {

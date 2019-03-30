@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;import org.slf4j.Logger;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterDataException;
 import org.yeastrc.proxl_import.api.xml_dto.Peptide;
 import org.yeastrc.proxl_import.api.xml_dto.Peptides;
@@ -24,7 +24,7 @@ import org.yeastrc.proxl_import.api.xml_dto.ReportedPeptides;
  */
 public class ValidatePsmPeptideRecordsUniqueIdOnPeptideRecord {
 
-	private static final Logger log = Logger.getLogger( ValidatePsmPeptideRecordsUniqueIdOnPeptideRecord.class );
+	private static final Logger log = LoggerFactory.getLogger(  ValidatePsmPeptideRecordsUniqueIdOnPeptideRecord.class );
 	private ValidatePsmPeptideRecordsUniqueIdOnPeptideRecord() { }
 	public static ValidatePsmPeptideRecordsUniqueIdOnPeptideRecord getInstance() {
 		return new ValidatePsmPeptideRecordsUniqueIdOnPeptideRecord();

@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;import org.slf4j.Logger;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterInteralException;
 import org.yeastrc.proxl.import_xml_to_db.objects.ProteinImporterContainer;
 import org.yeastrc.proxl.import_xml_to_db.utils.PeptideProteinSequenceForProteinInference;
@@ -22,7 +22,7 @@ import org.yeastrc.xlink.linker_data_processing_base.ILinkers_Main_ForSingleSear
  */
 public class GetLinkableProteinsAndPositions {
 
-	private static final Logger log = Logger.getLogger(GetLinkableProteinsAndPositions.class);
+	private static final Logger log = LoggerFactory.getLogger( GetLinkableProteinsAndPositions.class);
 	
 	private static final GetLinkableProteinsAndPositions instance = new GetLinkableProteinsAndPositions();
 	

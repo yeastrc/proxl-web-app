@@ -10,7 +10,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.www.dao.SearchDAO;
 import org.yeastrc.xlink.www.dao.ProjectDAO;
 import org.yeastrc.xlink.www.database_update_with_transaction_services.UpdateSearchDisplayOrderUsingDBTransactionService;
@@ -25,7 +25,7 @@ import org.yeastrc.xlink.www.user_web_utils.GetAuthAccessLevelForWebRequest;
 @Path("/project")
 public class ProjectOrganizeSearchesSetSearchesDisplayOrderService {
 	
-	private static final Logger log = Logger.getLogger(ProjectOrganizeSearchesSetSearchesDisplayOrderService.class);
+	private static final Logger log = LoggerFactory.getLogger( ProjectOrganizeSearchesSetSearchesDisplayOrderService.class);
 	
 	@POST
 	@Consumes( MediaType.APPLICATION_JSON )

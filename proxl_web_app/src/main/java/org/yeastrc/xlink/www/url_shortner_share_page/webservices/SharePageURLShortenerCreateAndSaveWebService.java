@@ -13,7 +13,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.auth.dto.AuthUserDTO;
 import org.yeastrc.xlink.www.constants.URLShortenerWhiteListConstants;
 import org.yeastrc.xlink.www.constants.WebConstants;
@@ -37,7 +37,7 @@ import com.google.common.primitives.Longs;
 @Path("/sharePageShortenURL")
 public class SharePageURLShortenerCreateAndSaveWebService {
 	
-	private static final Logger log = Logger.getLogger(SharePageURLShortenerCreateAndSaveWebService.class);
+	private static final Logger log = LoggerFactory.getLogger( SharePageURLShortenerCreateAndSaveWebService.class);
 	
 	private static final int RETRY_COUNT_MAX_ON_DUPLICATE_SHORT_KEY = 10;
 	

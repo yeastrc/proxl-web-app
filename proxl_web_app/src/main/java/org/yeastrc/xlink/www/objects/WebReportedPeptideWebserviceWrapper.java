@@ -1,7 +1,7 @@
 package org.yeastrc.xlink.www.objects;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 
 /**
  * For returning WebReportedPeptide from web services
@@ -11,7 +11,7 @@ import org.apache.log4j.Logger;
  */
 public class WebReportedPeptideWebserviceWrapper implements SearchPeptideCommonLinkWebserviceResultIF {
 
-	private static final Logger log = Logger.getLogger(WebReportedPeptideWebserviceWrapper.class);
+	private static final Logger log = LoggerFactory.getLogger( WebReportedPeptideWebserviceWrapper.class);
 	
 	private WebReportedPeptide webReportedPeptide;
 	

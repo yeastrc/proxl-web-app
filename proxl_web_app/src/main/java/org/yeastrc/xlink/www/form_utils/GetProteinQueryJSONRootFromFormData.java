@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.www.cutoff_processing_web.GetDefaultPsmPeptideCutoffs;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
 import org.yeastrc.xlink.www.form_query_json_objects.CutoffValuesRootLevel;
@@ -20,7 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class GetProteinQueryJSONRootFromFormData {
 
-	private static final Logger log = Logger.getLogger(GetProteinQueryJSONRootFromFormData.class);
+	private static final Logger log = LoggerFactory.getLogger( GetProteinQueryJSONRootFromFormData.class);
 	/**
 	 * Static get instance
 	 * @return

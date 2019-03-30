@@ -3,14 +3,16 @@ package org.yeastrc.xlink.utils;
 import java.util.Arrays;
 import java.util.List;
 
-//import org.apache.log4j.Logger;
+//import org.slf4j.LoggerFactory;
+//import org.slf4j.Logger;
+
 
 
 
 
 public class XLinkUtils {
 	
-//	private static final Logger log = Logger.getLogger(XLinkUtils.class);
+//	private static final Logger log = LoggerFactory.getLogger( XLinkUtils.class);
 
 	public static final int TYPE_UNLINKED  = 0;
 	public static final int TYPE_MONOLINK  = 1;

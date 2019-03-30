@@ -1,6 +1,6 @@
 package org.yeastrc.xlink.www.internal_services;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.auth.exceptions.AuthSharedObjectRecordNotFoundException;
 import org.yeastrc.auth.services.GetAuthLevel;
 import org.yeastrc.xlink.www.constants.AuthAccessLevelConstants;
@@ -14,7 +14,7 @@ import org.yeastrc.xlink.www.objects.AuthAccessLevel;
  */
 public class GetAuthLevelFromXLinkData {
 
-	private static final Logger log = Logger.getLogger(GetAuthLevelFromXLinkData.class);
+	private static final Logger log = LoggerFactory.getLogger( GetAuthLevelFromXLinkData.class);
 	GetAuthLevelFromXLinkData() { }
 	private static GetAuthLevelFromXLinkData _INSTANCE = new GetAuthLevelFromXLinkData();
 	public static GetAuthLevelFromXLinkData getInstance() { return _INSTANCE; }

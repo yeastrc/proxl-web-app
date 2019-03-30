@@ -1,7 +1,7 @@
 package org.yeastrc.xlink.www.user_web_utils;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.auth.dao.AuthForgotPasswordTrackingDAO;
 import org.yeastrc.auth.dao.AuthUserDAO;
 import org.yeastrc.auth.dto.AuthForgotPasswordTrackingDTO;
@@ -14,7 +14,7 @@ import org.yeastrc.xlink.www.constants.AllowedTimeConstants;
  */
 public class ValidateUserResetPasswordCode {
 	
-	private static final Logger log = Logger.getLogger(ValidateUserResetPasswordCode.class);
+	private static final Logger log = LoggerFactory.getLogger( ValidateUserResetPasswordCode.class);
 	
 	private String resetPasswordTrackingCode = null;
 	private boolean validationSearch = false;

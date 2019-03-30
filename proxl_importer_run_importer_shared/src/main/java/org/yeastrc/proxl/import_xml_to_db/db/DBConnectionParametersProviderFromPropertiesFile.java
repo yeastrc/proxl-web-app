@@ -9,7 +9,9 @@ import java.net.URL;
 import java.util.Properties;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 /**
  * Default version of IDBConnectionParametersProvider that reads a property file
@@ -33,7 +35,7 @@ public class DBConnectionParametersProviderFromPropertiesFile implements IDBConn
 
 
 
-	private static Logger log = Logger.getLogger( DBConnectionParametersProviderFromPropertiesFile.class );
+	private static final Logger log = LoggerFactory.getLogger(  DBConnectionParametersProviderFromPropertiesFile.class );
 
 
 	private File configFile;

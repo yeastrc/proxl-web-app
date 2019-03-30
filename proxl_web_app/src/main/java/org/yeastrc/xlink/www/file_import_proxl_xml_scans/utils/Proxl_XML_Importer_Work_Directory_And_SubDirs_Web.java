@@ -2,7 +2,7 @@ package org.yeastrc.xlink.www.file_import_proxl_xml_scans.utils;
 
 import java.io.File;
 import java.io.IOException;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.base.file_import_proxl_xml_scans.enum_classes.ProxlXMLFileImportFileType;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappFileUploadFileSystemException;
 import org.yeastrc.xlink.www.file_import_proxl_xml_scans.constants.ProxlXMLFileUploadWebConstants;
@@ -12,7 +12,7 @@ import org.yeastrc.xlink.www.file_import_proxl_xml_scans.constants.ProxlXMLFileU
  */
 public class Proxl_XML_Importer_Work_Directory_And_SubDirs_Web {
 
-	private static final Logger log = Logger.getLogger( Proxl_XML_Importer_Work_Directory_And_SubDirs_Web.class );
+	private static final Logger log = LoggerFactory.getLogger(  Proxl_XML_Importer_Work_Directory_And_SubDirs_Web.class );
 	//  private constructor
 	private Proxl_XML_Importer_Work_Directory_And_SubDirs_Web() { }
 	/**

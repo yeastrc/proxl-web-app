@@ -4,7 +4,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+
 import org.yeastrc.xlink.base.file_import_proxl_xml_scans.dao.ProxlXMLFileImportTrackingHistoryDAO;
 import org.yeastrc.xlink.base.constants.Database_OneTrueZeroFalse_Constants;
 import org.yeastrc.xlink.base.file_import_proxl_xml_scans.dto.ProxlXMLFileImportTrackingDTO;
@@ -18,7 +20,7 @@ import org.yeastrc.xlink.base.file_import_proxl_xml_scans.populate_dto_from_resu
 public class ProxlXMLFileImportTracking_For_ImporterRunner_DAO {
 
 
-	private static final Logger log = Logger.getLogger(ProxlXMLFileImportTracking_For_ImporterRunner_DAO.class);
+	private static final Logger log = LoggerFactory.getLogger( ProxlXMLFileImportTracking_For_ImporterRunner_DAO.class );
 	
 
 	//  private constructor

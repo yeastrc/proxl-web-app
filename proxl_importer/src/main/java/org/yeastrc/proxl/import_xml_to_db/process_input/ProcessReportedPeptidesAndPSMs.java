@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;import org.slf4j.Logger;
 import org.yeastrc.proxl.import_xml_to_db.dao.ReportedPeptideDAO_Importer;
 import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_PsmFilterableAnnotationGenericLookupDAO;
 import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_SearchDynamicModMassDAO;
@@ -64,7 +64,7 @@ import org.yeastrc.xlink.utils.XLinkUtils;
  */
 public class ProcessReportedPeptidesAndPSMs {
 	
-	private static final Logger log = Logger.getLogger( ProcessReportedPeptidesAndPSMs.class );
+	private static final Logger log = LoggerFactory.getLogger(  ProcessReportedPeptidesAndPSMs.class );
 	/**
 	 * private constructor
 	 */

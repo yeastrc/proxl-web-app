@@ -19,7 +19,7 @@ import org.apache.batik.transcoder.image.JPEGTranscoder;
 import org.apache.batik.transcoder.image.PNGTranscoder;
 import org.apache.commons.lang.StringUtils;
 import org.apache.fop.svg.PDFTranscoder;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -36,7 +36,7 @@ import org.yeastrc.xlink.www.forms.ConvertAndDownloadSVGForm;
  */
 public class ConvertAndDownloadSVGAction extends Action {
 
-	private static final Logger log = Logger.getLogger(ConvertAndDownloadSVGAction.class);
+	private static final Logger log = LoggerFactory.getLogger( ConvertAndDownloadSVGAction.class);
 	
 	private static final Map<String, String> mimeTypes;
 	private static final Map<String, String> extensions;

@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.dto.AnnotationTypeDTO;
 import org.yeastrc.xlink.dto.SearchProgramsPerSearchDTO;
 import org.yeastrc.xlink.enum_classes.FilterableDescriptiveAnnotationType;
@@ -34,7 +34,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class GetAnnotationDisplayUserSelectionDetailsData {
 	
-	private static final Logger log = Logger.getLogger( GetAnnotationDisplayUserSelectionDetailsData.class );
+	private static final Logger log = LoggerFactory.getLogger(  GetAnnotationDisplayUserSelectionDetailsData.class );
 	private static final GetAnnotationDisplayUserSelectionDetailsData instance = new GetAnnotationDisplayUserSelectionDetailsData();
 	private GetAnnotationDisplayUserSelectionDetailsData() { }
 	public static GetAnnotationDisplayUserSelectionDetailsData getInstance() { return instance; }

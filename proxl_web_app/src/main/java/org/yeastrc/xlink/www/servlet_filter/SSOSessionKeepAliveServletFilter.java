@@ -11,7 +11,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.www.constants.WebConstants;
 import org.yeastrc.xlink.www.user_account.UserSessionObject;
 import org.yeastrc.xlink.www.user_mgmt_webapp_access.UserMgmtCentralWebappWebserviceAccess;
@@ -26,7 +26,7 @@ import org.yeastrc.xlink.www.user_mgmt_webapp_access.UserMgmtSessionKeyAliveWebs
  */
 public class SSOSessionKeepAliveServletFilter implements Filter {
 
-	private static final Logger log = Logger.getLogger( SSOSessionKeepAliveServletFilter.class );
+	private static final Logger log = LoggerFactory.getLogger(  SSOSessionKeepAliveServletFilter.class );
 	
 	private static final long HOUR_IN_MILLISECONDS = 1 * 60 * 60 * 1000;
 	//  TODO  TEMP 1 second

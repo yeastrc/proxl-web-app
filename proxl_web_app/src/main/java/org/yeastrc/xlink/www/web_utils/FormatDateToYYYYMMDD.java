@@ -2,7 +2,7 @@ package org.yeastrc.xlink.www.web_utils;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-//import org.apache.log4j.Logger;
+//import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.www.constants.DateFormatConstants;
 /**
  * 
@@ -10,7 +10,7 @@ import org.yeastrc.xlink.www.constants.DateFormatConstants;
  */
 public class FormatDateToYYYYMMDD {
 	
-//	private static final Logger log = Logger.getLogger(FormatDateToYYYYMMDD.class);
+//	private static final Logger log = LoggerFactory.getLogger( FormatDateToYYYYMMDD.class);
 	//  private constructor
 	private FormatDateToYYYYMMDD() { }
 	/**

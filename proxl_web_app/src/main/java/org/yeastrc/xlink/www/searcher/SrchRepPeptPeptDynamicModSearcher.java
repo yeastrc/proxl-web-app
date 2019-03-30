@@ -5,7 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.base.constants.Database_OneTrueZeroFalse_Constants;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.dto.SrchRepPeptPeptDynamicModDTO;
@@ -15,7 +15,7 @@ import org.yeastrc.xlink.dto.SrchRepPeptPeptDynamicModDTO;
  */
 public class SrchRepPeptPeptDynamicModSearcher {
 	
-	private static final Logger log = Logger.getLogger(SrchRepPeptPeptDynamicModSearcher.class);
+	private static final Logger log = LoggerFactory.getLogger( SrchRepPeptPeptDynamicModSearcher.class);
 	private SrchRepPeptPeptDynamicModSearcher() { }
 	public static SrchRepPeptPeptDynamicModSearcher getInstance() { return new SrchRepPeptPeptDynamicModSearcher(); }
 	

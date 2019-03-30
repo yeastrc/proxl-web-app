@@ -1,6 +1,6 @@
 package org.yeastrc.xlink.www.objects;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.www.dao.ProteinSequenceDAO;
 import org.yeastrc.xlink.www.dto.ProteinSequenceDTO;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
@@ -11,7 +11,7 @@ import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
  */
 public class ProteinSequenceObject {
 
-	private static final Logger log = Logger.getLogger( ProteinSequenceObject.class );
+	private static final Logger log = LoggerFactory.getLogger(  ProteinSequenceObject.class );
 	
 	/**
 	 * constructor

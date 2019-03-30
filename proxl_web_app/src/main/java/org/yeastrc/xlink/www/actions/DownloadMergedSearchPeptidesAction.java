@@ -13,7 +13,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -44,7 +44,7 @@ import org.yeastrc.xlink.www.web_utils.XLinkWebAppUtils;
  */
 public class DownloadMergedSearchPeptidesAction extends Action {
 	
-	private static final Logger log = Logger.getLogger(DownloadMergedSearchPeptidesAction.class);
+	private static final Logger log = LoggerFactory.getLogger( DownloadMergedSearchPeptidesAction.class);
 	
 	/* (non-Javadoc)
 	 * @see org.apache.struts.action.Action#execute(org.apache.struts.action.ActionMapping, org.apache.struts.action.ActionForm, javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)

@@ -2,7 +2,7 @@ package org.yeastrc.xlink.www.nav_links_image_structure;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.www.constants.WebConstants;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
 import org.yeastrc.xlink.www.form_query_json_objects.ImageStructure_QC_QueryJSONRoot;
@@ -22,7 +22,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class PopulateRequestDataForImageAndStructureAndQC_NavLinks {
 
-	private static final Logger log = Logger.getLogger(PopulateRequestDataForImageAndStructureAndQC_NavLinks.class);
+	private static final Logger log = LoggerFactory.getLogger( PopulateRequestDataForImageAndStructureAndQC_NavLinks.class);
 
 	/**
 	 * Static get instance

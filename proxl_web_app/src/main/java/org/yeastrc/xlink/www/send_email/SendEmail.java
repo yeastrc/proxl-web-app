@@ -22,7 +22,7 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.www.constants.ConfigSystemsKeysConstants;
 import org.yeastrc.xlink.www.dao.ConfigSystemDAO;
 /**
@@ -34,7 +34,7 @@ public class SendEmail {
 	private static final SendEmail instance = new SendEmail();
 	private SendEmail() { }
 	public static SendEmail getInstance() { return instance; }
-	private static final Logger log = Logger.getLogger(SendEmail.class);
+	private static final Logger log = LoggerFactory.getLogger( SendEmail.class);
 	
 	private static final String TO = "to";
 	private static final String FROM = "from";

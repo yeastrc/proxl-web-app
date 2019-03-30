@@ -3,7 +3,7 @@ package org.yeastrc.proxl.import_xml_to_db.process_input;
 import java.math.BigDecimal;
 import java.util.List;
 
-//import org.apache.log4j.Logger;
+//import org.slf4j.LoggerFactory;import org.slf4j.Logger;
 
 
 
@@ -20,7 +20,7 @@ import org.yeastrc.xlink.dto.StaticModDTO;
  */
 public class ProcessStaticModifications {
 	
-//	private static final Logger log = Logger.getLogger( ProcessStaticModifications.class );
+//	private static final Logger log = LoggerFactory.getLogger(  ProcessStaticModifications.class );
 	/**
 	 * private constructor
 	 */

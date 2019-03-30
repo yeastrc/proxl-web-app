@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.www.cached_data_mgmt.CacheCurrentSizeMaxSizeResult;
 import org.yeastrc.xlink.www.cached_data_mgmt.CachedDataCentralRegistry;
 import org.yeastrc.xlink.www.cached_data_mgmt.CachedDataCommonIF;
@@ -26,7 +26,7 @@ import com.google.common.cache.LoadingCache;
  */
 public class Cached_SrchRepPeptPeptideDTO_ForSrchIdRepPeptId implements CachedDataCommonIF {
 
-	private static final Logger log = Logger.getLogger( Cached_SrchRepPeptPeptideDTO_ForSrchIdRepPeptId.class );
+	private static final Logger log = LoggerFactory.getLogger(  Cached_SrchRepPeptPeptideDTO_ForSrchIdRepPeptId.class );
 
 	private static final int CACHE_MAX_SIZE_FULL_SIZE = 40000;
 	private static final int CACHE_MAX_SIZE_SMALL = 10;

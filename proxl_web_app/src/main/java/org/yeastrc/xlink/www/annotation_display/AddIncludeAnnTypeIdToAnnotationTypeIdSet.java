@@ -1,13 +1,13 @@
 package org.yeastrc.xlink.www.annotation_display;
 import java.util.Set;
-//import org.apache.log4j.Logger;
+//import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 /**
  * Add Include AnnTypeId to the annotationTypeIds Set
  *
  */
 public class AddIncludeAnnTypeIdToAnnotationTypeIdSet {
 	
-//	private static final Logger log = Logger.getLogger(AddIncludeAnnTypeIdToAnnotationTypeIdSet.class);
+//	private static final Logger log = LoggerFactory.getLogger( AddIncludeAnnTypeIdToAnnotationTypeIdSet.class);
 	private AddIncludeAnnTypeIdToAnnotationTypeIdSet() { }
 	public static AddIncludeAnnTypeIdToAnnotationTypeIdSet getInstance() { return new AddIncludeAnnTypeIdToAnnotationTypeIdSet(); }
 	/**

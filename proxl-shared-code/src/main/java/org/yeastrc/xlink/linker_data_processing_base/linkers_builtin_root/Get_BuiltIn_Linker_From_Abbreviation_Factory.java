@@ -5,14 +5,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+
 import org.yeastrc.xlink.exceptions.ProxlBaseDataException;
 import org.yeastrc.xlink.linker_data_processing_base.linkers_builtin_root.Get_BuiltIn_Linker_From_Abbreviation_Factory;
 import org.yeastrc.xlink.linker_data_processing_base.linkers_builtin_root.linkers_builtin.*;
 
 public class Get_BuiltIn_Linker_From_Abbreviation_Factory {
 	
-	private static final Logger log = Logger.getLogger(Get_BuiltIn_Linker_From_Abbreviation_Factory.class);
+	private static final Logger log = LoggerFactory.getLogger( Get_BuiltIn_Linker_From_Abbreviation_Factory.class);
 	
 	//   WARNING:  ALL linker abbreviations MUST be Lower Case.  This is because in the importer the incoming linker is converted to lower case
 	

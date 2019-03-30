@@ -12,7 +12,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.www.dto.XLinkUserDTO;
 import org.yeastrc.xlink.www.internal_services.GetXLinkUserDTOListForUsers;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
@@ -25,7 +25,7 @@ import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
 @Path("/user")
 public class ListAllUsersService {
 
-	private static final Logger log = Logger.getLogger(ListAllUsersService.class);
+	private static final Logger log = LoggerFactory.getLogger( ListAllUsersService.class);
 	
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)

@@ -7,7 +7,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.dto.AnnotationDataBaseDTO;
 import org.yeastrc.xlink.dto.AnnotationTypeDTO;
 import org.yeastrc.xlink.dto.AnnotationTypeFilterableDTO;
@@ -45,7 +45,7 @@ import org.yeastrc.xlink.www.searcher.SearchPeptideCrosslink_LinkedPosition_Sear
  */
 public class CrosslinkLinkedPositions {
 	
-	private static final Logger log = Logger.getLogger(CrosslinkLinkedPositions.class);
+	private static final Logger log = LoggerFactory.getLogger( CrosslinkLinkedPositions.class);
 	
 	private CrosslinkLinkedPositions() { }
 	private static final CrosslinkLinkedPositions _INSTANCE = new CrosslinkLinkedPositions();

@@ -1,6 +1,6 @@
 package org.yeastrc.xlink.www.web_utils;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.auth.dao.AuthSharedObjectDAO;
 import org.yeastrc.auth.dto.AuthSharedObjectDTO;
 import org.yeastrc.xlink.www.dao.ProjectDAO;
@@ -12,7 +12,7 @@ import org.yeastrc.xlink.www.objects.ProjectPublicAccessData;
  */
 public class GetProjectPublicAccessData {
 	
-	private static final Logger log = Logger.getLogger(GetProjectPublicAccessData.class);
+	private static final Logger log = LoggerFactory.getLogger( GetProjectPublicAccessData.class);
 	//  private constructor
 	private GetProjectPublicAccessData() { }
 	/**

@@ -3,7 +3,9 @@ package org.yeastrc.xlink.base.file_import_proxl_xml_scans.dao;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+
 import org.yeastrc.xlink.base.file_import_proxl_xml_scans.dto.ProxlXMLFileImportTrackingRunDTO;
 import org.yeastrc.xlink.base.file_import_proxl_xml_scans.enum_classes.ProxlXMLFileImportStatus;
 import org.yeastrc.xlink.base.file_import_proxl_xml_scans.populate_dto_from_result.ProxlXMLFileImportTrackingRun_PopulateDTO;
@@ -14,7 +16,7 @@ import org.yeastrc.xlink.db.DBConnectionFactory;
  */
 public class ProxlXMLFileImportTrackingRun_Base_DAO {
 	
-	private static final Logger log = Logger.getLogger(ProxlXMLFileImportTrackingRun_Base_DAO.class);
+	private static final Logger log = LoggerFactory.getLogger( ProxlXMLFileImportTrackingRun_Base_DAO.class);
 	//  private constructor
 	private ProxlXMLFileImportTrackingRun_Base_DAO() { }
 	/**

@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang.mutable.MutableInt;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.dao.UnifiedRepPepDynamicModLookupDAO;
 import org.yeastrc.xlink.dao.UnifiedRepPepMatchedPeptideLookupDAO;
 import org.yeastrc.xlink.dto.UnifiedRepPepDynamicModLookupDTO;
@@ -45,7 +45,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class QC_PSM_CountsPerModification {
 
-	private static final Logger log = Logger.getLogger(QC_PSM_CountsPerModification.class);
+	private static final Logger log = LoggerFactory.getLogger( QC_PSM_CountsPerModification.class);
 	
 	/**
 	 * private constructor

@@ -4,7 +4,7 @@ import java.util.Calendar;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
 import org.yeastrc.xlink.www.cached_data_mgmt.CacheCurrentSizeMaxSizeResult;
 import org.yeastrc.xlink.www.cached_data_mgmt.CachedDataCentralRegistry;
@@ -35,7 +35,7 @@ import com.google.common.cache.LoadingCache;
  */
 public class Cached_ReportedPeptideBasicObjectsSearcher_Results implements CachedDataCommonIF {
 
-	private static final Logger log = Logger.getLogger( Cached_ReportedPeptideBasicObjectsSearcher_Results.class );
+	private static final Logger log = LoggerFactory.getLogger(  Cached_ReportedPeptideBasicObjectsSearcher_Results.class );
 
 	private static final int CACHE_MAX_SIZE_FULL_SIZE_DEFAULT_CUTOFFS = 10000;
 	private static final int CACHE_MAX_SIZE_FULL_SIZE__NOT__DEFAULT_CUTOFFS = 600;

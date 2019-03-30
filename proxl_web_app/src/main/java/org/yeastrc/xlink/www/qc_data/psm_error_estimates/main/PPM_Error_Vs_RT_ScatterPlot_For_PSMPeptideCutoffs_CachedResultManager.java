@@ -4,7 +4,7 @@ package org.yeastrc.xlink.www.qc_data.psm_error_estimates.main;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.www.cached_data_in_file.CachedDataInFileMgmt;
 import org.yeastrc.xlink.www.cached_data_in_file.CachedDataInFileMgmt.IdParamType;
 import org.yeastrc.xlink.www.cached_data_in_file.CachedDataInFileMgmt.ReplaceExistingValue;
@@ -23,7 +23,7 @@ import org.yeastrc.xlink.www.cached_data_in_file.CachedDataInFileMgmtRegistratio
  */
 public class PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_CachedResultManager implements CachedDataInFileMgmtRegistrationIF {
 
-	private static final Logger log = Logger.getLogger( PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_CachedResultManager.class );
+	private static final Logger log = LoggerFactory.getLogger(  PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_CachedResultManager.class );
 	
 	private static final String PREFIX_FOR_CACHING = "PPM_Error_Vs_RT_ScatterPlot_";
 	

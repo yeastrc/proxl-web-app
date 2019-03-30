@@ -4,7 +4,7 @@ import java.util.Calendar;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.linker_data_processing_base.ILinkers_Main_ForSingleSearch;
 import org.yeastrc.xlink.linker_data_processing_base.Linker_Main_LinkersForSingleSearch_Factory;
 import org.yeastrc.xlink.linker_data_processing_base.linker_db_data_per_search.LinkersDBDataSingleSearchRoot;
@@ -25,7 +25,7 @@ import com.google.common.cache.LoadingCache;
  */
 public class ILinker_Main_Objects_ForSearchId_Cached implements CachedDataCommonIF {
 
-	private static final Logger log = Logger.getLogger( ILinker_Main_Objects_ForSearchId_Cached.class );
+	private static final Logger log = LoggerFactory.getLogger(  ILinker_Main_Objects_ForSearchId_Cached.class );
 
 	private static final int CACHE_MAX_SIZE_FULL_SIZE = 2000;
 	private static final int CACHE_MAX_SIZE_SMALL = 20;

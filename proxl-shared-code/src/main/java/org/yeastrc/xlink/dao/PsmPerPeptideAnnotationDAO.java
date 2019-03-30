@@ -4,7 +4,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.dto.PsmPerPeptideAnnotationDTO;
 import org.yeastrc.xlink.enum_classes.AnnotationValueLocation;
@@ -16,7 +18,7 @@ import org.yeastrc.xlink.enum_classes.FilterableDescriptiveAnnotationType;
  */
 public class PsmPerPeptideAnnotationDAO {
 	
-	private static final Logger log = Logger.getLogger(PsmPerPeptideAnnotationDAO.class);
+	private static final Logger log = LoggerFactory.getLogger( PsmPerPeptideAnnotationDAO.class);
 
 	private PsmPerPeptideAnnotationDAO() { }
 	public static PsmPerPeptideAnnotationDAO getInstance() { return new PsmPerPeptideAnnotationDAO(); }

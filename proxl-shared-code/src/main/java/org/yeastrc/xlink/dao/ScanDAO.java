@@ -7,14 +7,16 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.dto.ScanDTO;
 import org.yeastrc.xlink.utils.ValidateIsCentroidValidValue;
 
 public class ScanDAO {
 	
-	private static final Logger log = Logger.getLogger(ScanDAO.class);
+	private static final Logger log = LoggerFactory.getLogger( ScanDAO.class);
 	
 	
 	

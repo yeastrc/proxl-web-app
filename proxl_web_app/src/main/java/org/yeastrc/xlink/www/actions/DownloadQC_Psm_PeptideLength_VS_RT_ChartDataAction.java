@@ -12,7 +12,7 @@ import java.util.Set;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -39,7 +39,7 @@ import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
  */
 public class DownloadQC_Psm_PeptideLength_VS_RT_ChartDataAction extends Action {
 	
-	private static final Logger log = Logger.getLogger(DownloadQC_Psm_PeptideLength_VS_RT_ChartDataAction.class);
+	private static final Logger log = LoggerFactory.getLogger( DownloadQC_Psm_PeptideLength_VS_RT_ChartDataAction.class);
 	
 	/* (non-Javadoc)
 	 * @see org.apache.struts.action.Action#execute(org.apache.struts.action.ActionMapping, org.apache.struts.action.ActionForm, javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)

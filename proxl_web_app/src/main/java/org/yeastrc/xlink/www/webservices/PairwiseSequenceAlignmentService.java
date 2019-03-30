@@ -16,7 +16,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.biojava.nbio.alignment.Alignments;
 import org.biojava.nbio.alignment.Alignments.PairwiseSequenceAlignerType;
 import org.biojava.nbio.alignment.SimpleGapPenalty;
@@ -49,7 +49,7 @@ import org.yeastrc.xlink.www.user_web_utils.GetAuthAccessLevelForWebRequest;
 @Path("/psa")
 public class PairwiseSequenceAlignmentService {
 
-	private static final Logger log = Logger.getLogger(PairwiseSequenceAlignmentService.class);
+	private static final Logger log = LoggerFactory.getLogger( PairwiseSequenceAlignmentService.class);
 	
 	/**
 	 * @param chain

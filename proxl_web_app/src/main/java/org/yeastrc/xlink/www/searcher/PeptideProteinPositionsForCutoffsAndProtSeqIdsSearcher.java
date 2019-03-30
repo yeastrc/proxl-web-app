@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.apache.commons.dbcp.DelegatingPreparedStatement;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.dto.AnnotationTypeDTO;
 import org.yeastrc.xlink.enum_classes.FilterDirectionType;
@@ -28,7 +28,7 @@ import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValue
  */
 public class PeptideProteinPositionsForCutoffsAndProtSeqIdsSearcher {
 
-	private static final Logger log = Logger.getLogger(PeptideProteinPositionsForCutoffsAndProtSeqIdsSearcher.class);
+	private static final Logger log = LoggerFactory.getLogger( PeptideProteinPositionsForCutoffsAndProtSeqIdsSearcher.class);
 	private PeptideProteinPositionsForCutoffsAndProtSeqIdsSearcher() { }
 	private static final PeptideProteinPositionsForCutoffsAndProtSeqIdsSearcher _INSTANCE = new PeptideProteinPositionsForCutoffsAndProtSeqIdsSearcher();
 	public static PeptideProteinPositionsForCutoffsAndProtSeqIdsSearcher getInstance() { return _INSTANCE; }

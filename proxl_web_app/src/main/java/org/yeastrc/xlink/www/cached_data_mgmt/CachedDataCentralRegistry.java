@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 
 /**
  * Registry of cached data that implement CachedDataCommonIF
@@ -19,7 +19,7 @@ import org.apache.log4j.Logger;
  */
 public class CachedDataCentralRegistry {
 
-	private static final Logger log = Logger.getLogger( CachedDataCentralRegistry.class );
+	private static final Logger log = LoggerFactory.getLogger(  CachedDataCentralRegistry.class );
 
 	private static final CachedDataCentralRegistry instance = new CachedDataCentralRegistry();
 

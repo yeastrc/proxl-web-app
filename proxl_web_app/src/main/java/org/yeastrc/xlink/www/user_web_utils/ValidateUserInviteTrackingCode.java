@@ -2,7 +2,7 @@ package org.yeastrc.xlink.www.user_web_utils;
 
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.apache.struts.action.ActionErrors;
 import org.apache.struts.action.ActionMessage;
 import org.yeastrc.auth.dao.AuthUserInviteTrackingDAO;
@@ -17,7 +17,7 @@ import org.yeastrc.xlink.www.dto.ProjectDTO;
  */
 public class ValidateUserInviteTrackingCode {
 
-	private static final Logger log = Logger.getLogger(ValidateUserInviteTrackingCode.class);
+	private static final Logger log = LoggerFactory.getLogger( ValidateUserInviteTrackingCode.class);
 	
 	private String inviteTrackingCode = null;
 	

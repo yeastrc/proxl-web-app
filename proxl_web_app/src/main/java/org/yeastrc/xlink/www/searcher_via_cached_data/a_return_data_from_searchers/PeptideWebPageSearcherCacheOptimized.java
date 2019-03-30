@@ -3,7 +3,7 @@ package org.yeastrc.xlink.www.searcher_via_cached_data.a_return_data_from_search
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
 import org.yeastrc.xlink.utils.XLinkUtils;
 import org.yeastrc.xlink.www.dto.SearchDTO;
@@ -24,7 +24,7 @@ import org.yeastrc.xlink.www.searcher_via_cached_data.return_objects_from_search
  */
 public class PeptideWebPageSearcherCacheOptimized {
 	
-	private static final Logger log = Logger.getLogger(PeptideWebPageSearcherCacheOptimized.class);
+	private static final Logger log = LoggerFactory.getLogger( PeptideWebPageSearcherCacheOptimized.class);
 	private PeptideWebPageSearcherCacheOptimized() { }
 	private static final PeptideWebPageSearcherCacheOptimized _INSTANCE = new PeptideWebPageSearcherCacheOptimized();
 	public static PeptideWebPageSearcherCacheOptimized getInstance() { return _INSTANCE; }

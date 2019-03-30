@@ -7,7 +7,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.www.dto.FolderForProjectDTO;
 /**
@@ -16,7 +16,7 @@ import org.yeastrc.xlink.www.dto.FolderForProjectDTO;
  */
 public class FolderForProjectDAO {
 	
-	private static final Logger log = Logger.getLogger(FolderForProjectDAO.class);
+	private static final Logger log = LoggerFactory.getLogger( FolderForProjectDAO.class);
 	//  private constructor
 	private FolderForProjectDAO() { }
 	/**

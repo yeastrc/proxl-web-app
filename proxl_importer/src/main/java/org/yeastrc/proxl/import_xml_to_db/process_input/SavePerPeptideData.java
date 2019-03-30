@@ -1,6 +1,6 @@
 package org.yeastrc.proxl.import_xml_to_db.process_input;
 
-// import org.apache.log4j.Logger;
+// import org.slf4j.LoggerFactory;import org.slf4j.Logger;
 import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_SrchRepPeptProtSeqIdPosMonolinkDAO;
 
 import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_SrchRepPeptPeptDynamicModDAO;
@@ -21,7 +21,7 @@ import org.yeastrc.xlink.dto.ReportedPeptideDTO;
  */
 public class SavePerPeptideData {
 
-//	private static final Logger log = Logger.getLogger( SavePerPeptideData.class );
+//	private static final Logger log = LoggerFactory.getLogger(  SavePerPeptideData.class );
 	/**
 	 * private constructor
 	 */

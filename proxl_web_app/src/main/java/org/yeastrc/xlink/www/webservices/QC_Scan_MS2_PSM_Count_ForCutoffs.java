@@ -15,7 +15,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
 import org.yeastrc.xlink.www.project_search__search__mapping.MapProjectSearchIdToSearchId;
@@ -37,7 +37,7 @@ import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
 @Path("/qc/dataPage")
 public class QC_Scan_MS2_PSM_Count_ForCutoffs {
 
-	private static final Logger log = Logger.getLogger(QC_Scan_MS2_PSM_Count_ForCutoffs.class);
+	private static final Logger log = LoggerFactory.getLogger( QC_Scan_MS2_PSM_Count_ForCutoffs.class);
 
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)

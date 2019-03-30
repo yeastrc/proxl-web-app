@@ -5,7 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 
 /**
@@ -14,7 +14,7 @@ import org.yeastrc.xlink.db.DBConnectionFactory;
  */
 public class ReportedPeptideIdsForSearchIdsUnifiedPeptideIdSearcher {
 	
-	private static final Logger log = Logger.getLogger(ReportedPeptideIdsForSearchIdsUnifiedPeptideIdSearcher.class);
+	private static final Logger log = LoggerFactory.getLogger( ReportedPeptideIdsForSearchIdsUnifiedPeptideIdSearcher.class);
 	private ReportedPeptideIdsForSearchIdsUnifiedPeptideIdSearcher() { }
 	public static ReportedPeptideIdsForSearchIdsUnifiedPeptideIdSearcher getInstance() { return new ReportedPeptideIdsForSearchIdsUnifiedPeptideIdSearcher(); }
 	

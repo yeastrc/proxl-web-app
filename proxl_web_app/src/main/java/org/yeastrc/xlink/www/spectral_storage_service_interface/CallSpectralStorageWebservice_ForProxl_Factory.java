@@ -1,7 +1,7 @@
 package org.yeastrc.xlink.www.spectral_storage_service_interface;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.spectral_storage.get_data_webapp.webservice_connect.main.CallSpectralStorageGetDataWebservice;
 import org.yeastrc.spectral_storage.get_data_webapp.webservice_connect.main.CallSpectralStorageGetDataWebserviceInitParameters;
 import org.yeastrc.xlink.base.config_system_table_common_access.ConfigSystemsKeysSharedConstants;
@@ -19,7 +19,7 @@ import org.yeastrc.xlink.www.exceptions.ProxlWebappConfigException;
  */
 class CallSpectralStorageWebservice_ForProxl_Factory {
 
-	private static final Logger log = Logger.getLogger(CallSpectralStorageWebservice_ForProxl_Factory.class);
+	private static final Logger log = LoggerFactory.getLogger( CallSpectralStorageWebservice_ForProxl_Factory.class);
 
 	private static final CallSpectralStorageWebservice_ForProxl_Factory instance = new CallSpectralStorageWebservice_ForProxl_Factory();
 	private CallSpectralStorageWebservice_ForProxl_Factory() { }

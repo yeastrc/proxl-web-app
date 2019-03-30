@@ -7,7 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.auth.dto.AuthUserDTO;
 import org.yeastrc.xlink.www.constants.AuthAccessLevelConstants;
 import org.yeastrc.xlink.www.constants.WebConstants;
@@ -28,7 +28,7 @@ import org.yeastrc.xlink.www.web_utils.RefreshAllowedReadAccessProjectIds;
  */
 public class GetAuthAccessLevelForWebRequest {
 
-	private static final Logger log = Logger.getLogger(GetAuthAccessLevelForWebRequest.class);
+	private static final Logger log = LoggerFactory.getLogger( GetAuthAccessLevelForWebRequest.class);
 	
 	
 	private GetAuthAccessLevelForWebRequest() { }

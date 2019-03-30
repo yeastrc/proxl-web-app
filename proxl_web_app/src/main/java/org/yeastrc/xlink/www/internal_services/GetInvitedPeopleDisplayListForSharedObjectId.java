@@ -2,7 +2,7 @@ package org.yeastrc.xlink.www.internal_services;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.auth.dto.AuthUserInviteTrackingDTO;
 import org.yeastrc.auth.exceptions.AuthSharedObjectRecordNotFoundException;
 import org.yeastrc.auth.searchers.AuthUserInvitesActiveUnusedNotReplacedNotRevokedSearcher;
@@ -15,7 +15,7 @@ import org.yeastrc.xlink.www.web_utils.FormatDateToYYYYMMDD;
  */
 public class GetInvitedPeopleDisplayListForSharedObjectId {
 
-	private static final Logger log = Logger.getLogger(GetInvitedPeopleDisplayListForSharedObjectId.class);
+	private static final Logger log = LoggerFactory.getLogger( GetInvitedPeopleDisplayListForSharedObjectId.class);
 	//  private constructor
 	private GetInvitedPeopleDisplayListForSharedObjectId() { }
 	/**

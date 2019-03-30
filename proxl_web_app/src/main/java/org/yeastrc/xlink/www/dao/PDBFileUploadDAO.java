@@ -2,7 +2,7 @@ package org.yeastrc.xlink.www.dao;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.apache.struts.upload.FormFile;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 /**
@@ -11,7 +11,7 @@ import org.yeastrc.xlink.db.DBConnectionFactory;
  */
 public class PDBFileUploadDAO {
 	
-	private static final Logger log = Logger.getLogger(PDBFileUploadDAO.class);
+	private static final Logger log = LoggerFactory.getLogger( PDBFileUploadDAO.class);
 	private PDBFileUploadDAO() { }
 	public static PDBFileUploadDAO getInstance() { return new PDBFileUploadDAO(); }
 	

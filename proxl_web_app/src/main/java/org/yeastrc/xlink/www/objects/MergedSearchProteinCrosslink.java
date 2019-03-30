@@ -4,7 +4,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesRootLevel;
 
@@ -14,7 +14,7 @@ import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValue
  */
 public class MergedSearchProteinCrosslink implements IProteinCrosslink, IMergedSearchLink {
 
-	private static final Logger log = Logger.getLogger(MergedSearchProteinCrosslink.class);
+	private static final Logger log = LoggerFactory.getLogger( MergedSearchProteinCrosslink.class);
 	
 			
 	/* 

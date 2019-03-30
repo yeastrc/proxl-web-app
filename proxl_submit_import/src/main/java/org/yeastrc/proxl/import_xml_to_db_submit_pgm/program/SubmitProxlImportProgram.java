@@ -12,7 +12,9 @@ import java.util.List;
 import java.util.Vector;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+
 import org.yeastrc.proxl.import_xml_to_db_submit_pgm.config.ConfigParams;
 import org.yeastrc.proxl.import_xml_to_db_submit_pgm.exceptions.ProxlSubImportConfigException;
 import org.yeastrc.proxl.import_xml_to_db_submit_pgm.exceptions.ProxlSubImportReportedErrorException;
@@ -28,7 +30,7 @@ import org.yeastrc.proxl.import_xml_to_db_submit_pgm.main.SubmitProxlUploadMain.
  */
 public class SubmitProxlImportProgram {
 
-	private static final Logger log = Logger.getLogger(SubmitProxlImportProgram.class);
+	private static final Logger log = LoggerFactory.getLogger( SubmitProxlImportProgram.class);
 
 	private static final int PROGRAM_EXIT_CODE_INVALID_CONFIGURATION = 1;
 

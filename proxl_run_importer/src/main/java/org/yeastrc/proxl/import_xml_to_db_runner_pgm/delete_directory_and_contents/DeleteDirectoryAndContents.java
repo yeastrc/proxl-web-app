@@ -3,7 +3,9 @@ package org.yeastrc.proxl.import_xml_to_db_runner_pgm.delete_directory_and_conte
 import java.io.File;
 import java.io.IOException;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+
 
 /**
  * 
@@ -11,7 +13,7 @@ import org.apache.log4j.Logger;
  */
 public class DeleteDirectoryAndContents {
 
-	private static final Logger log = Logger.getLogger(DeleteDirectoryAndContents.class);
+	private static final Logger log = LoggerFactory.getLogger( DeleteDirectoryAndContents.class);
 
 	//  private constructor
 	private DeleteDirectoryAndContents() { }

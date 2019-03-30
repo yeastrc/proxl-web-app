@@ -3,7 +3,7 @@ package org.yeastrc.proxl.import_xml_to_db.utils;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;import org.slf4j.Logger;
 import org.yeastrc.proxl_import.api.xml_dto.Peptide;
 import org.yeastrc.proxl_import.api.xml_dto.Peptide.PeptideIsotopeLabels;
 import org.yeastrc.proxl_import.api.xml_dto.Peptide.PeptideIsotopeLabels.PeptideIsotopeLabel;
@@ -21,7 +21,7 @@ import org.yeastrc.xlink.exceptions.ProxlBaseDataException;
  */
 public class GetIsotopeLabelIdFor_Protein_or_Peptide_FromProxlXMLFile {
 
-	private static final Logger log = Logger.getLogger(GetIsotopeLabelIdFor_Protein_or_Peptide_FromProxlXMLFile.class);
+	private static final Logger log = LoggerFactory.getLogger( GetIsotopeLabelIdFor_Protein_or_Peptide_FromProxlXMLFile.class);
 	private GetIsotopeLabelIdFor_Protein_or_Peptide_FromProxlXMLFile() { }
 	public static GetIsotopeLabelIdFor_Protein_or_Peptide_FromProxlXMLFile getInstance() { return new GetIsotopeLabelIdFor_Protein_or_Peptide_FromProxlXMLFile(); }
 	

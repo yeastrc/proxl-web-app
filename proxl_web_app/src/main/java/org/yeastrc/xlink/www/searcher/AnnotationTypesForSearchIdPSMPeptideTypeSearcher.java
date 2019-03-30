@@ -5,7 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.dao.AnnotationTypeDAO;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.dto.AnnotationTypeDTO;
@@ -18,7 +18,7 @@ import org.yeastrc.xlink.enum_classes.PsmPeptideAnnotationType;
  */
 public class AnnotationTypesForSearchIdPSMPeptideTypeSearcher {
 
-//	private static final Logger log = Logger.getLogger(AnnotationTypesForSearchIdPSMPeptideTypeSearcher.class);
+//	private static final Logger log = LoggerFactory.getLogger( AnnotationTypesForSearchIdPSMPeptideTypeSearcher.class);
 //	private AnnotationTypesForSearchIdPSMPeptideTypeSearcher() { }
 //	public static AnnotationTypesForSearchIdPSMPeptideTypeSearcher getInstance() { return new AnnotationTypesForSearchIdPSMPeptideTypeSearcher(); }
 //	

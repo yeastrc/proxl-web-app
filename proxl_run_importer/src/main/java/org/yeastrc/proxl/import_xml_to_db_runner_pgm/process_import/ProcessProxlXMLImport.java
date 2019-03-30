@@ -8,7 +8,9 @@ import java.util.List;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+
 import org.yeastrc.proxl.import_xml_to_db.database_update_with_transaction_services.UpdateTrackingTrackingRunRecordsDBTransaction;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterInteralException;
 import org.yeastrc.xlink.base.config_system_table_common_access.ConfigSystemTableGetValueCommon;
@@ -47,7 +49,7 @@ public class ProcessProxlXMLImport {
 	private static final int RETRY_COUNT_SWITCH_TO_EXTENDED_1 = 5;
 	private static final int RETRY_COUNT_SWITCH_TO_EXTENDED_2 = 10;
 	
-	private static final Logger log = Logger.getLogger(ProcessProxlXMLImport.class);
+	private static final Logger log = LoggerFactory.getLogger( ProcessProxlXMLImport.class);
 	
 	//  private constructor
 	private ProcessProxlXMLImport() { }

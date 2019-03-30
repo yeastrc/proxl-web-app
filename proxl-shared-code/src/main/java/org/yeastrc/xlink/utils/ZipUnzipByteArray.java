@@ -6,7 +6,9 @@ import java.io.IOException;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+
 
 /**
  * Use GZip to compress and uncompress a byte[]
@@ -14,7 +16,7 @@ import org.apache.log4j.Logger;
  */
 public class ZipUnzipByteArray {
 
-	private static final Logger log = Logger.getLogger( ZipUnzipByteArray.class );
+	private static final Logger log = LoggerFactory.getLogger(  ZipUnzipByteArray.class );
 	
 	//  private constructor
 	private ZipUnzipByteArray() {}

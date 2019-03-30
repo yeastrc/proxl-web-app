@@ -1,7 +1,7 @@
 package org.yeastrc.xlink.www.web_utils;
 
 import java.io.IOException;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
 import org.yeastrc.xlink.www.form_query_json_objects.CutoffValuesRootLevel;
 import org.yeastrc.xlink.www.form_query_json_objects.CutoffValuesSearchLevel;
@@ -16,7 +16,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class DeserializeCutoffForWebservices {
 	
-	private static final Logger log = Logger.getLogger(DeserializeCutoffForWebservices.class);
+	private static final Logger log = LoggerFactory.getLogger( DeserializeCutoffForWebservices.class);
 	private DeserializeCutoffForWebservices() { }
 	public static DeserializeCutoffForWebservices getInstance() { return new DeserializeCutoffForWebservices(); }
 	

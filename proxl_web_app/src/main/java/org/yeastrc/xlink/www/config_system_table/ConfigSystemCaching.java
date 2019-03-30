@@ -1,6 +1,6 @@
 package org.yeastrc.xlink.www.config_system_table;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.base.config_system_table_common_access.IConfigSystemTableGetValue;
 import org.yeastrc.xlink.www.cached_data_mgmt.CacheCurrentSizeMaxSizeResult;
 import org.yeastrc.xlink.www.cached_data_mgmt.CachedDataCentralRegistry;
@@ -19,7 +19,7 @@ import com.google.common.cache.LoadingCache;
  */
 public class ConfigSystemCaching implements IConfigSystemTableGetValue, CachedDataCommonIF {
 
-	private static final Logger log = Logger.getLogger(ConfigSystemCaching.class);
+	private static final Logger log = LoggerFactory.getLogger( ConfigSystemCaching.class);
 	private static final int CACHE_MAX_SIZE = 60;
 	/**
 	 * Static singleton instance

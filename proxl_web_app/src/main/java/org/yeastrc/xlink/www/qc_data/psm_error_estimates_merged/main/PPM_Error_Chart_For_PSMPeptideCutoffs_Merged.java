@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.proteomics.peptide.peptide.PeptideUtils;
 import org.yeastrc.xlink.dao.StaticModDAO;
 import org.yeastrc.xlink.dto.IsotopeLabelDTO;
@@ -59,7 +59,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class PPM_Error_Chart_For_PSMPeptideCutoffs_Merged {
 
-	private static final Logger log = Logger.getLogger(PPM_Error_Chart_For_PSMPeptideCutoffs_Merged.class);
+	private static final Logger log = LoggerFactory.getLogger( PPM_Error_Chart_For_PSMPeptideCutoffs_Merged.class);
 
 	/**
 	 *  !!!!!!!!!!!   VERY IMPORTANT  !!!!!!!!!!!!!!!!!!!!

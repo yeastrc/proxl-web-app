@@ -5,7 +5,9 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+
 import org.yeastrc.proxl.import_xml_to_db_runner_pgm.constants.RunControlFileConstants;
 import org.yeastrc.proxl.import_xml_to_db_runner_pgm.get_import_and_process_thread.GetImportAndProcessThread;
 import org.yeastrc.proxl.import_xml_to_db_runner_pgm.main.ImporterRunnerMain;
@@ -18,7 +20,7 @@ public class ManagerThread extends Thread {
 	
 	private static final String className = ManagerThread.class.getSimpleName();
 	
-	private static Logger log = Logger.getLogger(ManagerThread.class);
+	private static final Logger log = LoggerFactory.getLogger( ManagerThread.class);
 	
 	private static final int WAIT_TIME_FOR_MANAGER_THREAD_TO_EXIT_IN_SECONDS = 10;
 //	private static final int WAIT_TIME_FOR_CLIENT_STATUS_UPDATE_THREAD_TO_EXIT_IN_SECONDS = 10;

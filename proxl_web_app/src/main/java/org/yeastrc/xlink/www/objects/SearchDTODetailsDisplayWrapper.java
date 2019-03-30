@@ -2,7 +2,7 @@ package org.yeastrc.xlink.www.objects;
 
 import java.util.Collections;
 import java.util.List;
-//import org.apache.log4j.Logger;
+//import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.www.form_page_objects.CutoffPageDisplaySearchLevel;
 import org.yeastrc.xlink.www.searcher.SearchProgramDisplaySearcher;
@@ -17,7 +17,7 @@ import org.yeastrc.xlink.www.web_utils.GetCutoffsAppliedOnImport;
  */
 public class SearchDTODetailsDisplayWrapper {
 	
-//	private static final Logger log = Logger.getLogger( SearchDTODetailsDisplayWrapper.class );
+//	private static final Logger log = LoggerFactory.getLogger(  SearchDTODetailsDisplayWrapper.class );
 	
 	private SearchDTO searchDTO;
 	private List<SearchProgramDisplay> searchProgramDisplayList; 

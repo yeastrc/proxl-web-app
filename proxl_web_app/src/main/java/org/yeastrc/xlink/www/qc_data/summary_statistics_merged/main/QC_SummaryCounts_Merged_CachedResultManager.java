@@ -2,7 +2,7 @@ package org.yeastrc.xlink.www.qc_data.summary_statistics_merged.main;
 
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.www.cached_data_in_file.CachedDataInFileMgmt;
 import org.yeastrc.xlink.www.cached_data_in_file.CachedDataInFileMgmtRegistration;
 
@@ -22,7 +22,7 @@ import org.yeastrc.xlink.www.cached_data_in_file.CachedDataInFileMgmt.ReplaceExi
  */
 public class QC_SummaryCounts_Merged_CachedResultManager implements CachedDataInFileMgmtRegistrationIF {
 
-	private static final Logger log = Logger.getLogger( QC_SummaryCounts_Merged_CachedResultManager.class );
+	private static final Logger log = LoggerFactory.getLogger(  QC_SummaryCounts_Merged_CachedResultManager.class );
 	
 
 	private static final String PREFIX_FOR_CACHING = "QC_SummaryCounts_Merged_";

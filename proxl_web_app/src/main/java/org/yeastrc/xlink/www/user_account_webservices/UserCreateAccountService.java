@@ -13,7 +13,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.auth.dto.AuthSharedObjectUsersDTO;
 import org.yeastrc.auth.dto.AuthUserDTO;
 import org.yeastrc.auth.dto.AuthUserInviteTrackingDTO;
@@ -63,7 +63,7 @@ import org.yeastrc.xlink.www.web_utils.GetMessageTextFromKeyFrom_web_app_applica
 @Path("/user")
 public class UserCreateAccountService {
 
-	private static final Logger log = Logger.getLogger(UserCreateAccountService.class);
+	private static final Logger log = LoggerFactory.getLogger( UserCreateAccountService.class);
 	
 	private static enum CreateAccountUsingAdminUserAccount { YES, NO }
 

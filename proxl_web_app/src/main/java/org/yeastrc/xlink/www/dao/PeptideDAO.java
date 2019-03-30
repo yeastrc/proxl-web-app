@@ -3,7 +3,7 @@ package org.yeastrc.xlink.www.dao;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.dto.PeptideDTO;
 import org.yeastrc.xlink.www.searcher_via_cached_data.cached_data_holders.Cached_PeptideDTO;
@@ -14,7 +14,7 @@ import org.yeastrc.xlink.www.searcher_via_cached_data.cached_data_holders.Cached
  */
 public class PeptideDAO {
 	
-	private static final Logger log = Logger.getLogger(PeptideDAO.class);
+	private static final Logger log = LoggerFactory.getLogger( PeptideDAO.class);
 	private PeptideDAO() { }
 	public static PeptideDAO getInstance() { return new PeptideDAO(); }
 	

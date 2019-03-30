@@ -17,7 +17,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.www.dao.PeptideDAO;
 import org.yeastrc.xlink.www.dao.PsmDAO;
 import org.yeastrc.xlink.www.dao.SearchScanFilenameDAO;
@@ -70,7 +70,7 @@ import org.yeastrc.xlink.www.web_utils.SearchLinkerAndLinkerAbbreviationForLinke
 @Path("/lorikeetSpectrum")
 public class LorikeetSpectrumService {
 	
-	private static final Logger log = Logger.getLogger(LorikeetSpectrumService.class);
+	private static final Logger log = LoggerFactory.getLogger( LorikeetSpectrumService.class);
 	
 	/**
 	 * @param psmId

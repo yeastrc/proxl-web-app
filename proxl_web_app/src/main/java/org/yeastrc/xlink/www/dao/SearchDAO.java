@@ -3,7 +3,7 @@ package org.yeastrc.xlink.www.dao;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.joda.time.DateTime;
 import org.yeastrc.xlink.base.constants.Database_OneTrueZeroFalse_Constants;
 import org.yeastrc.xlink.db.DBConnectionFactory;
@@ -19,7 +19,7 @@ import org.yeastrc.xlink.www.searcher_via_cached_data.cached_data_holders.Cached
  */
 public class SearchDAO {
 
-	private static final Logger log = Logger.getLogger(SearchDAO.class);
+	private static final Logger log = LoggerFactory.getLogger( SearchDAO.class);
 	private SearchDAO() { }
 	public static SearchDAO getInstance() { return new SearchDAO(); }
 	

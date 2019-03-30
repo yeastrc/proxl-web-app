@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.dto.AnnotationDataBaseDTO;
 import org.yeastrc.xlink.dto.AnnotationTypeDTO;
 import org.yeastrc.xlink.dto.AnnotationTypeFilterableDTO;
@@ -45,7 +45,7 @@ import org.yeastrc.xlink.www.objects.SearchProtein;
  */
 public class ProteinsAllMergedCommonPageDownload {
 	
-	private static final Logger log = Logger.getLogger( ProteinsAllMergedCommonPageDownload.class );
+	private static final Logger log = LoggerFactory.getLogger(  ProteinsAllMergedCommonPageDownload.class );
 	private ProteinsAllMergedCommonPageDownload() { }
 	public static ProteinsAllMergedCommonPageDownload getInstance() { 
 		return new ProteinsAllMergedCommonPageDownload(); 

@@ -11,7 +11,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.auth.dto.AuthUserDTO;
 import org.yeastrc.xlink.www.constants.WebConstants;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
@@ -25,7 +25,7 @@ import org.yeastrc.xlink.www.user_account.UserSessionObject;
 @Path("/log_error")
 public class LogBrowserJavascriptErrorService {
 
-	private static final Logger log = Logger.getLogger( LogBrowserJavascriptErrorService.class );
+	private static final Logger log = LoggerFactory.getLogger(  LogBrowserJavascriptErrorService.class );
 
 	@POST
 	@Consumes( MediaType.APPLICATION_JSON )

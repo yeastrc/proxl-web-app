@@ -1,6 +1,6 @@
 package org.yeastrc.xlink.www.internal_services;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.auth.dao.AuthUserDAO;
 import org.yeastrc.xlink.base.file_import_proxl_xml_scans.dto.ProxlXMLFileImportTrackingDTO;
 import org.yeastrc.xlink.base.file_import_proxl_xml_scans.dto.ProxlXMLFileImportTrackingRunDTO;
@@ -19,7 +19,7 @@ import org.yeastrc.xlink.www.user_mgmt_webapp_access.UserMgmtGetUserDataResponse
  *
  */
 public class SendEmailForRunImportFinishInternalService {
-	private static final Logger log = Logger.getLogger(SendEmailForRunImportFinishInternalService.class);
+	private static final Logger log = LoggerFactory.getLogger( SendEmailForRunImportFinishInternalService.class);
 	
 	private static final int MAX_FAILURE_MESSAGE_LENGTH = 500;
 	

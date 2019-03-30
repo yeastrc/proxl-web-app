@@ -3,13 +3,13 @@ package org.yeastrc.xlink.www.searcher;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.utils.XLinkUtils;
 
 public class SearchReportedPeptideLinkTypeSearcher {
 	
-	private static final Logger log = Logger.getLogger(SearchReportedPeptideLinkTypeSearcher.class);
+	private static final Logger log = LoggerFactory.getLogger( SearchReportedPeptideLinkTypeSearcher.class);
 	private SearchReportedPeptideLinkTypeSearcher() { }
 	private static final SearchReportedPeptideLinkTypeSearcher _INSTANCE = new SearchReportedPeptideLinkTypeSearcher();
 	public static SearchReportedPeptideLinkTypeSearcher getInstance() { return _INSTANCE; }

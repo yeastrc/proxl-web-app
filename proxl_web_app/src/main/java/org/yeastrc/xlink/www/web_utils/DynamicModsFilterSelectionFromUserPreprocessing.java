@@ -5,7 +5,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.www.constants.DynamicModificationsSelectionConstants;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
 import org.yeastrc.xlink.www.searcher.SearchModMassDistinctSearcher;
@@ -16,7 +16,7 @@ import org.yeastrc.xlink.www.searcher.SearchModMassDistinctSearcher;
  */
 public class DynamicModsFilterSelectionFromUserPreprocessing {
 
-	private static final Logger log = Logger.getLogger(DynamicModsFilterSelectionFromUserPreprocessing.class);
+	private static final Logger log = LoggerFactory.getLogger( DynamicModsFilterSelectionFromUserPreprocessing.class);
 	private DynamicModsFilterSelectionFromUserPreprocessing() { }
 	public static DynamicModsFilterSelectionFromUserPreprocessing getInstance() { return new DynamicModsFilterSelectionFromUserPreprocessing(); }
 	

@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.dao.AnnotationTypeDAO;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.dto.AnnotationTypeDTO;
@@ -23,7 +23,7 @@ import org.yeastrc.xlink.enum_classes.PsmPeptideAnnotationType;
  */
 public class AnnotationTypeForSearchIdsSearcher {
 	
-	private static final Logger log = Logger.getLogger(AnnotationTypeForSearchIdsSearcher.class);
+	private static final Logger log = LoggerFactory.getLogger( AnnotationTypeForSearchIdsSearcher.class);
 	private AnnotationTypeForSearchIdsSearcher() { }
 	public static AnnotationTypeForSearchIdsSearcher getInstance() {
 		return new AnnotationTypeForSearchIdsSearcher(); 

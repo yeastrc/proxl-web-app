@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.dto.LinkerPerSearchCleavedCrosslinkMassDTO;
 import org.yeastrc.xlink.dto.LinkerPerSearchCrosslinkMassDTO;
 import org.yeastrc.xlink.dto.LinkerPerSearchMonolinkMassDTO;
@@ -34,7 +34,7 @@ import org.yeastrc.xlink.www.searcher_via_cached_data.return_objects_from_search
  */
 class GetLinkerDBDataForSingleSearch_Actual_PkgPrivate {
 
-	private static final Logger log = Logger.getLogger(GetLinkerDBDataForSingleSearch_Actual_PkgPrivate.class);
+	private static final Logger log = LoggerFactory.getLogger( GetLinkerDBDataForSingleSearch_Actual_PkgPrivate.class);
 
 	/**
 	 * Static singleton instance

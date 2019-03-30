@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.mutable.MutableDouble;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.spectral_storage.shared_server_client_importer.accum_scan_rt_mz_binned.dto.MS1_IntensitiesBinnedSummedMapRoot;
 import org.yeastrc.spectral_storage.shared_server_client_importer.accum_scan_rt_mz_binned.dto.MS1_IntensitiesBinnedSummed_Summary_DataRoot;
 import org.yeastrc.xlink.dao.ScanFileDAO;
@@ -23,7 +23,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class Scan_MS_1_IonCurrent_Histograms {
 
-	private static final Logger log = Logger.getLogger( Scan_MS_1_IonCurrent_Histograms.class );
+	private static final Logger log = LoggerFactory.getLogger(  Scan_MS_1_IonCurrent_Histograms.class );
 
 	/**
 	 *  !!!!!!!!!!!   VERY IMPORTANT  !!!!!!!!!!!!!!!!!!!!

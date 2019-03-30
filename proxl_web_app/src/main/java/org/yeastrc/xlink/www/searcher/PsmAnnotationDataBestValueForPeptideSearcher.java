@@ -5,7 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.dto.PsmAnnotationDTO;
 import org.yeastrc.xlink.dto.AnnotationTypeDTO;
@@ -15,7 +15,7 @@ import org.yeastrc.xlink.dto.AnnotationTypeDTO;
  */
 public class PsmAnnotationDataBestValueForPeptideSearcher {
 	
-	private static final Logger log = Logger.getLogger(PsmAnnotationDataBestValueForPeptideSearcher.class);
+	private static final Logger log = LoggerFactory.getLogger( PsmAnnotationDataBestValueForPeptideSearcher.class);
 	private PsmAnnotationDataBestValueForPeptideSearcher() { }
 	private static final PsmAnnotationDataBestValueForPeptideSearcher _INSTANCE = new PsmAnnotationDataBestValueForPeptideSearcher();
 	public static PsmAnnotationDataBestValueForPeptideSearcher getInstance() { return _INSTANCE; }

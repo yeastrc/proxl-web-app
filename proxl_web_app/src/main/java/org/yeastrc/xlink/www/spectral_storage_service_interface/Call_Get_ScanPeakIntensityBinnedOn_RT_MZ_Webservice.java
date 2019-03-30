@@ -2,7 +2,7 @@ package org.yeastrc.xlink.www.spectral_storage_service_interface;
 
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.spectral_storage.get_data_webapp.shared_server_client.exceptions.YRCSpectralStorageGetDataWebserviceCallErrorException;
 import org.yeastrc.spectral_storage.get_data_webapp.shared_server_client.webservice_request_response.main.Get_ScanPeakIntensityBinnedOn_RT_MZ_Request;
 import org.yeastrc.spectral_storage.get_data_webapp.webservice_connect.main.CallSpectralStorageGetDataWebservice;
@@ -16,7 +16,7 @@ import org.yeastrc.xlink.www.exceptions.ProxlWebappInternalErrorException;
  */
 public class Call_Get_ScanPeakIntensityBinnedOn_RT_MZ_Webservice {
 
-	private static final Logger log = Logger.getLogger(Call_Get_ScanPeakIntensityBinnedOn_RT_MZ_Webservice.class);
+	private static final Logger log = LoggerFactory.getLogger( Call_Get_ScanPeakIntensityBinnedOn_RT_MZ_Webservice.class);
 
 	private static final Call_Get_ScanPeakIntensityBinnedOn_RT_MZ_Webservice instance = new Call_Get_ScanPeakIntensityBinnedOn_RT_MZ_Webservice();
 	private Call_Get_ScanPeakIntensityBinnedOn_RT_MZ_Webservice() { }

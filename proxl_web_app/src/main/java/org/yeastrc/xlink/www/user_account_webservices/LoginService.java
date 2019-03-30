@@ -12,7 +12,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.auth.dao.AuthUserDAO;
 import org.yeastrc.auth.dto.AuthUserDTO;
 import org.yeastrc.xlink.base.config_system_table_common_access.ConfigSystemsKeysSharedConstants;
@@ -48,7 +48,7 @@ import org.yeastrc.xlink.www.user_web_utils.ValidateUserInviteTrackingCode;
 @Path("/user")
 public class LoginService {
 
-	private static final Logger log = Logger.getLogger(LoginService.class);
+	private static final Logger log = LoggerFactory.getLogger( LoginService.class);
 	
 	private static final String RETURN_TOS_TRUE = "true";
 	

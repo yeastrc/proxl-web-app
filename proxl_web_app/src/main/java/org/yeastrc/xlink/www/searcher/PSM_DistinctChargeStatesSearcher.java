@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.dbcp.DelegatingPreparedStatement;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.base.constants.Database_OneTrueZeroFalse_Constants;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.dto.AnnotationTypeDTO;
@@ -27,7 +27,7 @@ import org.yeastrc.xlink.www.constants.PeptideViewLinkTypesConstants;
  */
 public class PSM_DistinctChargeStatesSearcher {
 
-	private static final Logger log = Logger.getLogger(PSM_DistinctChargeStatesSearcher.class);
+	private static final Logger log = LoggerFactory.getLogger( PSM_DistinctChargeStatesSearcher.class);
 	private PSM_DistinctChargeStatesSearcher() { }
 	private static final PSM_DistinctChargeStatesSearcher _INSTANCE = new PSM_DistinctChargeStatesSearcher();
 	public static PSM_DistinctChargeStatesSearcher getInstance() { return _INSTANCE; }

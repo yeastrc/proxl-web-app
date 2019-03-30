@@ -7,7 +7,9 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+
 import org.yeastrc.xlink.dto.PeptideDTO;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterInteralException;
 import org.yeastrc.xlink.db.DBConnectionFactory;
@@ -18,7 +20,7 @@ import org.yeastrc.xlink.db.DBConnectionFactory;
  */
 public class PeptideDAO {
 	
-	private static final Logger log = Logger.getLogger(PeptideDAO.class);
+	private static final Logger log = LoggerFactory.getLogger( PeptideDAO.class);
 	
 	private PeptideDAO() { }
 	public static PeptideDAO getInstance() { return new PeptideDAO(); }

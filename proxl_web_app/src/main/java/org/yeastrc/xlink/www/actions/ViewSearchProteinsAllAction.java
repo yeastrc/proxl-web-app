@@ -12,7 +12,7 @@ import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -62,7 +62,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class ViewSearchProteinsAllAction extends Action {
 	
-	private static final Logger log = Logger.getLogger(ViewSearchProteinsAllAction.class);
+	private static final Logger log = LoggerFactory.getLogger( ViewSearchProteinsAllAction.class);
 
 	/* (non-Javadoc)
 	 * @see org.apache.struts.action.Action#execute(org.apache.struts.action.ActionMapping, org.apache.struts.action.ActionForm, javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)

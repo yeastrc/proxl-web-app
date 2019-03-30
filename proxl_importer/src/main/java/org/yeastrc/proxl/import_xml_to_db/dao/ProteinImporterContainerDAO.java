@@ -2,7 +2,9 @@ package org.yeastrc.proxl.import_xml_to_db.dao;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+
 import org.yeastrc.proxl.import_xml_to_db.constants.DatabaseAutoIncIdFieldForRecordNotInsertedYetConstants;
 import org.yeastrc.proxl.import_xml_to_db.dto.AnnotationDTO;
 import org.yeastrc.proxl.import_xml_to_db.dto.ProteinSequenceV2DTO;
@@ -17,7 +19,7 @@ import org.yeastrc.proxl.import_xml_to_db.objects.ProteinImporterContainer;
  */
 public class ProteinImporterContainerDAO {
 	
-	private static final Logger log = Logger.getLogger(ProteinImporterContainerDAO.class);
+	private static final Logger log = LoggerFactory.getLogger( ProteinImporterContainerDAO.class);
 	private ProteinImporterContainerDAO() { }
 	public static ProteinImporterContainerDAO getInstance() { return new ProteinImporterContainerDAO(); }
 	

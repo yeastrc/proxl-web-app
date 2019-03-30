@@ -6,7 +6,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.exceptions.ProxlBaseDataException;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
 import org.yeastrc.xlink.www.form_query_json_objects.ProteinQueryJSONRoot;
@@ -17,7 +17,7 @@ import org.yeastrc.xlink.www.searcher.ProteinSequenceVersionIdForNrseqProteinIdS
  */
 public class ProteinsMergedProteinsCommon {
 	
-	private static final Logger log = Logger.getLogger( ProteinsMergedProteinsCommon.class );
+	private static final Logger log = LoggerFactory.getLogger(  ProteinsMergedProteinsCommon.class );
 	
 	private ProteinsMergedProteinsCommon() { }
 	public static ProteinsMergedProteinsCommon getInstance() { 

@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
 import org.yeastrc.xlink.www.searcher.SearchTaxonomySearcher;
 import org.yeastrc.xlink.www.searcher_via_cached_data.cached_data_holders.Cached_TaxonomyIdsForSearchId;
@@ -19,7 +19,7 @@ import org.yeastrc.xlink.www.searcher_via_cached_data.return_objects_from_search
  */
 public class TaxonomiesForSearchOrSearches {
 	
-	private static final Logger log = Logger.getLogger( TaxonomiesForSearchOrSearches.class );
+	private static final Logger log = LoggerFactory.getLogger(  TaxonomiesForSearchOrSearches.class );
 
 	/**
 	 * Static singleton instance

@@ -9,7 +9,9 @@ import java.util.List;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+
 import org.yeastrc.proxl.import_xml_to_db_submit_pgm.constants.JSONStringCharsetConstants;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -21,7 +23,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class ListProjectsGet {
 	
 
-	private static final Logger log = Logger.getLogger(ListProjectsGet.class);
+	private static final Logger log = LoggerFactory.getLogger( ListProjectsGet.class);
 
 
 	private static final ListProjectsGet instance = new ListProjectsGet();

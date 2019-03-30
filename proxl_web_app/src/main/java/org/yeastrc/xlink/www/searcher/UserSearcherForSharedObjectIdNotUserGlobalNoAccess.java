@@ -5,7 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.HashSet;
 import java.util.Set;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.www.constants.AuthAccessLevelConstants;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 /**
@@ -16,7 +16,7 @@ import org.yeastrc.xlink.db.DBConnectionFactory;
  */
 public class UserSearcherForSharedObjectIdNotUserGlobalNoAccess {
 	
-	private static final Logger log = Logger.getLogger(UserSearcherForSharedObjectIdNotUserGlobalNoAccess.class);
+	private static final Logger log = LoggerFactory.getLogger( UserSearcherForSharedObjectIdNotUserGlobalNoAccess.class);
 	private UserSearcherForSharedObjectIdNotUserGlobalNoAccess() { }
 	private static final UserSearcherForSharedObjectIdNotUserGlobalNoAccess _INSTANCE = new UserSearcherForSharedObjectIdNotUserGlobalNoAccess();
 	public static UserSearcherForSharedObjectIdNotUserGlobalNoAccess getInstance() { return _INSTANCE; }

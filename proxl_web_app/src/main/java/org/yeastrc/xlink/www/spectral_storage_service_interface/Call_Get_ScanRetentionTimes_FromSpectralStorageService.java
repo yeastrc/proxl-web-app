@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.spectral_storage.get_data_webapp.shared_server_client.webservice_request_response.main.Get_ScanRetentionTimes_Request;
 import org.yeastrc.spectral_storage.get_data_webapp.shared_server_client.webservice_request_response.main.Get_ScanRetentionTimes_Response;
 import org.yeastrc.spectral_storage.get_data_webapp.shared_server_client.webservice_request_response.sub_parts.Single_ScanRetentionTime_ScanNumber_SubResponse;
@@ -16,7 +16,7 @@ import org.yeastrc.spectral_storage.get_data_webapp.webservice_connect.main.Call
  */
 public class Call_Get_ScanRetentionTimes_FromSpectralStorageService {
 
-	private static final Logger log = Logger.getLogger(Call_Get_ScanRetentionTimes_FromSpectralStorageService.class);
+	private static final Logger log = LoggerFactory.getLogger( Call_Get_ScanRetentionTimes_FromSpectralStorageService.class);
 
 	private static final Call_Get_ScanRetentionTimes_FromSpectralStorageService instance = new Call_Get_ScanRetentionTimes_FromSpectralStorageService();
 	private Call_Get_ScanRetentionTimes_FromSpectralStorageService() { }

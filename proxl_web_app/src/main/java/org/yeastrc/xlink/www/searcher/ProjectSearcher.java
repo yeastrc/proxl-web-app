@@ -5,7 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.www.constants.AuthAccessLevelConstants;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.www.objects.ProjectTblSubPartsForProjectLists;
@@ -18,7 +18,7 @@ import org.yeastrc.xlink.www.searcher_via_cached_data.cached_data_holders.Cached
  */
 public class ProjectSearcher {
 
-	private static final Logger log = Logger.getLogger(ProjectSearcher.class);
+	private static final Logger log = LoggerFactory.getLogger( ProjectSearcher.class);
 	private ProjectSearcher() { }
 	private static final ProjectSearcher _INSTANCE = new ProjectSearcher();
 	public static ProjectSearcher getInstance() { return _INSTANCE; }

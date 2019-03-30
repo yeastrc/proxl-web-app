@@ -5,7 +5,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.www.dao.URLShortenerDAO;
 import org.yeastrc.xlink.www.dto.URLShortenerDTO;
 import org.yeastrc.xlink.www.servlet_context.CurrentContext;
@@ -15,7 +15,7 @@ import org.yeastrc.xlink.www.servlet_context.CurrentContext;
  */
 public class SharePageURLHandlerServlet extends HttpServlet {
 	
-	private static final Logger log = Logger.getLogger( SharePageURLHandlerServlet.class );
+	private static final Logger log = LoggerFactory.getLogger(  SharePageURLHandlerServlet.class );
 	private static final long serialVersionUID = 1L;
 	private static final String REDIRECT_ON_SHORTCUT_NOT_FOUND = "shortcutNotFound.do";
 	

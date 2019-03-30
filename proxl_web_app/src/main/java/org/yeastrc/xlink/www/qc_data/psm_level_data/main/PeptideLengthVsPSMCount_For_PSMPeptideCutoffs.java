@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang3.mutable.MutableInt;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.dto.PeptideDTO;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesRootLevel;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
@@ -45,7 +45,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class PeptideLengthVsPSMCount_For_PSMPeptideCutoffs {
 
-	private static final Logger log = Logger.getLogger(PeptideLengthVsPSMCount_For_PSMPeptideCutoffs.class);
+	private static final Logger log = LoggerFactory.getLogger( PeptideLengthVsPSMCount_For_PSMPeptideCutoffs.class);
 
 	public enum ForDownload { YES, NO }
 	

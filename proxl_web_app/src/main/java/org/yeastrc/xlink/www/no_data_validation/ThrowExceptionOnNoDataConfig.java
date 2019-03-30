@@ -5,7 +5,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.Properties;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 
 /**
  * Singleton Class
@@ -15,7 +15,7 @@ import org.apache.log4j.Logger;
  */
 public class ThrowExceptionOnNoDataConfig {
 	
-	private static final Logger log = Logger.getLogger( ThrowExceptionOnNoDataConfig.class );
+	private static final Logger log = LoggerFactory.getLogger(  ThrowExceptionOnNoDataConfig.class );
 
 	public static String DB_CONFIG_FILENAME = "throw_exception_no_data.properties";
 

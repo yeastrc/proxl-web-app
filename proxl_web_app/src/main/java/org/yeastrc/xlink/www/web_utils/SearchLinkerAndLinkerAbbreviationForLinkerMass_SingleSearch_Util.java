@@ -5,7 +5,7 @@ import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.dto.LinkerPerSearchCrosslinkMassDTO;
 import org.yeastrc.xlink.dto.SearchLinkerDTO;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
@@ -20,7 +20,7 @@ import org.yeastrc.xlink.www.searcher_via_cached_data.return_objects_from_search
  */
 public class SearchLinkerAndLinkerAbbreviationForLinkerMass_SingleSearch_Util {
 	
-	private static final Logger log = Logger.getLogger( SearchLinkerAndLinkerAbbreviationForLinkerMass_SingleSearch_Util.class );
+	private static final Logger log = LoggerFactory.getLogger(  SearchLinkerAndLinkerAbbreviationForLinkerMass_SingleSearch_Util.class );
 	
 	private static final int DECIMAL_PLACE_ROUNDING_FOR_COMPARISON = 3;
 

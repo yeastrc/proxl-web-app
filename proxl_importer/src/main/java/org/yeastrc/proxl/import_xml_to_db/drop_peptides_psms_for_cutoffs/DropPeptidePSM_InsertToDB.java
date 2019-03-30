@@ -2,7 +2,7 @@ package org.yeastrc.proxl.import_xml_to_db.drop_peptides_psms_for_cutoffs;
 
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;import org.slf4j.Logger;
 import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_CutoffsAppliedOnImportDAO;
 import org.yeastrc.xlink.dto.CutoffsAppliedOnImportDTO;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterDataException;
@@ -15,7 +15,7 @@ import org.yeastrc.xlink.dto.AnnotationTypeDTO;
  */
 public class DropPeptidePSM_InsertToDB {
 
-	private static final Logger log = Logger.getLogger(DropPeptidePSM_InsertToDB.class);
+	private static final Logger log = LoggerFactory.getLogger( DropPeptidePSM_InsertToDB.class);
 
 	//  private constructor
 	private DropPeptidePSM_InsertToDB() { }

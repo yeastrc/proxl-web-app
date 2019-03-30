@@ -4,7 +4,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.dto.PsmAnnotationDTO;
 import org.yeastrc.xlink.enum_classes.AnnotationValueLocation;
@@ -16,7 +18,7 @@ import org.yeastrc.xlink.enum_classes.FilterableDescriptiveAnnotationType;
  */
 public class PsmAnnotationDAO {
 	
-	private static final Logger log = Logger.getLogger(PsmAnnotationDAO.class);
+	private static final Logger log = LoggerFactory.getLogger( PsmAnnotationDAO.class);
 
 	private PsmAnnotationDAO() { }
 	public static PsmAnnotationDAO getInstance() { return new PsmAnnotationDAO(); }

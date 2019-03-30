@@ -1,6 +1,6 @@
 package org.yeastrc.proxl.import_xml_to_db.project_importable_validation;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;import org.slf4j.Logger;
 import org.yeastrc.proxl.import_xml_to_db.exception.ProxlImporterProjectNotAllowImportException;
 import org.yeastrc.xlink.dao.ProjectLimitedInfoDAO;
 import org.yeastrc.xlink.dao.ProjectLockedChecker;
@@ -12,7 +12,7 @@ import org.yeastrc.xlink.dao.ProjectLockedChecker;
  */
 public class IsImportingAllowForProject {
 
-	private static final Logger log = Logger.getLogger( IsImportingAllowForProject.class );
+	private static final Logger log = LoggerFactory.getLogger(  IsImportingAllowForProject.class );
 	/**
 	 * private constructor
 	 */

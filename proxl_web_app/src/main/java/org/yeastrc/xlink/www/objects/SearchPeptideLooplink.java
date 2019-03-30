@@ -2,7 +2,7 @@ package org.yeastrc.xlink.www.objects;
 
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.www.dao.PeptideDAO;
 import org.yeastrc.xlink.dto.PeptideDTO;
 import org.yeastrc.xlink.www.dto.SrchRepPeptPeptideDTO;
@@ -19,7 +19,7 @@ import org.yeastrc.xlink.www.searcher_via_cached_data.return_objects_from_search
  */
 public class SearchPeptideLooplink extends SearchPeptide_BaseCommon {
 
-	private static final Logger log = Logger.getLogger(SearchPeptideLooplink.class);
+	private static final Logger log = LoggerFactory.getLogger( SearchPeptideLooplink.class);
 	
 	private void populatePeptides() throws Exception {
 		if ( populatePeptidesCalled ) {

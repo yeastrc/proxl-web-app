@@ -9,7 +9,9 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.dto.SearchFileDTO;
 
@@ -18,7 +20,7 @@ import org.yeastrc.xlink.dto.SearchFileDTO;
  */
 public class SearchFileDAO {
 	
-	private static final Logger log = Logger.getLogger(SearchFileDAO.class);
+	private static final Logger log = LoggerFactory.getLogger( SearchFileDAO.class);
 
 	private SearchFileDAO() { }
 	public static SearchFileDAO getInstance() { return new SearchFileDAO(); }

@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;import org.slf4j.Logger;
 import org.yeastrc.proxl.import_xml_to_db.dto.UnifiedRepPep_Search_ReportedPeptide_BestPsmValue_Generic_Lookup__DTO;
 import org.yeastrc.proxl.import_xml_to_db.dto.UnifiedRepPep_Search_ReportedPeptide__Generic_Lookup__DTO;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterDataException;
@@ -22,7 +22,7 @@ import org.yeastrc.xlink.enum_classes.FilterDirectionType;
  */
 public class BestPsmAnnotationProcessing {
 
-	private static final Logger log = Logger.getLogger( BestPsmAnnotationProcessing.class );
+	private static final Logger log = LoggerFactory.getLogger(  BestPsmAnnotationProcessing.class );
 	//  private constructor 
 	private BestPsmAnnotationProcessing() {}
 	

@@ -5,7 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.HashMap;
 import java.util.Map;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 
 /**
@@ -14,7 +14,7 @@ import org.yeastrc.xlink.db.DBConnectionFactory;
  */
 public class PsmAnnFromCrosslinkProteinSearcher {
 
-	private static final Logger log = Logger.getLogger( PsmAnnFromCrosslinkProteinSearcher.class );
+	private static final Logger log = LoggerFactory.getLogger(  PsmAnnFromCrosslinkProteinSearcher.class );
 	private PsmAnnFromCrosslinkProteinSearcher() { }
 	private static final PsmAnnFromCrosslinkProteinSearcher _INSTANCE = new PsmAnnFromCrosslinkProteinSearcher();
 	public static PsmAnnFromCrosslinkProteinSearcher getInstance() { return _INSTANCE; }

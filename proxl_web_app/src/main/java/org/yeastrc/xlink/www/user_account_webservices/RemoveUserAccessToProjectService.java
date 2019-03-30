@@ -12,7 +12,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.auth.dao.AuthSharedObjectUsersDAO;
 import org.yeastrc.auth.dto.AuthSharedObjectUsersDTO;
 import org.yeastrc.xlink.www.constants.AuthAccessLevelConstants;
@@ -27,7 +27,7 @@ import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
 @Path("/user")
 public class RemoveUserAccessToProjectService {
 
-	private static final Logger log = Logger.getLogger(RemoveUserAccessToProjectService.class);
+	private static final Logger log = LoggerFactory.getLogger( RemoveUserAccessToProjectService.class);
 	
 	@POST
 	@Consumes( MediaType.APPLICATION_FORM_URLENCODED )

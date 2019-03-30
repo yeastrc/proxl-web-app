@@ -6,7 +6,7 @@ import java.util.Map;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.dto.AnnotationTypeDTO;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesAnnotationLevel;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesRootLevel;
@@ -22,7 +22,7 @@ import org.yeastrc.xlink.www.project_search__search__mapping.MapProjectSearchIdT
  */
 public class Z_CutoffValuesObjectsToOtherObjectsFactory {
 	
-	private static final Logger log = Logger.getLogger( Z_CutoffValuesObjectsToOtherObjectsFactory.class );
+	private static final Logger log = LoggerFactory.getLogger(  Z_CutoffValuesObjectsToOtherObjectsFactory.class );
 	
 	/**
 	 * create SearcherCutoffValuesRootLevel object and children from 

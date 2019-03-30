@@ -4,7 +4,7 @@ import java.io.File;
 import java.text.NumberFormat;
 import java.util.Date;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;import org.slf4j.Logger;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterDataException;
 import org.yeastrc.proxl.import_xml_to_db.spectrum.mzml_mzxml.dto.MzML_MzXmlHeader;
 import org.yeastrc.proxl.import_xml_to_db.spectrum.mzml_mzxml.dto.MzML_MzXmlScan;
@@ -18,7 +18,7 @@ import org.yeastrc.proxl.import_xml_to_db.spectrum.mzml_mzxml.reader.MzMl_MzXml_
  */
 public class ValidateInputScanFile {
 
-	private static final Logger log = Logger.getLogger(ValidateInputScanFile.class);
+	private static final Logger log = LoggerFactory.getLogger( ValidateInputScanFile.class);
 	/**
 	 * private constructor
 	 */

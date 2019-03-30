@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.dbcp.DelegatingPreparedStatement;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.base.constants.Database_OneTrueZeroFalse_Constants;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.dto.AnnotationTypeDTO;
@@ -31,7 +31,7 @@ import org.yeastrc.xlink.www.searcher_utils.DefaultCutoffsExactlyMatchAnnTypeDat
  */
 public class Scan_CountsPerLinkTypeForSearchScanFileSearcher {
 
-	private static final Logger log = Logger.getLogger(Scan_CountsPerLinkTypeForSearchScanFileSearcher.class);
+	private static final Logger log = LoggerFactory.getLogger( Scan_CountsPerLinkTypeForSearchScanFileSearcher.class);
 	private Scan_CountsPerLinkTypeForSearchScanFileSearcher() { }
 	private static final Scan_CountsPerLinkTypeForSearchScanFileSearcher _INSTANCE = new Scan_CountsPerLinkTypeForSearchScanFileSearcher();
 	public static Scan_CountsPerLinkTypeForSearchScanFileSearcher getInstance() { return _INSTANCE; }

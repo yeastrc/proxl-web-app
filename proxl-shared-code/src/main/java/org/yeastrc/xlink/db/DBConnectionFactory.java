@@ -3,7 +3,9 @@ package org.yeastrc.xlink.db;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+
 
 /**
  * Get connections to the database. 
@@ -16,7 +18,7 @@ import org.apache.log4j.Logger;
  */
 public class DBConnectionFactory  {
 	
-	private static final Logger log = Logger.getLogger(DBConnectionFactory.class);
+	private static final Logger log = LoggerFactory.getLogger( DBConnectionFactory.class);
 			
 
 	public static final String PROXL = "proxl";

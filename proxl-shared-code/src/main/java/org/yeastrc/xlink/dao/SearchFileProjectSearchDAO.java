@@ -7,7 +7,9 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.dto.SearchFileProjectSearchDTO;
 
@@ -16,7 +18,7 @@ import org.yeastrc.xlink.dto.SearchFileProjectSearchDTO;
  */
 public class SearchFileProjectSearchDAO {
 
-	private static final Logger log = Logger.getLogger(SearchFileProjectSearchDAO.class);
+	private static final Logger log = LoggerFactory.getLogger( SearchFileProjectSearchDAO.class);
 	
 	private SearchFileProjectSearchDAO() { }
 	public static SearchFileProjectSearchDAO getInstance() { return new SearchFileProjectSearchDAO(); }

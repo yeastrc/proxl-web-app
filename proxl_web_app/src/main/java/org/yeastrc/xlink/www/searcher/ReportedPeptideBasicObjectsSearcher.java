@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.apache.commons.dbcp.DelegatingPreparedStatement;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.base.constants.Database_OneTrueZeroFalse_Constants;
 import org.yeastrc.xlink.base_searcher.PsmCountForSearchIdReportedPeptideIdSearcher;
 import org.yeastrc.xlink.db.DBConnectionFactory;
@@ -38,7 +38,7 @@ import org.yeastrc.xlink.www.searcher_via_cached_data.return_objects_from_search
  */
 public class ReportedPeptideBasicObjectsSearcher {
 	
-	private static final Logger log = Logger.getLogger(ReportedPeptideBasicObjectsSearcher.class);
+	private static final Logger log = LoggerFactory.getLogger( ReportedPeptideBasicObjectsSearcher.class);
 	private ReportedPeptideBasicObjectsSearcher() { }
 	private static final ReportedPeptideBasicObjectsSearcher _INSTANCE = new ReportedPeptideBasicObjectsSearcher();
 	public static ReportedPeptideBasicObjectsSearcher getInstance() { return _INSTANCE; }

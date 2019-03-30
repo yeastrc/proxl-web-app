@@ -5,7 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;import org.slf4j.Logger;
 import org.yeastrc.xlink.dao.ScanFileDAO;
 import org.yeastrc.xlink.dao.ScanFileHeaderDAO;
 import org.yeastrc.xlink.dao.ScanFileSourceDAO;
@@ -20,7 +20,7 @@ import org.yeastrc.xlink.dto.ScanFileSourceDTO;
  */
 public class AddNewScanFileAndHeadersIfNeededDBTransactionService {
 	
-	private static final Logger log = Logger.getLogger(AddNewScanFileAndHeadersIfNeededDBTransactionService.class);
+	private static final Logger log = LoggerFactory.getLogger( AddNewScanFileAndHeadersIfNeededDBTransactionService.class);
 	
 	AddNewScanFileAndHeadersIfNeededDBTransactionService() { }
 	private static AddNewScanFileAndHeadersIfNeededDBTransactionService _INSTANCE = new AddNewScanFileAndHeadersIfNeededDBTransactionService();

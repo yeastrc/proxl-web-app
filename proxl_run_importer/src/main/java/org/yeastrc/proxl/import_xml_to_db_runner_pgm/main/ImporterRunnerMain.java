@@ -1,6 +1,8 @@
 package org.yeastrc.proxl.import_xml_to_db_runner_pgm.main;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+
 import org.yeastrc.proxl.import_xml_to_db_runner_pgm.manager_thread.ManagerThread;
 
 /**
@@ -9,7 +11,7 @@ import org.yeastrc.proxl.import_xml_to_db_runner_pgm.manager_thread.ManagerThrea
  */
 public class ImporterRunnerMain {
 
-	private static final Logger log = Logger.getLogger( ImporterRunnerMain.class );
+	private static final Logger log = LoggerFactory.getLogger(  ImporterRunnerMain.class );
 	
 	/**
 	 * private constructor

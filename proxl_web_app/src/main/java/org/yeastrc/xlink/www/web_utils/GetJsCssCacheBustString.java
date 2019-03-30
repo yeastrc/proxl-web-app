@@ -1,6 +1,6 @@
 package org.yeastrc.xlink.www.web_utils;
 
-//import org.apache.log4j.Logger;
+//import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 
 /**
  * 
@@ -8,7 +8,7 @@ package org.yeastrc.xlink.www.web_utils;
  */
 public class GetJsCssCacheBustString {
 
-//	private static final Logger log = Logger.getLogger(GetJsCssCacheBustString.class);
+//	private static final Logger log = LoggerFactory.getLogger( GetJsCssCacheBustString.class);
 
 	private GetJsCssCacheBustString() { }
 	public static GetJsCssCacheBustString getInstance() { return new GetJsCssCacheBustString(); }

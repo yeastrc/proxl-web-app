@@ -2,7 +2,7 @@ package org.yeastrc.xlink.www.webservices_cache_response;
 
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.www.cached_data_in_file.CachedDataInFileMgmt;
 import org.yeastrc.xlink.www.cached_data_in_file.CachedDataInFileMgmtRegistration;
 import org.yeastrc.xlink.www.cached_data_in_file.CachedDataInFileMgmtRegistrationIF;
@@ -23,7 +23,7 @@ import org.yeastrc.xlink.www.webservices.ViewerCrosslinkService;
  */
 public class ViewerCrosslinkService_Results_Main_CachedResultManager implements CachedDataInFileMgmtRegistrationIF {
 
-	private static final Logger log = Logger.getLogger( ViewerCrosslinkService_Results_Main_CachedResultManager.class );
+	private static final Logger log = LoggerFactory.getLogger(  ViewerCrosslinkService_Results_Main_CachedResultManager.class );
 	
 	private static final String PREFIX_FOR_CACHING = "ViewerCrosslinkService_Main_";
 

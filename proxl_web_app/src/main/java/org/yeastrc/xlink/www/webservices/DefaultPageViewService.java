@@ -14,7 +14,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.default_page_view.DefaultPageViewSaveOrUpdate;
@@ -30,7 +30,7 @@ import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
 @Path("/defaultPageView")
 public class DefaultPageViewService {
 	
-	private static final Logger log = Logger.getLogger(DefaultPageViewService.class);
+	private static final Logger log = LoggerFactory.getLogger( DefaultPageViewService.class);
 	
 	@POST
 	@Consumes( MediaType.APPLICATION_FORM_URLENCODED )

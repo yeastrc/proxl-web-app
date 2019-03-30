@@ -1,7 +1,7 @@
 package org.yeastrc.xlink.www.database_update_with_transaction_services;
 
 import java.sql.Connection;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.www.dao.SearchComment_WebDAO;
 import org.yeastrc.xlink.www.dao.SearchFileProjectSearch_WebDAO;
 import org.yeastrc.xlink.www.dao.SearchWebLinksDAO;
@@ -16,7 +16,7 @@ import org.yeastrc.xlink.dto.ProjectSearch_Shared_DTO;
  */
 public class CopyProjectSearchIdToNewProjectUsingDBTransactionService {
 
-	private static final Logger log = Logger.getLogger(CopyProjectSearchIdToNewProjectUsingDBTransactionService.class);
+	private static final Logger log = LoggerFactory.getLogger( CopyProjectSearchIdToNewProjectUsingDBTransactionService.class);
 	CopyProjectSearchIdToNewProjectUsingDBTransactionService() { }
 	private static CopyProjectSearchIdToNewProjectUsingDBTransactionService _INSTANCE = new CopyProjectSearchIdToNewProjectUsingDBTransactionService();
 	public static CopyProjectSearchIdToNewProjectUsingDBTransactionService getInstance() { return _INSTANCE; }

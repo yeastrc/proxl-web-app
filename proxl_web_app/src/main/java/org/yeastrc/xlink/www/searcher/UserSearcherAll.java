@@ -5,7 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 /**
  * Return a list of all users in the database 
@@ -14,7 +14,7 @@ import org.yeastrc.xlink.db.DBConnectionFactory;
  */
 public class UserSearcherAll {
 	
-	private static final Logger log = Logger.getLogger(UserSearcherAll.class);
+	private static final Logger log = LoggerFactory.getLogger( UserSearcherAll.class);
 	private UserSearcherAll() { }
 	private static final UserSearcherAll _INSTANCE = new UserSearcherAll();
 	public static UserSearcherAll getInstance() { return _INSTANCE; }

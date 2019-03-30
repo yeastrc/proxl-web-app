@@ -1,6 +1,6 @@
 package org.yeastrc.auth.utils;
 
-//import org.apache.log4j.Logger;
+//import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 
 /**
  * 
@@ -8,7 +8,7 @@ package org.yeastrc.auth.utils;
  */
 public class GenerateRandomStringForCode {
 
-//	private static final Logger log = Logger.getLogger(GenerateRandomStringForCode.class);
+//	private static final Logger log = LoggerFactory.getLogger( GenerateRandomStringForCode.class);
 	private GenerateRandomStringForCode() { }
 	private static final GenerateRandomStringForCode _INSTANCE = new GenerateRandomStringForCode();
 	public static GenerateRandomStringForCode getInstance() { return _INSTANCE; }

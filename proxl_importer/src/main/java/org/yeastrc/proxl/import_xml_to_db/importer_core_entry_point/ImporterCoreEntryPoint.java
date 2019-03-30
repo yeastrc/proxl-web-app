@@ -11,7 +11,7 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;import org.slf4j.Logger;
 import org.yeastrc.proxl.import_xml_to_db.constants.Proxl_XSD_XML_Schema_Enabled_And_Filename_With_Path_Constant;
 import org.yeastrc.proxl.import_xml_to_db.dao.ProjectSearchDAO_Importer;
 import org.yeastrc.proxl.import_xml_to_db.dao.SearchDAO_Importer;
@@ -43,7 +43,7 @@ import org.yeastrc.xlink.enum_classes.SearchRecordStatus;
  */
 public class ImporterCoreEntryPoint {
 	
-	private static final Logger log = Logger.getLogger( ImporterCoreEntryPoint.class );
+	private static final Logger log = LoggerFactory.getLogger(  ImporterCoreEntryPoint.class );
 	
 	/**
 	 * private constructor

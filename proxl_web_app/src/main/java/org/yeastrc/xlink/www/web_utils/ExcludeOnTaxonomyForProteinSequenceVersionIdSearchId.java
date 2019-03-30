@@ -2,7 +2,7 @@ package org.yeastrc.xlink.www.web_utils;
 
 import java.util.Collection;
 import java.util.Set;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.www.objects.ProteinSequenceVersionObject;
 import org.yeastrc.xlink.www.searcher_via_cached_data.cached_data_holders.Cached_TaxonomyIdsFor_ProtSeqVersionId_SearchId;
 import org.yeastrc.xlink.www.searcher_via_cached_data.request_objects_for_searchers_for_cached_data.TaxonomyIdsForProtSeqIdSearchId_Request;
@@ -15,7 +15,7 @@ import org.yeastrc.xlink.www.searcher_via_cached_data.return_objects_from_search
  */
 public class ExcludeOnTaxonomyForProteinSequenceVersionIdSearchId {
 
-	private static final Logger log = Logger.getLogger(ExcludeOnTaxonomyForProteinSequenceVersionIdSearchId.class);
+	private static final Logger log = LoggerFactory.getLogger( ExcludeOnTaxonomyForProteinSequenceVersionIdSearchId.class);
 	//  private constructor
 	private ExcludeOnTaxonomyForProteinSequenceVersionIdSearchId() { }
 	/**

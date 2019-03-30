@@ -13,7 +13,7 @@ import javax.servlet.http.HttpSession;
 
 import org.yeastrc.xlink.www.browser_type_checking.IsBrowserIsInternetExplorer;
 import org.yeastrc.xlink.www.constants.StrutsActionPathsConstants;
-//import org.apache.log4j.Logger;
+//import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.www.constants.WebConstants;
 import org.yeastrc.xlink.www.servlet_context.CurrentContext;
 import org.yeastrc.xlink.www.user_account.UserSessionObject;
@@ -24,7 +24,7 @@ import org.yeastrc.xlink.www.user_account.UserSessionObject;
  */
 public class InitialServletFilter implements Filter {
 	
-//	private static final Logger log = Logger.getLogger(InitialServletFilter.class);
+//	private static final Logger log = LoggerFactory.getLogger( InitialServletFilter.class);
 	
 	@Override
 	public void destroy() {

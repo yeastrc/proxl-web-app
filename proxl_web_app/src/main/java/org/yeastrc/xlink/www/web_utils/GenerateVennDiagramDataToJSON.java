@@ -3,7 +3,7 @@ package org.yeastrc.xlink.www.web_utils;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-//import org.apache.log4j.Logger;
+//import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.www.objects.IMergedSearchLink;
 import org.yeastrc.xlink.www.objects.VennDiagramDataToJSON;
@@ -15,7 +15,7 @@ import org.yeastrc.xlink.www.objects.VennDiagramDataToJSON.VennDiagramDataSetEnt
  */
 public class GenerateVennDiagramDataToJSON {
 	
-//	private static final Logger log = Logger.getLogger(GenerateVennDiagramDataToJSON.class);
+//	private static final Logger log = LoggerFactory.getLogger( GenerateVennDiagramDataToJSON.class);
 	/**
 	 * Create the Venn Diagram for up to the first 3 searches
 	 * 

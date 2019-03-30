@@ -3,7 +3,7 @@ package org.yeastrc.xlink.www.qc_data.scan_level_data.main;
 import java.util.ArrayList;
 import java.util.List;
 
-//import org.apache.log4j.Logger;
+//import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 
 import org.yeastrc.xlink.www.cached_data_in_file.CachedDataInFileMgmt;
 import org.yeastrc.xlink.www.cached_data_in_file.CachedDataInFileMgmt.IdParamType;
@@ -23,7 +23,7 @@ import org.yeastrc.xlink.www.cached_data_in_file.CachedDataInFileMgmtRegistratio
  */
 public class Scan_MS_1_IonCurrent_Histograms_CachedResultManager implements CachedDataInFileMgmtRegistrationIF {
 
-//	private static final Logger log = Logger.getLogger( Scan_MS_1_IonCurrent_Histograms_CachedResultManager.class );
+//	private static final Logger log = LoggerFactory.getLogger(  Scan_MS_1_IonCurrent_Histograms_CachedResultManager.class );
 
 	private static final String PREFIX_FOR_CACHING = "MS1_All_Histograms_RT_MZ_";
 

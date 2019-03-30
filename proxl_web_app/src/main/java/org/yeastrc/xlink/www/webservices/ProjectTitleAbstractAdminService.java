@@ -12,7 +12,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.www.dao.ProjectDAO;
 import org.yeastrc.xlink.www.dto.ProjectDTO;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
@@ -27,7 +27,7 @@ import org.yeastrc.xlink.www.user_web_utils.TruncateProjectTitleForDisplay;
 @Path("/project")
 public class ProjectTitleAbstractAdminService {
 
-	private static final Logger log = Logger.getLogger(ProjectTitleAbstractAdminService.class);
+	private static final Logger log = LoggerFactory.getLogger( ProjectTitleAbstractAdminService.class);
 	
 	/**
 	 * @param projectId

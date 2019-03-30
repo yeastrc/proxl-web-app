@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.dto.AnnotationDataBaseDTO;
 import org.yeastrc.xlink.dto.PsmAnnotationDTO;
@@ -38,7 +38,7 @@ public class ReportedPeptidesForAssociatedScanId_From_PsmId_SearchId_Searcher {
 	
 	private ReportedPeptidesForAssociatedScanId_From_PsmId_SearchId_Searcher() { }
 	public static ReportedPeptidesForAssociatedScanId_From_PsmId_SearchId_Searcher getInstance() { return new ReportedPeptidesForAssociatedScanId_From_PsmId_SearchId_Searcher(); }
-	private static final Logger log = Logger.getLogger(ReportedPeptidesForAssociatedScanId_From_PsmId_SearchId_Searcher.class);
+	private static final Logger log = LoggerFactory.getLogger( ReportedPeptidesForAssociatedScanId_From_PsmId_SearchId_Searcher.class);
 	
 	/**
 	 * Should it use the optimization of Peptide and PSM defaults to skip joining the tables with the annotation values?

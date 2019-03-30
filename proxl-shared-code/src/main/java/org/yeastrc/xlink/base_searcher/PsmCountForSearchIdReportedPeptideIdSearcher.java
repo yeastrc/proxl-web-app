@@ -4,7 +4,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.List;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.enum_classes.FilterDirectionType;
 import org.yeastrc.xlink.searcher_constants.SearcherGeneralConstants;
@@ -18,7 +20,7 @@ public class PsmCountForSearchIdReportedPeptideIdSearcher {
 	
 	private PsmCountForSearchIdReportedPeptideIdSearcher() { }
 	public static PsmCountForSearchIdReportedPeptideIdSearcher getInstance() { return new PsmCountForSearchIdReportedPeptideIdSearcher(); }
-	private static final Logger log = Logger.getLogger(PsmCountForSearchIdReportedPeptideIdSearcher.class);
+	private static final Logger log = LoggerFactory.getLogger( PsmCountForSearchIdReportedPeptideIdSearcher.class);
 	/**
 	 * @param reportedPeptideId
 	 * @param searchId

@@ -12,7 +12,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.auth.dao.AuthForgotPasswordTrackingDAO;
 import org.yeastrc.auth.dao.AuthUserDAO;
 import org.yeastrc.auth.dto.AuthForgotPasswordTrackingDTO;
@@ -39,7 +39,7 @@ import org.yeastrc.xlink.www.web_utils.GetMessageTextFromKeyFrom_web_app_applica
 @Path("/user")
 public class ResetPasswordService {
 
-	private static final Logger log = Logger.getLogger(ResetPasswordService.class);
+	private static final Logger log = LoggerFactory.getLogger( ResetPasswordService.class);
 	
 	//   Webservice that accepts username or email and sends an email to the user with a code in a URL for setting/changing the user's password
 	@POST

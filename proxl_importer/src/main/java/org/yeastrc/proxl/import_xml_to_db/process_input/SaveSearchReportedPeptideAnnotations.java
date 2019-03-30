@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;import org.slf4j.Logger;
 import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_SearchReportedPeptideAnnotationDAO;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterDataException;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterInteralException;
@@ -26,7 +26,7 @@ import org.yeastrc.xlink.enum_classes.FilterableDescriptiveAnnotationType;
  */
 public class SaveSearchReportedPeptideAnnotations {
 
-	private static final Logger log = Logger.getLogger( SaveSearchReportedPeptideAnnotations.class );
+	private static final Logger log = LoggerFactory.getLogger(  SaveSearchReportedPeptideAnnotations.class );
 	/**
 	 * private constructor
 	 */

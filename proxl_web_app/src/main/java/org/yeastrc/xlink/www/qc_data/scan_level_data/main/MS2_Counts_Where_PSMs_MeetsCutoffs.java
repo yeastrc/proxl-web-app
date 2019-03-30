@@ -5,7 +5,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesRootLevel;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
 import org.yeastrc.xlink.utils.XLinkUtils;
@@ -28,7 +28,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class MS2_Counts_Where_PSMs_MeetsCutoffs {
 
-	private static final Logger log = Logger.getLogger(MS2_Counts_Where_PSMs_MeetsCutoffs.class);
+	private static final Logger log = LoggerFactory.getLogger( MS2_Counts_Where_PSMs_MeetsCutoffs.class);
 	
 	/**
 	 * private constructor

@@ -11,7 +11,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.www.dao.ProjectDAO;
 import org.yeastrc.xlink.www.dto.ProjectDTO;
@@ -33,7 +33,7 @@ import org.yeastrc.xlink.www.web_utils.ViewProjectSearchesInFolders;
 @Path("/project")
 public class ProjectGetDataForSearchDataSectionService {
 	
-	private static final Logger log = Logger.getLogger(ProjectGetDataForSearchDataSectionService.class);
+	private static final Logger log = LoggerFactory.getLogger( ProjectGetDataForSearchDataSectionService.class);
 	
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)

@@ -22,7 +22,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDBDataOutOfSyncException;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
 import org.yeastrc.xlink.dto.AnnotationTypeDTO;
@@ -51,7 +51,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Path("/imageViewer")
 public class Viewer_PSMsForMultUDR_Data_Service {
 
-	private static final Logger log = Logger.getLogger(Viewer_PSMsForMultUDR_Data_Service.class);
+	private static final Logger log = LoggerFactory.getLogger( Viewer_PSMsForMultUDR_Data_Service.class);
 	
 	private static enum LinkType { Crosslink, Looplink }
 	

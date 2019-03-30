@@ -2,7 +2,7 @@ package org.yeastrc.proxl.import_xml_to_db.utils;
 
 import java.util.regex.Pattern;
 
-//import org.apache.log4j.Logger;
+//import org.slf4j.LoggerFactory;import org.slf4j.Logger;
 
 /**
  * Get the Petide or Protein sequence used for string matches between peptide and protein sequences
@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
  */
 public class PeptideProteinSequenceForProteinInference {
 
-//	private static final Logger log = Logger.getLogger(PeptideProteinSequenceForProteinInference.class);
+//	private static final Logger log = LoggerFactory.getLogger( PeptideProteinSequenceForProteinInference.class);
 	
 	private static final String REPLACE_I_L_SEARCH_REGEX = "[IL]";
 	private static final String REPLACE_I_L_REPLACEMENT_STRING_J = "J";

@@ -1,7 +1,7 @@
 package org.yeastrc.xlink.www.searcher_via_cached_data.config_size_etc_central_code;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.www.cached_data_mgmt.CachedDataCentralRegistry;
 import org.yeastrc.xlink.www.config_system_table.ConfigSystemCaching;
 import org.yeastrc.xlink.www.config_system_table.ConfigSystemChangesRegistry;
@@ -15,7 +15,7 @@ import org.yeastrc.xlink.www.constants.ConfigSystemsKeysConstants;
  */
 public class CachedDataCentralConfigStorageAndProcessing implements ConfigSystemChangesRegistryItemIF {
 
-	private static final Logger log = Logger.getLogger( CachedDataCentralConfigStorageAndProcessing.class );
+	private static final Logger log = LoggerFactory.getLogger(  CachedDataCentralConfigStorageAndProcessing.class );
 
 	private static CachedDataCentralConfigStorageAndProcessing instance = null;
 

@@ -5,7 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 /**
  * Return a list of users in the database that match the enabled flag
@@ -14,7 +14,7 @@ import org.yeastrc.xlink.db.DBConnectionFactory;
  */
 public class UserSearcherForEnabledFlag {
 	
-	private static final Logger log = Logger.getLogger(UserSearcherForEnabledFlag.class);
+	private static final Logger log = LoggerFactory.getLogger( UserSearcherForEnabledFlag.class);
 	private UserSearcherForEnabledFlag() { }
 	private static final UserSearcherForEnabledFlag _INSTANCE = new UserSearcherForEnabledFlag();
 	public static UserSearcherForEnabledFlag getInstance() { return _INSTANCE; }

@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.spectral_storage.get_data_webapp.shared_server_client.webservice_request_response.sub_parts.SingleScanLevelSummaryData_SubResponse;
 import org.yeastrc.xlink.dao.ScanFileDAO;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesRootLevel;
@@ -37,7 +37,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class Scan_Statistics_Merged {
 
-	private static final Logger log = Logger.getLogger(Scan_Statistics_Merged.class);
+	private static final Logger log = LoggerFactory.getLogger( Scan_Statistics_Merged.class);
 	
 	/**
 	 * private constructor

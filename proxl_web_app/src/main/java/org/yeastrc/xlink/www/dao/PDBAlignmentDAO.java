@@ -4,7 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.www.dto.PDBAlignmentDTO;
 /**
@@ -13,7 +13,7 @@ import org.yeastrc.xlink.www.dto.PDBAlignmentDTO;
  */
 public class PDBAlignmentDAO {
 	
-	private static final Logger log = Logger.getLogger(PDBAlignmentDAO.class);
+	private static final Logger log = LoggerFactory.getLogger( PDBAlignmentDAO.class);
 	private PDBAlignmentDAO() { }
 	private static final PDBAlignmentDAO _INSTANCE = new PDBAlignmentDAO();
 	public static PDBAlignmentDAO getInstance() { return _INSTANCE; }

@@ -1,6 +1,6 @@
 package org.yeastrc.xlink.www.web_utils;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.www.constants.PeptideViewLinkTypesConstants;
 /**
  * 
@@ -10,7 +10,7 @@ import org.yeastrc.xlink.www.constants.PeptideViewLinkTypesConstants;
  */
 public class GetLinkTypesForSearchers {
 
-	private static final Logger log = Logger.getLogger(GetLinkTypesForSearchers.class);
+	private static final Logger log = LoggerFactory.getLogger( GetLinkTypesForSearchers.class);
 	private GetLinkTypesForSearchers() { }
 	public static GetLinkTypesForSearchers getInstance() { return new GetLinkTypesForSearchers(); }
 	

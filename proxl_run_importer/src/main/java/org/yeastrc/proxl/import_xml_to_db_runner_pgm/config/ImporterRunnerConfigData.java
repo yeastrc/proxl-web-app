@@ -2,7 +2,9 @@ package org.yeastrc.proxl.import_xml_to_db_runner_pgm.config;
 
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+
 
 /**
  * Values from the importer runner config file
@@ -10,7 +12,7 @@ import org.apache.log4j.Logger;
  */
 public class ImporterRunnerConfigData {
 
-	private static Logger log = Logger.getLogger( ImporterRunnerConfigData.class );
+	private static final Logger log = LoggerFactory.getLogger(  ImporterRunnerConfigData.class );
 	
 	private static Integer waitTimeForNextCheckForImportToProcess_InSeconds;
 	

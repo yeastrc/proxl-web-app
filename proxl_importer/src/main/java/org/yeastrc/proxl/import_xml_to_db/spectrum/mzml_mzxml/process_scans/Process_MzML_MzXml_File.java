@@ -7,7 +7,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;import org.slf4j.Logger;
 import org.yeastrc.xlink.base.file_import_proxl_xml_scans.dto.ProxlXMLFileImportTrackingSingleFileDTO;
 import org.yeastrc.xlink.dto.ScanFileDTO;
 import org.yeastrc.xlink.dto.ScanFileHeaderDTO;
@@ -35,7 +35,7 @@ import org.yeastrc.proxl.import_xml_to_db.utils.SHA1SumCalculator;
  */
 public class Process_MzML_MzXml_File {
 	
-	private static final Logger log = Logger.getLogger(Process_MzML_MzXml_File.class);
+	private static final Logger log = LoggerFactory.getLogger( Process_MzML_MzXml_File.class);
 	/**
 	 * private constructor
 	 */

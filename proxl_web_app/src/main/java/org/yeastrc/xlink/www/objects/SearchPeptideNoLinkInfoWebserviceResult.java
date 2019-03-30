@@ -2,7 +2,7 @@ package org.yeastrc.xlink.www.objects;
 
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.dto.ReportedPeptideDTO;
 
 /**
@@ -11,7 +11,7 @@ import org.yeastrc.xlink.dto.ReportedPeptideDTO;
  */
 public class SearchPeptideNoLinkInfoWebserviceResult implements SearchPeptideCommonLinkWebserviceResultIF {
 
-	private static final Logger log = Logger.getLogger(SearchPeptideNoLinkInfoWebserviceResult.class);
+	private static final Logger log = LoggerFactory.getLogger( SearchPeptideNoLinkInfoWebserviceResult.class);
 	
 	//  Constructors
 	

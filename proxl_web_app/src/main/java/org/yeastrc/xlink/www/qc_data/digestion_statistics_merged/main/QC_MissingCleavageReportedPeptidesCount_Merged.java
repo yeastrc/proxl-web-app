@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.base.cleavage_missed.GetMissedCleavageSites;
 import org.yeastrc.xlink.base.cleavage_missed.GetMissedCleavageSites.GetMissedCleavageSitesResult;
 import org.yeastrc.xlink.dao.StaticModDAO;
@@ -51,7 +51,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class QC_MissingCleavageReportedPeptidesCount_Merged {
 
-	private static final Logger log = Logger.getLogger(QC_MissingCleavageReportedPeptidesCount_Merged.class);
+	private static final Logger log = LoggerFactory.getLogger( QC_MissingCleavageReportedPeptidesCount_Merged.class);
 	
 	/**
 	 * private constructor

@@ -9,7 +9,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.www.factories.ProteinSequenceVersionObjectFactory;
 import org.yeastrc.xlink.www.linkable_positions.GetLinkablePositionsForLinkers;
 import org.yeastrc.xlink.www.linkable_positions.ILinker_Main_Objects_ForSearchId_Cached;
@@ -54,7 +54,7 @@ import com.google.common.collect.Range;
  */
 public class ProteinCoverageCompute {
 	
-	private static final Logger log = Logger.getLogger(ProteinCoverageCompute.class);
+	private static final Logger log = LoggerFactory.getLogger( ProteinCoverageCompute.class);
 	
 	private Collection<SearchDTO> searches;
 	private SearcherCutoffValuesRootLevel searcherCutoffValuesRootLevel;

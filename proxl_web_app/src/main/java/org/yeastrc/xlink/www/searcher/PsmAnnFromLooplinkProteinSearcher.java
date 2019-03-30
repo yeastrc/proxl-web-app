@@ -5,7 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.HashMap;
 import java.util.Map;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 /**
  * Retrieve PSM Filterable annotation data for specified looplink protein seq id and positions 
@@ -13,7 +13,7 @@ import org.yeastrc.xlink.db.DBConnectionFactory;
  */
 public class PsmAnnFromLooplinkProteinSearcher {
 	
-	private static final Logger log = Logger.getLogger( PsmAnnFromLooplinkProteinSearcher.class );
+	private static final Logger log = LoggerFactory.getLogger(  PsmAnnFromLooplinkProteinSearcher.class );
 	private PsmAnnFromLooplinkProteinSearcher() { }
 	private static final PsmAnnFromLooplinkProteinSearcher _INSTANCE = new PsmAnnFromLooplinkProteinSearcher();
 	public static PsmAnnFromLooplinkProteinSearcher getInstance() { return _INSTANCE; }

@@ -4,7 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.List;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.dto.AnnotationTypeDTO;
 import org.yeastrc.xlink.dto.PsmDTO;
@@ -22,7 +22,7 @@ public class Psm_ScanCountForAssociatedScanId_From_PsmId_SearchId_Searcher {
 
 	private Psm_ScanCountForAssociatedScanId_From_PsmId_SearchId_Searcher() { }
 	public static Psm_ScanCountForAssociatedScanId_From_PsmId_SearchId_Searcher getInstance() { return new Psm_ScanCountForAssociatedScanId_From_PsmId_SearchId_Searcher(); }
-	private static final Logger log = Logger.getLogger(Psm_ScanCountForAssociatedScanId_From_PsmId_SearchId_Searcher.class);
+	private static final Logger log = LoggerFactory.getLogger( Psm_ScanCountForAssociatedScanId_From_PsmId_SearchId_Searcher.class);
 	
 	private static final String SQL_MAIN = "SELECT COUNT(*) AS count FROM ( " ;
 	

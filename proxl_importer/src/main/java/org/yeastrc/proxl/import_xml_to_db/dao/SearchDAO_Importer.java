@@ -4,7 +4,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+
 import org.yeastrc.proxl.import_xml_to_db.dto.SearchDTO_Importer;
 import org.yeastrc.xlink.base.constants.Database_OneTrueZeroFalse_Constants;
 import org.yeastrc.xlink.db.DBConnectionFactory;
@@ -16,7 +18,7 @@ import org.yeastrc.xlink.enum_classes.SearchRecordStatus;
  */
 public class SearchDAO_Importer {
 
-	private static final Logger log = Logger.getLogger(SearchDAO_Importer.class);
+	private static final Logger log = LoggerFactory.getLogger( SearchDAO_Importer.class);
 	private SearchDAO_Importer() { }
 	public static SearchDAO_Importer getInstance() { return new SearchDAO_Importer(); }
 	

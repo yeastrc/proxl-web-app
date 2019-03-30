@@ -3,7 +3,7 @@ package org.yeastrc.proxl.import_xml_to_db.spectrum.spectral_storage_service_int
 import java.io.File;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;import org.slf4j.Logger;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterConfigException;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterDataException;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterSpectralStorageServiceErrorException;
@@ -32,7 +32,7 @@ import org.yeastrc.xlink.dto.ScanFileDTO;
  */
 public class ScanFileToSpectralStorageService_Processing {
 
-	private static final Logger log = Logger.getLogger(ScanFileToSpectralStorageService_Processing.class);
+	private static final Logger log = LoggerFactory.getLogger( ScanFileToSpectralStorageService_Processing.class);
 	
 	//  Send Scan File to Spectral Storage Service Retry Max and Delay
 	

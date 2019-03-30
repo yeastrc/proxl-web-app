@@ -5,7 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.www.dto.ProjectDTO;
 import org.yeastrc.xlink.www.objects.ProjectTblSubPartsForProjectLists;
@@ -16,7 +16,7 @@ import org.yeastrc.xlink.www.objects.ProjectTblSubPartsForProjectLists;
  */
 public class ProjectDAO {
 
-	private static final Logger log = Logger.getLogger(ProjectDAO.class);
+	private static final Logger log = LoggerFactory.getLogger( ProjectDAO.class);
 	//  private constructor
 	private ProjectDAO() { }
 	/**

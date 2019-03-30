@@ -2,7 +2,7 @@ package org.yeastrc.xlink.www.file_import_proxl_xml_scans.utils;
 
 import java.io.File;
 import java.io.IOException;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappInternalErrorException;
 /**
  * 
@@ -10,7 +10,7 @@ import org.yeastrc.xlink.www.exceptions.ProxlWebappInternalErrorException;
  */
 public class DeleteDirectoryAndContentsUtil {
 
-	private static final Logger log = Logger.getLogger( DeleteDirectoryAndContentsUtil.class );
+	private static final Logger log = LoggerFactory.getLogger(  DeleteDirectoryAndContentsUtil.class );
 	//  private constructor
 	private DeleteDirectoryAndContentsUtil() { }
 	/**

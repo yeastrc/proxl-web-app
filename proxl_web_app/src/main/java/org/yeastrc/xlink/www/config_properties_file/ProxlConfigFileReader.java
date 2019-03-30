@@ -6,7 +6,7 @@ import java.net.URL;
 import java.util.Properties;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappConfigException;
 
 /**
@@ -15,7 +15,7 @@ import org.yeastrc.xlink.www.exceptions.ProxlWebappConfigException;
  */
 public class ProxlConfigFileReader {
 
-	private static final Logger log = Logger.getLogger( ProxlConfigFileReader.class );
+	private static final Logger log = LoggerFactory.getLogger(  ProxlConfigFileReader.class );
 
 	private static String CONFIG_DEFAULTS_FILENAME = "proxl_config_defaults.properties";
 	private static String CONFIG_OVERRIDES_FILENAME = "proxl_config.properties";

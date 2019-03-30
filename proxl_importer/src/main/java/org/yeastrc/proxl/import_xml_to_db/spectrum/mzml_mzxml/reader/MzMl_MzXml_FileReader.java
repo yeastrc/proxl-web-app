@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 
 import javax.xml.stream.XMLStreamException;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;import org.slf4j.Logger;
 import org.systemsbiology.jrap.stax.DataProcessingInfo;
 import org.systemsbiology.jrap.stax.MSInstrumentInfo;
 import org.systemsbiology.jrap.stax.MSXMLSequentialParser;
@@ -37,7 +37,7 @@ import org.yeastrc.proxl.import_xml_to_db.spectrum.mzml_mzxml.dto.MzML_MzXmlScan
  */
 public class MzMl_MzXml_FileReader { // implements MzXmlDataProvider {
 	
-	private static final Logger log = Logger.getLogger(MzMl_MzXml_FileReader.class);
+	private static final Logger log = LoggerFactory.getLogger( MzMl_MzXml_FileReader.class);
 
 //    private String sha1Sum;
     private String filename;

@@ -1,6 +1,6 @@
 package org.yeastrc.auth.services;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.auth.dao.AuthUserInviteTrackingDAO;
 import org.yeastrc.auth.dto.AuthUserInviteTrackingDTO;
 import org.yeastrc.auth.utils.GenerateRandomStringForCode;
@@ -11,7 +11,7 @@ import org.yeastrc.auth.utils.GenerateRandomStringForCode;
  */
 public class GenerateInviteCodeSaveInviteRecordService {
 	
-	private static final Logger log = Logger.getLogger(GenerateInviteCodeSaveInviteRecordService.class);
+	private static final Logger log = LoggerFactory.getLogger( GenerateInviteCodeSaveInviteRecordService.class);
 	
 	private GenerateInviteCodeSaveInviteRecordService() { }
 	private static final GenerateInviteCodeSaveInviteRecordService _INSTANCE = new GenerateInviteCodeSaveInviteRecordService();

@@ -12,7 +12,9 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+
 import org.yeastrc.proxl.import_xml_to_db_submit_pgm.config.ConfigParams;
 import org.yeastrc.proxl.import_xml_to_db_submit_pgm.constants.ScanFilenameConstants;
 import org.yeastrc.proxl.import_xml_to_db_submit_pgm.constants.UploadFileSubDirConstants;
@@ -52,7 +54,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class SubmitProxlUploadMain {
 
-	private static final Logger log = Logger.getLogger(SubmitProxlUploadMain.class);
+	private static final Logger log = LoggerFactory.getLogger( SubmitProxlUploadMain.class);
 
 	
 

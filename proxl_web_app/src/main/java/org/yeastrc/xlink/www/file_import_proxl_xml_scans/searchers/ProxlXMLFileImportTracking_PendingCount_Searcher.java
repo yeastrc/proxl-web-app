@@ -3,7 +3,7 @@ package org.yeastrc.xlink.www.file_import_proxl_xml_scans.searchers;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.base.constants.Database_OneTrueZeroFalse_Constants;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.base.file_import_proxl_xml_scans.enum_classes.ProxlXMLFileImportStatus;
@@ -14,7 +14,7 @@ import org.yeastrc.xlink.base.file_import_proxl_xml_scans.enum_classes.ProxlXMLF
  */
 public class ProxlXMLFileImportTracking_PendingCount_Searcher {
 
-	private static final Logger log = Logger.getLogger(ProxlXMLFileImportTracking_PendingCount_Searcher.class);
+	private static final Logger log = LoggerFactory.getLogger( ProxlXMLFileImportTracking_PendingCount_Searcher.class);
 	//  private constructor
 	private ProxlXMLFileImportTracking_PendingCount_Searcher() { }
 	/**

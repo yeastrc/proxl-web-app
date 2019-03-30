@@ -19,7 +19,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.www.dao.SearchDAO;
 import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.dto.AnnotationTypeDTO;
@@ -60,7 +60,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Path("/imageViewer")
 public class Viewer_UDR_Data_Service {
 	
-	private static final Logger log = Logger.getLogger(Viewer_UDR_Data_Service.class);
+	private static final Logger log = LoggerFactory.getLogger( Viewer_UDR_Data_Service.class);
 	
 	private static final String CROSSLINK_LINK_TYPE = XLinkUtils.CROSS_TYPE_STRING;
 	private static final String LOOPLINK_LINK_TYPE = XLinkUtils.LOOP_TYPE_STRING;

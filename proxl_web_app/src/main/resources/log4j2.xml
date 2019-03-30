@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<Configuration  status="debug" >
+
+  <Appenders>
+  
+  <!--  
+    <Console name="STDOUT" target="SYSTEM_OUT">
+      <PatternLayout pattern="%d %-5p [%t] %C{2} (%F:%L)  %c - %m%n"/>
+    </Console>
+   -->
+   
+   <!-- This next appender is not working to create an output file -->
+   
+    <!-- Rolling File Appender -->
+    <RollingFile name="RollingFile">
+    	<!-- Compared to log4j, the system variable requires 'sys:' before it -->
+    			<!-- append '.current' to the filename so that Ubuntu does not compress the file (compresses files that end in .log).
+			Log4j2 will compress the file when it rolls over the file since '.gz' is at end of  -->
+		<!-- Filename used when create "current" file to log to  -->
+      <FileName>${sys:catalina.base}/logs/proxl.log.current</FileName>
+      		<!-- Filename used when roll "current" file to and then create new "current" file.
+      					Log4j2 will compress the file when it rolls over the file since '.gz' is at end of  -->
+      <FilePattern>${sys:catalina.base}/logs/proxl-%d{yyyy-MM-dd}.log.gz</FilePattern>
+      <PatternLayout>
+        <Pattern>%d{yyyy-MMM-dd HH:mm:ss a} [%t] %-5level %logger{36} - %msg%n</Pattern>
+      </PatternLayout>
+      <Policies>
+      		<!-- Roll over the log file based on time  -->
+        <TimeBasedTriggeringPolicy/>
+      </Policies>
+      <DefaultRolloverStrategy max="20" />
+    </RollingFile>
+        
+  </Appenders>
+  <Loggers>
+    <Logger name="org.apache.log4j.xml" level="debug"/>
+    
+    <Logger name="org.yeastrc.xlink.www.cached_data_mgmt.CachedDataCentralRegistry" level="info"/>
+    
+     <!-- Log Access from Browser Internet Explorer if this is set to debug. -->
+    <!-- 
+    <Logger name="org.yeastrc.xlink.www.browser_type_checking.IsBrowserIsInternetExplorer" level="debug"/>
+    -->
+    
+	<!-- 
+    <Logger name="org.springframework.transaction.interceptor" level="TRACE"/>
+    -->
+    <Root level="info">
+      <AppenderRef ref="RollingFile"/>
+    </Root>
+  </Loggers>
+</Configuration>

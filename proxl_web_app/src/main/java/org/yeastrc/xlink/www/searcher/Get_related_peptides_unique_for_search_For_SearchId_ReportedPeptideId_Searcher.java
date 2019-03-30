@@ -3,7 +3,7 @@ package org.yeastrc.xlink.www.searcher;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.base.constants.Database_OneTrueZeroFalse_Constants;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
@@ -13,7 +13,7 @@ import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
  */
 public class Get_related_peptides_unique_for_search_For_SearchId_ReportedPeptideId_Searcher {
 	
-	private static final Logger log = Logger.getLogger(Get_related_peptides_unique_for_search_For_SearchId_ReportedPeptideId_Searcher.class);
+	private static final Logger log = LoggerFactory.getLogger( Get_related_peptides_unique_for_search_For_SearchId_ReportedPeptideId_Searcher.class);
 	private Get_related_peptides_unique_for_search_For_SearchId_ReportedPeptideId_Searcher() { }
 	private static final Get_related_peptides_unique_for_search_For_SearchId_ReportedPeptideId_Searcher _INSTANCE = new Get_related_peptides_unique_for_search_For_SearchId_ReportedPeptideId_Searcher();
 	public static Get_related_peptides_unique_for_search_For_SearchId_ReportedPeptideId_Searcher getInstance() { return _INSTANCE; }

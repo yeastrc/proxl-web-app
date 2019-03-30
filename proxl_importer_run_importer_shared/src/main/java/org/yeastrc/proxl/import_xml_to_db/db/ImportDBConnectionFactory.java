@@ -6,7 +6,10 @@ import java.util.Map;
 
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.db.IDBConnectionFactory;
 
@@ -17,7 +20,7 @@ import org.yeastrc.xlink.db.IDBConnectionFactory;
  */
 public class ImportDBConnectionFactory implements IDBConnectionFactory {
 
-	private static Logger log = Logger.getLogger(ImportDBConnectionFactory.class);
+	private static final Logger log = LoggerFactory.getLogger( ImportDBConnectionFactory.class);
 	
 	private static final int MAX_TOTAL_OTHER_DB_CONNECTIONS = 2;
 //	private static final int MAX_TOTAL_NRSEQ_DB_CONNECTIONS = 1;

@@ -3,7 +3,7 @@ package org.yeastrc.xlink.www.searcher;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.www.objects.AnnotationMinMaxFilterableValues;
 /**
@@ -14,7 +14,7 @@ public class PsmMinMaxForSearchIdAnnotationTypeIdSearcher {
 
 	private PsmMinMaxForSearchIdAnnotationTypeIdSearcher() { }
 	public static PsmMinMaxForSearchIdAnnotationTypeIdSearcher getInstance() { return new PsmMinMaxForSearchIdAnnotationTypeIdSearcher(); }
-	private static final Logger log = Logger.getLogger(PsmMinMaxForSearchIdAnnotationTypeIdSearcher.class);
+	private static final Logger log = LoggerFactory.getLogger( PsmMinMaxForSearchIdAnnotationTypeIdSearcher.class);
 	
 	private static final String SQL = "SELECT MIN(value_double) AS min, MAX(value_double) AS max "
 			+ " FROM  psm_filterable_annotation__generic_lookup "

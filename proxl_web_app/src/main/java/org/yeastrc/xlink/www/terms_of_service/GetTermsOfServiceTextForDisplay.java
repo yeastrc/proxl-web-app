@@ -1,6 +1,6 @@
 package org.yeastrc.xlink.www.terms_of_service;
 
-//import org.apache.log4j.Logger;
+//import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.www.dao.TermsOfServiceTextVersionsDAO;
 import org.yeastrc.xlink.www.dto.TermsOfServiceTextVersionsDTO;
 
@@ -12,7 +12,7 @@ import org.yeastrc.xlink.www.dto.TermsOfServiceTextVersionsDTO;
  */
 public class GetTermsOfServiceTextForDisplay {
 
-//	private static final Logger log = Logger.getLogger(GetTermsOfServiceTextForDisplay.class);
+//	private static final Logger log = LoggerFactory.getLogger( GetTermsOfServiceTextForDisplay.class);
 	private GetTermsOfServiceTextForDisplay() { }
 	public static GetTermsOfServiceTextForDisplay getInstance() {
 		return new GetTermsOfServiceTextForDisplay(); 

@@ -4,7 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.joda.time.DateTime;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.www.dto.SearchWebLinksDTO;
@@ -15,7 +15,7 @@ import org.yeastrc.xlink.www.dto.SearchWebLinksDTO;
  */
 public class SearchWebLinksDAO {
 	
-	private static final Logger log = Logger.getLogger(SearchWebLinksDAO.class);
+	private static final Logger log = LoggerFactory.getLogger( SearchWebLinksDAO.class);
 	
 	private SearchWebLinksDAO() { }
 	public static SearchWebLinksDAO getInstance() { return new SearchWebLinksDAO(); }
