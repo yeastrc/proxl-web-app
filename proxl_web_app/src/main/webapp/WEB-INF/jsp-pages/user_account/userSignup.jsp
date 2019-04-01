@@ -34,7 +34,10 @@
 --%>
 		
 		<c:if test="${ configSystemValues.googleRecaptchaConfigured }">
+			<script src="https://www.recaptcha.net/recaptcha/api.js" async defer></script>
+			<%--  WAS:  This URL does not work in China
 			<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+			 --%>
 		</c:if>
 </head>
 
