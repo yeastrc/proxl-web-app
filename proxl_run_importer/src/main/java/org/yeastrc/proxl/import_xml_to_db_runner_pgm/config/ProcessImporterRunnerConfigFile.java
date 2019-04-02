@@ -139,18 +139,21 @@ public class ProcessImporterRunnerConfigFile {
 			String importerJarWithPath = configProps.getProperty( PROPERTY_NAME__IMPORTER_JAR_WITH_PATH );
 			String importerDbConfigWithPath = configProps.getProperty( PROPERTY_NAME__IMPORTER_DB_CONFIG_WITH_PATH );
 			
+			//  Do Not set PROPERTY_NAME__PROXL_WEB_APP_BASE_URL to Not send email on import completion 
 			String proxlWebAppBaseURL = configProps.getProperty( PROPERTY_NAME__PROXL_WEB_APP_BASE_URL );
 			
 			String commandToRunOnSuccessfulImport = configProps.getProperty( PROPERTY_NAME__COMMAND_RUN_ON_SUCCESSFUL_IMPORT );
 			String commandToRunOnSuccessfulImportSyoutSyserrDir = configProps.getProperty( PROPERTY_NAME__COMMAND_RUN_ON_SUCCESSFUL_IMPORT_SYSOUT_SYSERR_DIR );
 
 			if ( StringUtils.isNotEmpty( waitTimeForNextCheckForImportToProcess_InSecondsString ) ) {
+				
+				//  Have default so ok if empty
 
 				int waitTimeForNextCheckForImportToProcess_InSeconds = -1;
 				try {
 					waitTimeForNextCheckForImportToProcess_InSeconds = Integer.parseInt( waitTimeForNextCheckForImportToProcess_InSecondsString );
 				} catch (Exception e ) {
-					String msg = "For config file: parameter '" 
+					String msg = "ERROR:  For config file: parameter '" 
 							+ PROPERTY_NAME__WAIT_TIME_FOR_NEXT_CHECK_FOR_IMPORT_TO_PROCESS 
 							+ "' is provided but is not an integer.  Value in config file: "
 							+ waitTimeForNextCheckForImportToProcess_InSecondsString;
@@ -169,12 +172,30 @@ public class ProcessImporterRunnerConfigFile {
 
 			if ( StringUtils.isEmpty( proxlWebAppBaseURL ) ) {
 
-				String msg = "For config file: parameter '" + PROPERTY_NAME__PROXL_WEB_APP_BASE_URL + "' is not provided or is empty string.";
+				//  Do Not set PROPERTY_NAME__PROXL_WEB_APP_BASE_URL to Not send email on import completion 
+
+				String msg = "INFO::  For config file: parameter '" + PROPERTY_NAME__PROXL_WEB_APP_BASE_URL 
+						+ "' is not provided or is empty string.  Not calling server to send email on import completion.";
 				log.warn( msg );
+			} else {
+
+				String msg = "INFO::  Config file: parameter '" + PROPERTY_NAME__PROXL_WEB_APP_BASE_URL 
+						+ "' is provided so calling server to send email on import completion.";
+				log.warn( msg );
+			}
+
+			if ( StringUtils.isEmpty( importerJarWithPath ) ) {
+
+				String msg = "  ERROR:  For config file: parameter '" + PROPERTY_NAME__IMPORTER_JAR_WITH_PATH + "' is not provided or is empty string.";
+				log.error( msg );
+				throw new ConfigPropertiesFileErrorException(msg);
 			}
 
 
 			if ( StringUtils.isNotEmpty( javaExecutableWithPath ) ) {
+
+				// Have default of "java" so ok if empty
+				
 				ImporterRunnerConfigData.setJavaExecutableWithPath( javaExecutableWithPath );
 			}
 			
@@ -194,6 +215,9 @@ public class ProcessImporterRunnerConfigFile {
 			ImporterRunnerConfigData.setImporterJarWithPath( importerJarWithPath );
 			
 			if ( StringUtils.isNotEmpty( importerDbConfigWithPath ) ) {
+				
+				//  If not set, assumes that the importer jar has the DB config data file in it's jar 
+				
 				ImporterRunnerConfigData.setImporterDbConfigWithPath( importerDbConfigWithPath );
 			}
 			
@@ -201,9 +225,17 @@ public class ProcessImporterRunnerConfigFile {
 
 			if ( StringUtils.isNotEmpty( commandToRunOnSuccessfulImport ) ) {
 				ImporterRunnerConfigData.setCommandToRunOnSuccessfulImport( commandToRunOnSuccessfulImport );
+
+				String msg = "INFO::  Config file: parameter '" + PROPERTY_NAME__COMMAND_RUN_ON_SUCCESSFUL_IMPORT 
+						+ "' is provided so calling that program on Successful import.  value:  " + commandToRunOnSuccessfulImport;
+				log.warn( msg );
 			}
 			if ( StringUtils.isNotEmpty( commandToRunOnSuccessfulImportSyoutSyserrDir ) ) {
 				ImporterRunnerConfigData.setCommandToRunOnSuccessfulImportSyoutSyserrDir( commandToRunOnSuccessfulImportSyoutSyserrDir );
+
+				String msg = "INFO::  Config file: parameter '" + PROPERTY_NAME__COMMAND_RUN_ON_SUCCESSFUL_IMPORT_SYSOUT_SYSERR_DIR 
+						+ "' is provided so calling that program on Successful import.  value:  " + commandToRunOnSuccessfulImportSyoutSyserrDir;
+				log.warn( msg );
 			}
 			
 			
