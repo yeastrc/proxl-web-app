@@ -1,6 +1,5 @@
 package org.yeastrc.xlink.linker_data_processing_base;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -21,18 +20,6 @@ class Linkers_Main_ForSingleSearch implements ILinkers_Main_ForSingleSearch {
 			throw new IllegalArgumentException( "Constructor: Invalid param: linker_MainList is null or empty" );
 		}
 		this.linker_MainList = linker_MainList;
-		
-		linkerAbbreviations = new ArrayList<>( linker_MainList.size() );
-		StringBuilder linkerAbbreviationsCommaDelimSB = new StringBuilder( 1000 );
-		for ( ILinker_Main linker_Main : linker_MainList ) {
-			String linkerAbbr = linker_Main.getLinkerAbbreviation();
-			linkerAbbreviations.add( linkerAbbr );
-			if ( linkerAbbreviationsCommaDelimSB.length() != 0 ) {
-				linkerAbbreviationsCommaDelimSB.append( "," );
-			}
-			linkerAbbreviationsCommaDelimSB.append( linkerAbbr );
-		}
-		linkerAbbreviationsCommaDelim = linkerAbbreviationsCommaDelimSB.toString();
 	}
 
 	/**

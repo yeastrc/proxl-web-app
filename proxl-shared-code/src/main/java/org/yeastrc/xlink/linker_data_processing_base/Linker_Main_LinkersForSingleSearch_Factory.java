@@ -40,6 +40,21 @@ public class Linker_Main_LinkersForSingleSearch_Factory {
 				
 		linkers_Main_ForSingleSearch.setAllLinkersHave_LinkablePositions( allLinkersHave_LinkablePositions );
 		
+		List<String> linkerAbbreviations = new ArrayList<>( linker_MainList.size() );
+		StringBuilder linkerAbbreviationsCommaDelimSB = new StringBuilder( 1000 );
+		for ( ILinker_Main linker_Main : linker_MainList ) {
+			String linkerAbbr = linker_Main.getLinkerAbbreviation();
+			linkerAbbreviations.add( linkerAbbr );
+			if ( linkerAbbreviationsCommaDelimSB.length() != 0 ) {
+				linkerAbbreviationsCommaDelimSB.append( "," );
+			}
+			linkerAbbreviationsCommaDelimSB.append( linkerAbbr );
+		}
+		String linkerAbbreviationsCommaDelim = linkerAbbreviationsCommaDelimSB.toString();
+		
+		linkers_Main_ForSingleSearch.setLinkerAbbreviations( linkerAbbreviations );
+		linkers_Main_ForSingleSearch.setLinkerAbbreviationsCommaDelim( linkerAbbreviationsCommaDelim );
+		
 		return linkers_Main_ForSingleSearch;
 	}
 }
