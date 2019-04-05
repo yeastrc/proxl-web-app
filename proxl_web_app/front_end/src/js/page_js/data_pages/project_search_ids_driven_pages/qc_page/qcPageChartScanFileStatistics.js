@@ -20,6 +20,8 @@
 //JavaScript directive:   all variables have to be declared with "var", maybe other things
 "use strict";
 
+import { webserviceCallStandardPost } from 'page_js/webservice_call_common/webserviceCallStandardPost.js';
+
 import { qc_pages_Single_Merged_Common } from './qc_pages_Single_Merged_Common.js';
 
 import { qcChartDownloadHelp } from './qcChart_Download_Help_HTMLBlock.js';
@@ -435,49 +437,39 @@ var QCPageChartScanFileStatistics = function() {
 
 		this.clearScanOverallStastics();
 
-		var _URL = "services/qc/dataPage/getScanOverallStatistics";
 		var requestData = {
-				project_search_id : _project_search_ids,
-				scan_file_id : scanFileId
+			projectSearchIds : _project_search_ids,
+			scanFileId : scanFileId
 		};
 		if ( _activeAjax ) {
 			_activeAjax.abort();
 			_activeAjax = null;
 		}
 
-		_activeAjax =
-			$.ajax({
-				type : "GET",
-				url : _URL,
-				data : requestData,
-				dataType : "json",
-				traditional: true,  //  Force traditional serialization of the data sent
-				//   One thing this means is that arrays are sent as the object property instead of object property followed by "[]".
-				//   So _project_search_ids array is passed as "project_search_id=<value>" which is what Jersey expects
-				success : function(data) {
-					try {
-						_activeAjax = null;
-						objectThis.loadScanOverallStatisticsProcessResponse(requestData, data, params );
-					} catch( e ) {
-						reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
-						throw e;
-					}
-				},
-				failure: function(errMsg) {
-					_activeAjax = null;
-					handleAJAXFailure( errMsg );
-				},
-				error : function(jqXHR, textStatus, errorThrown) {
-					_activeAjax = null;
-					handleAJAXError(jqXHR, textStatus, errorThrown);
-				}
-			});
+		const url = "services/qc/dataPage/getScanOverallStatistics";
+
+		const webserviceCallStandardPostResult = webserviceCallStandardPost({ dataToSend : requestData, url }); //  External Function
+
+		const promise_webserviceCallStandardPost = webserviceCallStandardPostResult.promise; 
+		_activeAjax = webserviceCallStandardPostResult.api;
+
+		promise_webserviceCallStandardPost.catch( ( ) => { _activeAjax = null; } );
+
+		promise_webserviceCallStandardPost.then( ({ responseData }) => {
+			try {
+				_activeAjax = null;
+				objectThis.loadScanOverallStatisticsProcessResponse( responseData, params );
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
+		});
 	};
 
 	/**
 	 * Load the data for  Scan Overall Statistics Process AJAX response
 	 */
-	this.loadScanOverallStatisticsProcessResponse = function( requestData, responseData, originalParams ) {
+	this.loadScanOverallStatisticsProcessResponse = function( responseData, originalParams ) {
 		var scanFileId = originalParams.scanFileId;
 
 		_scanOverallStatistics = responseData;
@@ -550,53 +542,39 @@ var QCPageChartScanFileStatistics = function() {
 		var objectThis = this;
 		var scanFileId = params.scanFileId;
 
-		var hash_json_field_Contents_JSONString = JSON.stringify( _get_hash_json_Contents() );
-
-		var _URL = "services/qc/dataPage/ms2Counts";
-		var requestData = {
-				project_search_id : _project_search_ids, //  Only supported if length === 1
-				scan_file_id : scanFileId,
-				filterCriteria : hash_json_field_Contents_JSONString
-		};
-
 		if ( _MS2CountsActiveAjax ) {
 			_MS2CountsActiveAjax.abort();
 			_MS2CountsActiveAjax = null;
 		}
-		_MS2CountsActiveAjax =
-			$.ajax({
-				type : "GET",
-				url : _URL,
-				data : requestData,
-				dataType : "json",
-				traditional: true,  //  Force traditional serialization of the data sent
-				//   One thing this means is that arrays are sent as the object property instead of object property followed by "[]".
-				//   So _project_search_ids array is passed as "project_search_id=<value>" which is what Jersey expects
-				success : function(data) {
-					try {
-						_MS2CountsActiveAjax = null;
-						objectThis.loadScanOverallStatisticsMS2CountsProcessResponse(requestData, data);
-					} catch( e ) {
-						reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
-						throw e;
-					}
-				},
-				failure: function(errMsg) {
-					_MS2CountsActiveAjax = null;
-					handleAJAXFailure( errMsg );
-				},
-				error : function(jqXHR, textStatus, errorThrown) {
-					_MS2CountsActiveAjax = null;
-					handleAJAXError(jqXHR, textStatus, errorThrown);
-				}
-			});
 
+		const hash_json_Contents = _get_hash_json_Contents();
+
+		const ajaxRequestData = { projectSearchIds : _project_search_ids, qcPageQueryJSONRoot : hash_json_Contents, scanFileId };
+
+		const url = "services/qc/dataPage/ms2Counts";
+
+		const webserviceCallStandardPostResult = webserviceCallStandardPost({ dataToSend : ajaxRequestData, url }); //  External Function
+
+		const promise_webserviceCallStandardPost = webserviceCallStandardPostResult.promise; 
+		_MS2CountsActiveAjax = webserviceCallStandardPostResult.api;
+
+		promise_webserviceCallStandardPost.catch( ( ) => { _MS2CountsActiveAjax = null } );
+
+		promise_webserviceCallStandardPost.then( ({ responseData }) => {
+			try {
+				_MS2CountsActiveAjax = null;
+				objectThis.loadScanOverallStatisticsMS2CountsProcessResponse( responseData );
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
+		});
 	};
 
 	/**
 	 * Load the data for  Scan Overall Statistics MS Counts Process AJAX response
 	 */
-	this.loadScanOverallStatisticsMS2CountsProcessResponse = function( requestData, responseData ) {
+	this.loadScanOverallStatisticsMS2CountsProcessResponse = function( responseData ) {
 
 		var crosslinkCount = responseData.crosslinkCount;
 		var looplinkCount = responseData.looplinkCount;
@@ -748,48 +726,37 @@ var QCPageChartScanFileStatistics = function() {
 		} );
 
 		var ajaxRequestData = {
-				project_search_id : _project_search_ids,
-				scan_file_id : scanFileId
+			projectSearchIds : _project_search_ids,
+			scanFileId : scanFileId
 		};
 
 		if ( _load_MS_1_IonCurrent_HistogramsActiveAjax ) {
 			_load_MS_1_IonCurrent_HistogramsActiveAjax.abort();
 			_load_MS_1_IonCurrent_HistogramsActiveAjax = null;
 		}
-		//  Set to returned jQuery XMLHttpRequest (jqXHR) object
-		_load_MS_1_IonCurrent_HistogramsActiveAjax =
-			$.ajax({
-				url : "services/qc/dataPage/getScan_MS_1_IonCurrent_Histograms",
-				traditional: true,  //  Force traditional serialization of the data sent
-				//   One thing this means is that arrays are sent as the object property instead of object property followed by "[]".
-				//   So project_search_ids array is passed as "project_search_ids=<value>" which is what Jersey expects
-				data : ajaxRequestData,  // The data sent as params on the URL
-				dataType : "json",
-				success : function( ajaxResponseData ) {
-					try {
-						_load_MS_1_IonCurrent_HistogramsActiveAjax = null;
-						var responseParams = {
-								ajaxResponseData : ajaxResponseData, 
-								ajaxRequestData : ajaxRequestData,
-								scanFileId : scanFileId
-						};
-						objectThis.load_MS_1_IonCurrent_HistogramsResponse( responseParams );
-					} catch( e ) {
-						reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
-						throw e;
-					}
-				},
-				failure: function(errMsg) {
-					_load_MS_1_IonCurrent_HistogramsActiveAjax = null;
-					handleAJAXFailure( errMsg );
-				},
-				error : function(jqXHR, textStatus, errorThrown) {
-					_load_MS_1_IonCurrent_HistogramsActiveAjax = null;
-					if ( objectThis._passAJAXErrorTo_handleAJAXError(jqXHR, textStatus, errorThrown) ) {
-						handleAJAXError(jqXHR, textStatus, errorThrown);
-					}
-				}
-			});
+
+		const url = "services/qc/dataPage/getScan_MS_1_IonCurrent_Histograms";
+
+		const webserviceCallStandardPostResult = webserviceCallStandardPost({ dataToSend : ajaxRequestData, url }); //  External Function
+
+		const promise_webserviceCallStandardPost = webserviceCallStandardPostResult.promise; 
+		_load_MS_1_IonCurrent_HistogramsActiveAjax = webserviceCallStandardPostResult.api;
+
+		promise_webserviceCallStandardPost.catch( ( ) => { _load_MS_1_IonCurrent_HistogramsActiveAjax = null; } );
+
+		promise_webserviceCallStandardPost.then( ({ responseData }) => {
+			try {
+				_load_MS_1_IonCurrent_HistogramsActiveAjax = null;
+				var responseParams = {
+					ajaxResponseData : responseData, 
+					scanFileId : scanFileId
+				};
+				objectThis.load_MS_1_IonCurrent_HistogramsResponse( responseParams );
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
+		});
 	};
 
 	/**
@@ -797,7 +764,6 @@ var QCPageChartScanFileStatistics = function() {
 	 */
 	this.load_MS_1_IonCurrent_HistogramsResponse = function( params ) {
 		var ajaxResponseData = params.ajaxResponseData;
-		var ajaxRequestData = params.ajaxRequestData;
 		var scanFileId = params.scanFileId;
 
 //		var scan_MS_1_IonCurrent_HistogramsResult = ajaxResponseData.scan_MS_1_IonCurrent_HistogramsResult;
@@ -842,26 +808,9 @@ var QCPageChartScanFileStatistics = function() {
 			return;  //  EARLY EXIT
 		}
 
-		
-
-		var urlQueryParamsArray = [];
-		
 		if ( _project_search_ids.length !== 1 ) {
 			throw Error( "project_search_ids length must be 1.  Download code server side only supports 1 project_search_id" );
 		}
-		
-		urlQueryParamsArray.push( "project_search_id=" + _project_search_ids[ 0 ] );
-
-//		project_search_ids.forEach(function( projectSearchId, i, array) {
-//			urlQueryParamsArray.push( "project_search_id=" + projectSearchId );
-//		}, this );
-		
-		urlQueryParamsArray.push( "scan_file_id=" + scanFileId );
-
-		var urlQueryParams = urlQueryParamsArray.join( "&" );
-
-		var downloadURL_MS1_VS_RetentionTime = _download_MS1_VS_RetentionTime_StrutsAction + "?" + urlQueryParams;
-		var downloadURL_MS1_VS_M_Over_Z = _download_MS1_VS_M_Over_Z_StrutsAction + "?" + urlQueryParams;
 		
 		var retentionTimeTooltip = ""; 
 
@@ -869,7 +818,8 @@ var QCPageChartScanFileStatistics = function() {
 		var download_MS1_VS_RetentionTime_DataCallback = function( params ) {
 //			var clickedThis = params.clickedThis;
 			//  Download the data for params
-			qc_pages_Single_Merged_Common.submitDownloadURL( { downloadURL : downloadURL_MS1_VS_RetentionTime } );
+			const dataToSend = { projectSearchId : _project_search_ids[ 0 ], scanFileId : scanFileId };
+			qc_pages_Single_Merged_Common.submitDownloadForParams( { downloadStrutsAction : _download_MS1_VS_RetentionTime_StrutsAction, dataToSend } );
 		};
 
 		var retentionTimeParams = { 
@@ -890,7 +840,8 @@ var QCPageChartScanFileStatistics = function() {
 		var download_MS1_VS_M_Over_Z_DataCallback = function( params ) {
 //			var clickedThis = params.clickedThis;
 			//  Download the data for params
-			qc_pages_Single_Merged_Common.submitDownloadURL( { downloadURL : downloadURL_MS1_VS_M_Over_Z } );
+			const dataToSend = { projectSearchId : _project_search_ids[ 0 ], scanFileId : scanFileId };
+			qc_pages_Single_Merged_Common.submitDownloadForParams( { downloadStrutsAction : _download_MS1_VS_M_Over_Z_StrutsAction, dataToSend } );
 		};
 		
 		var mOverZ_Params = { 
@@ -1168,48 +1119,37 @@ var QCPageChartScanFileStatistics = function() {
 		$MS_1_IonCurrent_Heatmap_No_Data.hide();
 
 		var ajaxRequestData = {
-				project_search_id : _project_search_ids,
-				scan_file_id : scanFileId
+			projectSearchIds : _project_search_ids,
+			scanFileId : scanFileId
 		};
 
 		if ( _load_MS_1_IonCurrent_HeatmapActiveAjax ) {
 			_load_MS_1_IonCurrent_HeatmapActiveAjax.abort();
 			_load_MS_1_IonCurrent_HeatmapActiveAjax = null;
 		}
-		//  Set to returned jQuery XMLHttpRequest (jqXHR) object
-		_load_MS_1_IonCurrent_HeatmapActiveAjax =
-			$.ajax({
-				url : "services/qc/dataPage/getScan_MS_1_IonCurrent_HeatmapHasData",
-				traditional: true,  //  Force traditional serialization of the data sent
-				//   One thing this means is that arrays are sent as the object property instead of object property followed by "[]".
-				//   So project_search_ids array is passed as "project_search_ids=<value>" which is what Jersey expects
-				data : ajaxRequestData,  // The data sent as params on the URL
-				dataType : "json",
-				success : function( ajaxResponseData ) {
-					try {
-						_load_MS_1_IonCurrent_HeatmapActiveAjax = null;
-						var responseParams = {
-								ajaxResponseData : ajaxResponseData, 
-								ajaxRequestData : ajaxRequestData,
-								scanFileId : scanFileId
-						};
-						objectThis.load_MS_1_IonCurrent_HeatmapResponse( responseParams );
-					} catch( e ) {
-						reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
-						throw e;
-					}
-				},
-				failure: function(errMsg) {
-					_load_MS_1_IonCurrent_HeatmapActiveAjax = null;
-					handleAJAXFailure( errMsg );
-				},
-				error : function(jqXHR, textStatus, errorThrown) {
-					_load_MS_1_IonCurrent_HeatmapActiveAjax = null;
-					if ( objectThis._passAJAXErrorTo_handleAJAXError(jqXHR, textStatus, errorThrown) ) {
-						handleAJAXError(jqXHR, textStatus, errorThrown);
-					}
-				}
-			});
+
+		const url = "services/qc/dataPage/getScan_MS_1_IonCurrent_HeatmapHasData";
+
+		const webserviceCallStandardPostResult = webserviceCallStandardPost({ dataToSend : ajaxRequestData, url }); //  External Function
+
+		const promise_webserviceCallStandardPost = webserviceCallStandardPostResult.promise; 
+		_load_MS_1_IonCurrent_HeatmapActiveAjax = webserviceCallStandardPostResult.api;
+
+		promise_webserviceCallStandardPost.catch( ( ) => { _load_MS_1_IonCurrent_HeatmapActiveAjax = null; } );
+
+		promise_webserviceCallStandardPost.then( ({ responseData }) => {
+			try {
+				_load_MS_1_IonCurrent_HeatmapActiveAjax = null;
+				var responseParams = {
+					ajaxResponseData : responseData, 
+					scanFileId : scanFileId
+				};
+				objectThis.load_MS_1_IonCurrent_HeatmapResponse( responseParams );
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
+		});
 	};
 
 	/**
@@ -1219,7 +1159,6 @@ var QCPageChartScanFileStatistics = function() {
 		var objectThis = this;
 
 		var ajaxResponseData = params.ajaxResponseData;
-		var ajaxRequestData = params.ajaxRequestData;
 		var scanFileId = params.scanFileId;
 
 		var hasData = ajaxResponseData.hasData;
@@ -1327,26 +1266,30 @@ var QCPageChartScanFileStatistics = function() {
 	 */
 	this.downloadMS1_Heatmap_Data = function() {
 	
-		var urlQueryParamsArray = [];
+		// var urlQueryParamsArray = [];
 		
 		if ( _project_search_ids.length !== 1 ) {
 			throw Error( "project_search_ids length must be 1.  Download code server side only supports 1 project_search_id" );
 		}
 		
-		urlQueryParamsArray.push( "project_search_id=" + _project_search_ids[ 0 ] );
+		// urlQueryParamsArray.push( "project_search_id=" + _project_search_ids[ 0 ] );
 
 //		project_search_ids.forEach(function( projectSearchId, i, array) {
 //			urlQueryParamsArray.push( "project_search_id=" + projectSearchId );
 //		}, this );
 		
-		urlQueryParamsArray.push( "scan_file_id=" + _currentScanFileId );
+		// urlQueryParamsArray.push( "scan_file_id=" + _currentScanFileId );
 
-		var urlQueryParams = urlQueryParamsArray.join( "&" );
+		// var urlQueryParams = urlQueryParamsArray.join( "&" );
 
-		var downloadURL = _download_MS1_VS_RetentionTime_VS_M_Over_Z_StrutsAction + "?" + urlQueryParams;
+		// var downloadURL = _download_MS1_VS_RetentionTime_VS_M_Over_Z_StrutsAction + "?" + urlQueryParams;
 
-		qc_pages_Single_Merged_Common.submitDownloadURL( { downloadURL : downloadURL } );
-
+		// qc_pages_Single_Merged_Common.submitDownloadURL( { downloadURL : downloadURL } );
+		
+		const dataToSend = { projectSearchId : _project_search_ids[ 0 ], scanFileId : _currentScanFileId };
+		qc_pages_Single_Merged_Common.submitDownloadForParams( { downloadStrutsAction : _download_MS1_VS_RetentionTime_VS_M_Over_Z_StrutsAction, dataToSend } );
+		
+		
 	};
 
 };

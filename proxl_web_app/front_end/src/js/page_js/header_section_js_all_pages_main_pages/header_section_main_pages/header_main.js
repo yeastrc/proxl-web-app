@@ -19,7 +19,7 @@
 
 //  Import of header_section_every_page_root.js
 
-import { header_section_every_page_rootVariable } from 'page_js/common_all_pages/header_section_every_page/header_section_every_page_root.js';
+import { header_section_every_page_rootVariable } from 'page_js/header_section_js_all_pages_main_pages/header_section_every_page/header_section_every_page_root.js';
 
 
 //  Imports for this folder

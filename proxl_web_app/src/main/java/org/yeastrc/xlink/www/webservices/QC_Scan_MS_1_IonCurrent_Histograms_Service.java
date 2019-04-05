@@ -8,10 +8,10 @@ import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.GET;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
@@ -27,22 +27,63 @@ import org.yeastrc.xlink.www.searcher.SearchIdScanFileIdCombinedRecordExistsSear
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
+import org.yeastrc.xlink.www.web_utils.UnmarshalJSON_ToObject;
 
 @Path("/qc/dataPage")
 public class QC_Scan_MS_1_IonCurrent_Histograms_Service {
 	
 	private static final Logger log = LoggerFactory.getLogger( QC_Scan_MS_1_IonCurrent_Histograms_Service.class);
+
+	/**
+	 * Input to function getMS_1_IonCurrent_Histograms(..)
+	 */
+	public static class WebserviceRequest {
+		private List<Integer> projectSearchIds;
+		private Integer scanFileId;
+		public void setProjectSearchIds(List<Integer> projectSearchIds) {
+			this.projectSearchIds = projectSearchIds;
+		}
+		public void setScanFileId(Integer scanFileId) {
+			this.scanFileId = scanFileId;
+		}
+	}
 	
-	@GET
+	@POST
+	@Consumes( MediaType.APPLICATION_JSON )
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/getScan_MS_1_IonCurrent_Histograms") 
 	public byte[] getMS_1_IonCurrent_Histograms( 
-			@QueryParam( "project_search_id" ) List<Integer> projectSearchIdList,
-			@QueryParam( "scan_file_id" ) Integer scanFileId,
+			byte[] requestJSONBytes,
 			@Context HttpServletRequest request,
 			@Context HttpServletResponse response )
 	throws Exception {
 
+		if ( requestJSONBytes == null || requestJSONBytes.length == 0 ) {
+			String msg = "requestJSONBytes is null or requestJSONBytes is empty";
+			log.warn( msg );
+		    throw new WebApplicationException(
+		    	      Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+//		    	        .entity(  )
+		    	        .build()
+		    	        );
+		}
+		WebserviceRequest webserviceRequest = null;
+		try {
+			webserviceRequest =
+					UnmarshalJSON_ToObject.getInstance().getObjectFromJSONByteArray( requestJSONBytes, WebserviceRequest.class );
+		} catch ( Exception e ) {
+			String msg = "parse request failed";
+			log.warn( msg );
+		    throw new WebApplicationException(
+		    	      Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+//		    	        .entity(  )
+		    	        .build()
+		    	        );
+		}
+		
+		List<Integer> projectSearchIdList = webserviceRequest.projectSearchIds;
+		Integer scanFileId = webserviceRequest.scanFileId;
+		
 		if ( projectSearchIdList == null || projectSearchIdList.isEmpty() ) {
 			String msg = "Provided project_search_id is null or project_search_id is missing";
 			log.warn( msg );
@@ -162,7 +203,7 @@ public class QC_Scan_MS_1_IonCurrent_Histograms_Service {
 
 			byte[] resultsAsBytes = 
 					Scan_MS_1_IonCurrent_Histograms.getInstance()
-					.getScan_MS_1_IonCurrent_HistogramsResult( scanFileId, requestQueryString );
+					.getScan_MS_1_IonCurrent_HistogramsResult( scanFileId, requestJSONBytes );
 		
 			
 			return resultsAsBytes;

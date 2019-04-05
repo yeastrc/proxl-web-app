@@ -3,8 +3,9 @@ package org.yeastrc.xlink.www.searcher;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.www.objects.ProteinSequenceVersionIdProteinAnnotationName;
@@ -20,7 +21,7 @@ public class ProteinSequenceVersionIdAnnotationNameSearcher {
 	public static ProteinSequenceVersionIdAnnotationNameSearcher getInstance() { return _INSTANCE; }
 	
 	private static final String SQL = 
-			"SELECT DISTINCT annotation.name, spsva.protein_sequence_version_id " 
+			"SELECT annotation.name, spsva.protein_sequence_version_id " //  Removed DISTINCT after Select since return Set 
 			+ " FROM search__protein_sequence_version__annotation AS spsva "
 			+ " INNER JOIN annotation on spsva.annotation_id = annotation.id "
 			+ " WHERE spsva.search_id = ? ";
@@ -29,8 +30,8 @@ public class ProteinSequenceVersionIdAnnotationNameSearcher {
 	 * @return
 	 * @throws Exception
 	 */
-	public List<ProteinSequenceVersionIdProteinAnnotationName> getProteinSequenceVersionIdAnnotationNameForSearch( int searchId ) throws Exception {
-		List<ProteinSequenceVersionIdProteinAnnotationName> results = new ArrayList<>();
+	public Set<ProteinSequenceVersionIdProteinAnnotationName> getProteinSequenceVersionIdAnnotationNameForSearch( int searchId ) throws Exception {
+		Set<ProteinSequenceVersionIdProteinAnnotationName> results = new HashSet<>();
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;

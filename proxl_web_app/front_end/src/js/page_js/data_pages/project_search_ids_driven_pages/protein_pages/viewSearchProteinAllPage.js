@@ -10,7 +10,7 @@
 "use strict";
 
 //Import header_main.js and children to ensure on the page
-import { header_mainVariable } from 'page_js/common_all_pages/header_section_main_pages/header_main.js';
+import { header_mainVariable } from 'page_js/header_section_js_all_pages_main_pages/header_section_main_pages/header_main.js';
 
 
 //  Import to make available on the page

@@ -22,16 +22,20 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.yeastrc.xlink.www.dao.SearchDAO;
 import org.yeastrc.xlink.www.dto.SearchDTO;
+import org.yeastrc.xlink.www.form_query_json_objects.QCPageQueryJSONRoot;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
+import org.yeastrc.xlink.www.qc_data.a_enums.ForDownload_Enum;
+import org.yeastrc.xlink.www.qc_data.a_request_json_root.QCPageRequestJSONRoot;
 import org.yeastrc.xlink.www.qc_data.digestion_statistics_merged.main.QC_MissingCleavageReportedPeptidesCount_Merged;
 import org.yeastrc.xlink.www.qc_data.digestion_statistics_merged.objects.QC_MissingCleavageReportedPeptidesCount_Merged_Results;
 import org.yeastrc.xlink.www.qc_data.digestion_statistics_merged.objects.QC_MissingCleavageReportedPeptidesCount_Merged_Results.QC_MissingCleavageReportedPeptidesCountResultsPerLinkType_Merged;
 import org.yeastrc.xlink.www.qc_data.digestion_statistics_merged.objects.QC_MissingCleavageReportedPeptidesCount_Merged_Results.QC_MissingCleavageReportedPeptidesCountResults_PerSearchId_Merged;
+import org.yeastrc.xlink.www.qc_data.utils.QC_DeserializeRequestJSON_To_QCPageRequestJSONRoot;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
 import org.yeastrc.xlink.www.constants.ServletOutputStreamCharacterSetConstant;
 import org.yeastrc.xlink.www.constants.StrutsGlobalForwardNames;
 import org.yeastrc.xlink.www.constants.WebConstants;
-import org.yeastrc.xlink.www.forms.MergedSearchViewPeptidesForm;
+import org.yeastrc.xlink.www.forms.SingleRequestJSONStringFieldForm;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
 
@@ -53,23 +57,41 @@ public class DownloadQC_Digestion_PsmMissedCleavageChartDataAction extends Actio
 					  throws Exception {
 		try {
 			// our form
-			MergedSearchViewPeptidesForm form = (MergedSearchViewPeptidesForm)actionForm;
+			SingleRequestJSONStringFieldForm form = (SingleRequestJSONStringFieldForm)actionForm;
+			
+			//  Form Parameter Name.  JSON encoded data
+			String requestJSONString = form.getRequestJSONString();
+
+			QCPageRequestJSONRoot qcPageRequestJSONRoot = null;
+			try {
+				qcPageRequestJSONRoot =
+						QC_DeserializeRequestJSON_To_QCPageRequestJSONRoot.getInstance().deserializeRequestJSON_To_QCPageRequestJSONRoot( requestJSONString );
+			} catch ( Exception e ) {
+				String msg = "parse request failed";
+				log.warn( msg );
+				return mapping.findForward( StrutsGlobalForwardNames.INVALID_REQUEST_DATA );
+			}
+			
+			List<Integer> projectSearchIdList = qcPageRequestJSONRoot.getProjectSearchIds();
+			QCPageQueryJSONRoot qcPageQueryJSONRoot = qcPageRequestJSONRoot.getQcPageQueryJSONRoot();
+			
 			// Get the session first.  
 //			HttpSession session = request.getSession();
-			int[] projectSearchIds = form.getProjectSearchId();
-			if ( projectSearchIds.length == 0 ) {
+			if ( projectSearchIdList == null || projectSearchIdList.isEmpty() ) {
+				String msg = "No projectSearchIdList or is empty";
+				log.warn( msg );
 				return mapping.findForward( StrutsGlobalForwardNames.INVALID_REQUEST_DATA );
 			}
 			//   Get the project id for these searches
 			Set<Integer> projectSearchIdsSet = new HashSet<Integer>( );
-			for ( int searchId : projectSearchIds ) {
+			for ( int searchId : projectSearchIdList ) {
 				projectSearchIdsSet.add( searchId );
 			}
 			List<Integer> projectIdsFromSearchIds = ProjectIdsForProjectSearchIdsSearcher.getInstance().getProjectIdsForProjectSearchIds( projectSearchIdsSet );
 			if ( projectIdsFromSearchIds.isEmpty() ) {
 				// should never happen
 				String msg = "No project ids for search ids: ";
-				for ( int searchId : projectSearchIds ) {
+				for ( int searchId : projectSearchIdList ) {
 					msg += searchId + ", ";
 				}
 				log.error( msg );
@@ -99,13 +121,13 @@ public class DownloadQC_Digestion_PsmMissedCleavageChartDataAction extends Actio
 			///    Done Processing Auth Check and Auth Level
 			//////////////////////////////
 			
-			List<SearchDTO> searches = new ArrayList<SearchDTO>( projectSearchIds.length );
+			List<SearchDTO> searches = new ArrayList<SearchDTO>( projectSearchIdList.size() );
 			Map<Integer, SearchDTO> searchesMapOnSearchId = new HashMap<>();
-			List<Integer> searchIds = new ArrayList<>( projectSearchIds.length );
+			List<Integer> searchIds = new ArrayList<>( projectSearchIdList.size() );
 			
 			Set<Integer> projectSearchIdsAlreadyProcessed = new HashSet<>();
 			
-			for( int projectSearchId : projectSearchIds ) {
+			for( int projectSearchId : projectSearchIdList ) {
 				if ( projectSearchIdsAlreadyProcessed.contains( projectSearchId ) ) {
 					// ALready processed this projectSearchId, this must be a duplicate
 					continue; //  EARLY CONTINUE
@@ -128,11 +150,15 @@ public class DownloadQC_Digestion_PsmMissedCleavageChartDataAction extends Actio
 			
 			OutputStreamWriter writer = null;
 			try {
-
 				////////     Get Download Data
-				QC_MissingCleavageReportedPeptidesCount_Merged_Results qc_MissingCleavageReportedPeptidesCount_Merged_Results =
+				QC_MissingCleavageReportedPeptidesCount_Merged_Results qc_MissingCleavageReportedPeptidesCount_Merged_Results = 
 						QC_MissingCleavageReportedPeptidesCount_Merged.getInstance()
-						.getQC_MissingCleavageReportedPeptidesCount_Merged( form.getQueryJSON(), searches );
+						.getQC_MissingCleavageReportedPeptidesCount_Merged(
+								null /* requestJSONBytes */,
+								requestJSONString,
+								ForDownload_Enum.YES,
+								qcPageQueryJSONRoot,
+								searches );
 				
 				List<QC_MissingCleavageReportedPeptidesCountResultsPerLinkType_Merged> psmCountPerLinkTypeList =
 						qc_MissingCleavageReportedPeptidesCount_Merged_Results.getPsmCountPerLinkTypeList();
@@ -171,7 +197,10 @@ public class DownloadQC_Digestion_PsmMissedCleavageChartDataAction extends Actio
 						QC_MissingCleavageReportedPeptidesCountResults_PerSearchId_Merged countPerSearchId = 
 								countPerSearchIdMap_KeyProjectSearchId.get( projectSearchId );
 						if ( countPerSearchId != null ) {
-							double fraction = countPerSearchId.getCount() / (double) countPerSearchId.getTotalCount();
+							double fraction = 0;
+							if ( countPerSearchId.getTotalCount() != 0 ) {
+								fraction = countPerSearchId.getCount() / (double) countPerSearchId.getTotalCount();
+							}
 							writer.write( Double.toString( fraction ) );
 							writer.write( "\t" );
 							writer.write( Long.toString( countPerSearchId.getCount() ) );

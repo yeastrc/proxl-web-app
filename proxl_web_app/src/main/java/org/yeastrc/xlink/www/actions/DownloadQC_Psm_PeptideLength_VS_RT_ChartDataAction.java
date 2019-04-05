@@ -13,6 +13,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -22,14 +23,18 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.yeastrc.xlink.www.dao.SearchDAO;
 import org.yeastrc.xlink.www.dto.SearchDTO;
+import org.yeastrc.xlink.www.form_query_json_objects.QCPageQueryJSONRoot;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
+import org.yeastrc.xlink.www.qc_data.a_enums.ForDownload_Enum;
+import org.yeastrc.xlink.www.qc_data.a_request_json_root.QCPageRequestJSONRoot;
 import org.yeastrc.xlink.www.qc_data.psm_level_data.main.PeptideLength_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs;
 import org.yeastrc.xlink.www.qc_data.psm_level_data.main.PeptideLength_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs.PeptideLength_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_Method_Response;
+import org.yeastrc.xlink.www.qc_data.utils.QC_DeserializeRequestJSON_To_QCPageRequestJSONRoot;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
 import org.yeastrc.xlink.www.constants.ServletOutputStreamCharacterSetConstant;
 import org.yeastrc.xlink.www.constants.StrutsGlobalForwardNames;
 import org.yeastrc.xlink.www.constants.WebConstants;
-import org.yeastrc.xlink.www.forms.MergedSearchViewPeptidesForm;
+import org.yeastrc.xlink.www.forms.SingleRequestJSONStringFieldForm;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
 
@@ -44,6 +49,7 @@ public class DownloadQC_Psm_PeptideLength_VS_RT_ChartDataAction extends Action {
 	/* (non-Javadoc)
 	 * @see org.apache.struts.action.Action#execute(org.apache.struts.action.ActionMapping, org.apache.struts.action.ActionForm, javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
 	 */
+	@Override
 	public ActionForward execute( ActionMapping mapping,
 			  ActionForm actionForm,
 			  HttpServletRequest request,
@@ -51,14 +57,35 @@ public class DownloadQC_Psm_PeptideLength_VS_RT_ChartDataAction extends Action {
 					  throws Exception {
 		try {
 			// our form
-			MergedSearchViewPeptidesForm form = (MergedSearchViewPeptidesForm)actionForm;
-			// Get the session first.  
-//			HttpSession session = request.getSession();
-			int[] projectSearchIds = form.getProjectSearchId();
-			if ( projectSearchIds.length == 0 ) {
+			SingleRequestJSONStringFieldForm form = (SingleRequestJSONStringFieldForm)actionForm;
+			
+			//  Form Parameter Name.  JSON encoded data
+			String requestJSONString = form.getRequestJSONString();
+			
+			if ( StringUtils.isEmpty( requestJSONString ) ) {
+				//  Invalid request, searches across projects
+				return mapping.findForward( StrutsGlobalForwardNames.INVALID_REQUEST_SEARCHES_ACROSS_PROJECTS );
+			}
+			
+			QCPageRequestJSONRoot qcPageRequestJSONRoot = null;
+			try {
+				qcPageRequestJSONRoot =
+						QC_DeserializeRequestJSON_To_QCPageRequestJSONRoot.getInstance().deserializeRequestJSON_To_QCPageRequestJSONRoot( requestJSONString );
+			} catch ( Exception e ) {
+				String msg = "parse request failed";
+				log.warn( msg );
 				return mapping.findForward( StrutsGlobalForwardNames.INVALID_REQUEST_DATA );
 			}
-			if ( projectSearchIds.length > 1 ) {
+			
+			List<Integer> projectSearchIds = qcPageRequestJSONRoot.getProjectSearchIds();
+			QCPageQueryJSONRoot qcPageQueryJSONRoot = qcPageRequestJSONRoot.getQcPageQueryJSONRoot();
+			
+			if ( projectSearchIds == null || projectSearchIds.isEmpty() ) {
+				log.warn( "projectSearchIds == null || projectSearchIds.isEmpty().  requestJSONString: " + requestJSONString );
+				return mapping.findForward( StrutsGlobalForwardNames.INVALID_REQUEST_DATA );
+			}
+			
+			if ( projectSearchIds.size() > 1 ) {
 				String msg = "Only 1 project search id is allowed.";
 				log.error( msg );
 				return mapping.findForward( StrutsGlobalForwardNames.INVALID_REQUEST_DATA );
@@ -102,9 +129,9 @@ public class DownloadQC_Psm_PeptideLength_VS_RT_ChartDataAction extends Action {
 			///    Done Processing Auth Check and Auth Level
 			//////////////////////////////
 			
-			List<SearchDTO> searches = new ArrayList<SearchDTO>( projectSearchIds.length );
+			List<SearchDTO> searches = new ArrayList<SearchDTO>( projectSearchIds.size() );
 			Map<Integer, SearchDTO> searchesMapOnSearchId = new HashMap<>();
-			List<Integer> searchIds = new ArrayList<>( projectSearchIds.length );
+			List<Integer> searchIds = new ArrayList<>( projectSearchIds.size() );
 			
 			Set<Integer> projectSearchIdsAlreadyProcessed = new HashSet<>();
 			
@@ -136,14 +163,11 @@ public class DownloadQC_Psm_PeptideLength_VS_RT_ChartDataAction extends Action {
 			try {
 				
 				////////     Get Download Data
-				
-				String filterCriteria_JSONString = form.getQueryJSON();
-
 				PeptideLength_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_Method_Response peptideLength_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_Method_Response =
 						PeptideLength_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs.getInstance()
 						.getPeptideLength_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs(
-								PeptideLength_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs.ForDownload.YES, 
-								filterCriteria_JSONString, search );
+								ForDownload_Enum.YES, 
+								qcPageQueryJSONRoot, search );
 				
 				Map<Integer,List<BigDecimal>> retentionTime_KeyedByPeptideLength =
 						peptideLength_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_Method_Response.getRetentionTime_KeyedByPeptideLength();

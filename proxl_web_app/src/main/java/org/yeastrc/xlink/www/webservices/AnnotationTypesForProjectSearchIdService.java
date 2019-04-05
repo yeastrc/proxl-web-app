@@ -9,10 +9,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.GET;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
@@ -29,6 +29,7 @@ import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDBDataOutOfSyncException;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
+import org.yeastrc.xlink.www.web_utils.UnmarshalJSON_ToObject;
 /**
  * 
  *
@@ -37,16 +38,52 @@ import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
 public class AnnotationTypesForProjectSearchIdService {
 	
 	private static final Logger log = LoggerFactory.getLogger( AnnotationTypesForProjectSearchIdService.class);
-	
-	@GET
+
+	/**
+	 * Input to function getProteinNameListForProjectSearchId(..)
+	 */
+	public static class WebserviceRequest {
+		private Integer projectSearchId;
+
+		public void setProjectSearchId(Integer projectSearchId) {
+			this.projectSearchId = projectSearchId;
+		}
+	}
+
+	@POST
+	@Consumes( MediaType.APPLICATION_JSON )
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/getAnnotationTypesPsmFilterableForProjectSearchId") 
 	public WebserviceResult getPSMFilterableAnnTypesForProjectSearchId( 
-			@QueryParam( "projectSearchId" ) int projectSearchId,
+			byte[] requestJSONBytes,
 			@Context HttpServletRequest request )
 	throws Exception {
-		if ( projectSearchId == 0 ) {
-			String msg = ": Provided searchId is zero";
+
+		if ( requestJSONBytes == null || requestJSONBytes.length == 0 ) {
+			String msg = "requestJSONBytes is null or requestJSONBytes is empty";
+			log.warn( msg );
+		    throw new WebApplicationException(
+		    	      Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+//		    	        .entity(  )
+		    	        .build()
+		    	        );
+		}
+		WebserviceRequest webserviceRequest = null;
+		try {
+			webserviceRequest =
+					UnmarshalJSON_ToObject.getInstance().getObjectFromJSONByteArray( requestJSONBytes, WebserviceRequest.class );
+		} catch ( Exception e ) {
+			String msg = "parse request failed";
+			log.warn( msg );
+		    throw new WebApplicationException(
+		    	      Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+//		    	        .entity(  )
+		    	        .build()
+		    	        );
+		}
+		
+		if ( webserviceRequest.projectSearchId == null || webserviceRequest.projectSearchId == 0 ) {
+			String msg = ": Provided projectSearchId is not provided or is zero";
 			log.error( msg );
 		    throw new WebApplicationException(
 		    	      Response.status(WebServiceErrorMessageConstants.INVALID_PARAMETER_STATUS_CODE)  //  return 400 error
@@ -54,6 +91,9 @@ public class AnnotationTypesForProjectSearchIdService {
 		    	        .build()
 		    	        );
 		}
+		
+		Integer projectSearchId = webserviceRequest.projectSearchId;
+		
 		try {
 			// Get the session first.  
 //			HttpSession session = request.getSession();

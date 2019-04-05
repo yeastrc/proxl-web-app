@@ -1,6 +1,5 @@
 package org.yeastrc.xlink.www.webservices;
 
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -14,7 +13,6 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
@@ -22,14 +20,17 @@ import javax.ws.rs.core.Response;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
+import org.yeastrc.xlink.www.qc_data.a_enums.ForDownload_Enum;
+import org.yeastrc.xlink.www.qc_data.a_request_json_root.QCPageRequestJSONRoot;
 import org.yeastrc.xlink.www.qc_data.summary_statistics_merged.main.QC_SummaryCounts_Merged;
-import org.yeastrc.xlink.www.qc_data.summary_statistics_merged.main.QC_SummaryCounts_Merged.ForDownload;
 import org.yeastrc.xlink.www.qc_data.summary_statistics_merged.main.QC_SummaryCounts_Merged.QC_SummaryCounts_Merged_Method_Response;
+import org.yeastrc.xlink.www.qc_data.utils.QC_DeserializeRequestJSON_To_QCPageRequestJSONRoot;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.dao.SearchDAO;
 import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
+import org.yeastrc.xlink.www.form_query_json_objects.QCPageQueryJSONRoot;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
 
@@ -49,21 +50,37 @@ public class QC_SummaryStatistics_Merged_Service {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/summaryStatistics_Merged") 
 	public byte[] getQC_SummaryStatistics_Merged_POST( 
-			@QueryParam( "project_search_id" ) List<Integer> projectSearchIdList,
-			byte[] postBody,
+			byte[] requestJSONBytes,
 			@Context HttpServletRequest request ) {
 
-		if ( projectSearchIdList == null || projectSearchIdList.isEmpty() ) {
-			String msg = "Provided project_search_id is null or project_search_id is missing";
+		if ( requestJSONBytes == null || requestJSONBytes.length == 0 ) {
+			String msg = "requestJSONBytes is null or requestJSONBytes is empty";
 			log.error( msg );
 		    throw new WebApplicationException(
 		    	      Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
-		    	        .entity( msg )
+//		    	        .entity(  )
 		    	        .build()
 		    	        );
 		}
-		if ( postBody == null || postBody.length == 0 ) {
-			String msg = "POST body is null or POST body is missing";
+		QCPageRequestJSONRoot qcPageRequestJSONRoot = null;
+		try {
+			qcPageRequestJSONRoot =
+					QC_DeserializeRequestJSON_To_QCPageRequestJSONRoot.getInstance().deserializeRequestJSON_To_QCPageRequestJSONRoot( requestJSONBytes );
+		} catch ( Exception e ) {
+			String msg = "parse request failed";
+			log.warn( msg );
+		    throw new WebApplicationException(
+		    	      Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+//		    	        .entity(  )
+		    	        .build()
+		    	        );
+		}
+		
+		List<Integer> projectSearchIdList = qcPageRequestJSONRoot.getProjectSearchIds();
+		QCPageQueryJSONRoot qcPageQueryJSONRoot = qcPageRequestJSONRoot.getQcPageQueryJSONRoot();
+
+		if ( projectSearchIdList == null || projectSearchIdList.isEmpty() ) {
+			String msg = "projectSearchIdList is null or projectSearchIdList is empty";
 			log.error( msg );
 			throw new WebApplicationException(
 					Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
@@ -71,6 +88,16 @@ public class QC_SummaryStatistics_Merged_Service {
 					.build()
 					);
 		}
+		if ( qcPageQueryJSONRoot == null ) {
+			String msg = "qcPageQueryJSONRoot is null or qcPageQueryJSONRoot is missing";
+			log.error( msg );
+			throw new WebApplicationException(
+					Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+					.entity( msg )
+					.build()
+					);
+		}
+
 		try {
 			// Get the session first.  
 //			HttpSession session = request.getSession();
@@ -130,10 +157,7 @@ public class QC_SummaryStatistics_Merged_Service {
 			
 			////////   Auth complete
 			//////////////////////////////////////////
-			
 
-			String requestQueryString = request.getQueryString();
-			
 			Set<Integer> projectSearchIdsProcessedFromForm = new HashSet<>(); // add each projectSearchId as process in loop next
 			
 			List<SearchDTO> searches = new ArrayList<SearchDTO>();
@@ -161,14 +185,12 @@ public class QC_SummaryStatistics_Merged_Service {
 				}
 			}
 			
-			String filterCriteriaJSON = new String( postBody, StandardCharsets.UTF_8 );
-
 			QC_SummaryCounts_Merged_Method_Response qc_SummaryCounts_Merged_Method_Response =
 					QC_SummaryCounts_Merged.getInstance()
 					.getQC_SummaryCounts_Merged( 
-							ForDownload.NO,
-							filterCriteriaJSON,
-							requestQueryString,
+							requestJSONBytes,
+							ForDownload_Enum.NO,
+							qcPageQueryJSONRoot,
 							searches );
 
 			return qc_SummaryCounts_Merged_Method_Response.getResultsAsBytes();

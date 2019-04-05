@@ -53,11 +53,11 @@ public class PPM_Error_Chart_For_PSMPeptideCutoffs_Merged_CachedResultManager im
 
 	/**
 	 * @param projectSearchIds
-	 * @param requestedImageWidth
-	 * @param imageAsBytes
+	 * @param requestJSONBytes
+	 * @return
 	 * @throws Exception
 	 */
-	public PPM_Error_Chart_For_PSMPeptideCutoffs_Merged_CachedResultManager_Result retrieveDataFromCache( List<Integer> projectSearchIds, String cacheKey ) throws Exception {
+	public PPM_Error_Chart_For_PSMPeptideCutoffs_Merged_CachedResultManager_Result retrieveDataFromCache( List<Integer> projectSearchIds, byte[] requestJSONBytes ) throws Exception {
 		
 		if ( ! CachedDataInFileMgmt.getSingletonInstance().isCachedDataFilesDirConfigured() ) {
 			return null;  //  EARLY EXIT
@@ -69,7 +69,7 @@ public class PPM_Error_Chart_For_PSMPeptideCutoffs_Merged_CachedResultManager im
 				CachedDataInFileMgmt.getSingletonInstance().retrieveCachedDataFileContents( 
 						PREFIX_FOR_CACHING /* namePrefix */, 
 						VERSION_FOR_CACHING_FROM_MAIN_CLASS /* version */, 
-						cacheKey, 
+						requestJSONBytes, 
 						projectSearchIds /* ids */,
 						IdParamType.PROJECT_SEARCH_ID );
 				
@@ -78,10 +78,11 @@ public class PPM_Error_Chart_For_PSMPeptideCutoffs_Merged_CachedResultManager im
 	
 	/**
 	 * @param projectSearchIds
-	 * @param imageAsBytes
+	 * @param chartJSONAsBytes
+	 * @param requestJSONBytes
 	 * @throws Exception
 	 */
-	public void saveDataToCache( List<Integer> projectSearchIds, byte[] chartJSONAsBytes, String cacheKey ) throws Exception {
+	public void saveDataToCache( List<Integer> projectSearchIds, byte[] chartJSONAsBytes, byte[] requestJSONBytes ) throws Exception {
 		
 		if ( ! CachedDataInFileMgmt.getSingletonInstance().isCachedDataFilesDirConfigured() ) {
 			return;  //  EARLY EXIT
@@ -92,7 +93,7 @@ public class PPM_Error_Chart_For_PSMPeptideCutoffs_Merged_CachedResultManager im
 				ReplaceExistingValue.NO,
 				PREFIX_FOR_CACHING /* namePrefix */, 
 				VERSION_FOR_CACHING_FROM_MAIN_CLASS /* version */, 
-				cacheKey, 
+				requestJSONBytes, 
 				projectSearchIds /* ids */,
 				IdParamType.PROJECT_SEARCH_ID );
 	}

@@ -38,8 +38,10 @@ import org.yeastrc.xlink.www.constants.ServletOutputStreamCharacterSetConstant;
 import org.yeastrc.xlink.www.constants.StrutsGlobalForwardNames;
 import org.yeastrc.xlink.www.constants.WebConstants;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
+import org.yeastrc.xlink.www.forms.SingleRequestJSONStringFieldForm;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
+import org.yeastrc.xlink.www.web_utils.UnmarshalJSON_ToObject;
 
 /**
  * 
@@ -48,64 +50,83 @@ import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
 public class DownloadQC_MS1_VS_M_Over_Z_ChartDataAction extends Action {
 	
 	private static final Logger log = LoggerFactory.getLogger( DownloadQC_MS1_VS_M_Over_Z_ChartDataAction.class);
+
+	/**
+	 * Deserialize the JSON in the request to this
+	 */
+	public static class DownloadRequest {
+		private Integer projectSearchId;
+		private Integer scanFileId;
+		public void setScanFileId(Integer scanFileId) {
+			this.scanFileId = scanFileId;
+		}
+		public void setProjectSearchId(Integer projectSearchId) {
+			this.projectSearchId = projectSearchId;
+		}
+	}
 	
 	/* (non-Javadoc)
 	 * @see org.apache.struts.action.Action#execute(org.apache.struts.action.ActionMapping, org.apache.struts.action.ActionForm, javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
 	 */
+	@Override
 	public ActionForward execute( ActionMapping mapping,
 			  ActionForm actionForm,
 			  HttpServletRequest request,
 			  HttpServletResponse response )
 					  throws Exception {
 
-		String scanFileIdString = null;
-		String projectSearchIdString = null;
-
-		int scanFileId = 0;
-		int projectSearchId = 0;
+		Integer scanFileId = null;
+		Integer projectSearchId = null;
 		
 		try {
+			// our form
+			SingleRequestJSONStringFieldForm form = (SingleRequestJSONStringFieldForm)actionForm;
+			
+			//  Form Parameter Name.  JSON encoded data
+			String requestJSONString = form.getRequestJSONString();
+
+			if ( StringUtils.isEmpty( requestJSONString ) ) {
+				log.warn( "parameter requestJSONString is empty" );
+				response.sendError( 
+						WebServiceErrorMessageConstants.INVALID_PARAMETER_STATUS_CODE.getStatusCode(), 
+						WebServiceErrorMessageConstants.INVALID_PARAMETER_TEXT );
+				return null;
+			}
+			
+			DownloadRequest downloadRequest = null;
+			try {
+				downloadRequest =
+						UnmarshalJSON_ToObject.getInstance().getObjectFromJSONString( requestJSONString, DownloadRequest.class );
+			} catch ( Exception e ) {
+				String msg = "parse request failed";
+				log.warn( msg );
+				response.sendError( 
+						WebServiceErrorMessageConstants.INVALID_PARAMETER_STATUS_CODE.getStatusCode(), 
+						WebServiceErrorMessageConstants.INVALID_PARAMETER_TEXT );
+				return null;
+			}
+			
+			scanFileId = downloadRequest.scanFileId;
+			projectSearchId = downloadRequest.projectSearchId;
+			
 			// Get the session first.  
 //			HttpSession session = request.getSession();
 			
-			scanFileIdString = request.getParameter( "scan_file_id" );
-			projectSearchIdString = request.getParameter( "project_search_id" );
-
-
-			if ( StringUtils.isEmpty( scanFileIdString ) ) {
-				log.warn( "parameter scan_file_id is empty" );
+			if ( scanFileId == null ) {
+				log.warn( "parameter scanFileId is empty" );
 				response.sendError( 
 						WebServiceErrorMessageConstants.INVALID_PARAMETER_STATUS_CODE.getStatusCode(), 
 						WebServiceErrorMessageConstants.INVALID_PARAMETER_TEXT );
 				return null;
 			}
-			if ( StringUtils.isEmpty( projectSearchIdString ) ) {
-				log.warn( "parameter project_search_id is empty" );
+			if ( projectSearchId == null ) {
+				log.warn( "parameter projectSearchId is empty" );
 				response.sendError( 
 						WebServiceErrorMessageConstants.INVALID_PARAMETER_STATUS_CODE.getStatusCode(), 
 						WebServiceErrorMessageConstants.INVALID_PARAMETER_TEXT );
 				return null;
 			}
 
-			try {
-				scanFileId = Integer.parseInt( scanFileIdString );
-			} catch ( Exception e ) {
-				log.warn( "Failed to parse parameter scan_file_id: " + scanFileIdString );
-				response.sendError( 
-						WebServiceErrorMessageConstants.INVALID_PARAMETER_STATUS_CODE.getStatusCode(), 
-						WebServiceErrorMessageConstants.INVALID_PARAMETER_TEXT );
-				return null;
-			}
-			try {
-				projectSearchId = Integer.parseInt( projectSearchIdString );
-			} catch ( Exception e ) {
-				log.warn( "Failed to parse parameter project_search_id: " + projectSearchIdString );
-				response.sendError( 
-						WebServiceErrorMessageConstants.INVALID_PARAMETER_STATUS_CODE.getStatusCode(), 
-						WebServiceErrorMessageConstants.INVALID_PARAMETER_TEXT );
-				return null;
-			}
-			
 			//   Get the project id for these searches
 			Set<Integer> projectSearchIds = new HashSet<Integer>( );
 			projectSearchIds.add( projectSearchId );

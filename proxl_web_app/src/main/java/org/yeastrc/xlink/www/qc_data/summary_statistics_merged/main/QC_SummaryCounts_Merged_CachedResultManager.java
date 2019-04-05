@@ -24,7 +24,6 @@ public class QC_SummaryCounts_Merged_CachedResultManager implements CachedDataIn
 
 	private static final Logger log = LoggerFactory.getLogger(  QC_SummaryCounts_Merged_CachedResultManager.class );
 	
-
 	private static final String PREFIX_FOR_CACHING = "QC_SummaryCounts_Merged_";
 
 	static final int VERSION_FOR_CACHING_FROM_MAIN_CLASS = QC_SummaryCounts_Merged.VERSION_FOR_CACHING;
@@ -54,23 +53,27 @@ public class QC_SummaryCounts_Merged_CachedResultManager implements CachedDataIn
 
 	/**
 	 * @param projectSearchIds
-	 * @param requestedImageWidth
-	 * @param imageAsBytes
+	 * @param requestJSONBytes
+	 * @return
 	 * @throws Exception
 	 */
-	public QC_SummaryCounts_Merged_CachedResultManager_Result retrieveDataFromCache( List<Integer> projectSearchIds, String cacheKey ) throws Exception {
+	public QC_SummaryCounts_Merged_CachedResultManager_Result retrieveDataFromCache( List<Integer> projectSearchIds, byte[] requestJSONBytes ) throws Exception {
+
+		if ( requestJSONBytes == null ) {
+			throw new IllegalArgumentException( "requestJSONBytes == null" );
+		}
 		
 		if ( ! CachedDataInFileMgmt.getSingletonInstance().isCachedDataFilesDirConfigured() ) {
 			return null;  //  EARLY EXIT
 		}
 				
 		QC_SummaryCounts_Merged_CachedResultManager_Result result = new QC_SummaryCounts_Merged_CachedResultManager_Result();
-		
-		result.chartJSONAsBytes =
+	
+		result.chartJSONAsBytes = 
 				CachedDataInFileMgmt.getSingletonInstance().retrieveCachedDataFileContents( 
 						PREFIX_FOR_CACHING /* namePrefix */, 
 						VERSION_FOR_CACHING_FROM_MAIN_CLASS /* version */, 
-						cacheKey, 
+						requestJSONBytes, 
 						projectSearchIds /* ids */,
 						IdParamType.PROJECT_SEARCH_ID );
 				
@@ -82,7 +85,11 @@ public class QC_SummaryCounts_Merged_CachedResultManager implements CachedDataIn
 	 * @param imageAsBytes
 	 * @throws Exception
 	 */
-	public void saveDataToCache( List<Integer> projectSearchIds, byte[] chartJSONAsBytes, String cacheKey ) throws Exception {
+	public void saveDataToCache( List<Integer> projectSearchIds, byte[] chartJSONAsBytes, byte[] requestJSONBytes ) throws Exception {
+
+		if ( requestJSONBytes == null ) {
+			throw new IllegalArgumentException( "requestJSONBytes == null" );
+		}
 		
 		if ( ! CachedDataInFileMgmt.getSingletonInstance().isCachedDataFilesDirConfigured() ) {
 			return;  //  EARLY EXIT
@@ -93,7 +100,7 @@ public class QC_SummaryCounts_Merged_CachedResultManager implements CachedDataIn
 				ReplaceExistingValue.NO,
 				PREFIX_FOR_CACHING /* namePrefix */, 
 				VERSION_FOR_CACHING_FROM_MAIN_CLASS /* version */, 
-				cacheKey, 
+				requestJSONBytes, 
 				projectSearchIds /* ids */,
 				IdParamType.PROJECT_SEARCH_ID );
 	}
@@ -105,13 +112,9 @@ public class QC_SummaryCounts_Merged_CachedResultManager implements CachedDataIn
 	 */
 	@Override
 	public void register() throws Exception {
-		
-		//  Register for full width
-		{
-			CachedDataInFileMgmtRegistration.getSingletonInstance()
-			.register( PREFIX_FOR_CACHING, VERSION_FOR_CACHING_FROM_MAIN_CLASS );
-		}
-		
+
+		CachedDataInFileMgmtRegistration.getSingletonInstance()
+		.register( PREFIX_FOR_CACHING, VERSION_FOR_CACHING_FROM_MAIN_CLASS );
 	}
 
 }

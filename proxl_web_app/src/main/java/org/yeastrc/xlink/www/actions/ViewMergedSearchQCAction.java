@@ -24,15 +24,18 @@ import org.yeastrc.xlink.www.form_query_json_objects.CutoffValuesRootLevel;
 import org.yeastrc.xlink.www.forms.MergedSearchViewProteinsForm;
 import org.yeastrc.xlink.www.forms.PeptideProteinCommonForm;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
+import org.yeastrc.xlink.www.objects.ProteinSequenceVersionIdProteinAnnotationName;
 import org.yeastrc.xlink.www.constants.ConfigSystemsKeysConstants;
 import org.yeastrc.xlink.www.constants.StrutsGlobalForwardNames;
 import org.yeastrc.xlink.www.constants.WebConstants;
 import org.yeastrc.xlink.www.cutoff_processing_web.GetDefaultPsmPeptideCutoffs;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
+import org.yeastrc.xlink.www.searcher.ProteinSequenceVersionIdAnnotationNameSearcher;
 import org.yeastrc.xlink.www.searcher.SearchModMassDistinctSearcher;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
 import org.yeastrc.xlink.www.web_utils.AnyPDBFilesForProjectId;
+import org.yeastrc.xlink.www.web_utils.CombineProteinAnnNamesForSameSeqVId;
 import org.yeastrc.xlink.www.web_utils.GetAnnotationDisplayUserSelectionDetailsData;
 import org.yeastrc.xlink.www.web_utils.GetCutoffsAppliedOnImport;
 import org.yeastrc.xlink.www.web_utils.GetPageHeaderData;
@@ -213,6 +216,39 @@ public class ViewMergedSearchQCAction extends Action {
 				modMassStringsList.add( modMassAsString );
 			}
 			request.setAttribute( "modMassFilterList", modMassStringsList );
+			
+
+			//  Get  proteinSequenceVersionId and AnnotationName for search
+			
+			Set<ProteinSequenceVersionIdProteinAnnotationName> proteinSequenceVersionIdProteinAnnotationNameSet = null;
+			
+			for ( Integer searchId : searchIds ) {
+				Set<ProteinSequenceVersionIdProteinAnnotationName> proteinSequenceVersionIdProteinAnnotationNameSet_SingleSearch = 
+						ProteinSequenceVersionIdAnnotationNameSearcher.getInstance()
+						.getProteinSequenceVersionIdAnnotationNameForSearch( searchId );
+
+				if ( proteinSequenceVersionIdProteinAnnotationNameSet == null ) {
+					proteinSequenceVersionIdProteinAnnotationNameSet = proteinSequenceVersionIdProteinAnnotationNameSet_SingleSearch;
+				} else {
+					proteinSequenceVersionIdProteinAnnotationNameSet.addAll( proteinSequenceVersionIdProteinAnnotationNameSet_SingleSearch );
+				}
+			}
+			
+			Set<ProteinSequenceVersionIdProteinAnnotationName> proteinSequenceVersionIdProteinAnnotationNameCombinedSet = 
+				CombineProteinAnnNamesForSameSeqVId.getInstance()
+				.combineProteinAnnNamesForSameSeqVId( proteinSequenceVersionIdProteinAnnotationNameSet );
+			
+			List<ProteinSequenceVersionIdProteinAnnotationName> proteinSequenceVersionIdProteinAnnotationNameList =
+					new ArrayList<>( proteinSequenceVersionIdProteinAnnotationNameCombinedSet );
+
+			Collections.sort( proteinSequenceVersionIdProteinAnnotationNameList, new Comparator<ProteinSequenceVersionIdProteinAnnotationName>() {
+				@Override
+				public int compare(ProteinSequenceVersionIdProteinAnnotationName o1, ProteinSequenceVersionIdProteinAnnotationName o2) {
+					return o1.getAnnotationName().compareToIgnoreCase( o2.getAnnotationName() );
+				}
+			});
+			
+			request.setAttribute( "proteinIdsAndNames", proteinSequenceVersionIdProteinAnnotationNameList );
 			
 			if ( searchIdsArray.length == 1 ) {
 				String cutoffsAppliedOnImportAllAsString =

@@ -1,6 +1,5 @@
 package org.yeastrc.xlink.www.qc_plots.scan_retention_time;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -20,18 +19,15 @@ import org.yeastrc.xlink.www.dao.SearchDAO;
 import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
 import org.yeastrc.xlink.www.form_query_json_objects.CutoffValuesRootLevel;
-import org.yeastrc.xlink.www.form_query_json_objects.MergedPeptideQueryJSONRoot;
+import org.yeastrc.xlink.www.form_query_json_objects.QCPageQueryJSONRoot;
 import org.yeastrc.xlink.www.form_query_json_objects.Z_CutoffValuesObjectsToOtherObjectsFactory;
 import org.yeastrc.xlink.www.form_query_json_objects.Z_CutoffValuesObjectsToOtherObjectsFactory.Z_CutoffValuesObjectsToOtherObjects_RootResult;
+import org.yeastrc.xlink.www.qc_data.a_enums.ForDownload_Enum;
 import org.yeastrc.xlink.www.searcher.RetentionTimesForPSMCriteriaSearcher;
 import org.yeastrc.xlink.www.searcher.ScanFileIdsForSearchSearcher;
 import org.yeastrc.xlink.www.spectral_storage_service_interface.Call_Get_ScanRetentionTimes_FromSpectralStorageService;
 import org.yeastrc.xlink.www.web_utils.GetLinkTypesForSearchers;
 import org.yeastrc.xlink.www.web_utils.RetentionTimeScalingAndRounding;
-
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * 
@@ -41,10 +37,8 @@ public class CreateScanRetentionTimeQCPlotData {
 
 	private static final Logger log = LoggerFactory.getLogger( CreateScanRetentionTimeQCPlotData.class);
 	
-	public enum ForDownload { YES, NO }
-	
 	private static final int BIN_COUNT = 100;  //  Number of bars on the chart
-	private static final int EXCLUDE_SCAN_LEVEL_1 = 1;
+//	private static final int EXCLUDE_SCAN_LEVEL_1 = 1;
 	
 	/**
 	 * private constructor
@@ -103,11 +97,11 @@ public class CreateScanRetentionTimeQCPlotData {
 	 * @throws Exception
 	 */
 	public CreateScanRetentionTimeQCPlotData_Result create( 
-			ForDownload forDownload,
+			ForDownload_Enum forDownload,
 			int projectSearchId, 
 			List<Integer> scanFileIdList, 
 			boolean scanFileAll, 
-			String filterCriteria_JSONString,
+			QCPageQueryJSONRoot qcPageQueryJSONRoot,
 			Double retentionTimeInSecondsCutoff ) throws Exception {
 		
 		CreateScanRetentionTimeQCPlotData_Result result = new CreateScanRetentionTimeQCPlotData_Result();
@@ -144,7 +138,7 @@ public class CreateScanRetentionTimeQCPlotData {
 							searchDTO,
 							scanFileIdList, 
 							scanFileAll, 
-							filterCriteria_JSONString, 
+							qcPageQueryJSONRoot, 
 							retentionTimeInSecondsCutoff );
 		
 		List<Single_ScanRetentionTime_ScanNumber_SubResponse> scanRetentionTime_AllScansExcludeScanLevel_1_List = null;
@@ -161,7 +155,7 @@ public class CreateScanRetentionTimeQCPlotData {
 		result.retentionTimeForPSMsthatMeetCriteriaList = retentionTimeForPSMsthatMeetCriteriaList;
 		result.scanRetentionTime_AllScansExcludeScanLevel_1_List = scanRetentionTime_AllScansExcludeScanLevel_1_List;
 		
-		if ( forDownload == ForDownload.YES ) {
+		if ( forDownload == ForDownload_Enum.YES ) {
 			return result;  //  EARLY EXIT
 		}
 		
@@ -227,7 +221,7 @@ public class CreateScanRetentionTimeQCPlotData {
 			SearchDTO searchDTO, 
 			List<Integer> scanFileIdList, 
 			boolean scanFileAll, 
-			String filterCriteria_JSONString,
+			QCPageQueryJSONRoot qcPageQueryJSONRoot,
 			Double retentionTimeInSecondsCutoff ) throws Exception {
 		
 		List<BigDecimal> retentionTimeForPSMsthatMeetCriteriaList = null;
@@ -235,29 +229,10 @@ public class CreateScanRetentionTimeQCPlotData {
 		Collection<Integer> searchIds = new HashSet<>();
 		searchIds.add( searchDTO.getSearchId() );
 
-		//  Jackson JSON Mapper object for JSON deserialization and serialization
-		ObjectMapper jacksonJSON_Mapper = new ObjectMapper();  //  Jackson JSON library object
-		//   deserialize 
-		MergedPeptideQueryJSONRoot mergedPeptideQueryJSONRoot = null;
-		try {
-			mergedPeptideQueryJSONRoot = jacksonJSON_Mapper.readValue( filterCriteria_JSONString, MergedPeptideQueryJSONRoot.class );
-		} catch ( JsonParseException e ) {
-			String msg = "Failed to parse 'filterCriteriaJSON', JsonParseException.  filterCriteriaJSON: " + filterCriteria_JSONString;
-			log.error( msg, e );
-			throw e;
-		} catch ( JsonMappingException e ) {
-			String msg = "Failed to parse 'filterCriteriaJSON', JsonMappingException.  filterCriteriaJSON: " + filterCriteria_JSONString;
-			log.error( msg, e );
-			throw e;
-		} catch ( IOException e ) {
-			String msg = "Failed to parse 'filterCriteriaJSON', IOException.  filterCriteriaJSON: " + filterCriteria_JSONString;
-			log.error( msg, e );
-			throw e;
-		}
 		//  Process retention times for psms that meet criteria
 			////////////
 		/////   Searcher cutoffs for all searches
-		CutoffValuesRootLevel cutoffValuesRootLevel = mergedPeptideQueryJSONRoot.getCutoffs();
+		CutoffValuesRootLevel cutoffValuesRootLevel = qcPageQueryJSONRoot.getCutoffs();
 		Z_CutoffValuesObjectsToOtherObjects_RootResult cutoffValuesObjectsToOtherObjects_RootResult =
 				Z_CutoffValuesObjectsToOtherObjectsFactory
 				.createSearcherCutoffValuesRootLevel( searchIds, cutoffValuesRootLevel );
@@ -274,9 +249,11 @@ public class CreateScanRetentionTimeQCPlotData {
 		
 		///////////////////////////////////////////////////
 		//  Get LinkTypes for DB query - Sets to null when all selected as an optimization
-		String[] linkTypesForDBQuery = GetLinkTypesForSearchers.getInstance().getLinkTypesForSearchers( mergedPeptideQueryJSONRoot.getLinkTypes() );
+		String[] linkTypesForDBQuery = GetLinkTypesForSearchers.getInstance().getLinkTypesForSearchers( qcPageQueryJSONRoot.getLinkTypes() );
 		//   Mods for DB Query
-		String[] modsForDBQuery = mergedPeptideQueryJSONRoot.getMods();
+		String[] modsForDBQuery = qcPageQueryJSONRoot.getMods();
+
+		List<Integer> includeProteinSeqVIdsDecodedArray = qcPageQueryJSONRoot.getIncludeProteinSeqVIdsDecodedArray();
 		
 		Integer scanFileId = null;
 		if ( ! scanFileAll ) {
@@ -291,6 +268,7 @@ public class CreateScanRetentionTimeQCPlotData {
 						searcherCutoffValuesSearchLevel, 
 						linkTypesForDBQuery, 
 						modsForDBQuery,
+						includeProteinSeqVIdsDecodedArray,
 						retentionTimeInSecondsCutoff );
 		
 		return retentionTimeForPSMsthatMeetCriteriaList;
@@ -382,7 +360,7 @@ public class CreateScanRetentionTimeQCPlotData {
 				int binStart = (int)Math.round( binStartDouble );
 				chartBucket.setBinStart( binStart );
 			}
-			int binEnd = (int)Math.round( ( binIndex + 1 ) * binSizeAsDouble );
+			int binEnd = Math.round( ( binIndex + 1 ) * binSizeAsDouble );
 			chartBucket.setBinEnd( binEnd );
 			double binMiddleDouble = binStartDouble + binHalf;
 			chartBucket.setBinCenter( binMiddleDouble );

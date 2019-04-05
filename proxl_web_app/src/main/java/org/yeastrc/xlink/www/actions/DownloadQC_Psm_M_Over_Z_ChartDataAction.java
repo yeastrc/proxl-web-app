@@ -23,14 +23,18 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.yeastrc.xlink.www.dao.SearchDAO;
 import org.yeastrc.xlink.www.dto.SearchDTO;
+import org.yeastrc.xlink.www.form_query_json_objects.QCPageQueryJSONRoot;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
+import org.yeastrc.xlink.www.qc_data.a_enums.ForDownload_Enum;
+import org.yeastrc.xlink.www.qc_data.a_request_json_root.QCPageRequestJSONRoot;
 import org.yeastrc.xlink.www.qc_data.psm_level_data_merged.main.PreMZ_Chart_For_PSMPeptideCutoffs_Merged;
 import org.yeastrc.xlink.www.qc_data.psm_level_data_merged.main.PreMZ_Chart_For_PSMPeptideCutoffs_Merged.PreMZ_Chart_For_PSMPeptideCutoffs_Merged_Method_Response;
+import org.yeastrc.xlink.www.qc_data.utils.QC_DeserializeRequestJSON_To_QCPageRequestJSONRoot;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
 import org.yeastrc.xlink.www.constants.ServletOutputStreamCharacterSetConstant;
 import org.yeastrc.xlink.www.constants.StrutsGlobalForwardNames;
 import org.yeastrc.xlink.www.constants.WebConstants;
-import org.yeastrc.xlink.www.forms.MergedSearchViewPeptidesForm;
+import org.yeastrc.xlink.www.forms.SingleRequestJSONStringFieldForm;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
 
@@ -45,6 +49,7 @@ public class DownloadQC_Psm_M_Over_Z_ChartDataAction extends Action {
 	/* (non-Javadoc)
 	 * @see org.apache.struts.action.Action#execute(org.apache.struts.action.ActionMapping, org.apache.struts.action.ActionForm, javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
 	 */
+	@Override
 	public ActionForward execute( ActionMapping mapping,
 			  ActionForm actionForm,
 			  HttpServletRequest request,
@@ -52,13 +57,34 @@ public class DownloadQC_Psm_M_Over_Z_ChartDataAction extends Action {
 					  throws Exception {
 		try {
 			// our form
-			MergedSearchViewPeptidesForm form = (MergedSearchViewPeptidesForm)actionForm;
-			// Get the session first.  
-//			HttpSession session = request.getSession();
-			int[] projectSearchIds = form.getProjectSearchId();
-			if ( projectSearchIds.length == 0 ) {
+			SingleRequestJSONStringFieldForm form = (SingleRequestJSONStringFieldForm)actionForm;
+			
+			//  Form Parameter Name.  JSON encoded data
+			String requestJSONString = form.getRequestJSONString();
+			
+			if ( StringUtils.isEmpty( requestJSONString ) ) {
+				//  Invalid request, searches across projects
+				return mapping.findForward( StrutsGlobalForwardNames.INVALID_REQUEST_SEARCHES_ACROSS_PROJECTS );
+			}
+			
+			QCPageRequestJSONRoot qcPageRequestJSONRoot = null;
+			try {
+				qcPageRequestJSONRoot =
+						QC_DeserializeRequestJSON_To_QCPageRequestJSONRoot.getInstance().deserializeRequestJSON_To_QCPageRequestJSONRoot( requestJSONString );
+			} catch ( Exception e ) {
+				String msg = "parse request failed";
+				log.warn( msg );
 				return mapping.findForward( StrutsGlobalForwardNames.INVALID_REQUEST_DATA );
 			}
+			
+			List<Integer> projectSearchIds = qcPageRequestJSONRoot.getProjectSearchIds();
+			QCPageQueryJSONRoot qcPageQueryJSONRoot = qcPageRequestJSONRoot.getQcPageQueryJSONRoot();
+			
+			if ( projectSearchIds == null || projectSearchIds.isEmpty() ) {
+				log.warn( "projectSearchIds == null || projectSearchIds.isEmpty().  requestJSONString: " + requestJSONString );
+				return mapping.findForward( StrutsGlobalForwardNames.INVALID_REQUEST_DATA );
+			}
+			
 			//   Get the project id for these searches
 			Set<Integer> projectSearchIdsSet = new HashSet<Integer>( );
 			for ( int searchId : projectSearchIds ) {
@@ -98,9 +124,9 @@ public class DownloadQC_Psm_M_Over_Z_ChartDataAction extends Action {
 			///    Done Processing Auth Check and Auth Level
 			//////////////////////////////
 			
-			List<SearchDTO> searches = new ArrayList<SearchDTO>( projectSearchIds.length );
+			List<SearchDTO> searches = new ArrayList<SearchDTO>( projectSearchIds.size() );
 			Map<Integer, SearchDTO> searchesMapOnSearchId = new HashMap<>();
-			List<Integer> searchIds = new ArrayList<>( projectSearchIds.length );
+			List<Integer> searchIds = new ArrayList<>( projectSearchIds.size() );
 			
 			Set<Integer> projectSearchIdsAlreadyProcessed = new HashSet<>();
 			
@@ -132,13 +158,11 @@ public class DownloadQC_Psm_M_Over_Z_ChartDataAction extends Action {
 				
 				////////     Get Download Data
 				
-				String filterCriteria_JSONString = form.getQueryJSON();
-
 				PreMZ_Chart_For_PSMPeptideCutoffs_Merged_Method_Response methodResponse = 
 						PreMZ_Chart_For_PSMPeptideCutoffs_Merged.getInstance()
 						.getPreMZ_Chart_For_PSMPeptideCutoffs_Merged(
-								PreMZ_Chart_For_PSMPeptideCutoffs_Merged.ForDownload.YES,
-								filterCriteria_JSONString, 
+								ForDownload_Enum.YES,
+								qcPageQueryJSONRoot, 
 								projectSearchIdsListDeduppedSorted, 
 								searches, 
 								searchesMapOnSearchId );

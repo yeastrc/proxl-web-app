@@ -7,10 +7,10 @@ import java.util.List;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.GET;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
@@ -28,21 +28,64 @@ import org.yeastrc.xlink.dao.ScanFileDAO;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
+import org.yeastrc.xlink.www.web_utils.UnmarshalJSON_ToObject;
 
 @Path("/qc/dataPage")
 public class QC_Scan_OverallStatistics_Service {
 	
 	private static final Logger log = LoggerFactory.getLogger( QC_Scan_OverallStatistics_Service.class);
 	
-	@GET
+	/**
+	 * Input to function getScanOverallStatistics(..)
+	 */
+	public static class GetScanOverallStatistics_WebserviceRequest {
+		private List<Integer> projectSearchIds;
+		private Integer scanFileId;
+		public void setProjectSearchIds(List<Integer> projectSearchIds) {
+			this.projectSearchIds = projectSearchIds;
+		}
+		public void setScanFileId(Integer scanFileId) {
+			this.scanFileId = scanFileId;
+		}
+	}
+	
+	@POST
+	@Consumes( MediaType.APPLICATION_JSON )
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/getScanOverallStatistics") 
 	public QC_Scan_OverallStatistics_WebserviceResult getScanOverallStatistics( 
-			@QueryParam( "project_search_id" ) List<Integer> projectSearchIdList,
-			@QueryParam( "scan_file_id" ) Integer scanFileId,
+			byte[] requestJSONBytes,
 			@Context HttpServletRequest request )
 	throws Exception {
 
+		if ( requestJSONBytes == null || requestJSONBytes.length == 0 ) {
+			String msg = "requestJSONBytes is null or requestJSONBytes is empty";
+			log.warn( msg );
+		    throw new WebApplicationException(
+		    	      Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+//		    	        .entity(  )
+		    	        .build()
+		    	        );
+		}
+		GetScanOverallStatistics_WebserviceRequest getScanOverallStatistics_WebserviceRequest = null;
+		try {
+			getScanOverallStatistics_WebserviceRequest =
+					UnmarshalJSON_ToObject.getInstance().getObjectFromJSONByteArray( requestJSONBytes, GetScanOverallStatistics_WebserviceRequest.class );
+		} catch ( Exception e ) {
+			String msg = "parse request failed";
+			log.warn( msg );
+		    throw new WebApplicationException(
+		    	      Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+//		    	        .entity(  )
+		    	        .build()
+		    	        );
+		}
+		
+		
+		List<Integer> projectSearchIdList = getScanOverallStatistics_WebserviceRequest.projectSearchIds;
+		Integer scanFileId = getScanOverallStatistics_WebserviceRequest.scanFileId;
+		
+		
 		QC_Scan_OverallStatistics_WebserviceResult webserviceResult = null;
 		
 		if ( projectSearchIdList == null || projectSearchIdList.isEmpty() ) {

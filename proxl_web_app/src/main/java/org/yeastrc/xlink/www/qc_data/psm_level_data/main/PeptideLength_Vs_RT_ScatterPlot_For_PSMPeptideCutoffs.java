@@ -1,6 +1,5 @@
 package org.yeastrc.xlink.www.qc_data.psm_level_data.main;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -23,25 +22,23 @@ import org.yeastrc.xlink.www.dto.SrchRepPeptPeptideDTO;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappInternalErrorException;
 import org.yeastrc.xlink.www.form_query_json_objects.CutoffValuesRootLevel;
-import org.yeastrc.xlink.www.form_query_json_objects.MergedPeptideQueryJSONRoot;
+import org.yeastrc.xlink.www.form_query_json_objects.QCPageQueryJSONRoot;
 import org.yeastrc.xlink.www.form_query_json_objects.Z_CutoffValuesObjectsToOtherObjectsFactory;
 import org.yeastrc.xlink.www.form_query_json_objects.Z_CutoffValuesObjectsToOtherObjectsFactory.Z_CutoffValuesObjectsToOtherObjects_RootResult;
 import org.yeastrc.xlink.www.objects.PsmWebDisplayWebServiceResult;
 import org.yeastrc.xlink.www.objects.WebReportedPeptide;
 import org.yeastrc.xlink.www.objects.WebReportedPeptideWrapper;
+import org.yeastrc.xlink.www.qc_data.a_enums.ForDownload_Enum;
 import org.yeastrc.xlink.www.qc_data.psm_level_data.objects.PeptideLength_Vs_RT_ScatterPlot_For_PSMPeptideCutoffsResults;
 import org.yeastrc.xlink.www.qc_data.psm_level_data.objects.PeptideLength_Vs_RT_ScatterPlot_For_PSMPeptideCutoffsResults.PeptideLength_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_ResultChartBucket;
 import org.yeastrc.xlink.www.qc_data.psm_level_data.objects.PeptideLength_Vs_RT_ScatterPlot_For_PSMPeptideCutoffsResults.PeptideLength_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_ResultRetentionTimeBucket;
+import org.yeastrc.xlink.www.qc_data.utils.QC_Cached_WebReportedPeptideWrapperList_FilteredOnIncludeProtSeqVIds;
 import org.yeastrc.xlink.www.searcher.PsmWebDisplaySearcher;
 import org.yeastrc.xlink.www.searcher_via_cached_data.a_return_data_from_searchers.PeptideWebPageSearcherCacheOptimized;
 import org.yeastrc.xlink.www.searcher_via_cached_data.cached_data_holders.Cached_SrchRepPeptPeptideDTO_ForSrchIdRepPeptId;
 import org.yeastrc.xlink.www.searcher_via_cached_data.request_objects_for_searchers_for_cached_data.SrchRepPeptPeptideDTO_ForSrchIdRepPeptId_ReqParams;
 import org.yeastrc.xlink.www.searcher_via_cached_data.return_objects_from_searchers_for_cached_data.SrchRepPeptPeptideDTO_ForSrchIdRepPeptId_Result;
 import org.yeastrc.xlink.www.web_utils.GetLinkTypesForSearchers;
-
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Get Peptide Length Vs Retention Time Scatter Plot where associated Reported Peptides meet criteria, including Reported Peptide and PSM cutoffs
@@ -53,9 +50,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class PeptideLength_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs {
 
 	private static final Logger log = LoggerFactory.getLogger( PeptideLength_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs.class);
-
-	public enum ForDownload { YES, NO }
-
 	
 	/**
 	 * private constructor
@@ -112,8 +106,8 @@ public class PeptideLength_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs {
 	 * @throws Exception
 	 */
 	public PeptideLength_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_Method_Response getPeptideLength_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs( 			
-			ForDownload forDownload,
-			String filterCriteriaJSON, 
+			ForDownload_Enum forDownload,
+			QCPageQueryJSONRoot qcPageQueryJSONRoot, 
 			SearchDTO search ) throws Exception {
 		
 		Collection<Integer> searchIds = new HashSet<>();
@@ -123,27 +117,7 @@ public class PeptideLength_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs {
 //		List<SearchDTO> searches = new ArrayList<>( 1 );
 //		searches.add( search );
 
-		//  Jackson JSON Mapper object for JSON deserialization and serialization
-		ObjectMapper jacksonJSON_Mapper = new ObjectMapper();  //  Jackson JSON library object
-		//   deserialize 
-		MergedPeptideQueryJSONRoot mergedPeptideQueryJSONRoot = null;
-		try {
-			mergedPeptideQueryJSONRoot = jacksonJSON_Mapper.readValue( filterCriteriaJSON, MergedPeptideQueryJSONRoot.class );
-		} catch ( JsonParseException e ) {
-			String msg = "Failed to parse 'filterCriteriaJSON', JsonParseException.  filterCriteriaJSON: " + filterCriteriaJSON;
-			log.error( msg, e );
-			throw e;
-		} catch ( JsonMappingException e ) {
-			String msg = "Failed to parse 'filterCriteriaJSON', JsonMappingException.  filterCriteriaJSON: " + filterCriteriaJSON;
-			log.error( msg, e );
-			throw e;
-		} catch ( IOException e ) {
-			String msg = "Failed to parse 'filterCriteriaJSON', IOException.  filterCriteriaJSON: " + filterCriteriaJSON;
-			log.error( msg, e );
-			throw e;
-		}
-
-		String[] linkTypesFromURL = mergedPeptideQueryJSONRoot.getLinkTypes();
+		String[] linkTypesFromURL = qcPageQueryJSONRoot.getLinkTypes();
 		
 		//  Populate countForLinkType_ByLinkType for selected link types
 		if ( linkTypesFromURL == null || linkTypesFromURL.length != 1 ) {
@@ -179,17 +153,17 @@ public class PeptideLength_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs {
 		
 		linkTypesFromURL[ 0 ] = linkTypeRequestUpdated;
 		
-		mergedPeptideQueryJSONRoot.setLinkTypes( linkTypesFromURL );
+		qcPageQueryJSONRoot.setLinkTypes( linkTypesFromURL );
 
 		
 		///////////////////////////////////////////////////
 		//  Get LinkTypes for DB query - Sets to null when all selected as an optimization
-		String[] linkTypesForDBQuery = GetLinkTypesForSearchers.getInstance().getLinkTypesForSearchers( mergedPeptideQueryJSONRoot.getLinkTypes() );
+		String[] linkTypesForDBQuery = GetLinkTypesForSearchers.getInstance().getLinkTypesForSearchers( qcPageQueryJSONRoot.getLinkTypes() );
 		//   Mods for DB Query
-		String[] modsForDBQuery = mergedPeptideQueryJSONRoot.getMods();
+		String[] modsForDBQuery = qcPageQueryJSONRoot.getMods();
 		////////////
 		/////   Searcher cutoffs for all searches
-		CutoffValuesRootLevel cutoffValuesRootLevel = mergedPeptideQueryJSONRoot.getCutoffs();
+		CutoffValuesRootLevel cutoffValuesRootLevel = qcPageQueryJSONRoot.getCutoffs();
 		Z_CutoffValuesObjectsToOtherObjects_RootResult cutoffValuesObjectsToOtherObjects_RootResult =
 				Z_CutoffValuesObjectsToOtherObjectsFactory
 				.createSearcherCutoffValuesRootLevel( searchIds, cutoffValuesRootLevel );
@@ -207,14 +181,14 @@ public class PeptideLength_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs {
 
 
 		Map<Integer,List<BigDecimal>> retentionTime_KeyedByPeptideLength = 
-				getRetentionTime_KeyedOnPeptideLength( requestedLinkTypeInt, search, searcherCutoffValuesSearchLevel, linkTypesForDBQuery, modsForDBQuery );
+				getRetentionTime_KeyedOnPeptideLength( requestedLinkTypeInt, search, searcherCutoffValuesSearchLevel, linkTypesForDBQuery, modsForDBQuery, qcPageQueryJSONRoot );
 			
 		PeptideLength_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_Method_Response methodResponse = new PeptideLength_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_Method_Response();
 		
 		methodResponse.linkTypeDisplay = linkTypeDisplay;
 		methodResponse.retentionTime_KeyedByPeptideLength = retentionTime_KeyedByPeptideLength;
 
-		if ( forDownload == ForDownload.YES ) {
+		if ( forDownload == ForDownload_Enum.YES ) {
 			return methodResponse;  //  EARY RETURN
 		}
 
@@ -386,7 +360,8 @@ public class PeptideLength_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs {
 			SearchDTO searchDTO,
 			SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel,
 			String[] linkTypesForDBQuery,
-			String[] modsForDBQuery
+			String[] modsForDBQuery,
+			QCPageQueryJSONRoot qcPageQueryJSONRoot
 			) throws Exception {
 		
 		int searchId = searchDTO.getSearchId();
@@ -398,10 +373,23 @@ public class PeptideLength_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs {
 
 		///////////////////////////////////////////////
 		//  Get peptides for this search from the DATABASE
+
+		//  Change to use QC_Cached_WebReportedPeptideWrapperList_FilteredOnIncludeProtSeqVIds 
+		//     to get list filtered on 
+
 		List<WebReportedPeptideWrapper> wrappedLinksPerForSearch =
-				PeptideWebPageSearcherCacheOptimized.getInstance().searchOnSearchIdPsmCutoffPeptideCutoff(
-						searchDTO, searcherCutoffValuesSearchLevel, linkTypesForDBQuery, modsForDBQuery, 
-						PeptideWebPageSearcherCacheOptimized.ReturnOnlyReportedPeptidesWithMonolinks.NO );
+				QC_Cached_WebReportedPeptideWrapperList_FilteredOnIncludeProtSeqVIds.getInstance()
+				.get_WebReportedPeptideWrapperList_FilteredOnIncludeProtSeqVIds(
+						searchDTO, searcherCutoffValuesSearchLevel, 
+						linkTypesForDBQuery,
+						modsForDBQuery, 
+						PeptideWebPageSearcherCacheOptimized.ReturnOnlyReportedPeptidesWithMonolinks.NO,
+						qcPageQueryJSONRoot.getIncludeProteinSeqVIdsDecodedArray() );
+		
+//		List<WebReportedPeptideWrapper> wrappedLinksPerForSearch =
+//				PeptideWebPageSearcherCacheOptimized.getInstance().searchOnSearchIdPsmCutoffPeptideCutoff(
+//						searchDTO, searcherCutoffValuesSearchLevel, linkTypesForDBQuery, modsForDBQuery, 
+//						PeptideWebPageSearcherCacheOptimized.ReturnOnlyReportedPeptidesWithMonolinks.NO );
 		
 		for ( WebReportedPeptideWrapper webReportedPeptideWrapper : wrappedLinksPerForSearch ) {
 			WebReportedPeptide webReportedPeptide = webReportedPeptideWrapper.getWebReportedPeptide();

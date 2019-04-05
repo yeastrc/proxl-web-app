@@ -5,7 +5,7 @@
  * 
  * Root JS file for Header 
  * 
- * Included in page_js/common_all_pages/header_section_main_pages/header_main.js
+ * Included in page_js/header_section_js_all_pages_main_pages/header_section_main_pages/header_main.js
  */
 
 var z = 0;

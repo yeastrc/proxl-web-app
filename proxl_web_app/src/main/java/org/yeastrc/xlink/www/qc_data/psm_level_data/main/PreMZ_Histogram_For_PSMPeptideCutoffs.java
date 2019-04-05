@@ -1,6 +1,5 @@
 package org.yeastrc.xlink.www.qc_data.psm_level_data.main;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -18,7 +17,7 @@ import org.yeastrc.xlink.www.constants.PeptideViewLinkTypesConstants;
 import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
 import org.yeastrc.xlink.www.form_query_json_objects.CutoffValuesRootLevel;
-import org.yeastrc.xlink.www.form_query_json_objects.MergedPeptideQueryJSONRoot;
+import org.yeastrc.xlink.www.form_query_json_objects.QCPageQueryJSONRoot;
 import org.yeastrc.xlink.www.form_query_json_objects.Z_CutoffValuesObjectsToOtherObjectsFactory;
 import org.yeastrc.xlink.www.form_query_json_objects.Z_CutoffValuesObjectsToOtherObjectsFactory.Z_CutoffValuesObjectsToOtherObjects_RootResult;
 import org.yeastrc.xlink.www.qc_data.psm_level_data.objects.PreMZ_Histogram_For_PSMPeptideCutoffsResults;
@@ -27,10 +26,6 @@ import org.yeastrc.xlink.www.qc_data.psm_level_data.objects.PreMZ_Histogram_For_
 import org.yeastrc.xlink.www.searcher.PreMZ_For_PSMPeptideCutoffsSearcher;
 import org.yeastrc.xlink.www.searcher.PreMZ_For_PSMPeptideCutoffsSearcher.PreMZ_For_PSMPeptideCutoffsResult;
 import org.yeastrc.xlink.www.web_utils.GetLinkTypesForSearchers;
-
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Get PreMZ Histogram from Scans where associated PSMs meet on criteria, including Reported Peptide and PSM cutoffs
@@ -57,7 +52,7 @@ public class PreMZ_Histogram_For_PSMPeptideCutoffs {
 	 * @throws Exception
 	 */
 	public PreMZ_Histogram_For_PSMPeptideCutoffsResults getPreMZ_Histogram_For_PSMPeptideCutoffs( 			
-			String filterCriteriaJSON, 
+			QCPageQueryJSONRoot qcPageQueryJSONRoot, 
 			List<SearchDTO> searches
 			) throws Exception {
 
@@ -71,29 +66,9 @@ public class PreMZ_Histogram_For_PSMPeptideCutoffs {
 			mapProjectSearchIdToSearchId.put( search.getProjectSearchId(), search.getSearchId() );
 		}
 
-		//  Jackson JSON Mapper object for JSON deserialization and serialization
-		ObjectMapper jacksonJSON_Mapper = new ObjectMapper();  //  Jackson JSON library object
-		//   deserialize 
-		MergedPeptideQueryJSONRoot mergedPeptideQueryJSONRoot = null;
-		try {
-			mergedPeptideQueryJSONRoot = jacksonJSON_Mapper.readValue( filterCriteriaJSON, MergedPeptideQueryJSONRoot.class );
-		} catch ( JsonParseException e ) {
-			String msg = "Failed to parse 'filterCriteriaJSON', JsonParseException.  filterCriteriaJSON: " + filterCriteriaJSON;
-			log.error( msg, e );
-			throw e;
-		} catch ( JsonMappingException e ) {
-			String msg = "Failed to parse 'filterCriteriaJSON', JsonMappingException.  filterCriteriaJSON: " + filterCriteriaJSON;
-			log.error( msg, e );
-			throw e;
-		} catch ( IOException e ) {
-			String msg = "Failed to parse 'filterCriteriaJSON', IOException.  filterCriteriaJSON: " + filterCriteriaJSON;
-			log.error( msg, e );
-			throw e;
-		}
-
 		////////////
 		/////   Searcher cutoffs for all searches
-		CutoffValuesRootLevel cutoffValuesRootLevel = mergedPeptideQueryJSONRoot.getCutoffs();
+		CutoffValuesRootLevel cutoffValuesRootLevel = qcPageQueryJSONRoot.getCutoffs();
 		Z_CutoffValuesObjectsToOtherObjects_RootResult cutoffValuesObjectsToOtherObjects_RootResult =
 				Z_CutoffValuesObjectsToOtherObjectsFactory
 				.createSearcherCutoffValuesRootLevel( searchIds, cutoffValuesRootLevel );
@@ -101,30 +76,33 @@ public class PreMZ_Histogram_For_PSMPeptideCutoffs {
 				cutoffValuesObjectsToOtherObjects_RootResult.getSearcherCutoffValuesRootLevel();
 		
 		return getResultsForParams(
-				searches, mergedPeptideQueryJSONRoot, searcherCutoffValuesRootLevel);
+				searches, qcPageQueryJSONRoot, searcherCutoffValuesRootLevel);
 	}
 	
 	public PreMZ_Histogram_For_PSMPeptideCutoffsResults getResultsForParams(
 			List<SearchDTO> searches, 
-			MergedPeptideQueryJSONRoot mergedPeptideQueryJSONRoot, 
+			QCPageQueryJSONRoot qcPageQueryJSONRoot, 
 			SearcherCutoffValuesRootLevel searcherCutoffValuesRootLevel)
 			throws Exception, ProxlWebappDataException {
 
 		///////////////////////////////////////////////////
 		//  Get LinkTypes for DB query - Sets to null when all selected as an optimization
-		String[] linkTypesForDBQuery = GetLinkTypesForSearchers.getInstance().getLinkTypesForSearchers( mergedPeptideQueryJSONRoot.getLinkTypes() );
+		String[] linkTypesForDBQuery = GetLinkTypesForSearchers.getInstance().getLinkTypesForSearchers( qcPageQueryJSONRoot.getLinkTypes() );
 		//   Mods for DB Query
-		String[] modsForDBQuery = mergedPeptideQueryJSONRoot.getMods();
+		String[] modsForDBQuery = qcPageQueryJSONRoot.getMods();
+
+		List<Integer> includeProteinSeqVIdsDecodedArray = qcPageQueryJSONRoot.getIncludeProteinSeqVIdsDecodedArray();
+		
 		
 		Set<String> selectedLinkTypes = new HashSet<>();
 		
 		//  Populate countForLinkType_ByLinkType for selected link types
-		if ( mergedPeptideQueryJSONRoot.getLinkTypes() == null || mergedPeptideQueryJSONRoot.getLinkTypes().length == 0 ) {
+		if ( qcPageQueryJSONRoot.getLinkTypes() == null || qcPageQueryJSONRoot.getLinkTypes().length == 0 ) {
 			String msg = "At least one linkType is required";
 			log.error( msg );
 			throw new Exception( msg );
 		} else {
-			for ( String linkType : mergedPeptideQueryJSONRoot.getLinkTypes() ) {
+			for ( String linkType : qcPageQueryJSONRoot.getLinkTypes() ) {
 				if ( PeptideViewLinkTypesConstants.CROSSLINK_PSM.equals( linkType ) ) {
 					selectedLinkTypes.add( XLinkUtils.CROSS_TYPE_STRING );
 				} else if ( PeptideViewLinkTypesConstants.LOOPLINK_PSM.equals( linkType ) ) {
@@ -141,7 +119,7 @@ public class PreMZ_Histogram_For_PSMPeptideCutoffs {
 		
 		//  Get Lists of preMZ mapped by link type
 		Map<String,List<BigDecimal>> allSearchesCombinedPreMZList_Map_KeyedOnLinkType = 
-				getAllSearchesCombinedPreMZList_Map_KeyedOnLinkType(searches, linkTypesForDBQuery, modsForDBQuery, searcherCutoffValuesRootLevel);
+				getAllSearchesCombinedPreMZList_Map_KeyedOnLinkType(searches, linkTypesForDBQuery, modsForDBQuery, includeProteinSeqVIdsDecodedArray,  searcherCutoffValuesRootLevel);
 		
 		
 		Map<String, PreMZ_Histogram_For_PSMPeptideCutoffsResultsForLinkType> preMZInChartBuckets_KeyedOnLinkType = 
@@ -304,6 +282,7 @@ public class PreMZ_Histogram_For_PSMPeptideCutoffs {
 			List<SearchDTO> searches, 
 			String[] linkTypesForDBQuery, 
 			String[] modsForDBQuery,
+			List<Integer> includeProteinSeqVIdsDecodedArray,
 			SearcherCutoffValuesRootLevel searcherCutoffValuesRootLevel) throws ProxlWebappDataException, Exception {
 		
 		/**
@@ -326,7 +305,7 @@ public class PreMZ_Histogram_For_PSMPeptideCutoffs {
 			
 			PreMZ_For_PSMPeptideCutoffsResult preMZ_For_PSMPeptideCutoffsResult = 
 					PreMZ_For_PSMPeptideCutoffsSearcher.getInstance()
-					.getPreMZ_For_PSMPeptideCutoffs( searchId, searcherCutoffValuesSearchLevel, linkTypesForDBQuery, modsForDBQuery );
+					.getPreMZ_For_PSMPeptideCutoffs( searchId, searcherCutoffValuesSearchLevel, linkTypesForDBQuery, modsForDBQuery, includeProteinSeqVIdsDecodedArray );
 			
 			/**
 			 * Map <{Link Type},List<{preMZ}>>

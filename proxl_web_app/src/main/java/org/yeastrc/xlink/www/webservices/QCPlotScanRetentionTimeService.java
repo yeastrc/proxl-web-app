@@ -4,10 +4,10 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.GET;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
@@ -16,11 +16,15 @@ import javax.ws.rs.core.Response;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
+import org.yeastrc.xlink.www.qc_data.a_enums.ForDownload_Enum;
+import org.yeastrc.xlink.www.qc_data.a_request_json_root.QCPageRequestJSONRoot;
+import org.yeastrc.xlink.www.qc_data.utils.QC_DeserializeRequestJSON_To_QCPageRequestJSONRoot;
 import org.yeastrc.xlink.www.qc_plots.scan_retention_time.CreateScanRetentionTimeQCPlotData;
 import org.yeastrc.xlink.www.qc_plots.scan_retention_time.ScanRetentionTimeJSONRoot;
 import org.yeastrc.xlink.www.qc_plots.scan_retention_time.CreateScanRetentionTimeQCPlotData.CreateScanRetentionTimeQCPlotData_Result;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
+import org.yeastrc.xlink.www.form_query_json_objects.QCPageQueryJSONRoot;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
 
@@ -40,17 +44,82 @@ public class QCPlotScanRetentionTimeService {
 	 * @return
 	 * @throws Exception
 	 */
-	@GET
+
+	@POST
+	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/getScanRetentionTime") 
 	public ScanRetentionTimeJSONRoot getScanRetentionTime( 
-			@QueryParam( "projectSearchId" ) Integer projectSearchId,
-			@QueryParam( "scanFileId" ) List<Integer> scanFileIdList,
-			@QueryParam( "scanFileAll" ) String scanFileAllString, 
-			@QueryParam( "filterCriteria" ) String filterCriteria_JSONString,
-			@QueryParam( "retentionTimeInMinutesCutoff" ) Double retentionTimeInMinutesCutoff,
+			byte[] requestJSONBytes,
 			@Context HttpServletRequest request )
 	throws Exception {
+
+		Integer projectSearchId = null;
+
+		//  Must be size 1 if scanFileAll not populated, if empty when scanFileAll is populated, lookup scanfile ids for projectSearchId
+		List<Integer> scanFileIdList = null;
+		// If populated, assumed to be true
+		String scanFileAllString = null; 
+		
+		Double retentionTimeInMinutesCutoff = null;
+
+		QCPageRequestJSONRoot qcPageRequestJSONRoot = null;
+		QCPageQueryJSONRoot qcPageQueryJSONRoot = null;
+		
+		{
+			if ( requestJSONBytes == null || requestJSONBytes.length == 0 ) {
+				String msg = "requestJSONBytes is null or requestJSONBytes is empty";
+				log.error( msg );
+			    throw new WebApplicationException(
+			    	      Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+	//		    	        .entity(  )
+			    	        .build()
+			    	        );
+			}
+			try {
+				qcPageRequestJSONRoot =
+						QC_DeserializeRequestJSON_To_QCPageRequestJSONRoot.getInstance().deserializeRequestJSON_To_QCPageRequestJSONRoot( requestJSONBytes );
+			} catch ( Exception e ) {
+				String msg = "parse request failed";
+				log.warn( msg );
+			    throw new WebApplicationException(
+			    	      Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+	//		    	        .entity(  )
+			    	        .build()
+			    	        );
+			}
+	
+			List<Integer> projectSearchIdList = qcPageRequestJSONRoot.getProjectSearchIds();
+
+			if ( projectSearchIdList == null || projectSearchIdList.isEmpty() ) {
+				String msg = "Provided projectSearchIds is null or projectSearchIds is missing";
+				log.error( msg );
+			    throw new WebApplicationException(
+			    	      Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+			    	        .entity( msg )
+			    	        .build()
+			    	        );
+			}
+
+			if ( projectSearchIdList.size() != 1 ) {
+				String msg = "Provided projectSearchIds size is not == 1 ";
+				log.error( msg );
+			    throw new WebApplicationException(
+			    	      Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+			    	        .entity( msg )
+			    	        .build()
+			    	        );
+			}
+			
+			projectSearchId = projectSearchIdList.get(0);
+			scanFileIdList = qcPageRequestJSONRoot.getScanFileIdList();
+			// If populated, assumed to be true
+			scanFileAllString = qcPageRequestJSONRoot.getScanFileAllString(); 
+			
+			retentionTimeInMinutesCutoff = qcPageRequestJSONRoot.getRetentionTimeInMinutesCutoff();
+			
+			qcPageQueryJSONRoot = qcPageRequestJSONRoot.getQcPageQueryJSONRoot();
+		}
 		
 		if ( projectSearchId == null ) {
 			String msg = "projectSearchId is not provided";
@@ -61,8 +130,8 @@ public class QCPlotScanRetentionTimeService {
 		    	        .build()
 		    	        );
 		}
-		if ( StringUtils.isEmpty( filterCriteria_JSONString ) ) {
-			String msg = "Provided filterCriteria is null or filterCriteria is missing";
+		if ( qcPageQueryJSONRoot == null ) {
+			String msg = "Provided qcPageQueryJSONRoot is null or is missing";
 			log.error( msg );
 			throw new WebApplicationException(
 					Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
@@ -155,8 +224,8 @@ public class QCPlotScanRetentionTimeService {
 			
 			CreateScanRetentionTimeQCPlotData_Result createScanRetentionTimeQCPlotData_Result = 
 					CreateScanRetentionTimeQCPlotData.getInstance()
-					.create( CreateScanRetentionTimeQCPlotData.ForDownload.NO,  
-							projectSearchId, scanFileIdList, scanFileAll, filterCriteria_JSONString, retentionTimeInSecondsCutoff );
+					.create( ForDownload_Enum.NO,  
+							projectSearchId, scanFileIdList, scanFileAll, qcPageQueryJSONRoot, retentionTimeInSecondsCutoff );
 			
 			ScanRetentionTimeJSONRoot scanRetentionTimeJSONRoot = createScanRetentionTimeQCPlotData_Result.getScanRetentionTimeJSONRoot();
 					

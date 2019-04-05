@@ -19,16 +19,18 @@ import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappInternalErrorException;
 import org.yeastrc.xlink.www.form_query_json_objects.CutoffValuesRootLevel;
-import org.yeastrc.xlink.www.form_query_json_objects.MergedPeptideQueryJSONRoot;
+import org.yeastrc.xlink.www.form_query_json_objects.QCPageQueryJSONRoot;
 import org.yeastrc.xlink.www.form_query_json_objects.Z_CutoffValuesObjectsToOtherObjectsFactory;
 import org.yeastrc.xlink.www.form_query_json_objects.Z_CutoffValuesObjectsToOtherObjectsFactory.Z_CutoffValuesObjectsToOtherObjects_RootResult;
 import org.yeastrc.xlink.www.objects.WebProteinPosition;
 import org.yeastrc.xlink.www.objects.WebReportedPeptide;
 import org.yeastrc.xlink.www.objects.WebReportedPeptideWrapper;
+import org.yeastrc.xlink.www.qc_data.a_enums.ForDownload_Enum;
 import org.yeastrc.xlink.www.qc_data.summary_statistics_merged.main.QC_SummaryCounts_Merged_CachedResultManager.QC_SummaryCounts_Merged_CachedResultManager_Result;
 import org.yeastrc.xlink.www.qc_data.summary_statistics_merged.objects.QC_SummaryCounts_Merged_Results;
 import org.yeastrc.xlink.www.qc_data.summary_statistics_merged.objects.QC_SummaryCounts_Merged_Results.QC_SummaryCountsResultsPerLinkType_Merged;
 import org.yeastrc.xlink.www.qc_data.summary_statistics_merged.objects.QC_SummaryCounts_Merged_Results.QC_SummaryCountsResults_PerSearchId_Merged;
+import org.yeastrc.xlink.www.qc_data.utils.QC_Cached_WebReportedPeptideWrapperList_FilteredOnIncludeProtSeqVIds;
 import org.yeastrc.xlink.www.searcher_via_cached_data.a_return_data_from_searchers.PeptideWebPageSearcherCacheOptimized;
 import org.yeastrc.xlink.www.web_utils.GetLinkTypesForSearchers;
 
@@ -49,10 +51,7 @@ public class QC_SummaryCounts_Merged {
 	 * 
 	 *  Increment this value whenever change the resulting image since Caching the resulting JSON
 	 */
-	static final int VERSION_FOR_CACHING = 1;
-	
-	
-	public enum ForDownload { YES, NO }
+	static final int VERSION_FOR_CACHING = 2;
 	
 	
 	/**
@@ -99,14 +98,11 @@ public class QC_SummaryCounts_Merged {
 	 * @throws Exception
 	 */
 	public QC_SummaryCounts_Merged_Method_Response getQC_SummaryCounts_Merged( 
-			ForDownload forDownload,
-			String filterCriteriaJSON,
-			String requestQueryString,
+			byte[] requestJSONBytes,  //  Contents of POST to webservice.  Only used here for caching
+			ForDownload_Enum forDownload,
+			QCPageQueryJSONRoot qcPageQueryJSONRoot, 
 			List<SearchDTO> searches ) throws Exception {
 
-
-		String cacheKey = null;
-		
 		Collection<Integer> searchIds = new HashSet<>();
 		Map<Integer,Integer> mapProjectSearchIdToSearchId = new HashMap<>();
 		List<Integer> searchIdsListDeduppedSorted = new ArrayList<>( searches.size() );
@@ -117,57 +113,36 @@ public class QC_SummaryCounts_Merged {
 			mapProjectSearchIdToSearchId.put( search.getProjectSearchId(), search.getSearchId() );
 		}
 		
-		if ( forDownload != ForDownload.YES ) {
+		if ( forDownload != ForDownload_Enum.YES ) {
 			
 			//  Only if not download, get from Cache on disk
-			
-			cacheKey = requestQueryString + filterCriteriaJSON;
-			
+
 			QC_SummaryCounts_Merged_CachedResultManager_Result qc_SummaryCounts_Merged_CachedResultManager_Result =
 					QC_SummaryCounts_Merged_CachedResultManager.getSingletonInstance()
-					.retrieveDataFromCache(searchIdsListDeduppedSorted, cacheKey );
+					.retrieveDataFromCache(searchIdsListDeduppedSorted, requestJSONBytes );
+
 			if ( qc_SummaryCounts_Merged_CachedResultManager_Result != null ) {
 				byte[] chartJSONAsBytes = qc_SummaryCounts_Merged_CachedResultManager_Result.getChartJSONAsBytes();
 				if ( chartJSONAsBytes != null ) {
-					
+
 					//  Data in Cache on disk so return it
-					
+
 					QC_SummaryCounts_Merged_Method_Response response = new QC_SummaryCounts_Merged_Method_Response();
 					response.resultsAsBytes = chartJSONAsBytes;
-					
+
 					return response;  // EARLY EXIT
 				}
 			}
 		}
 
-		//  Jackson JSON Mapper object for JSON deserialization and serialization
-		ObjectMapper jacksonJSON_Mapper = new ObjectMapper();  //  Jackson JSON library object
-		//   deserialize 
-		MergedPeptideQueryJSONRoot mergedPeptideQueryJSONRoot = null;
-		try {
-			mergedPeptideQueryJSONRoot = jacksonJSON_Mapper.readValue( filterCriteriaJSON, MergedPeptideQueryJSONRoot.class );
-		} catch ( JsonParseException e ) {
-			String msg = "Failed to parse 'postBody', JsonParseException. filterCriteriaJSON: " + filterCriteriaJSON; 
-			log.error( msg, e );
-			throw e;
-		} catch ( JsonMappingException e ) {
-			String msg = "Failed to parse 'postBody', JsonMappingException. filterCriteriaJSON: " + filterCriteriaJSON;
-			log.error( msg, e );
-			throw e;
-		} catch ( IOException e ) {
-			String msg = "Failed to parse 'postBody', IOException. filterCriteriaJSON: " + filterCriteriaJSON;
-			log.error( msg, e );
-			throw e;
-		}
-
 		///////////////////////////////////////////////////
 		//  Get LinkTypes for DB query - Sets to null when all selected as an optimization
-		String[] linkTypesForDBQuery = GetLinkTypesForSearchers.getInstance().getLinkTypesForSearchers( mergedPeptideQueryJSONRoot.getLinkTypes() );
+		String[] linkTypesForDBQuery = GetLinkTypesForSearchers.getInstance().getLinkTypesForSearchers( qcPageQueryJSONRoot.getLinkTypes() );
 		//   Mods for DB Query
-		String[] modsForDBQuery = mergedPeptideQueryJSONRoot.getMods();
+		String[] modsForDBQuery = qcPageQueryJSONRoot.getMods();
 		////////////
 		/////   Searcher cutoffs for all searches
-		CutoffValuesRootLevel cutoffValuesRootLevel = mergedPeptideQueryJSONRoot.getCutoffs();
+		CutoffValuesRootLevel cutoffValuesRootLevel = qcPageQueryJSONRoot.getCutoffs();
 		Z_CutoffValuesObjectsToOtherObjects_RootResult cutoffValuesObjectsToOtherObjects_RootResult =
 				Z_CutoffValuesObjectsToOtherObjectsFactory
 				.createSearcherCutoffValuesRootLevel( searchIds, cutoffValuesRootLevel );
@@ -175,7 +150,7 @@ public class QC_SummaryCounts_Merged {
 				cutoffValuesObjectsToOtherObjects_RootResult.getSearcherCutoffValuesRootLevel();
 		
 		//  Populate countForLinkType_ByLinkType for selected link types
-		if ( mergedPeptideQueryJSONRoot.getLinkTypes() == null || mergedPeptideQueryJSONRoot.getLinkTypes().length == 0 ) {
+		if ( qcPageQueryJSONRoot.getLinkTypes() == null || qcPageQueryJSONRoot.getLinkTypes().length == 0 ) {
 			String msg = "At least one linkType is required";
 			log.error( msg );
 			throw new Exception( msg );
@@ -183,9 +158,9 @@ public class QC_SummaryCounts_Merged {
 		
 		Map<Integer, PerSearchIdTempData> perSearchIdTempData_BySearchId = new HashMap<>();
 		
-		List<String> linkTypesList = new ArrayList<String>( mergedPeptideQueryJSONRoot.getLinkTypes().length );
+		List<String> linkTypesList = new ArrayList<String>( qcPageQueryJSONRoot.getLinkTypes().length );
 
-		for ( String linkTypeFromWeb : mergedPeptideQueryJSONRoot.getLinkTypes() ) {
+		for ( String linkTypeFromWeb : qcPageQueryJSONRoot.getLinkTypes() ) {
 			String linkType = null;
 			if ( PeptideViewLinkTypesConstants.CROSSLINK_PSM.equals( linkTypeFromWeb ) ) {
 				linkType = XLinkUtils.CROSS_TYPE_STRING;
@@ -219,10 +194,23 @@ public class QC_SummaryCounts_Merged {
 			
 			///////////////////////////////////////////////
 			//  Get peptides for this search from the DATABASE
+
+			//  Change to use QC_Cached_WebReportedPeptideWrapperList_FilteredOnIncludeProtSeqVIds 
+			//     to get list filtered on 
+
 			List<WebReportedPeptideWrapper> wrappedLinksPerForSearch =
-					PeptideWebPageSearcherCacheOptimized.getInstance().searchOnSearchIdPsmCutoffPeptideCutoff(
-							searchDTO, searcherCutoffValuesSearchLevel, linkTypesForDBQuery, modsForDBQuery, 
-							PeptideWebPageSearcherCacheOptimized.ReturnOnlyReportedPeptidesWithMonolinks.NO );
+					QC_Cached_WebReportedPeptideWrapperList_FilteredOnIncludeProtSeqVIds.getInstance()
+					.get_WebReportedPeptideWrapperList_FilteredOnIncludeProtSeqVIds(
+							searchDTO, searcherCutoffValuesSearchLevel, 
+							linkTypesForDBQuery,
+							modsForDBQuery, 
+							PeptideWebPageSearcherCacheOptimized.ReturnOnlyReportedPeptidesWithMonolinks.NO,
+							qcPageQueryJSONRoot.getIncludeProteinSeqVIdsDecodedArray() );
+			
+//			List<WebReportedPeptideWrapper> wrappedLinksPerForSearch =
+//					PeptideWebPageSearcherCacheOptimized.getInstance().searchOnSearchIdPsmCutoffPeptideCutoff(
+//							searchDTO, searcherCutoffValuesSearchLevel, linkTypesForDBQuery, modsForDBQuery, 
+//							PeptideWebPageSearcherCacheOptimized.ReturnOnlyReportedPeptidesWithMonolinks.NO );
 			
 			if ( ! wrappedLinksPerForSearch.isEmpty() ) {
 				foundData = true;
@@ -331,12 +319,12 @@ public class QC_SummaryCounts_Merged {
 		QC_SummaryCounts_Merged_Method_Response response = new QC_SummaryCounts_Merged_Method_Response();
 		response.summaryCounts_Merged_Results = qc_SummaryCounts_Merged_Results;
 		
-		if ( forDownload != ForDownload.YES && cacheKey != null ) {
+		if ( forDownload != ForDownload_Enum.YES && requestJSONBytes != null ) {
 			//  Not for download so create the JSON and cache it to disk
 			response.resultsAsBytes = getResultsByteArray( qc_SummaryCounts_Merged_Results );
 			
 			QC_SummaryCounts_Merged_CachedResultManager.getSingletonInstance()
-			.saveDataToCache( searchIdsListDeduppedSorted, response.resultsAsBytes, cacheKey );
+			.saveDataToCache( searchIdsListDeduppedSorted, response.resultsAsBytes, requestJSONBytes );
 		}
 		
 		return response;

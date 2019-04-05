@@ -19,8 +19,10 @@
 "use strict";
 
 //Import header_main.js and children to ensure on the page
-import { header_mainVariable } from 'page_js/common_all_pages/header_section_main_pages/header_main.js';
+import { header_mainVariable } from 'page_js/header_section_js_all_pages_main_pages/header_section_main_pages/header_main.js';
 
+
+import { copyObject_DeepCopy_Proxl } from 'page_js/common_js_includes_all_pages/copyObject_DeepCopy.js';
 
 
 //  Import to make available on the page
@@ -34,6 +36,8 @@ import { webserviceDataParamsDistributionCommonCode } from 'page_js/data_pages/p
 import { annotationDataDisplayProcessingCommonCode } from 'page_js/data_pages/project_search_ids_driven_pages/common/psmPeptideAnnDisplayDataCommon.js';
 import { cutoffProcessingCommonCode } from 'page_js/data_pages/project_search_ids_driven_pages/common/psmPeptideCutoffsCommon.js';
 
+
+import { qc_pages_Single_Merged_Common } from './qc_pages_Single_Merged_Common.js';
 
 import { qcPageSection_Peptide_Level_Statistics } from './qcPageSection_Peptide_Level_Statistics.js';
 import { qcPageSection_PSM_Error_Estimates } from './qcPageSection_PSM_Error_Estimates.js';
@@ -125,8 +129,21 @@ var QCPageMain = function() {
 
 	var _project_search_ids = null;
 
+	//////////////////////
+
+	///  Has URL contents
 
 	var _hash_json_Contents = null;
+	//   Added properties:
+	//		includeProteinSeqVIdsDecodedArray
+
+	//  Properties added to _hash_json_Contents are placed here to strip them out when create JSON to put back on URL
+	const _hash_json_Contents_PROPERTY_ADDITIONS = [ 'includeProteinSeqVIdsDecodedArray' ];
+
+	//  Properties On Hash in _hash_json_Contents are only for URL.  They are not passed to webservices
+	const _hash_json_Contents_PROPERTY_URL_ONLY = [ 'inclProtSeqVIds', 'inclProtSeqVIdsAllSelected' ];
+
+	////////////////////
 
 	var _anySearchesHaveScanDataYes = false;
 
@@ -173,6 +190,11 @@ var QCPageMain = function() {
 		//  Make a copy of hash_json_Contents    (  true for deep, target object, source object, <source object 2>, ... )
 		var hash_json_Contents_COPY = $.extend( true /*deep*/,  {}, _hash_json_Contents );
 
+		//  Delete encoded data, for URL only
+		for ( const propertyNameToRemove of _hash_json_Contents_PROPERTY_URL_ONLY ) {
+			delete hash_json_Contents_COPY[ propertyNameToRemove ];
+		}
+		
 		return hash_json_Contents_COPY;
 	};
 	
@@ -621,6 +643,21 @@ var QCPageMain = function() {
 				$item.prop('checked', true);
 			});
 		}
+		
+		//  Mark Multi <select> for chosen Proteins to include
+		if ( _hash_json_Contents.includeProteinSeqVIdsDecodedArray ) {
+			const $includeProtein = $("#includeProtein");
+			$includeProtein.val( _hash_json_Contents.includeProteinSeqVIdsDecodedArray );
+		}
+		if ( _hash_json_Contents.inclProtSeqVIdsAllSelected ) {
+			//  All selected so build array of all option values and assign it
+			const $includeProtein = $("#includeProtein");
+						//  Set all <option> values in selector to selected
+			const $optionAll = $includeProtein.find("option");
+			$optionAll.each( ( index, element ) => {
+				element.selected = true;
+			});
+		}
 	};
 
 	/**
@@ -678,10 +715,14 @@ var QCPageMain = function() {
 				//  Only update if there were no errors in the input data
 				return;
 			}
+
+			this.updateURLHashWithJSONObject( dataFromFiltersResult );
+
+			this.decode_inclProtSeqVIds_Update_json_param( dataFromFiltersResult );
+
 			//  Update filter data held in JS variable
 			_hash_json_Contents = dataFromFiltersResult;
 
-			this.updateURLHashWithJSONObject( dataFromFiltersResult );
 
 		} catch( e ) {
 			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
@@ -693,6 +734,13 @@ var QCPageMain = function() {
 	 * 
 	 */
 	this.updateURLHashWithJSONObject = function( jsonObject ) {
+
+		const jsonObject_Copy = copyObject_DeepCopy_Proxl( jsonObject );  // External function
+
+		for ( const propertyNameToRemove of _hash_json_Contents_PROPERTY_ADDITIONS ) {
+			delete jsonObject_Copy[ propertyNameToRemove ];
+		}
+
 		var newHash = JSON.stringify( jsonObject );	
 		var newHashEncodedToEncodedURIComponent = LZString.compressToEncodedURIComponent( newHash );
 		try {
@@ -753,12 +801,27 @@ var QCPageMain = function() {
 		if ( allDynamicModMassesChosen ) {
 			outputDynamicModMasses = null;  //  set to null when all chosen
 		}
+				
 		var outputFilterCContents = { 
-				cutoffs : outputCutoffs, 
-				annTypeIdDisplay : annotationTypeDisplayByProjectSearchId,
-				linkTypes : outputLinkTypes, 
-				mods : outputDynamicModMasses 
+			cutoffs : outputCutoffs, 
+			annTypeIdDisplay : annotationTypeDisplayByProjectSearchId,
+			linkTypes : outputLinkTypes, 
+			mods : outputDynamicModMasses
 		};
+
+		const areAllOrNoneIncludeProteinsSelected_Result = qc_pages_Single_Merged_Common.areAllOrNoneIncludeProteinsSelected();
+
+		if ( areAllOrNoneIncludeProteinsSelected_Result.allSelected ) {
+			//  Set property in output object
+			outputFilterCContents.inclProtSeqVIdsAllSelected = true;
+
+		} else if ( ( ! areAllOrNoneIncludeProteinsSelected_Result.noneSelected ) ) {
+			var outputIncludeProteinsAsStrings = $("#includeProtein").val( );
+			var getEncodedIncludeProteinsResponse = qc_pages_Single_Merged_Common.getEncodedIncludeProteins( outputIncludeProteinsAsStrings );
+			//  Set property in output object
+			outputFilterCContents.inclProtSeqVIds = getEncodedIncludeProteinsResponse.encodedIncludeProteins;
+		}
+
 
 		return outputFilterCContents;
 	};
@@ -836,6 +899,7 @@ var QCPageMain = function() {
 			//  Set cutoff defaults if not in JSON
 			json.cutoffs = getCutoffDefaultsFromPage();
 		}
+
 		//  START: Special update to allow projectSearchId values to be added or removed from URL
 		//  Update cutoffs to add defaults for search ids in defaults but not in cutoffs
 		//  Update cutoffs to remove search ids not in defaults but in cutoffs
@@ -872,8 +936,23 @@ var QCPageMain = function() {
 		if ( ! json.linkTypes ) {
 			json.linkTypes = _link_type_default_selected;
 		}
+
+		this.decode_inclProtSeqVIds_Update_json_param( json );
 		
 		return json;
+	}
+
+	this.decode_inclProtSeqVIds_Update_json_param = function( json ) {
+
+		//  Decode json.inclProtSeqVIds and place result into json.includeProteinSeqVIdsDecodedArray
+
+		if ( json.inclProtSeqVIds ) {
+			const includeProteinSeqVIdsSet = qc_pages_Single_Merged_Common.getDecodedIncludeProteins( json.inclProtSeqVIds );
+			if ( includeProteinSeqVIdsSet ) {
+				const includeProteinSeqVIdsDecodedArray = Array.from( includeProteinSeqVIdsSet );
+				json.includeProteinSeqVIdsDecodedArray = includeProteinSeqVIdsDecodedArray;
+			}
+		}
 	}
 
 	/**

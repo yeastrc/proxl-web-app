@@ -15,7 +15,7 @@
 
 
 
-import { addSingleGenericProxlToolTip } from 'page_js/common_all_pages/header_section_every_page/genericToolTip.js';
+import { addSingleGenericProxlToolTip } from 'page_js/header_section_js_all_pages_main_pages/header_section_every_page/genericToolTip.js';
 
 //  Instance object on page:  searchesForPageChooser
 

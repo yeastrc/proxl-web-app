@@ -14,6 +14,8 @@
 //JavaScript directive:   all variables have to be declared with "var", maybe other things
 "use strict";
 
+import { webserviceCallStandardPost } from 'page_js/webservice_call_common/webserviceCallStandardPost.js';
+
 import { qcChartDownloadHelp } from './qcChart_Download_Help_HTMLBlock.js';
 
 
@@ -241,52 +243,39 @@ var QCMergedPageChartScanFileStatistics = function() {
 
 		_chart_isLoaded = _IS_LOADED_LOADING;
 		
-		var hash_json_field_Contents_JSONString = JSON.stringify( _get_hash_json_Contents() );
-		var ajaxRequestData = {
-				project_search_id : _project_search_ids,
-				filterCriteria : hash_json_field_Contents_JSONString
-		};
-
 		if ( _activeAjax ) {
 			_activeAjax.abort();
 			_activeAjax = null;
 		}
 		
-		var _URL = "services/qc/dataPage/getScanStatistics_Merged";
+		const hash_json_Contents = _get_hash_json_Contents();
 
-		_activeAjax =
-			$.ajax({
-				type : "POST",
-				url : _URL,
-				data : ajaxRequestData,
-				dataType : "json",
-				traditional: true,  //  Force traditional serialization of the data sent
-				//   One thing this means is that arrays are sent as the object property instead of object property followed by "[]".
-				//   So _project_search_ids array is passed as "project_search_id=<value>" which is what Jersey expects
-				success : function(data) {
-					try {
-						_activeAjax = null;
-						objectThis.loadScanStatisticsProcessResponse(ajaxRequestData, data, params );
-					} catch( e ) {
-						reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
-						throw e;
-					}
-				},
-				failure: function(errMsg) {
-					_activeAjax = null;
-					handleAJAXFailure( errMsg );
-				},
-				error : function(jqXHR, textStatus, errorThrown) {
-					_activeAjax = null;
-					handleAJAXError(jqXHR, textStatus, errorThrown);
-				}
-			});
+		const ajaxRequestData = { projectSearchIds : _project_search_ids, qcPageQueryJSONRoot : hash_json_Contents };
+
+		const url = "services/qc/dataPage/getScanStatistics_Merged";
+
+		const webserviceCallStandardPostResult = webserviceCallStandardPost({ dataToSend : ajaxRequestData, url }); //  External Function
+
+		const promise_webserviceCallStandardPost = webserviceCallStandardPostResult.promise; 
+		_activeAjax = webserviceCallStandardPostResult.api;
+
+		promise_webserviceCallStandardPost.catch( ( ) => { _activeAjax = null; } );
+
+		promise_webserviceCallStandardPost.then( ({ responseData }) => {
+			try {
+				_activeAjax = null;
+				objectThis.loadScanStatisticsProcessResponse( responseData );
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
+		});
 	};
 
 	/**
 	 * Load the data for  Scan Statistics Process AJAX response
 	 */
-	this.loadScanStatisticsProcessResponse = function( requestData, responseData ) {
+	this.loadScanStatisticsProcessResponse = function( responseData ) {
 
 		var results = responseData.results;
 		

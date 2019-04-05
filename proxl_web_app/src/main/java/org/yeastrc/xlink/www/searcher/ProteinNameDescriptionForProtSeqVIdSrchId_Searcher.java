@@ -10,9 +10,9 @@ import org.yeastrc.xlink.db.DBConnectionFactory;
  * 
  *
  */
-public class SearchUtils {
+public class ProteinNameDescriptionForProtSeqVIdSrchId_Searcher {
 	
-	private static final Logger log = LoggerFactory.getLogger( SearchUtils.class);
+	private static final Logger log = LoggerFactory.getLogger( ProteinNameDescriptionForProtSeqVIdSrchId_Searcher.class);
 	
 	private static final String NAME_SQL =
 			"SELECT DISTINCT  annotation.name "

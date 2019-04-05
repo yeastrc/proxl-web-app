@@ -1,6 +1,5 @@
 package org.yeastrc.xlink.www.qc_data.psm_level_data_merged.main;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -18,25 +17,17 @@ import org.yeastrc.xlink.utils.XLinkUtils;
 import org.yeastrc.xlink.www.constants.PeptideViewLinkTypesConstants;
 import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
-import org.yeastrc.xlink.www.exceptions.ProxlWebappInternalErrorException;
 import org.yeastrc.xlink.www.form_query_json_objects.CutoffValuesRootLevel;
-import org.yeastrc.xlink.www.form_query_json_objects.MergedPeptideQueryJSONRoot;
+import org.yeastrc.xlink.www.form_query_json_objects.QCPageQueryJSONRoot;
 import org.yeastrc.xlink.www.form_query_json_objects.Z_CutoffValuesObjectsToOtherObjectsFactory;
 import org.yeastrc.xlink.www.form_query_json_objects.Z_CutoffValuesObjectsToOtherObjectsFactory.Z_CutoffValuesObjectsToOtherObjects_RootResult;
-import org.yeastrc.xlink.www.objects.WebReportedPeptide;
-import org.yeastrc.xlink.www.objects.WebReportedPeptideWrapper;
 import org.yeastrc.xlink.www.qc_data.psm_level_data_merged.objects.ChargeStateCounts_Merged_Results;
 import org.yeastrc.xlink.www.qc_data.psm_level_data_merged.objects.ChargeStateCounts_Merged_Results.ChargeStateCountsResultsForChargeValue;
 import org.yeastrc.xlink.www.qc_data.psm_level_data_merged.objects.ChargeStateCounts_Merged_Results.ChargeStateCountsResultsForLinkType;
 import org.yeastrc.xlink.www.qc_data.psm_level_data_merged.objects.ChargeStateCounts_Merged_Results.ChargeStateCountsResultsForSearchId;
 import org.yeastrc.xlink.www.searcher.PSM_DistinctChargeStatesSearcher;
 import org.yeastrc.xlink.www.searcher.PSM_DistinctChargeStatesSearcher.PSM_DistinctChargeStatesResult;
-import org.yeastrc.xlink.www.searcher_via_cached_data.a_return_data_from_searchers.PeptideWebPageSearcherCacheOptimized;
 import org.yeastrc.xlink.www.web_utils.GetLinkTypesForSearchers;
-
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * 
@@ -62,7 +53,7 @@ public class ChargeStateCounts_Merged {
 	 * @throws Exception
 	 */
 	public ChargeStateCounts_Merged_Results getChargeStateCounts_Merged( 			
-			String filterCriteriaJSON, 
+			QCPageQueryJSONRoot qcPageQueryJSONRoot, 
 			List<SearchDTO> searches ) throws Exception {
 
 		Collection<Integer> searchIds = new HashSet<>();
@@ -75,27 +66,7 @@ public class ChargeStateCounts_Merged {
 			mapProjectSearchIdToSearchId.put( search.getProjectSearchId(), search.getSearchId() );
 		}
 
-		//  Jackson JSON Mapper object for JSON deserialization and serialization
-		ObjectMapper jacksonJSON_Mapper = new ObjectMapper();  //  Jackson JSON library object
-		//   deserialize 
-		MergedPeptideQueryJSONRoot mergedPeptideQueryJSONRoot = null;
-		try {
-			mergedPeptideQueryJSONRoot = jacksonJSON_Mapper.readValue( filterCriteriaJSON, MergedPeptideQueryJSONRoot.class );
-		} catch ( JsonParseException e ) {
-			String msg = "Failed to parse 'filterCriteriaJSON', JsonParseException.  filterCriteriaJSON: " + filterCriteriaJSON;
-			log.error( msg, e );
-			throw e;
-		} catch ( JsonMappingException e ) {
-			String msg = "Failed to parse 'filterCriteriaJSON', JsonMappingException.  filterCriteriaJSON: " + filterCriteriaJSON;
-			log.error( msg, e );
-			throw e;
-		} catch ( IOException e ) {
-			String msg = "Failed to parse 'filterCriteriaJSON', IOException.  filterCriteriaJSON: " + filterCriteriaJSON;
-			log.error( msg, e );
-			throw e;
-		}
-
-		String[] linkTypesFromURL = mergedPeptideQueryJSONRoot.getLinkTypes();
+		String[] linkTypesFromURL = qcPageQueryJSONRoot.getLinkTypes();
 		
 		if ( linkTypesFromURL == null || linkTypesFromURL.length == 0 ) {
 			String msg = "At least one linkType is required";
@@ -131,16 +102,19 @@ public class ChargeStateCounts_Merged {
 				linkTypesFromURLUpdatedIndex++;
 			}
 			linkTypesFromURL = linkTypesFromURLUpdated;
-			mergedPeptideQueryJSONRoot.setLinkTypes( linkTypesFromURLUpdated );
+			qcPageQueryJSONRoot.setLinkTypes( linkTypesFromURLUpdated );
 		}
 		///////////////////////////////////////////////////
 		//  Get LinkTypes for DB query - Sets to null when all selected as an optimization
-		String[] linkTypesForDBQuery = GetLinkTypesForSearchers.getInstance().getLinkTypesForSearchers( mergedPeptideQueryJSONRoot.getLinkTypes() );
+		String[] linkTypesForDBQuery = GetLinkTypesForSearchers.getInstance().getLinkTypesForSearchers( qcPageQueryJSONRoot.getLinkTypes() );
 		//   Mods for DB Query
-		String[] modsForDBQuery = mergedPeptideQueryJSONRoot.getMods();
+		String[] modsForDBQuery = qcPageQueryJSONRoot.getMods();
+
+		List<Integer> includeProteinSeqVIdsDecodedArray = qcPageQueryJSONRoot.getIncludeProteinSeqVIdsDecodedArray();
+		
 		////////////
 		/////   Searcher cutoffs for all searches
-		CutoffValuesRootLevel cutoffValuesRootLevel = mergedPeptideQueryJSONRoot.getCutoffs();
+		CutoffValuesRootLevel cutoffValuesRootLevel = qcPageQueryJSONRoot.getCutoffs();
 		Z_CutoffValuesObjectsToOtherObjects_RootResult cutoffValuesObjectsToOtherObjects_RootResult =
 				Z_CutoffValuesObjectsToOtherObjectsFactory
 				.createSearcherCutoffValuesRootLevel( searchIds, cutoffValuesRootLevel );
@@ -151,7 +125,7 @@ public class ChargeStateCounts_Merged {
 		//  Map<[link type], Map<[search id],Map<[charge value],[count of charge value]>>>
 		Map<String,Map<Integer,Map<Integer,Long>>> allSearchesCombinedChargeValueCountMap_Map_KeyedOnSearchId_KeyedOnLinkType = 
 				getAllSearchesCombinedChargeValueCountMap_Map_KeyedOnSearchId_KeyedOnLinkType(
-						searches, linkTypesForDBQuery, modsForDBQuery, searcherCutoffValuesRootLevel);
+						searches, linkTypesForDBQuery, modsForDBQuery, includeProteinSeqVIdsDecodedArray, searcherCutoffValuesRootLevel);
 
 		//  Get Maps of PSM count mapped by search id and then link type
 		//  Map<[link type], Map<[search id],[count of PSMs]>>
@@ -367,6 +341,7 @@ public class ChargeStateCounts_Merged {
 			List<SearchDTO> searches, 
 			String[] linkTypesForDBQuery, 
 			String[] modsForDBQuery,
+			List<Integer> includeProteinSeqVIdsDecodedArray,
 			SearcherCutoffValuesRootLevel searcherCutoffValuesRootLevel) throws ProxlWebappDataException, Exception {
 	
 		//  Map<[link type], Map<[search id],Map<[charge value],[count of charge value]>>>
@@ -387,7 +362,7 @@ public class ChargeStateCounts_Merged {
 			
 			PSM_DistinctChargeStatesResult psm_DistinctChargeStatesResult = 
 					PSM_DistinctChargeStatesSearcher.getInstance()
-					.getPSM_DistinctChargeStates( searchId, searcherCutoffValuesSearchLevel, linkTypesForDBQuery, modsForDBQuery );
+					.getPSM_DistinctChargeStates( searchId, searcherCutoffValuesSearchLevel, linkTypesForDBQuery, modsForDBQuery, includeProteinSeqVIdsDecodedArray );
 			
 			/**
 			 * Map <{Link Type},Map<{Charge Value},{count}>>

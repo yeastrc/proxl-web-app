@@ -1,6 +1,5 @@
 package org.yeastrc.xlink.www.qc_data.reported_peptide_level.main;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -20,7 +19,7 @@ import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.www.dto.SrchRepPeptPeptideDTO;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
 import org.yeastrc.xlink.www.form_query_json_objects.CutoffValuesRootLevel;
-import org.yeastrc.xlink.www.form_query_json_objects.MergedPeptideQueryJSONRoot;
+import org.yeastrc.xlink.www.form_query_json_objects.QCPageQueryJSONRoot;
 import org.yeastrc.xlink.www.form_query_json_objects.Z_CutoffValuesObjectsToOtherObjectsFactory;
 import org.yeastrc.xlink.www.form_query_json_objects.Z_CutoffValuesObjectsToOtherObjectsFactory.Z_CutoffValuesObjectsToOtherObjects_RootResult;
 import org.yeastrc.xlink.www.objects.WebReportedPeptide;
@@ -28,15 +27,12 @@ import org.yeastrc.xlink.www.objects.WebReportedPeptideWrapper;
 import org.yeastrc.xlink.www.qc_data.reported_peptide_level.objects.PeptideLength_Histogram_For_PSMPeptideCutoffsResults;
 import org.yeastrc.xlink.www.qc_data.reported_peptide_level.objects.PeptideLength_Histogram_For_PSMPeptideCutoffsResults.PeptideLength_Histogram_For_PSMPeptideCutoffsResultsChartBucket;
 import org.yeastrc.xlink.www.qc_data.reported_peptide_level.objects.PeptideLength_Histogram_For_PSMPeptideCutoffsResults.PeptideLength_Histogram_For_PSMPeptideCutoffsResultsForLinkType;
+import org.yeastrc.xlink.www.qc_data.utils.QC_Cached_WebReportedPeptideWrapperList_FilteredOnIncludeProtSeqVIds;
 import org.yeastrc.xlink.www.searcher_via_cached_data.a_return_data_from_searchers.PeptideWebPageSearcherCacheOptimized;
 import org.yeastrc.xlink.www.searcher_via_cached_data.cached_data_holders.Cached_SrchRepPeptPeptideDTO_ForSrchIdRepPeptId;
 import org.yeastrc.xlink.www.searcher_via_cached_data.request_objects_for_searchers_for_cached_data.SrchRepPeptPeptideDTO_ForSrchIdRepPeptId_ReqParams;
 import org.yeastrc.xlink.www.searcher_via_cached_data.return_objects_from_searchers_for_cached_data.SrchRepPeptPeptideDTO_ForSrchIdRepPeptId_Result;
 import org.yeastrc.xlink.www.web_utils.GetLinkTypesForSearchers;
-
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Get Peptide Length Histogram where associated Reported Peptides meet criteria, including Reported Peptide and PSM cutoffs
@@ -64,7 +60,7 @@ public class PeptideLength_Histogram_For_PSMPeptideCutoffs {
 	 * @throws Exception
 	 */
 	public PeptideLength_Histogram_For_PSMPeptideCutoffsResults getPeptideLength_Histogram_For_PSMPeptideCutoffs( 			
-			String filterCriteriaJSON, 
+			QCPageQueryJSONRoot qcPageQueryJSONRoot, 
 			List<Integer> projectSearchIdsListDeduppedSorted,
 			List<SearchDTO> searches, 
 			Map<Integer, SearchDTO> searchesMapOnSearchId ) throws Exception {
@@ -81,34 +77,14 @@ public class PeptideLength_Histogram_For_PSMPeptideCutoffs {
 			mapProjectSearchIdToSearchId.put( search.getProjectSearchId(), search.getSearchId() );
 		}
 
-		//  Jackson JSON Mapper object for JSON deserialization and serialization
-		ObjectMapper jacksonJSON_Mapper = new ObjectMapper();  //  Jackson JSON library object
-		//   deserialize 
-		MergedPeptideQueryJSONRoot mergedPeptideQueryJSONRoot = null;
-		try {
-			mergedPeptideQueryJSONRoot = jacksonJSON_Mapper.readValue( filterCriteriaJSON, MergedPeptideQueryJSONRoot.class );
-		} catch ( JsonParseException e ) {
-			String msg = "Failed to parse 'filterCriteriaJSON', JsonParseException.  filterCriteriaJSON: " + filterCriteriaJSON;
-			log.error( msg, e );
-			throw e;
-		} catch ( JsonMappingException e ) {
-			String msg = "Failed to parse 'filterCriteriaJSON', JsonMappingException.  filterCriteriaJSON: " + filterCriteriaJSON;
-			log.error( msg, e );
-			throw e;
-		} catch ( IOException e ) {
-			String msg = "Failed to parse 'filterCriteriaJSON', IOException.  filterCriteriaJSON: " + filterCriteriaJSON;
-			log.error( msg, e );
-			throw e;
-		}
-
 		///////////////////////////////////////////////////
 		//  Get LinkTypes for DB query - Sets to null when all selected as an optimization
-		String[] linkTypesForDBQuery = GetLinkTypesForSearchers.getInstance().getLinkTypesForSearchers( mergedPeptideQueryJSONRoot.getLinkTypes() );
+		String[] linkTypesForDBQuery = GetLinkTypesForSearchers.getInstance().getLinkTypesForSearchers( qcPageQueryJSONRoot.getLinkTypes() );
 		//   Mods for DB Query
-		String[] modsForDBQuery = mergedPeptideQueryJSONRoot.getMods();
+		String[] modsForDBQuery = qcPageQueryJSONRoot.getMods();
 		////////////
 		/////   Searcher cutoffs for all searches
-		CutoffValuesRootLevel cutoffValuesRootLevel = mergedPeptideQueryJSONRoot.getCutoffs();
+		CutoffValuesRootLevel cutoffValuesRootLevel = qcPageQueryJSONRoot.getCutoffs();
 		Z_CutoffValuesObjectsToOtherObjects_RootResult cutoffValuesObjectsToOtherObjects_RootResult =
 				Z_CutoffValuesObjectsToOtherObjectsFactory
 				.createSearcherCutoffValuesRootLevel( searchIds, cutoffValuesRootLevel );
@@ -116,12 +92,12 @@ public class PeptideLength_Histogram_For_PSMPeptideCutoffs {
 				cutoffValuesObjectsToOtherObjects_RootResult.getSearcherCutoffValuesRootLevel();
 		
 		//  Populate countForLinkType_ByLinkType for selected link types
-		if ( mergedPeptideQueryJSONRoot.getLinkTypes() == null || mergedPeptideQueryJSONRoot.getLinkTypes().length == 0 ) {
+		if ( qcPageQueryJSONRoot.getLinkTypes() == null || qcPageQueryJSONRoot.getLinkTypes().length == 0 ) {
 			String msg = "At least one linkType is required";
 			log.error( msg );
 			throw new Exception( msg );
 		} else {
-			for ( String linkType : mergedPeptideQueryJSONRoot.getLinkTypes() ) {
+			for ( String linkType : qcPageQueryJSONRoot.getLinkTypes() ) {
 				if ( PeptideViewLinkTypesConstants.CROSSLINK_PSM.equals( linkType ) ) {
 					selectedLinkTypes.add( XLinkUtils.CROSS_TYPE_STRING );
 				} else if ( PeptideViewLinkTypesConstants.LOOPLINK_PSM.equals( linkType ) ) {
@@ -138,7 +114,7 @@ public class PeptideLength_Histogram_For_PSMPeptideCutoffs {
 		
 		//  Get Lists of peptideLength mapped by link type
 		Map<String,List<Integer>> allSearchesCombinedPeptideLengthList_Map_KeyedOnLinkType = 
-				getAllSearchesCombinedPeptideLengthList_Map_KeyedOnLinkType(searches, linkTypesForDBQuery, modsForDBQuery, searcherCutoffValuesRootLevel, selectedLinkTypes);
+				getAllSearchesCombinedPeptideLengthList_Map_KeyedOnLinkType(searches, linkTypesForDBQuery, modsForDBQuery, searcherCutoffValuesRootLevel, selectedLinkTypes, qcPageQueryJSONRoot );
 		
 		
 		Map<String, PeptideLength_Histogram_For_PSMPeptideCutoffsResultsForLinkType> peptideLengthInChartBuckets_KeyedOnLinkType = 
@@ -199,6 +175,7 @@ public class PeptideLength_Histogram_For_PSMPeptideCutoffs {
 		Map<String, PeptideLength_Histogram_For_PSMPeptideCutoffsResultsForLinkType> peptideLengthInChartBuckets_KeyedOnLinkType = new HashMap<>();
 		
 		for ( Map.Entry<String,List<Integer>> entry : allSearchesCombinedPeptideLengthList_Map_KeyedOnLinkType.entrySet() ) {
+			String linkType = entry.getKey();
 			List<Integer> peptideLengthList = entry.getValue();
 			
 			//  Find max and min values
@@ -222,7 +199,7 @@ public class PeptideLength_Histogram_For_PSMPeptideCutoffs {
 			
 			PeptideLength_Histogram_For_PSMPeptideCutoffsResultsForLinkType peptideLength_HistogramData =
 					getpeptideLength_HistogramData( peptideLengthList, peptideLengthMin, peptideLengthMax );
-			peptideLength_HistogramData.setLinkType( entry.getKey() );
+			peptideLength_HistogramData.setLinkType( linkType );
 			peptideLength_HistogramData.setPeptideLengthMin( peptideLengthMin );
 			peptideLength_HistogramData.setPeptideLengthMax( peptideLengthMax );
 			
@@ -242,56 +219,64 @@ public class PeptideLength_Histogram_For_PSMPeptideCutoffs {
 			int peptideLengthMin, 
 			int peptideLengthMax ) {
 		
-		//  Number of bins between 50 and 100.  Whole number of peptide lengths in each bin.
+		List<PeptideLength_Histogram_For_PSMPeptideCutoffsResultsChartBucket> chartBuckets = null;
 		
-		int peptideLengthRange = peptideLengthMax - peptideLengthMin + 1;
-		double peptideLengthRangeAsDouble = peptideLengthRange;
-		
-		//  Process data into bins
-		int binCount = peptideLengthRange;
-		if ( peptideLengthRange > 100 ) {
-			//  bin count between 50 and 100
-			double rangeDiv50 = ( peptideLengthRange / 50.0 );
-			int rangeDiv50Floor = (int) Math.floor( rangeDiv50 );
-			binCount = peptideLengthRange / rangeDiv50Floor;
-		}
-		
-//		int binCount = (int) ( Math.sqrt( peptideLengthList.size() ) );
-		int[] peptideLengthCounts = new int[ binCount ];
-		double binSizeAsDouble = (  peptideLengthRangeAsDouble ) / binCount;
-		
-		for ( Integer peptideLength : peptideLengthList ) {
-			double peptideLengthFraction = ( peptideLength - peptideLengthMin ) / peptideLengthRangeAsDouble;
-			int bin = (int) ( (  peptideLengthFraction ) * binCount );
-			if ( bin < 0 ) {
-				bin = 0;
-			} else if ( bin >= binCount ) {
-				bin = binCount - 1;
-			} 
-			peptideLengthCounts[ bin ]++;
-		}
-		
-		List<PeptideLength_Histogram_For_PSMPeptideCutoffsResultsChartBucket> chartBuckets = new ArrayList<>();
-		double binHalf = binSizeAsDouble / 2 ;
-		//  Take the data in the bins and  create "buckets" in the format required for the charting API
-		for ( int binIndex = 0; binIndex < peptideLengthCounts.length; binIndex++ ) {
-			PeptideLength_Histogram_For_PSMPeptideCutoffsResultsChartBucket chartBucket = new PeptideLength_Histogram_For_PSMPeptideCutoffsResultsChartBucket();
-			chartBuckets.add( chartBucket );
-			int peptideLengthCount = peptideLengthCounts[ binIndex ];
-			double binStartDouble = ( ( binIndex * binSizeAsDouble ) ) + peptideLengthMin;
-			int binStart = (int)Math.round( binStartDouble );
-			if ( binIndex == 0 && binStartDouble < 0.1 ) {
-				binStart = 0;
+		if ( peptideLengthList != null && ( ! peptideLengthList.isEmpty() ) ) {
+
+			// Only process if have data
+			
+			
+			//  Number of bins between 50 and 100.  Whole number of peptide lengths in each bin.
+
+			int peptideLengthRange = peptideLengthMax - peptideLengthMin + 1;
+			double peptideLengthRangeAsDouble = peptideLengthRange;
+
+			//  Process data into bins
+			int binCount = peptideLengthRange;
+			if ( peptideLengthRange > 100 ) {
+				//  bin count between 50 and 100
+				double rangeDiv50 = ( peptideLengthRange / 50.0 );
+				int rangeDiv50Floor = (int) Math.floor( rangeDiv50 );
+				binCount = peptideLengthRange / rangeDiv50Floor;
 			}
-			chartBucket.setBinStart( binStart );
-			int binEnd = (int)Math.round( ( binIndex + 1 ) * binSizeAsDouble ) - 1 + peptideLengthMin;
-			if ( binIndex == peptideLengthCounts.length - 1 ) {
-				binEnd = peptideLengthMax;  //  since last entry, set binEnd to peptideLengthMax
+
+			//		int binCount = (int) ( Math.sqrt( peptideLengthList.size() ) );
+			int[] peptideLengthCounts = new int[ binCount ];
+			double binSizeAsDouble = (  peptideLengthRangeAsDouble ) / binCount;
+
+			for ( Integer peptideLength : peptideLengthList ) {
+				double peptideLengthFraction = ( peptideLength - peptideLengthMin ) / peptideLengthRangeAsDouble;
+				int bin = (int) ( (  peptideLengthFraction ) * binCount );
+				if ( bin < 0 ) {
+					bin = 0;
+				} else if ( bin >= binCount ) {
+					bin = binCount - 1;
+				} 
+				peptideLengthCounts[ bin ]++;
 			}
-			chartBucket.setBinEnd( binEnd );
-			double binMiddleDouble = binStartDouble + binHalf;
-			chartBucket.setBinCenter( binMiddleDouble );
-			chartBucket.setCount( peptideLengthCount );
+
+			chartBuckets = new ArrayList<>( peptideLengthCounts.length );
+			double binHalf = binSizeAsDouble / 2 ;
+			//  Take the data in the bins and  create "buckets" in the format required for the charting API
+			for ( int binIndex = 0; binIndex < peptideLengthCounts.length; binIndex++ ) {
+				PeptideLength_Histogram_For_PSMPeptideCutoffsResultsChartBucket chartBucket = new PeptideLength_Histogram_For_PSMPeptideCutoffsResultsChartBucket();
+				chartBuckets.add( chartBucket );
+				int peptideLengthCount = peptideLengthCounts[ binIndex ];
+				double binStartDouble = ( ( binIndex * binSizeAsDouble ) ) + peptideLengthMin;
+				int binStart = (int)Math.round( binStartDouble );
+				if ( binIndex == 0 && binStartDouble < 0.1 ) {
+					binStart = 0;
+				}
+				chartBucket.setBinStart( binStart );
+				int binEnd = (int)Math.round( ( binIndex + 1 ) * binSizeAsDouble ) - 1 + peptideLengthMin;
+				if ( binIndex == peptideLengthCounts.length - 1 ) {
+					binEnd = peptideLengthMax;  //  since last entry, set binEnd to peptideLengthMax
+				}
+				chartBucket.setBinEnd( binEnd );
+				double binMiddleDouble = binStartDouble + binHalf;
+				chartBucket.setBinCenter( binMiddleDouble );
+				chartBucket.setCount( peptideLengthCount );
+			}
 		}
 		
 		PeptideLength_Histogram_For_PSMPeptideCutoffsResultsForLinkType result = new PeptideLength_Histogram_For_PSMPeptideCutoffsResultsForLinkType();
@@ -320,7 +305,8 @@ public class PeptideLength_Histogram_For_PSMPeptideCutoffs {
 			String[] linkTypesForDBQuery, 
 			String[] modsForDBQuery,
 			SearcherCutoffValuesRootLevel searcherCutoffValuesRootLevel,
-			Set<String> selectedLinkTypes ) throws ProxlWebappDataException, Exception {
+			Set<String> selectedLinkTypes,
+			QCPageQueryJSONRoot qcPageQueryJSONRoot ) throws ProxlWebappDataException, Exception {
 		
 		/**
 		 * Map <{Link Type},List<{peptideLength}>>
@@ -355,7 +341,8 @@ public class PeptideLength_Histogram_For_PSMPeptideCutoffs {
 							peptideDTO_MappedById, 
 							searchDTO, 
 							searchId, 
-							searcherCutoffValuesSearchLevel );
+							searcherCutoffValuesSearchLevel,
+							qcPageQueryJSONRoot );
 			
 			//  Combine with entries for previous searches
 			for ( Map.Entry<String, List<Integer>> entry : peptideLengthList_Map_KeyedOnLinkType.entrySet() ) {
@@ -389,16 +376,30 @@ public class PeptideLength_Histogram_For_PSMPeptideCutoffs {
 			Map<Integer, PeptideDTO> peptideDTO_MappedById, 
 			SearchDTO searchDTO, 
 			Integer searchId,
-			SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel ) throws Exception, ProxlWebappDataException {
+			SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel,
+			QCPageQueryJSONRoot qcPageQueryJSONRoot ) throws Exception, ProxlWebappDataException {
 		
 		Map<String, List<Integer>> peptideLengthList_Map_KeyedOnLinkType = new HashMap<>();
 		
 		///////////////////////////////////////////////
 		//  Get peptides for this search from the DATABASE
+
+		//  Change to use QC_Cached_WebReportedPeptideWrapperList_FilteredOnIncludeProtSeqVIds 
+		//     to get list filtered on 
+
 		List<WebReportedPeptideWrapper> wrappedLinksPerForSearch =
-				PeptideWebPageSearcherCacheOptimized.getInstance().searchOnSearchIdPsmCutoffPeptideCutoff(
-						searchDTO, searcherCutoffValuesSearchLevel, linkTypesForDBQuery, modsForDBQuery, 
-						PeptideWebPageSearcherCacheOptimized.ReturnOnlyReportedPeptidesWithMonolinks.NO );
+				QC_Cached_WebReportedPeptideWrapperList_FilteredOnIncludeProtSeqVIds.getInstance()
+				.get_WebReportedPeptideWrapperList_FilteredOnIncludeProtSeqVIds(
+						searchDTO, searcherCutoffValuesSearchLevel, 
+						linkTypesForDBQuery,
+						modsForDBQuery, 
+						PeptideWebPageSearcherCacheOptimized.ReturnOnlyReportedPeptidesWithMonolinks.NO,
+						qcPageQueryJSONRoot.getIncludeProteinSeqVIdsDecodedArray() );
+		
+//		List<WebReportedPeptideWrapper> wrappedLinksPerForSearch =
+//				PeptideWebPageSearcherCacheOptimized.getInstance().searchOnSearchIdPsmCutoffPeptideCutoff(
+//						searchDTO, searcherCutoffValuesSearchLevel, linkTypesForDBQuery, modsForDBQuery, 
+//						PeptideWebPageSearcherCacheOptimized.ReturnOnlyReportedPeptidesWithMonolinks.NO );
 
 		for ( WebReportedPeptideWrapper webReportedPeptideWrapper : wrappedLinksPerForSearch ) {
 			WebReportedPeptide webReportedPeptide = webReportedPeptideWrapper.getWebReportedPeptide();

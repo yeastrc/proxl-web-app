@@ -14,6 +14,8 @@
 //JavaScript directive:   all variables have to be declared with "var", maybe other things
 "use strict";
 
+import { webserviceCallStandardPost } from 'page_js/webservice_call_common/webserviceCallStandardPost.js';
+
 import { qc_pages_Single_Merged_Common } from './qc_pages_Single_Merged_Common.js';
 
 import { qcChartDownloadHelp } from './qcChart_Download_Help_HTMLBlock.js';
@@ -305,20 +307,6 @@ var QCMergedPageChart_PPM_Error_PSM = function() {
 		var hash_json_Contents_COPY = params.hash_json_Contents_COPY;
 		var $chart_outer_container_jq = params.$chart_outer_container_jq; 
 
-
-		//  POST body
-		var hash_json_field_Contents_JSONString = JSON.stringify( hash_json_Contents_COPY );
-
-		//  Put Project Search Ids on the Query String of the URL
-		var projectSearchIdsForQueryStringArray = [];
-		_project_search_ids.forEach(function( projectSearchId, index, array) {
-			projectSearchIdsForQueryStringArray.push( "project_search_id=" + projectSearchId );
-		}, this )
-		
-		var projectSearchIdsForQueryString = projectSearchIdsForQueryStringArray.join( "&" );
-		
-		var url = "services/qc/dataPage/ppmError_Merged?" + projectSearchIdsForQueryString;
-
 		if ( _activeAjax && 
 				_activeAjax[ selectedLinkType ] ) {
 			_activeAjax[ selectedLinkType ].abort();
@@ -327,50 +315,84 @@ var QCMergedPageChart_PPM_Error_PSM = function() {
 		if ( ! _activeAjax ) {
 			_activeAjax = {};
 		}
-		//  Set to returned jQuery XMLHttpRequest (jqXHR) object
-		_activeAjax[ selectedLinkType ] = 
-			$.ajax({
-				type : "POST",
-				url : url,
-				traditional: true,  //  Force traditional serialization of the data sent
-				//   One thing this means is that arrays are sent as the object property instead of object property followed by "[]".
-				//   So project_search_ids array is passed as "project_search_ids=<value>" which is what Jersey expects
-				data : hash_json_field_Contents_JSONString,  // The data sent as the POST body
-				contentType: "application/json; charset=utf-8",
-				dataType : "json",
-				success : function( ajaxResponseData ) {
-					try {
-						if ( _activeAjax ) {
-							_activeAjax[ selectedLinkType ] = null;
-						}
-						var responseParams = {
-								ajaxResponseData : ajaxResponseData, 
-								selectedLinkType : selectedLinkType,
-								indexForLinkType : indexForLinkType,
-								$chart_outer_container_jq : $chart_outer_container_jq
-						};
-						objectThis.load_PPM_Error_For_PSMs_HistogramResponse( responseParams );
-//						$topTRelement.data( _DATA_LOADED_DATA_KEY, true );
-					} catch( e ) {
-						reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
-						throw e;
-					}
-				},
-				failure: function(errMsg) {
-					if ( _activeAjax ) {
-						_activeAjax[ selectedLinkType ] = null;
-					}
-					handleAJAXFailure( errMsg );
-				},
-				error : function(jqXHR, textStatus, errorThrown) {
-					if ( _activeAjax ) {
-						_activeAjax[ selectedLinkType ] = null;
-					}
-					if ( objectThis._passAJAXErrorTo_handleAJAXError(jqXHR, textStatus, errorThrown) ) {
-						handleAJAXError(jqXHR, textStatus, errorThrown);
-					}
+
+		const ajaxRequestData = { projectSearchIds : _project_search_ids, qcPageQueryJSONRoot : hash_json_Contents_COPY };
+
+		const url = "services/qc/dataPage/ppmError_Merged";
+
+		const webserviceCallStandardPostResult = webserviceCallStandardPost({ dataToSend : ajaxRequestData, url }); //  External Function
+
+		const promise_webserviceCallStandardPost = webserviceCallStandardPostResult.promise; 
+		_activeAjax[ selectedLinkType ] = webserviceCallStandardPostResult.api;
+
+		promise_webserviceCallStandardPost.catch( ( ) => { 
+			if ( _activeAjax ) {
+				_activeAjax[ selectedLinkType ] = null;
+			}
+		} );
+
+		promise_webserviceCallStandardPost.then( ({ responseData }) => {
+			try {
+				if ( _activeAjax ) {
+					_activeAjax[ selectedLinkType ] = null;
 				}
-			});
+				var responseParams = {
+						ajaxResponseData : responseData, 
+						selectedLinkType : selectedLinkType,
+						indexForLinkType : indexForLinkType,
+						$chart_outer_container_jq : $chart_outer_container_jq
+				};
+				objectThis.load_PPM_Error_For_PSMs_HistogramResponse( responseParams );
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
+		});
+
+		//  Set to returned jQuery XMLHttpRequest (jqXHR) object
+// 		_activeAjax[ selectedLinkType ] = 
+// 			$.ajax({
+// 				type : "POST",
+// 				url : url,
+// 				traditional: true,  //  Force traditional serialization of the data sent
+// 				//   One thing this means is that arrays are sent as the object property instead of object property followed by "[]".
+// 				//   So project_search_ids array is passed as "project_search_ids=<value>" which is what Jersey expects
+// 				data : hash_json_field_Contents_JSONString,  // The data sent as the POST body
+// 				contentType: "application/json; charset=utf-8",
+// 				dataType : "json",
+// 				success : function( ajaxResponseData ) {
+// 					try {
+// 						if ( _activeAjax ) {
+// 							_activeAjax[ selectedLinkType ] = null;
+// 						}
+// 						var responseParams = {
+// 								ajaxResponseData : ajaxResponseData, 
+// 								selectedLinkType : selectedLinkType,
+// 								indexForLinkType : indexForLinkType,
+// 								$chart_outer_container_jq : $chart_outer_container_jq
+// 						};
+// 						objectThis.load_PPM_Error_For_PSMs_HistogramResponse( responseParams );
+// //						$topTRelement.data( _DATA_LOADED_DATA_KEY, true );
+// 					} catch( e ) {
+// 						reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+// 						throw e;
+// 					}
+// 				},
+// 				failure: function(errMsg) {
+// 					if ( _activeAjax ) {
+// 						_activeAjax[ selectedLinkType ] = null;
+// 					}
+// 					handleAJAXFailure( errMsg );
+// 				},
+// 				error : function(jqXHR, textStatus, errorThrown) {
+// 					if ( _activeAjax ) {
+// 						_activeAjax[ selectedLinkType ] = null;
+// 					}
+// 					if ( objectThis._passAJAXErrorTo_handleAJAXError(jqXHR, textStatus, errorThrown) ) {
+// 						handleAJAXError(jqXHR, textStatus, errorThrown);
+// 					}
+// 				}
+// 			});
 		// indent due to assignment
 	};
 
@@ -435,7 +457,8 @@ var QCMergedPageChart_PPM_Error_PSM = function() {
 //				var clickedThis = params.clickedThis;
 
 				//  Download the data for params
-				qc_pages_Single_Merged_Common.submitDownloadForParams( { downloadStrutsAction : _downloadStrutsAction, project_search_ids : _project_search_ids, hash_json_Contents : hash_json_Contents } );
+				const dataToSend = { projectSearchIds : _project_search_ids, qcPageQueryJSONRoot : hash_json_Contents };
+				qc_pages_Single_Merged_Common.submitDownloadForParams( { downloadStrutsAction : _downloadStrutsAction, dataToSend } );
 			};
 
 			//  Get Help tooltip HTML

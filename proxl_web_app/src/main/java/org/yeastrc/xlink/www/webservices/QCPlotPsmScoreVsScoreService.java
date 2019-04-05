@@ -5,10 +5,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.GET;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
@@ -34,32 +34,61 @@ public class QCPlotPsmScoreVsScoreService {
 	private static final Logger log = LoggerFactory.getLogger( QCPlotPsmScoreVsScoreService.class);
 	
 	/**
-	 * @param projectSearchId
-	 * @param scanFileId - Optional
-	 * @param selectedLinkTypes
-	 * @param annotationTypeId_1
-	 * @param annotationTypeId_2
-	 * @param psmScoreCutoff_1
-	 * @param psmScoreCutoff_2
-	 * @param request
-	 * @return
-	 * @throws Exception
+	 * Format of JSON in request
+	 *
 	 */
-	@GET
+	public static class WebserviceRequest {
+		
+		Integer projectSearchId;
+		Integer scanFileId; // Optional
+		Set<String> selectedLinkTypes;			
+		String scoreType_1;
+		String scoreType_2;
+		Double psmScoreCutoff_1;
+		Double psmScoreCutoff_2;
+		
+		public void setProjectSearchId(Integer projectSearchId) {
+			this.projectSearchId = projectSearchId;
+		}
+		public void setScanFileId(Integer scanFileId) {
+			this.scanFileId = scanFileId;
+		}
+		public void setSelectedLinkTypes(Set<String> selectedLinkTypes) {
+			this.selectedLinkTypes = selectedLinkTypes;
+		}
+		public void setScoreType_1(String scoreType_1) {
+			this.scoreType_1 = scoreType_1;
+		}
+		public void setScoreType_2(String scoreType_2) {
+			this.scoreType_2 = scoreType_2;
+		}
+		public void setPsmScoreCutoff_1(Double psmScoreCutoff_1) {
+			this.psmScoreCutoff_1 = psmScoreCutoff_1;
+		}
+		public void setPsmScoreCutoff_2(Double psmScoreCutoff_2) {
+			this.psmScoreCutoff_2 = psmScoreCutoff_2;
+		}
+	
+	}
+	
+	@POST
+	@Consumes( MediaType.APPLICATION_JSON )
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/getPsmScoreVsScore") 
 	public QCPlotPsmScoreVsScoreServiceResult getPsmScoreVsScore( 
-			@QueryParam( "projectSearchId" ) int projectSearchId,
-			@QueryParam( "scanFileId" ) Integer scanFileId,
-			@QueryParam( "selectedLinkTypes" ) Set<String> selectedLinkTypes,			
-			@QueryParam( "scoreType_1" ) String scoreType_1,
-			@QueryParam( "scoreType_2" ) String scoreType_2,
-			@QueryParam( "psmScoreCutoff_1" ) Double psmScoreCutoff_1,
-			@QueryParam( "psmScoreCutoff_2" ) Double psmScoreCutoff_2,
+			WebserviceRequest webserviceRequest,
 			@Context HttpServletRequest request )
 	throws Exception {
+		
+		Integer projectSearchId =  webserviceRequest.projectSearchId;
+		Integer scanFileId =  webserviceRequest.scanFileId; // Optional
+		Set<String> selectedLinkTypes =  webserviceRequest.selectedLinkTypes;
+		String scoreType_1 =  webserviceRequest.scoreType_1;
+		String scoreType_2 =  webserviceRequest.scoreType_2;
+		Double psmScoreCutoff_1 =  webserviceRequest.psmScoreCutoff_1;
+		Double psmScoreCutoff_2 =  webserviceRequest.psmScoreCutoff_2;
 
-		if ( projectSearchId == 0 ) {
+		if ( webserviceRequest.projectSearchId == null || webserviceRequest.projectSearchId == 0 ) {
 			String msg = ": Provided projectSearchId is zero or wasn't provided";
 			log.error( msg );
 		    throw new WebApplicationException(

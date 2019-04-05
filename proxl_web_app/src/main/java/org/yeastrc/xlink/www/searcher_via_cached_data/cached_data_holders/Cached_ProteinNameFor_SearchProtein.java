@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.www.cached_data_mgmt.CacheCurrentSizeMaxSizeResult;
 import org.yeastrc.xlink.www.cached_data_mgmt.CachedDataCentralRegistry;
 import org.yeastrc.xlink.www.cached_data_mgmt.CachedDataCommonIF;
-import org.yeastrc.xlink.www.searcher.SearchUtils;
+import org.yeastrc.xlink.www.searcher.ProteinNameDescriptionForProtSeqVIdSrchId_Searcher;
 import org.yeastrc.xlink.www.searcher_via_cached_data.config_size_etc_central_code.CachedDataCentralConfigStorageAndProcessing;
 import org.yeastrc.xlink.www.searcher_via_cached_data.config_size_etc_central_code.CachedDataSizeOptions;
 import org.yeastrc.xlink.www.searcher_via_cached_data.request_objects_for_searchers_for_cached_data.ProteinNameFor_SearchProtein_Request;
@@ -221,7 +221,7 @@ public class Cached_ProteinNameFor_SearchProtein implements CachedDataCommonIF {
 				cacheDBRetrievalCount.incrementAndGet();
 			}
 			String proteinName = 
-					SearchUtils
+					ProteinNameDescriptionForProtSeqVIdSrchId_Searcher
 					.getProteinNameForSearchIdProteinSequenceVersionId( 
 							proteinNameFor_SearchProtein_Request.getSearchId(),
 							proteinNameFor_SearchProtein_Request.getProteinSequenceVersionId() );

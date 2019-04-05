@@ -1,6 +1,5 @@
 package org.yeastrc.xlink.www.qc_data.psm_level_data.main;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -19,7 +18,7 @@ import org.yeastrc.xlink.www.constants.PeptideViewLinkTypesConstants;
 import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
 import org.yeastrc.xlink.www.form_query_json_objects.CutoffValuesRootLevel;
-import org.yeastrc.xlink.www.form_query_json_objects.MergedPeptideQueryJSONRoot;
+import org.yeastrc.xlink.www.form_query_json_objects.QCPageQueryJSONRoot;
 import org.yeastrc.xlink.www.form_query_json_objects.Z_CutoffValuesObjectsToOtherObjectsFactory;
 import org.yeastrc.xlink.www.form_query_json_objects.Z_CutoffValuesObjectsToOtherObjectsFactory.Z_CutoffValuesObjectsToOtherObjects_RootResult;
 import org.yeastrc.xlink.www.qc_data.psm_level_data.objects.ChargeStateCountsResults;
@@ -28,10 +27,6 @@ import org.yeastrc.xlink.www.qc_data.psm_level_data.objects.ChargeStateCountsRes
 import org.yeastrc.xlink.www.searcher.PSM_DistinctChargeStatesSearcher;
 import org.yeastrc.xlink.www.searcher.PSM_DistinctChargeStatesSearcher.PSM_DistinctChargeStatesResult;
 import org.yeastrc.xlink.www.web_utils.GetLinkTypesForSearchers;
-
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Get Charge State Counts
@@ -59,7 +54,7 @@ public class ChargeStateCounts {
 	 * @throws Exception
 	 */
 	public ChargeStateCountsResults getChargeStateCounts( 			
-			String filterCriteriaJSON, 
+			QCPageQueryJSONRoot qcPageQueryJSONRoot, 
 			List<Integer> projectSearchIdsListDeduppedSorted,
 			List<SearchDTO> searches, 
 			Map<Integer, SearchDTO> searchesMapOnSearchId ) throws Exception {
@@ -76,34 +71,18 @@ public class ChargeStateCounts {
 			mapProjectSearchIdToSearchId.put( search.getProjectSearchId(), search.getSearchId() );
 		}
 
-		//  Jackson JSON Mapper object for JSON deserialization and serialization
-		ObjectMapper jacksonJSON_Mapper = new ObjectMapper();  //  Jackson JSON library object
-		//   deserialize 
-		MergedPeptideQueryJSONRoot mergedPeptideQueryJSONRoot = null;
-		try {
-			mergedPeptideQueryJSONRoot = jacksonJSON_Mapper.readValue( filterCriteriaJSON, MergedPeptideQueryJSONRoot.class );
-		} catch ( JsonParseException e ) {
-			String msg = "Failed to parse 'filterCriteriaJSON', JsonParseException.  filterCriteriaJSON: " + filterCriteriaJSON;
-			log.error( msg, e );
-			throw e;
-		} catch ( JsonMappingException e ) {
-			String msg = "Failed to parse 'filterCriteriaJSON', JsonMappingException.  filterCriteriaJSON: " + filterCriteriaJSON;
-			log.error( msg, e );
-			throw e;
-		} catch ( IOException e ) {
-			String msg = "Failed to parse 'filterCriteriaJSON', IOException.  filterCriteriaJSON: " + filterCriteriaJSON;
-			log.error( msg, e );
-			throw e;
-		}
-
 		///////////////////////////////////////////////////
 		//  Get LinkTypes for DB query - Sets to null when all selected as an optimization
-		String[] linkTypesForDBQuery = GetLinkTypesForSearchers.getInstance().getLinkTypesForSearchers( mergedPeptideQueryJSONRoot.getLinkTypes() );
+		String[] linkTypesForDBQuery = GetLinkTypesForSearchers.getInstance().getLinkTypesForSearchers( qcPageQueryJSONRoot.getLinkTypes() );
 		//   Mods for DB Query
-		String[] modsForDBQuery = mergedPeptideQueryJSONRoot.getMods();
+		String[] modsForDBQuery = qcPageQueryJSONRoot.getMods();
+
+		List<Integer> includeProteinSeqVIdsDecodedArray = qcPageQueryJSONRoot.getIncludeProteinSeqVIdsDecodedArray();
+		
+		
 		////////////
 		/////   Searcher cutoffs for all searches
-		CutoffValuesRootLevel cutoffValuesRootLevel = mergedPeptideQueryJSONRoot.getCutoffs();
+		CutoffValuesRootLevel cutoffValuesRootLevel = qcPageQueryJSONRoot.getCutoffs();
 		Z_CutoffValuesObjectsToOtherObjects_RootResult cutoffValuesObjectsToOtherObjects_RootResult =
 				Z_CutoffValuesObjectsToOtherObjectsFactory
 				.createSearcherCutoffValuesRootLevel( searchIds, cutoffValuesRootLevel );
@@ -111,12 +90,12 @@ public class ChargeStateCounts {
 				cutoffValuesObjectsToOtherObjects_RootResult.getSearcherCutoffValuesRootLevel();
 		
 		//  Populate countForLinkType_ByLinkType for selected link types
-		if ( mergedPeptideQueryJSONRoot.getLinkTypes() == null || mergedPeptideQueryJSONRoot.getLinkTypes().length == 0 ) {
+		if ( qcPageQueryJSONRoot.getLinkTypes() == null || qcPageQueryJSONRoot.getLinkTypes().length == 0 ) {
 			String msg = "At least one linkType is required";
 			log.error( msg );
 			throw new Exception( msg );
 		} else {
-			for ( String linkType : mergedPeptideQueryJSONRoot.getLinkTypes() ) {
+			for ( String linkType : qcPageQueryJSONRoot.getLinkTypes() ) {
 				if ( PeptideViewLinkTypesConstants.CROSSLINK_PSM.equals( linkType ) ) {
 					selectedLinkTypes.add( XLinkUtils.CROSS_TYPE_STRING );
 				} else if ( PeptideViewLinkTypesConstants.LOOPLINK_PSM.equals( linkType ) ) {
@@ -152,7 +131,7 @@ public class ChargeStateCounts {
 			
 			PSM_DistinctChargeStatesResult psm_DistinctChargeStatesResult = 
 					PSM_DistinctChargeStatesSearcher.getInstance()
-					.getPSM_DistinctChargeStates( searchId, searcherCutoffValuesSearchLevel, linkTypesForDBQuery, modsForDBQuery );
+					.getPSM_DistinctChargeStates( searchId, searcherCutoffValuesSearchLevel, linkTypesForDBQuery, modsForDBQuery, includeProteinSeqVIdsDecodedArray );
 			
 			/**
 			 * Map <{Link Type},Map<{Charge Value},{count}>>

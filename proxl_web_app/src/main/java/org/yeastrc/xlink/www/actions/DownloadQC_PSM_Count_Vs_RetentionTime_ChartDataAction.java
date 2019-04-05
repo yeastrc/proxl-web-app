@@ -3,14 +3,12 @@ package org.yeastrc.xlink.www.actions;
 import java.io.BufferedOutputStream;
 import java.io.OutputStreamWriter;
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.apache.struts.action.Action;
@@ -22,7 +20,11 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.yeastrc.xlink.www.dao.SearchDAO;
 import org.yeastrc.xlink.www.dto.SearchDTO;
+import org.yeastrc.xlink.www.form_query_json_objects.QCPageQueryJSONRoot;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
+import org.yeastrc.xlink.www.qc_data.a_enums.ForDownload_Enum;
+import org.yeastrc.xlink.www.qc_data.a_request_json_root.QCPageRequestJSONRoot;
+import org.yeastrc.xlink.www.qc_data.utils.QC_DeserializeRequestJSON_To_QCPageRequestJSONRoot;
 import org.yeastrc.xlink.www.qc_plots.scan_retention_time.CreateScanRetentionTimeQCPlotData;
 import org.yeastrc.xlink.www.qc_plots.scan_retention_time.CreateScanRetentionTimeQCPlotData.CreateScanRetentionTimeQCPlotData_Result;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
@@ -31,7 +33,7 @@ import org.yeastrc.xlink.dao.ScanFileDAO;
 import org.yeastrc.xlink.www.constants.ServletOutputStreamCharacterSetConstant;
 import org.yeastrc.xlink.www.constants.StrutsGlobalForwardNames;
 import org.yeastrc.xlink.www.constants.WebConstants;
-import org.yeastrc.xlink.www.forms.MergedSearchViewPeptidesForm;
+import org.yeastrc.xlink.www.forms.SingleRequestJSONStringFieldForm;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
 
@@ -49,62 +51,86 @@ public class DownloadQC_PSM_Count_Vs_RetentionTime_ChartDataAction extends Actio
 	/* (non-Javadoc)
 	 * @see org.apache.struts.action.Action#execute(org.apache.struts.action.ActionMapping, org.apache.struts.action.ActionForm, javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
 	 */
+	@Override
 	public ActionForward execute( ActionMapping mapping,
 			  ActionForm actionForm,
 			  HttpServletRequest request,
 			  HttpServletResponse response )
 					  throws Exception {
 		try {
+
 			// our form
-			MergedSearchViewPeptidesForm form = (MergedSearchViewPeptidesForm)actionForm;
-			// Get the session first.  
-//			HttpSession session = request.getSession();
-			int[] projectSearchIds = form.getProjectSearchId();
-			if ( projectSearchIds.length == 0 ) {
+			SingleRequestJSONStringFieldForm form = (SingleRequestJSONStringFieldForm)actionForm;
+		
+			//  Form Parameter Name.  JSON encoded data
+			String requestJSONString = form.getRequestJSONString();
+
+			if ( StringUtils.isEmpty( requestJSONString ) ) {
+				//  Invalid request, searches across projects
+				return mapping.findForward( StrutsGlobalForwardNames.INVALID_REQUEST_SEARCHES_ACROSS_PROJECTS );
+			}
+			
+			Integer projectSearchId = null;
+
+			//  Must be size 1 if scanFileAll not populated, if empty when scanFileAll is populated, lookup scanfile ids for projectSearchId
+			List<Integer> scanFileIdList = null;
+			// If populated, assumed to be true
+			String scanFileAllString = null; 
+
+			boolean scanFileAll = false;
+			
+			QCPageRequestJSONRoot qcPageRequestJSONRoot = null;
+			QCPageQueryJSONRoot qcPageQueryJSONRoot = null;
+		
+			try {
+				qcPageRequestJSONRoot =
+						QC_DeserializeRequestJSON_To_QCPageRequestJSONRoot.getInstance().deserializeRequestJSON_To_QCPageRequestJSONRoot( requestJSONString );
+			} catch ( Exception e ) {
+				String msg = "Request rejected: parse request failed";
+				log.warn( msg );
+				return mapping.findForward( StrutsGlobalForwardNames.INVALID_REQUEST_DATA );
+			}
+			
+			List<Integer> projectSearchIds = qcPageRequestJSONRoot.getProjectSearchIds();
+			qcPageQueryJSONRoot = qcPageRequestJSONRoot.getQcPageQueryJSONRoot();
+			
+			if ( projectSearchIds == null || projectSearchIds.isEmpty() ) {
+				log.warn( "Request rejected: projectSearchIds == null || projectSearchIds.isEmpty()" );
 				return mapping.findForward( StrutsGlobalForwardNames.INVALID_REQUEST_DATA );
 			}
 			//   !!!!  Only 1 project search id is allowed
-			if ( projectSearchIds.length > 1 ) {
+			if ( projectSearchIds.size() > 1 ) {
+				log.warn( "Request rejected: projectSearchIds.size() > 1.  Only 1 project search id is allowed" );
 				return mapping.findForward( StrutsGlobalForwardNames.INVALID_REQUEST_DATA );
 			}
+		
+			projectSearchId = projectSearchIds.get( 0 );
+
+			scanFileIdList = qcPageRequestJSONRoot.getScanFileIdList();
+			// If populated, assumed to be true
+			scanFileAllString = qcPageRequestJSONRoot.getScanFileAllString(); 
 			
-			int projectSearchId = projectSearchIds[ 0 ];
+			//  Ignored
+//			retentionTimeInMinutesCutoff = qcPageRequestJSONRoot.getRetentionTimeInMinutesCutoff();
 			
-			String [] scanFileIdStringArray = request.getParameterValues( "scanFileId" );
-			String scanFileAllString = request.getParameter( "scanFileAll" );
+			qcPageQueryJSONRoot = qcPageRequestJSONRoot.getQcPageQueryJSONRoot();
 
 			if ( StringUtils.isEmpty( scanFileAllString ) ) {
-				if ( scanFileIdStringArray == null || scanFileIdStringArray.length == 0 ) {
+				if ( scanFileIdList == null || scanFileIdList.isEmpty() ) {
 					String msg = "scanFileId is not provided and scanFileAll is empty or not provided";
 					log.error( msg );
 					return mapping.findForward( StrutsGlobalForwardNames.INVALID_REQUEST_DATA );
 				}
-				if ( scanFileIdStringArray.length > 1 ) {
+				if ( scanFileIdList.size() > 1 ) {
 					// scanFileId must be size 1 if scanFileAll not populated
 					String msg = "More than 1 scanFileId and scanFileAll is empty or not provided";
 					log.error( msg );
 					return mapping.findForward( StrutsGlobalForwardNames.INVALID_REQUEST_DATA );
 				}
 			}
-			
-			boolean scanFileAll = false;
+		
 			if ( StringUtils.isNotEmpty( scanFileAllString ) ) {
 				scanFileAll = true;
-			}
-			
-			List<Integer> scanFileIdList = new ArrayList<>( 10 ); 
-			
-			if ( scanFileIdStringArray != null ) {
-				for ( String scanFileIdString : scanFileIdStringArray ) {
-					try {
-						int scanFileId = Integer.parseInt( scanFileIdString );
-						scanFileIdList.add( scanFileId );
-					} catch ( Exception e ) {
-						String msg = "scanFileId failed to parse as int: " + scanFileIdString;
-						log.error( msg );
-						return mapping.findForward( StrutsGlobalForwardNames.INVALID_REQUEST_DATA );
-					}
-				}
 			}
 			
 			//  Start Auth
@@ -185,15 +211,13 @@ public class DownloadQC_PSM_Count_Vs_RetentionTime_ChartDataAction extends Actio
 				
 				////////     Get Download Data
 				
-				String filterCriteria_JSONString = form.getQueryJSON();
-				
 				CreateScanRetentionTimeQCPlotData_Result createScanRetentionTimeQCPlotData_Result = 
 						CreateScanRetentionTimeQCPlotData.getInstance()
-						.create( CreateScanRetentionTimeQCPlotData.ForDownload.YES,  
+						.create( ForDownload_Enum.YES,  
 								projectSearchId, 
 								scanFileIdList, 
 								scanFileAll, 
-								filterCriteria_JSONString, 
+								qcPageQueryJSONRoot, 
 								null /* retentionTimeInSecondsCutoff */ );
 				
 				String scanFilename = null;

@@ -5,22 +5,24 @@ import java.util.HashSet;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.GET;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
+import org.yeastrc.xlink.www.form_query_json_objects.QCPageQueryJSONRoot;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
 import org.yeastrc.xlink.www.project_search__search__mapping.MapProjectSearchIdToSearchId;
+import org.yeastrc.xlink.www.qc_data.a_request_json_root.QCPageRequestJSONRoot;
 import org.yeastrc.xlink.www.qc_data.scan_level_data.main.MS2_Counts_Where_PSMs_MeetsCutoffs;
 import org.yeastrc.xlink.www.qc_data.scan_level_data.objects.MS2_Counts_Where_PSMs_MeetsCutoffsResults;
+import org.yeastrc.xlink.www.qc_data.utils.QC_DeserializeRequestJSON_To_QCPageRequestJSONRoot;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
@@ -39,19 +41,59 @@ public class QC_Scan_MS2_PSM_Count_ForCutoffs {
 
 	private static final Logger log = LoggerFactory.getLogger( QC_Scan_MS2_PSM_Count_ForCutoffs.class);
 
-	@GET
+	@POST
+	@Consumes( MediaType.APPLICATION_JSON )
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/ms2Counts") 
 	public WebserviceResult_getQC_Scan_MS2_PSM_Count_ForCutoffs
 		getQC_Scan_MS2_PSM_Count_ForCutoffs( 
-				@QueryParam( "project_search_id" ) Integer projectSearchId,
-				@QueryParam( "scan_file_id" ) Integer scanFileId,
-				@QueryParam( "filterCriteria" ) String filterCriteria_JSONString,
+				byte[] requestJSONBytes,
 				@Context HttpServletRequest request ) {
 
+		
+//		@QueryParam( "project_search_id" ) Integer projectSearchId,
+//		@QueryParam( "scan_file_id" ) Integer scanFileId,
+//		@QueryParam( "filterCriteria" ) String filterCriteria_JSONString,
+
+		if ( requestJSONBytes == null || requestJSONBytes.length == 0 ) {
+			String msg = "requestJSONBytes is null or requestJSONBytes is empty";
+			log.warn( msg );
+		    throw new WebApplicationException(
+		    	      Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+//		    	        .entity(  )
+		    	        .build()
+		    	        );
+		}
+		QCPageRequestJSONRoot qcPageRequestJSONRoot = null;
 		try {
-			if ( projectSearchId == null || projectSearchId == 0 ) {
-				String msg = ": Provided project_search_id is zero or wasn't provided";
+			qcPageRequestJSONRoot =
+					QC_DeserializeRequestJSON_To_QCPageRequestJSONRoot.getInstance().deserializeRequestJSON_To_QCPageRequestJSONRoot( requestJSONBytes );
+		} catch ( Exception e ) {
+			String msg = "parse request failed";
+			log.warn( msg );
+		    throw new WebApplicationException(
+		    	      Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+//		    	        .entity(  )
+		    	        .build()
+		    	        );
+		}
+		
+		List<Integer> projectSearchIdList = qcPageRequestJSONRoot.getProjectSearchIds();
+		QCPageQueryJSONRoot qcPageQueryJSONRoot = qcPageRequestJSONRoot.getQcPageQueryJSONRoot();
+		Integer scanFileId = qcPageRequestJSONRoot.getScanFileId();
+
+		try {
+			if ( projectSearchIdList == null || projectSearchIdList.isEmpty() ) {
+				String msg = ": Provided projectSearchIds not provided or is empty";
+				log.warn( msg );
+				throw new WebApplicationException(
+						Response.status(WebServiceErrorMessageConstants.INVALID_PARAMETER_STATUS_CODE)  //  return 400 error
+						.entity( WebServiceErrorMessageConstants.INVALID_PARAMETER_TEXT + msg )
+						.build()
+						);
+			}
+			if ( projectSearchIdList.size() != 1 ) {
+				String msg = ": Provided projectSearchIds not size 1";
 				log.warn( msg );
 				throw new WebApplicationException(
 						Response.status(WebServiceErrorMessageConstants.INVALID_PARAMETER_STATUS_CODE)  //  return 400 error
@@ -68,15 +110,9 @@ public class QC_Scan_MS2_PSM_Count_ForCutoffs {
 						.build()
 						);
 			}
-			if ( StringUtils.isEmpty( filterCriteria_JSONString ) ) {
-				String msg = ": Provided filterCriteria is zero or wasn't provided";
-				log.warn( msg );
-				throw new WebApplicationException(
-						Response.status(WebServiceErrorMessageConstants.INVALID_PARAMETER_STATUS_CODE)  //  return 400 error
-						.entity( WebServiceErrorMessageConstants.INVALID_PARAMETER_TEXT + msg )
-						.build()
-						);
-			}
+			
+			Integer projectSearchId = projectSearchIdList.get(0);
+			
 			//   Get the project id for this search
 			Collection<Integer> projectSearchIdsCollection = new HashSet<Integer>( );
 			projectSearchIdsCollection.add( projectSearchId );
@@ -139,7 +175,9 @@ public class QC_Scan_MS2_PSM_Count_ForCutoffs {
 
 			MS2_Counts_Where_PSMs_MeetsCutoffsResults ms2_Counts_Where_PSMs_MeetsCutoffsResults =
 					MS2_Counts_Where_PSMs_MeetsCutoffs.getInstance()
-					.getMS2_Counts_Where_PSMs_MeetsCutoffs(filterCriteria_JSONString, projectSearchId, searchId, scanFileId );
+					.getMS2_Counts_Where_PSMs_MeetsCutoffs(
+							qcPageQueryJSONRoot,
+							projectSearchId, searchId, scanFileId );
 
 			WebserviceResult_getQC_Scan_MS2_PSM_Count_ForCutoffs webserviceResult = 
 					new WebserviceResult_getQC_Scan_MS2_PSM_Count_ForCutoffs();

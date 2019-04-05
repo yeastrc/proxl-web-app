@@ -21,15 +21,19 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.yeastrc.xlink.www.dao.SearchDAO;
 import org.yeastrc.xlink.www.dto.SearchDTO;
+import org.yeastrc.xlink.www.form_query_json_objects.QCPageQueryJSONRoot;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
+import org.yeastrc.xlink.www.qc_data.a_enums.ForDownload_Enum;
+import org.yeastrc.xlink.www.qc_data.a_request_json_root.QCPageRequestJSONRoot;
 import org.yeastrc.xlink.www.qc_data.psm_error_estimates.main.PPM_Error_Vs_M_over_Z_ScatterPlot_For_PSMPeptideCutoffs;
 import org.yeastrc.xlink.www.qc_data.psm_error_estimates.main.PPM_Error_Vs_M_over_Z_ScatterPlot_For_PSMPeptideCutoffs.PPMErrorM_over_ZPair;
 import org.yeastrc.xlink.www.qc_data.psm_error_estimates.main.PPM_Error_Vs_M_over_Z_ScatterPlot_For_PSMPeptideCutoffs.PPM_Error_Vs_M_over_Z_ScatterPlot_For_PSMPeptideCutoffs_Method_Response;
+import org.yeastrc.xlink.www.qc_data.utils.QC_DeserializeRequestJSON_To_QCPageRequestJSONRoot;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
 import org.yeastrc.xlink.www.constants.ServletOutputStreamCharacterSetConstant;
 import org.yeastrc.xlink.www.constants.StrutsGlobalForwardNames;
 import org.yeastrc.xlink.www.constants.WebConstants;
-import org.yeastrc.xlink.www.forms.MergedSearchViewPeptidesForm;
+import org.yeastrc.xlink.www.forms.SingleRequestJSONStringFieldForm;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
 
@@ -44,29 +48,39 @@ public class DownloadQC_Psm_PPM_Error_VS_MZ_ChartDataAction extends Action {
 	/* (non-Javadoc)
 	 * @see org.apache.struts.action.Action#execute(org.apache.struts.action.ActionMapping, org.apache.struts.action.ActionForm, javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
 	 */
+	@Override
 	public ActionForward execute( ActionMapping mapping,
 			  ActionForm actionForm,
 			  HttpServletRequest request,
 			  HttpServletResponse response )
 					  throws Exception {
 		try {
-			String requestQueryString = request.getQueryString();
-			
 			// our form
-			MergedSearchViewPeptidesForm form = (MergedSearchViewPeptidesForm)actionForm;
-			// Get the session first.  
-//			HttpSession session = request.getSession();
-			int[] projectSearchIds = form.getProjectSearchId();
-			if ( projectSearchIds.length == 0 ) {
+			SingleRequestJSONStringFieldForm form = (SingleRequestJSONStringFieldForm)actionForm;
+			
+			//  Form Parameter Name.  JSON encoded data
+			String requestJSONString = form.getRequestJSONString();
+
+			QCPageRequestJSONRoot qcPageRequestJSONRoot = null;
+			try {
+				qcPageRequestJSONRoot =
+						QC_DeserializeRequestJSON_To_QCPageRequestJSONRoot.getInstance().deserializeRequestJSON_To_QCPageRequestJSONRoot( requestJSONString );
+			} catch ( Exception e ) {
+				String msg = "parse request failed";
+				log.warn( msg );
 				return mapping.findForward( StrutsGlobalForwardNames.INVALID_REQUEST_DATA );
 			}
-			if ( projectSearchIds.length > 1 ) {
+			
+			List<Integer> projectSearchIds = qcPageRequestJSONRoot.getProjectSearchIds();
+			QCPageQueryJSONRoot qcPageQueryJSONRoot = qcPageRequestJSONRoot.getQcPageQueryJSONRoot();
+			
+			if ( projectSearchIds.size() > 1 ) {
 				String msg = "Only 1 project search id is allowed.";
 				log.error( msg );
 				return mapping.findForward( StrutsGlobalForwardNames.INVALID_REQUEST_DATA );
 			}
 
-			int projectSearchId = projectSearchIds[ 0 ];
+			int projectSearchId = projectSearchIds.get(0);
 			
 			//   Get the project id for these searches
 			Set<Integer> projectSearchIdsSet = new HashSet<Integer>( );
@@ -120,15 +134,13 @@ public class DownloadQC_Psm_PPM_Error_VS_MZ_ChartDataAction extends Action {
 			try {
 				
 				////////     Get Download Data
-				
-				String filterCriteria_JSONString = form.getQueryJSON();
-
 				PPM_Error_Vs_M_over_Z_ScatterPlot_For_PSMPeptideCutoffs_Method_Response ppm_Error_Vs_MZ_ScatterPlot_For_PSMPeptideCutoffs_Method_Response =
 						PPM_Error_Vs_M_over_Z_ScatterPlot_For_PSMPeptideCutoffs.getInstance()
 						.getPPM_Error_Vs_M_over_Z_ScatterPlot_For_PSMPeptideCutoffs( 
-								requestQueryString,
-								PPM_Error_Vs_M_over_Z_ScatterPlot_For_PSMPeptideCutoffs.ForDownload.YES,
-								filterCriteria_JSONString, search );
+								qcPageQueryJSONRoot,
+								ForDownload_Enum.YES,
+								null /* requestJSONBytes */, 
+								search );
 				
 				/**
 				 * Map<[link type]...>

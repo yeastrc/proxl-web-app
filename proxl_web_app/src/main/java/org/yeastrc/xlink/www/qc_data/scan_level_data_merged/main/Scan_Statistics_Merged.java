@@ -1,6 +1,5 @@
 package org.yeastrc.xlink.www.qc_data.scan_level_data_merged.main;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -17,19 +16,16 @@ import org.yeastrc.xlink.utils.XLinkUtils;
 import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
 import org.yeastrc.xlink.www.form_query_json_objects.CutoffValuesRootLevel;
-import org.yeastrc.xlink.www.form_query_json_objects.MergedPeptideQueryJSONRoot;
+import org.yeastrc.xlink.www.form_query_json_objects.QCPageQueryJSONRoot;
 import org.yeastrc.xlink.www.form_query_json_objects.Z_CutoffValuesObjectsToOtherObjectsFactory;
 import org.yeastrc.xlink.www.form_query_json_objects.Z_CutoffValuesObjectsToOtherObjectsFactory.Z_CutoffValuesObjectsToOtherObjects_RootResult;
+import org.yeastrc.xlink.www.qc_data.a_enums.ForDownload_Enum;
 import org.yeastrc.xlink.www.qc_data.scan_level_data_merged.objects.Scan_Statistics_Merged_Results;
 import org.yeastrc.xlink.www.qc_data.scan_level_data_merged.objects.Scan_Statistics_Merged_Results.Scan_Statistics_PerSearch;
 import org.yeastrc.xlink.www.searcher.Scan_CountsPerLinkTypeForSearchScanFileSearcher;
 import org.yeastrc.xlink.www.searcher.ScanFileIdsForSearchSearcher;
 import org.yeastrc.xlink.www.searcher.Scan_CountsPerLinkTypeForSearchScanFileSearcher.PSM_CountsPerLinkTypeForSearchScanFileResult;
 import org.yeastrc.xlink.www.spectral_storage_service_interface.Call_Get_GetSummaryDataPerScanLevel_FromSpectralStorageService;
-
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * QC Merged page, "Ion Current Statistics" Section, "Scan Statistics" table
@@ -55,7 +51,11 @@ public class Scan_Statistics_Merged {
 	 * @throws Exception
 	 */
 	public Scan_Statistics_Merged_Results getScan_Statistics_Merged( 
-			String filterCriteriaJSON, 
+			//  One and only 1 of requestJSONBytes and requestJSONString can be not null
+			byte[] requestJSONBytes,  //  Contents of POST to webservice.  Only used here for caching
+			String requestJSONString,  //  Contents of JSON field in POST to download.  Only used here for caching
+			ForDownload_Enum forDownload,
+			QCPageQueryJSONRoot qcPageQueryJSONRoot, 
 			List<SearchDTO> searches ) throws Exception {
 
 		Collection<Integer> searchIds = new HashSet<>();
@@ -64,34 +64,16 @@ public class Scan_Statistics_Merged {
 			searchIds.add( search.getSearchId() );
 		}
 		
-		//  Jackson JSON Mapper object for JSON deserialization and serialization
-		ObjectMapper jacksonJSON_Mapper = new ObjectMapper();  //  Jackson JSON library object
-		//   deserialize 
-		MergedPeptideQueryJSONRoot mergedPeptideQueryJSONRoot = null;
-		try {
-			mergedPeptideQueryJSONRoot = jacksonJSON_Mapper.readValue( filterCriteriaJSON, MergedPeptideQueryJSONRoot.class );
-		} catch ( JsonParseException e ) {
-			String msg = "Failed to parse 'filterCriteriaJSON', JsonParseException.  filterCriteriaJSON: " + filterCriteriaJSON;
-			log.error( msg, e );
-			throw e;
-		} catch ( JsonMappingException e ) {
-			String msg = "Failed to parse 'filterCriteriaJSON', JsonMappingException.  filterCriteriaJSON: " + filterCriteriaJSON;
-			log.error( msg, e );
-			throw e;
-		} catch ( IOException e ) {
-			String msg = "Failed to parse 'filterCriteriaJSON', IOException.  filterCriteriaJSON: " + filterCriteriaJSON;
-			log.error( msg, e );
-			throw e;
-		}
-
 		///////////////////////////////////////////////////
 		//  Get LinkTypes for DB query - Sets to null when all selected as an optimization
-//		String[] linkTypesForDBQuery = GetLinkTypesForSearchers.getInstance().getLinkTypesForSearchers( mergedPeptideQueryJSONRoot.getLinkTypes() );
+//		String[] linkTypesForDBQuery = GetLinkTypesForSearchers.getInstance().getLinkTypesForSearchers( qcPageQueryJSONRoot.getLinkTypes() );
 		//   Mods for DB Query
-		String[] modsForDBQuery = mergedPeptideQueryJSONRoot.getMods();
+		String[] modsForDBQuery = qcPageQueryJSONRoot.getMods();
+		
+		List<Integer> includeProteinSeqVIdsDecodedArray = qcPageQueryJSONRoot.getIncludeProteinSeqVIdsDecodedArray();
 
 		/////   Searcher cutoffs for all searches
-		CutoffValuesRootLevel cutoffValuesRootLevel = mergedPeptideQueryJSONRoot.getCutoffs();
+		CutoffValuesRootLevel cutoffValuesRootLevel = qcPageQueryJSONRoot.getCutoffs();
 		Z_CutoffValuesObjectsToOtherObjects_RootResult cutoffValuesObjectsToOtherObjects_RootResult =
 				Z_CutoffValuesObjectsToOtherObjectsFactory
 				.createSearcherCutoffValuesRootLevel( searchIds, cutoffValuesRootLevel );
@@ -178,7 +160,7 @@ public class Scan_Statistics_Merged {
 				PSM_CountsPerLinkTypeForSearchScanFileResult psm_CountsPerLinkTypeForSearchScanFileResult =
 						Scan_CountsPerLinkTypeForSearchScanFileSearcher.getInstance()
 						.getPSM_CountsPerLinkTypeForSearchScanFile( 
-								searchId, scanFileId, searcherCutoffValuesSearchLevel, modsForDBQuery );
+								searchId, scanFileId, searcherCutoffValuesSearchLevel, modsForDBQuery, includeProteinSeqVIdsDecodedArray );
 
 				Map<String,Long> resultsMS2CountMap_KeyedOnLinkType =
 						psm_CountsPerLinkTypeForSearchScanFileResult.getResultsMS2CountMap_KeyedOnLinkType();

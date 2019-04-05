@@ -14,6 +14,8 @@
 //JavaScript directive:   all variables have to be declared with "var", maybe other things
 "use strict";
 
+import { webserviceCallStandardPost } from 'page_js/webservice_call_common/webserviceCallStandardPost.js';
+
 import { qc_pages_Single_Merged_Common } from './qc_pages_Single_Merged_Common.js';
 
 import { qcChartDownloadHelp } from './qcChart_Download_Help_HTMLBlock.js';
@@ -276,60 +278,36 @@ var QCMergedPageChartSummaryStatistics = function() {
 			} );
 		}
 
-		//  POST body
-		var hash_json_field_Contents_JSONString = JSON.stringify( _get_hash_json_Contents() );
-
-		//  Put Project Search Ids on the Query String of the URL
-		var projectSearchIdsForQueryStringArray = [];
-		_project_search_ids.forEach(function( projectSearchId, index, array) {
-			projectSearchIdsForQueryStringArray.push( "project_search_id=" + projectSearchId );
-		}, this )
-		
-		var projectSearchIdsForQueryString = projectSearchIdsForQueryStringArray.join( "&" );
-		
-		var url = "services/qc/dataPage/summaryStatistics_Merged?" + projectSearchIdsForQueryString;
-
-
 		if ( _activeAjax ) {
 			_activeAjax.abort();
 			_activeAjax = null;
 		}
 
-		//  Set to returned jQuery XMLHttpRequest (jqXHR) object
-		_activeAjax =
-			$.ajax({
-				type : "POST",
-				url : url,
-				traditional: true,  //  Force traditional serialization of the data sent
-				//   One thing this means is that arrays are sent as the object property instead of object property followed by "[]".
-				//   So project_search_ids array is passed as "project_search_ids=<value>" which is what Jersey expects
-				data : hash_json_field_Contents_JSONString,  // The data sent as the POST body
-				contentType: "application/json; charset=utf-8",
-				dataType : "json",
-				success : function( ajaxResponseData ) {
-					try {
-						_activeAjax = null;
-						var responseParams = {
-								ajaxResponseData : ajaxResponseData 
-						};
-						objectThis.loadSummaryStatisticsCountProcessResponse( responseParams );
-					} catch( e ) {
-						reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
-						throw e;
-					}
-				},
-				failure: function(errMsg) {
-					_activeAjax = null;
-					handleAJAXFailure( errMsg );
-				},
-				error : function(jqXHR, textStatus, errorThrown) {
-					_activeAjax = null;
-					if ( objectThis._passAJAXErrorTo_handleAJAXError(jqXHR, textStatus, errorThrown) ) {
-						handleAJAXError(jqXHR, textStatus, errorThrown);
-					}
-				}
-			});
+		const hash_json_Contents = _get_hash_json_Contents();
 
+		const ajaxRequestData = { projectSearchIds : _project_search_ids, qcPageQueryJSONRoot : hash_json_Contents };
+
+		const url = "services/qc/dataPage/summaryStatistics_Merged";
+
+		const webserviceCallStandardPostResult = webserviceCallStandardPost({ dataToSend : ajaxRequestData, url }); //  External Function
+
+		const promise_webserviceCallStandardPost = webserviceCallStandardPostResult.promise; 
+		_activeAjax = webserviceCallStandardPostResult.api;
+
+		promise_webserviceCallStandardPost.catch( ( ) => { _activeAjax = null; } );
+
+		promise_webserviceCallStandardPost.then( ({ responseData }) => {
+			try {
+				_activeAjax = null;
+				var responseParams = {
+					ajaxResponseData : responseData 
+			};
+			objectThis.loadSummaryStatisticsCountProcessResponse( responseParams );
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
+		});
 	};
 
 	/**
@@ -392,7 +370,8 @@ var QCMergedPageChartSummaryStatistics = function() {
 		var download_Psm_DataCallback = function( params ) {
 //			var clickedThis = params.clickedThis;
 			//  Download the data for params
-			qc_pages_Single_Merged_Common.submitDownloadForParams( { downloadStrutsAction : _download_PSM_StrutsAction, project_search_ids : _project_search_ids, hash_json_Contents : hash_json_Contents } );
+			const dataToSend = { projectSearchIds : _project_search_ids, qcPageQueryJSONRoot : hash_json_Contents };
+			qc_pages_Single_Merged_Common.submitDownloadForParams( { downloadStrutsAction : _download_PSM_StrutsAction, dataToSend } );
 		};
 
 		qcChartDownloadHelp.add_DownloadClickHandlers_HelpTooltip( { $chart_outer_container_for_download_jq :  $chart_outer_container_jq, helpTooltipHTML : _psmCountChart_helpTooltipHTML, downloadDataCallback : download_Psm_DataCallback } );
@@ -413,9 +392,9 @@ var QCMergedPageChartSummaryStatistics = function() {
 		//  Download Data Setup
 		var download_Peptide_DataCallback = function( params ) {
 //			var clickedThis = params.clickedThis;
-
 			//  Download the data for params
-			qc_pages_Single_Merged_Common.submitDownloadForParams( { downloadStrutsAction : _download_Peptide_StrutsAction, project_search_ids : _project_search_ids, hash_json_Contents : hash_json_Contents } );
+			const dataToSend = { projectSearchIds : _project_search_ids, qcPageQueryJSONRoot : hash_json_Contents };
+			qc_pages_Single_Merged_Common.submitDownloadForParams( { downloadStrutsAction : _download_Peptide_StrutsAction, dataToSend } );
 		};
 		
 		qcChartDownloadHelp.add_DownloadClickHandlers_HelpTooltip( { $chart_outer_container_for_download_jq :  $chart_outer_container_jq, helpTooltipHTML : _peptideCountChart_helpTooltipHTML, downloadDataCallback : download_Peptide_DataCallback } );
@@ -436,9 +415,9 @@ var QCMergedPageChartSummaryStatistics = function() {
 		//  Download Data Setup
 		var download_Protein_DataCallback = function( params ) {
 //			var clickedThis = params.clickedThis;
-
 			//  Download the data for params
-			qc_pages_Single_Merged_Common.submitDownloadForParams( { downloadStrutsAction : _download_Protein_StrutsAction, project_search_ids : _project_search_ids, hash_json_Contents : hash_json_Contents } );
+			const dataToSend = { projectSearchIds : _project_search_ids, qcPageQueryJSONRoot : hash_json_Contents };
+			qc_pages_Single_Merged_Common.submitDownloadForParams( { downloadStrutsAction : _download_Protein_StrutsAction, dataToSend } );
 		};
 		
 		qcChartDownloadHelp.add_DownloadClickHandlers_HelpTooltip( { $chart_outer_container_for_download_jq :  $chart_outer_container_jq, helpTooltipHTML : _proteinCountChart_helpTooltipHTML, downloadDataCallback : download_Protein_DataCallback } );

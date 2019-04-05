@@ -46,7 +46,7 @@ public class Scan_MS_1_IonCurrent_Histograms_CachedResultManager implements Cach
 	 * @param imageAsBytes
 	 * @throws Exception
 	 */
-	public byte[] retrieveDataFromCache( int scanFileId, String requestQueryString ) throws Exception {
+	public byte[] retrieveDataFromCache( int scanFileId, byte[] requestJSONBytes ) throws Exception {
 		
 		if ( ! CachedDataInFileMgmt.getSingletonInstance().isCachedDataFilesDirConfigured() ) {
 			return null;  //  EARLY EXIT
@@ -60,7 +60,7 @@ public class Scan_MS_1_IonCurrent_Histograms_CachedResultManager implements Cach
 				.retrieveCachedDataFileContents(
 						PREFIX_FOR_CACHING /* namePrefix */, 
 						Scan_MS_1_IonCurrent_Histograms.VERSION_FOR_CACHING /* version */, 
-						requestQueryString, 
+						requestJSONBytes, 
 						ids,
 						IdParamType.SCAN_FILE_ID );
 		return resultJSONAsBytes;
@@ -71,7 +71,7 @@ public class Scan_MS_1_IonCurrent_Histograms_CachedResultManager implements Cach
 	 * @param imageAsBytes
 	 * @throws Exception
 	 */
-	public void saveDataToCache( int scanFileId, byte[] resultJSONAsBytes, String requestQueryString ) throws Exception {
+	public void saveDataToCache( int scanFileId, byte[] resultJSONAsBytes, byte[] requestJSONBytes ) throws Exception {
 		
 		if ( ! CachedDataInFileMgmt.getSingletonInstance().isCachedDataFilesDirConfigured() ) {
 			return;  //  EARLY EXIT
@@ -86,7 +86,7 @@ public class Scan_MS_1_IonCurrent_Histograms_CachedResultManager implements Cach
 				ReplaceExistingValue.NO,
 				PREFIX_FOR_CACHING /* namePrefix */, 
 				Scan_MS_1_IonCurrent_Histograms.VERSION_FOR_CACHING /* version */, 
-				requestQueryString, 
+				requestJSONBytes, 
 				ids,
 				IdParamType.SCAN_FILE_ID );
 		

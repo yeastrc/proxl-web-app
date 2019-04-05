@@ -18,6 +18,8 @@
 //JavaScript directive:   all variables have to be declared with "var", maybe other things
 "use strict";
 
+import { webserviceCallStandardPost } from 'page_js/webservice_call_common/webserviceCallStandardPost.js';
+
 import { qcChartDownloadHelp } from './qcChart_Download_Help_HTMLBlock.js';
 
 import { downloadStringAsFile } from 'page_js/data_pages/project_search_ids_driven_pages/common/download-string-as-file.js';
@@ -28,9 +30,11 @@ import { downloadStringAsFile } from 'page_js/data_pages/project_search_ids_driv
  */
 var QCPageChart_PSM_Count_Vs_Score_PSM = function() {
 
-
-
 	//	CONSTANTS - PSM Count Vs Score Chart
+
+	//  Handlebars Templates for <option> entries
+	const _SELECT_ANNOTATION_CHOICE_OPTION_ENTRY_HTML_HANDLEBARS_TEMPLATE = '<option value="{{ id }}">{{ name }} ({{ searchProgramName }})</option>';
+	const _SELECT_PROTEIN_CHOICE_OPTION_ENTRY_HTML_HANDLEBARS_TEMPLATE = '<option value="{{ proteinSequenceVersionId }}">{{ annotationName }}</option>';
 
 	var PSM_COUNT_VS_SCORE_CHART_BIN_START_OR_END_TO_FIXED_VALUE = 4;
 	var PSM_COUNT_VS_SCORE_CHART_PERCENTAGE_OF_MAX_TO_FIXED_VALUE = 1;
@@ -475,33 +479,36 @@ var QCPageChart_PSM_Count_Vs_Score_PSM = function() {
 	this.psmCountVsScoreQCPlot_getPSMFilterableAnnTypesForProjectSearchId = function( params ) {
 		var objectThis = this;
 
+		if ( _project_search_ids.length !== 1 ) {
+			throw Error("Unsupported: _project_search_ids.length !== 1.  length: " + _project_search_ids.length );
+		}
+
 		// TODO  Hard code taking first project search id
 		var projectSearchId = _project_search_ids[ 0 ];	
 		
-		var _URL = "services/annotationTypes/getAnnotationTypesPsmFilterableForProjectSearchId";
-		var requestData = {
-				projectSearchId : projectSearchId
-		};
-//		var request =
-		$.ajax({
-			type : "GET",
-			url : _URL,
-			data : requestData,
-			dataType : "json",
-			success : function(data) {
-				objectThis.psmCountVsScoreQCPlot_getPSMFilterableAnnTypesForProjectSearchIdResponse(requestData, data, params);
-			},
-			failure: function(errMsg) {
-				handleAJAXFailure( errMsg );
-			},
-			error : function(jqXHR, textStatus, errorThrown) {
-				handleAJAXError(jqXHR, textStatus, errorThrown);
+		const ajaxRequestData = { projectSearchId : projectSearchId };
+
+		const url = "services/annotationTypes/getAnnotationTypesPsmFilterableForProjectSearchId";
+
+		const webserviceCallStandardPostResult = webserviceCallStandardPost({ dataToSend : ajaxRequestData, url }); //  External Function
+
+		const promise_webserviceCallStandardPost = webserviceCallStandardPostResult.promise; 
+		// _activeAjax = webserviceCallStandardPostResult.api;
+
+		promise_webserviceCallStandardPost.catch( ( ) => { } );
+
+		promise_webserviceCallStandardPost.then( ({ responseData }) => {
+			try {
+				objectThis.psmCountVsScoreQCPlot_getPSMFilterableAnnTypesForProjectSearchIdResponse( responseData );
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
 			}
 		});
 	};
 
 //	/
-	this.psmCountVsScoreQCPlot_getPSMFilterableAnnTypesForProjectSearchIdResponse = function(requestData, responseData, originalParams) {
+	this.psmCountVsScoreQCPlot_getPSMFilterableAnnTypesForProjectSearchIdResponse = function( responseData ) {
 		var annTypesSearchProgramsPerSearch = responseData.annotationTypeList;
 		if (  annTypesSearchProgramsPerSearch.length === 0 ) {
 			throw "annTypesSearchProgramsPerSearch.length === 0";
@@ -526,11 +533,12 @@ var QCPageChart_PSM_Count_Vs_Score_PSM = function() {
 		var $psm_count_vs_score_qc_plot_score_type_id = $("#psm_count_vs_score_qc_plot_score_type_id");
 		$psm_count_vs_score_qc_plot_score_type_id.empty();
 		var optionsHTMLarray = [];
+
+		var optionEntryTemplateCompiled = Handlebars.compile( _SELECT_ANNOTATION_CHOICE_OPTION_ENTRY_HTML_HANDLEBARS_TEMPLATE );
+
 		for ( var annTypesIndex = 0; annTypesIndex < annTypes.length; annTypesIndex++ ) {
 			var annType = annTypes[ annTypesIndex ];
-			var html = "<option value='" + annType.id + "'>" + annType.name +
-			" (" + annType.searchProgramName + ")" +
-			"</option>";
+			var html = optionEntryTemplateCompiled( annType );
 			optionsHTMLarray.push( html );
 		}
 		var optionsHTML = optionsHTMLarray.join("");
@@ -572,33 +580,36 @@ var QCPageChart_PSM_Count_Vs_Score_PSM = function() {
 //			throw "qcChartsInitialized is false"; 
 //		}
 
+		if ( _project_search_ids.length !== 1 ) {
+			throw Error("Unsupported: _project_search_ids.length !== 1.  length: " + _project_search_ids.length );
+		}
+
 		// TODO  Hard code taking first project search id
 		var projectSearchId = _project_search_ids[ 0 ];	
 		
-		var _URL = "services/proteinNames/getProteinNameListForProjectSearchId";
-		var requestData = {
-				projectSearchId : projectSearchId
-		};
-//		var request =
-		$.ajax({
-			type : "GET",
-			url : _URL,
-			data : requestData,
-			dataType : "json",
-			success : function(data) {
-				objectThis.psmCountVsScoreQCPlot_getProteinSeqIdsProteinAnnNamesForProjectSearchIdResponse(requestData, data, params);
-			},
-			failure: function(errMsg) {
-				handleAJAXFailure( errMsg );
-			},
-			error : function(jqXHR, textStatus, errorThrown) {
-				handleAJAXError(jqXHR, textStatus, errorThrown);
+		const ajaxRequestData = { projectSearchId : projectSearchId };
+
+		const url = "services/proteinNames/getProteinNameListForProjectSearchId";
+
+		const webserviceCallStandardPostResult = webserviceCallStandardPost({ dataToSend : ajaxRequestData, url }); //  External Function
+
+		const promise_webserviceCallStandardPost = webserviceCallStandardPostResult.promise; 
+		// _activeAjax = webserviceCallStandardPostResult.api;
+
+		promise_webserviceCallStandardPost.catch( ( ) => { } );
+
+		promise_webserviceCallStandardPost.then( ({ responseData }) => {
+			try {
+				objectThis.psmCountVsScoreQCPlot_getProteinSeqIdsProteinAnnNamesForProjectSearchIdResponse( responseData );
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
 			}
 		});
 	};
 
 //	/
-	this.psmCountVsScoreQCPlot_getProteinSeqIdsProteinAnnNamesForProjectSearchIdResponse = function(requestData, responseData, originalParams) {
+	this.psmCountVsScoreQCPlot_getProteinSeqIdsProteinAnnNamesForProjectSearchIdResponse = function(responseData) {
 
 		var proteinSequenceVersionIdProteinAnnotationNameList = responseData.proteinSequenceVersionIdProteinAnnotationNameList;
 
@@ -610,19 +621,22 @@ var QCPageChart_PSM_Count_Vs_Score_PSM = function() {
 		var $psm_count_vs_score_qc_plot_protein_seq_id_exclude_select = $("#psm_count_vs_score_qc_plot_protein_seq_id_exclude_select");
 		$psm_count_vs_score_qc_plot_protein_seq_id_exclude_select.empty();
 
+		var optionEntryTemplateCompiled = Handlebars.compile( _SELECT_PROTEIN_CHOICE_OPTION_ENTRY_HTML_HANDLEBARS_TEMPLATE );
+
 		var optionsHTMLarray = [];
 		for ( var dataIndex = 0; dataIndex < proteinSequenceVersionIdProteinAnnotationNameList.length; dataIndex++ ) {
 			var proteinSequenceVersionIdProteinAnnotationName = proteinSequenceVersionIdProteinAnnotationNameList[ dataIndex ];
-			var html = "<option value='" + proteinSequenceVersionIdProteinAnnotationName.proteinSequenceVersionId + 
-			"'>" + proteinSequenceVersionIdProteinAnnotationName.annotationName +
-			"</option>";
+			var html = optionEntryTemplateCompiled( proteinSequenceVersionIdProteinAnnotationName );
 			optionsHTMLarray.push( html );
 		}
 		var optionsHTML = optionsHTMLarray.join("");
 		$psm_count_vs_score_qc_plot_protein_seq_id_include_select.append( optionsHTML );
 		$psm_count_vs_score_qc_plot_protein_seq_id_exclude_select.append( optionsHTML );
 
-		$psm_count_vs_score_qc_plot_protein_seq_id_include_select.val("");
+		//  Initialize include protein to match page selection
+		var hash_json_Contents = _get_hash_json_Contents();
+		$psm_count_vs_score_qc_plot_protein_seq_id_include_select.val( hash_json_Contents.includeProteinSeqVIdsDecodedArray );
+
 		$psm_count_vs_score_qc_plot_protein_seq_id_exclude_select.val("");
 	};
 
@@ -668,11 +682,16 @@ var QCPageChart_PSM_Count_Vs_Score_PSM = function() {
 		var annotationTypeId = undefined;
 		var selectedAnnotationTypeText = undefined;
 		var selectedLinkTypes = undefined;
+		let includeproteinSequenceVersionIds = undefined;
+		let excludeproteinSequenceVersionIds = undefined;
 
 		if ( thumbnailChart ) {
 			
 			selectedLinkTypes = hash_json_Contents.linkTypes;
-			
+
+			//  Convert selected include proteins on main page to format
+			includeproteinSequenceVersionIds = hash_json_Contents.includeProteinSeqVIdsDecodedArray;
+
 			//  TODO  Properly handle no link types selected on main page
 			
 //			var selectedLinkTypes = this.psmCountVsScoreQCPlot_getLinkTypesChecked();
@@ -759,6 +778,33 @@ var QCPageChart_PSM_Count_Vs_Score_PSM = function() {
 				$(".psm_count_vs_score_qc_plot_have_data_jq").hide();
 				return;  //  EARLY EXIT		
 			}
+
+			//  Process User select of proteins to include
+
+			var $psm_count_vs_score_qc_plot_protein_seq_id_include_select = $("#psm_count_vs_score_qc_plot_protein_seq_id_include_select");
+			var psm_count_vs_score_qc_plot_protein_seq_id_include_select = $psm_count_vs_score_qc_plot_protein_seq_id_include_select.val();
+
+			if ( psm_count_vs_score_qc_plot_protein_seq_id_include_select !== null ) {
+				includeproteinSequenceVersionIds = psm_count_vs_score_qc_plot_protein_seq_id_include_select;
+			}
+			{
+				//  Should never get here but just in case...
+				const $optionsInsideSelect = $psm_count_vs_score_qc_plot_protein_seq_id_include_select.children("option");
+				if ( $optionsInsideSelect.length === 0 ) {
+					//  Options not populated yet so default to selection from page, since will set those into the select when populated
+					includeproteinSequenceVersionIds = hash_json_Contents.includeProteinSeqVIdsDecodedArray;
+				}
+			}
+
+
+			//  Process User select of proteins to exclude
+
+			var $psm_count_vs_score_qc_plot_protein_seq_id_exclude_select = $("#psm_count_vs_score_qc_plot_protein_seq_id_exclude_select");
+			var psm_count_vs_score_qc_plot_protein_seq_id_exclude_select = $psm_count_vs_score_qc_plot_protein_seq_id_exclude_select.val();
+
+			if ( psm_count_vs_score_qc_plot_protein_seq_id_exclude_select !== null ) {
+				excludeproteinSequenceVersionIds = psm_count_vs_score_qc_plot_protein_seq_id_exclude_select;
+			}
 		}
 
 		var $psm_count_vs_score_qc_plot_scan_file_id = $("#psm_count_vs_score_qc_plot_scan_file_id");
@@ -772,31 +818,12 @@ var QCPageChart_PSM_Count_Vs_Score_PSM = function() {
 				annotationTypeId : annotationTypeId,
 				selectedAnnotationTypeText : selectedAnnotationTypeText,
 				selectedLinkTypes : selectedLinkTypes,
+				includeproteinSequenceVersionIds,
+				excludeproteinSequenceVersionIds,
 				userInputMaxX : userInputMaxX,
 				userInputMaxY : userInputMaxY, 
 				thumbnailChart : thumbnailChart
 		};
-
-		if ( ! thumbnailChart ) {
-
-			//  Process User select of proteins to include
-
-			var $psm_count_vs_score_qc_plot_protein_seq_id_include_select = $("#psm_count_vs_score_qc_plot_protein_seq_id_include_select");
-			var psm_count_vs_score_qc_plot_protein_seq_id_include_select = $psm_count_vs_score_qc_plot_protein_seq_id_include_select.val();
-
-			if ( psm_count_vs_score_qc_plot_protein_seq_id_include_select !== null ) {
-				createChartParams.includeproteinSequenceVersionIds = psm_count_vs_score_qc_plot_protein_seq_id_include_select;
-			}
-
-			//  Process User select of proteins to exclude
-
-			var $psm_count_vs_score_qc_plot_protein_seq_id_exclude_select = $("#psm_count_vs_score_qc_plot_protein_seq_id_exclude_select");
-			var psm_count_vs_score_qc_plot_protein_seq_id_exclude_select = $psm_count_vs_score_qc_plot_protein_seq_id_exclude_select.val();
-
-			if ( psm_count_vs_score_qc_plot_protein_seq_id_exclude_select !== null ) {
-				createChartParams.excludeproteinSequenceVersionIds = psm_count_vs_score_qc_plot_protein_seq_id_exclude_select;
-			}
-		}
 
 		this.psmCountVsScoreQCPlot_createChart( createChartParams );
 	};
@@ -821,60 +848,81 @@ var QCPageChart_PSM_Count_Vs_Score_PSM = function() {
 		var objectThis = this;
 		var projectSearchId = params.projectSearchId;
 		var scanFileId = params.scanFileId;
-		var scanFileName = params.scanFileName;
+		// var scanFileName = params.scanFileName;
 		var selectedLinkTypes = params.selectedLinkTypes;
 		var includeproteinSequenceVersionIds = params.includeproteinSequenceVersionIds;
 		var excludeproteinSequenceVersionIds = params.excludeproteinSequenceVersionIds;
 		var annotationTypeId = params.annotationTypeId;
 		var userInputMaxXString = params.userInputMaxX;
-		var thumbnailChart = params.thumbnailChart;
+		// var thumbnailChart = params.thumbnailChart;
 		
 		var $psm_count_vs_score_qc_plot_chartDiv = $("#psm_count_vs_score_qc_plot_chartDiv");
 		$psm_count_vs_score_qc_plot_chartDiv.empty();
-		var _URL = "services/qcplot/getPsmCountsVsScore";
-		var requestData = {
-				selectedLinkTypes : selectedLinkTypes,
-				iP : includeproteinSequenceVersionIds,
-				eP : excludeproteinSequenceVersionIds,
-				projectSearchId : projectSearchId,
-				annotationTypeId : annotationTypeId
-		};
-		if ( userInputMaxXString !== "" && userInputMaxXString !== undefined ) {
-			var psmScoreCutoff = userInputMaxXString;
-			requestData.psmScoreCutoff = psmScoreCutoff;
-		}
 
+		let projectSearchIdNumber = undefined;
+		let scanFileIdNumber = undefined;
+		let annotationTypeIdNumber = undefined;
+		let psmScoreCutoff = undefined;
+
+		projectSearchIdNumber = Number.parseInt( projectSearchId );
+		if ( Number.isNaN( projectSearchIdNumber ) ) {
+			throw Error("projectSearchId is not a number: " + projectSearchId );
+		}
 		if ( scanFileId === "" || scanFileId === undefined || scanFileId === null ) {
 		} else {
 			//  Add scan file id
-			requestData.scanFileId = [ scanFileId ];
+			scanFileIdNumber = Number.parseInt( scanFileId );
+			if ( Number.isNaN( scanFileIdNumber ) ) {
+				throw Error("scanFileId is not a number: " + scanFileId );
+			}
 		}
+		if ( annotationTypeId && annotationTypeId !== "" ) {
+			const annotationTypeIdNumber = Number.parseInt( annotationTypeId );
+			if ( Number.isNaN( annotationTypeIdNumber ) ) {
+				throw Error("annotationTypeId is not a number: " + annotationTypeId );
+			}
+		}
+		if ( userInputMaxXString !== "" && userInputMaxXString !== undefined ) {
+			psmScoreCutoff = Number.parseFloat( userInputMaxXString );
+			if ( Number.isNaN( psmScoreCutoff ) ) {
+				throw Error("userInputMaxXString is not a number: " + userInputMaxXString );
+			}
+		}
+
+		var ajaxRequestData = {
+				selectedLinkTypes : selectedLinkTypes,
+				proteinSequenceVersionIdsToIncludeList : includeproteinSequenceVersionIds,
+				proteinSequenceVersionIdsToExcludeList : excludeproteinSequenceVersionIds,
+				projectSearchId : projectSearchIdNumber,
+				annotationTypeId : annotationTypeIdNumber,
+				scanFileId : scanFileIdNumber,
+				psmScoreCutoff : psmScoreCutoff
+		};
+
+		let _activeAjax = null;
 		
-		// var request =
-		$.ajax({
-			type : "GET",
-			url : _URL,
-			data : requestData,
-			traditional: true,  //  Force traditional serialization of the data sent
-			//   One thing this means is that arrays are sent as the object property instead of object property followed by "[]".
-			//   So scansFor array is passed as "scansFor=<value>" which is what Jersey expects
-			dataType : "json",
-			success : function(data) {
-				objectThis.psmCountVsScoreQCPlot_createChartResponse(requestData, data, params);
-			},
-			failure: function(errMsg) {
-				handleAJAXFailure( errMsg );
-			},
-			error : function(jqXHR, textStatus, errorThrown) {
-				handleAJAXError(jqXHR, textStatus, errorThrown);
-				// alert( "exception: " + errorThrown + ", jqXHR: " + jqXHR + ",
-				// textStatus: " + textStatus );
+		const url = "services/qcplot/getPsmCountsVsScore";
+
+		const webserviceCallStandardPostResult = webserviceCallStandardPost({ dataToSend : ajaxRequestData, url }); //  External Function
+
+		const promise_webserviceCallStandardPost = webserviceCallStandardPostResult.promise; 
+		_activeAjax = webserviceCallStandardPostResult.api;
+
+		promise_webserviceCallStandardPost.catch( ( ) => { _activeAjax = null; } );
+
+		promise_webserviceCallStandardPost.then( ({ responseData }) => {
+			try {
+				_activeAjax = null;
+				objectThis.psmCountVsScoreQCPlot_createChartResponse(responseData, params);
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
 			}
 		});
 	};
 
 
-	this.psmCountVsScoreQCPlot_createChartResponse = function(requestData, responseData, originalParams) {
+	this.psmCountVsScoreQCPlot_createChartResponse = function(responseData, originalParams) {
 		var objectThis = this;
 		
 		var scanFileId = originalParams.scanFileId;

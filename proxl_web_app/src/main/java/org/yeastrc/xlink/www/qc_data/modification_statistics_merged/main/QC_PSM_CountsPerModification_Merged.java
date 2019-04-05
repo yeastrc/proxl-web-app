@@ -1,6 +1,5 @@
 package org.yeastrc.xlink.www.qc_data.modification_statistics_merged.main;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -23,7 +22,7 @@ import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappInternalErrorException;
 import org.yeastrc.xlink.www.form_query_json_objects.CutoffValuesRootLevel;
-import org.yeastrc.xlink.www.form_query_json_objects.MergedPeptideQueryJSONRoot;
+import org.yeastrc.xlink.www.form_query_json_objects.QCPageQueryJSONRoot;
 import org.yeastrc.xlink.www.form_query_json_objects.Z_CutoffValuesObjectsToOtherObjectsFactory;
 import org.yeastrc.xlink.www.form_query_json_objects.Z_CutoffValuesObjectsToOtherObjectsFactory.Z_CutoffValuesObjectsToOtherObjects_RootResult;
 import org.yeastrc.xlink.www.objects.WebReportedPeptide;
@@ -32,14 +31,11 @@ import org.yeastrc.xlink.www.qc_data.modification_statistics_merged.objects.QC_P
 import org.yeastrc.xlink.www.qc_data.modification_statistics_merged.objects.QC_PSM_CountsPerModification_Merged_Results.QC_PSM_CountsPerModificationResultsPerLinkType_Merged;
 import org.yeastrc.xlink.www.qc_data.modification_statistics_merged.objects.QC_PSM_CountsPerModification_Merged_Results.QC_PSM_CountsPerModificationResultsPerModMass_Merged;
 import org.yeastrc.xlink.www.qc_data.modification_statistics_merged.objects.QC_PSM_CountsPerModification_Merged_Results.QC_PSM_CountsPerModificationResults_Per_ModMass_SearchId_Merged;
+import org.yeastrc.xlink.www.qc_data.utils.QC_Cached_WebReportedPeptideWrapperList_FilteredOnIncludeProtSeqVIds;
 import org.yeastrc.xlink.www.searcher_via_cached_data.a_return_data_from_searchers.PeptideWebPageSearcherCacheOptimized;
 import org.yeastrc.xlink.www.web_utils.DynamicModsFilterSelectionFromUserPreprocessing;
 import org.yeastrc.xlink.www.web_utils.GetLinkTypesForSearchers;
 import org.yeastrc.xlink.www.web_utils.DynamicModsFilterSelectionFromUserPreprocessing.DynamicModsFilterSelectionFromUserPreprocessingResult;
-
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * 
@@ -60,15 +56,13 @@ public class QC_PSM_CountsPerModification_Merged {
 	}
 	
 	/**
-	 * @param filterCriteriaJSON
-	 * @param projectSearchIdsListDeduppedSorted
+	 * @param qcPageQueryJSONRoot
 	 * @param searches
-	 * @param searchesMapOnSearchId
 	 * @return
 	 * @throws Exception
 	 */
 	public QC_PSM_CountsPerModification_Merged_Results getQC_PSM_CountsPerModification_Merged( 
-			String filterCriteriaJSON, 
+			QCPageQueryJSONRoot qcPageQueryJSONRoot, 
 			List<SearchDTO> searches ) throws Exception {
 
 		Collection<Integer> searchIds = new HashSet<>();
@@ -81,33 +75,13 @@ public class QC_PSM_CountsPerModification_Merged {
 			mapProjectSearchIdToSearchId.put( search.getProjectSearchId(), search.getSearchId() );
 		}
 
-		//  Jackson JSON Mapper object for JSON deserialization and serialization
-		ObjectMapper jacksonJSON_Mapper = new ObjectMapper();  //  Jackson JSON library object
-		//   deserialize 
-		MergedPeptideQueryJSONRoot mergedPeptideQueryJSONRoot = null;
-		try {
-			mergedPeptideQueryJSONRoot = jacksonJSON_Mapper.readValue( filterCriteriaJSON, MergedPeptideQueryJSONRoot.class );
-		} catch ( JsonParseException e ) {
-			String msg = "Failed to parse 'filterCriteriaJSON', JsonParseException.  filterCriteriaJSON: " + filterCriteriaJSON;
-			log.error( msg, e );
-			throw e;
-		} catch ( JsonMappingException e ) {
-			String msg = "Failed to parse 'filterCriteriaJSON', JsonMappingException.  filterCriteriaJSON: " + filterCriteriaJSON;
-			log.error( msg, e );
-			throw e;
-		} catch ( IOException e ) {
-			String msg = "Failed to parse 'filterCriteriaJSON', IOException.  filterCriteriaJSON: " + filterCriteriaJSON;
-			log.error( msg, e );
-			throw e;
-		}
-
 		//  Populate countForLinkType_ByLinkType for selected link types
-		if ( mergedPeptideQueryJSONRoot.getLinkTypes() == null || mergedPeptideQueryJSONRoot.getLinkTypes().length == 0 ) {
+		if ( qcPageQueryJSONRoot.getLinkTypes() == null || qcPageQueryJSONRoot.getLinkTypes().length == 0 ) {
 			String msg = "At least one linkType is required";
 			log.error( msg );
 			throw new Exception( msg );
 		} 
-		String[] linkTypesFromURL = mergedPeptideQueryJSONRoot.getLinkTypes();
+		String[] linkTypesFromURL = qcPageQueryJSONRoot.getLinkTypes();
 		
 		if ( linkTypesFromURL == null || linkTypesFromURL.length == 0 ) {
 			String msg = "At least one linkType is required";
@@ -143,17 +117,17 @@ public class QC_PSM_CountsPerModification_Merged {
 				linkTypesFromURLUpdatedIndex++;
 			}
 			linkTypesFromURL = linkTypesFromURLUpdated;
-			mergedPeptideQueryJSONRoot.setLinkTypes( linkTypesFromURLUpdated );
+			qcPageQueryJSONRoot.setLinkTypes( linkTypesFromURLUpdated );
 		}
 		
 		///////////////////////////////////////////////////
 		//  Get LinkTypes for DB query - Sets to null when all selected as an optimization
-		String[] linkTypesForDBQuery = GetLinkTypesForSearchers.getInstance().getLinkTypesForSearchers( mergedPeptideQueryJSONRoot.getLinkTypes() );
+		String[] linkTypesForDBQuery = GetLinkTypesForSearchers.getInstance().getLinkTypesForSearchers( qcPageQueryJSONRoot.getLinkTypes() );
 		//   Mods for DB Query
-		String[] modsForDBQuery = mergedPeptideQueryJSONRoot.getMods();
+		String[] modsForDBQuery = qcPageQueryJSONRoot.getMods();
 		////////////
 		/////   Searcher cutoffs for all searches
-		CutoffValuesRootLevel cutoffValuesRootLevel = mergedPeptideQueryJSONRoot.getCutoffs();
+		CutoffValuesRootLevel cutoffValuesRootLevel = qcPageQueryJSONRoot.getCutoffs();
 		Z_CutoffValuesObjectsToOtherObjects_RootResult cutoffValuesObjectsToOtherObjects_RootResult =
 				Z_CutoffValuesObjectsToOtherObjectsFactory
 				.createSearcherCutoffValuesRootLevel( searchIds, cutoffValuesRootLevel );
@@ -163,7 +137,7 @@ public class QC_PSM_CountsPerModification_Merged {
 		DynamicModsFilterSelectionFromUserPreprocessingResult dynamicModsFilterSelectionFromUserPreprocessingResult =
 				DynamicModsFilterSelectionFromUserPreprocessing.getInstance().getDynamicModsFilterHandleAllSelected( modsForDBQuery, searchIds );
 		
-		if ( mergedPeptideQueryJSONRoot.getLinkTypes() == null || mergedPeptideQueryJSONRoot.getLinkTypes().length == 0 ) {
+		if ( qcPageQueryJSONRoot.getLinkTypes() == null || qcPageQueryJSONRoot.getLinkTypes().length == 0 ) {
 			String msg = "At least one linkType is required";
 			log.error( msg );
 			throw new Exception( msg );
@@ -188,10 +162,23 @@ public class QC_PSM_CountsPerModification_Merged {
 			
 			///////////////////////////////////////////////
 			//  Get peptides for this search from the DATABASE
+
+			//  Change to use QC_Cached_WebReportedPeptideWrapperList_FilteredOnIncludeProtSeqVIds 
+			//     to get list filtered on 
+
 			List<WebReportedPeptideWrapper> wrappedLinksPerForSearch =
-					PeptideWebPageSearcherCacheOptimized.getInstance().searchOnSearchIdPsmCutoffPeptideCutoff(
-							searchDTO, searcherCutoffValuesSearchLevel, linkTypesForDBQuery, modsForDBQuery, 
-							PeptideWebPageSearcherCacheOptimized.ReturnOnlyReportedPeptidesWithMonolinks.NO );
+					QC_Cached_WebReportedPeptideWrapperList_FilteredOnIncludeProtSeqVIds.getInstance()
+					.get_WebReportedPeptideWrapperList_FilteredOnIncludeProtSeqVIds(
+							searchDTO, searcherCutoffValuesSearchLevel, 
+							linkTypesForDBQuery,
+							modsForDBQuery, 
+							PeptideWebPageSearcherCacheOptimized.ReturnOnlyReportedPeptidesWithMonolinks.NO,
+							qcPageQueryJSONRoot.getIncludeProteinSeqVIdsDecodedArray() );
+			
+//			List<WebReportedPeptideWrapper> wrappedLinksPerForSearch =
+//					PeptideWebPageSearcherCacheOptimized.getInstance().searchOnSearchIdPsmCutoffPeptideCutoff(
+//							searchDTO, searcherCutoffValuesSearchLevel, linkTypesForDBQuery, modsForDBQuery, 
+//							PeptideWebPageSearcherCacheOptimized.ReturnOnlyReportedPeptidesWithMonolinks.NO );
 
 			if ( ! wrappedLinksPerForSearch.isEmpty() ) {
 				foundData = true;

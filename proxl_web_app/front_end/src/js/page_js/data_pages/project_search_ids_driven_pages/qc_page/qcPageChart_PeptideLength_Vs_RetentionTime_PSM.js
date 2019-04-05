@@ -18,6 +18,8 @@
 //JavaScript directive:   all variables have to be declared with "var", maybe other things
 "use strict";
 
+import { webserviceCallStandardPost } from 'page_js/webservice_call_common/webserviceCallStandardPost.js';
+
 import { qc_pages_Single_Merged_Common } from './qc_pages_Single_Merged_Common.js';
 
 import { qcChartDownloadHelp } from './qcChart_Download_Help_HTMLBlock.js';
@@ -303,12 +305,6 @@ var QCPageChart_PeptideLength_Vs_RetentionTime_PSM = function() {
 		var hash_json_Contents_COPY = params.hash_json_Contents_COPY;
 		var $chart_outer_container_jq = params.$chart_outer_container_jq; 
 
-		var hash_json_field_Contents_JSONString = JSON.stringify( hash_json_Contents_COPY );
-		var ajaxRequestData = {
-				project_search_id : _project_search_ids,
-				filterCriteria : hash_json_field_Contents_JSONString
-		};
-
 		if ( _activeAjax && 
 				_activeAjax[ selectedLinkType ] ) {
 			_activeAjax[ selectedLinkType ].abort();
@@ -317,48 +313,38 @@ var QCPageChart_PeptideLength_Vs_RetentionTime_PSM = function() {
 		if ( ! _activeAjax ) {
 			_activeAjax = {};
 		}
-		//  Set to returned jQuery XMLHttpRequest (jqXHR) object
-		_activeAjax[ selectedLinkType ] = 
-			$.ajax({
-//				cache : false,
-				url : "services/qc/dataPage/peptideLengthVsRetentionTime", // 
-				traditional: true,  //  Force traditional serialization of the data sent
-				//   One thing this means is that arrays are sent as the object property instead of object property followed by "[]".
-				//   So project_search_ids array is passed as "project_search_ids=<value>" which is what Jersey expects
-				data : ajaxRequestData,  // The data sent as params on the URL
-				dataType : "json",
-				success : function( ajaxResponseData ) {
-					try {
-						if ( _activeAjax ) {
-							_activeAjax[ selectedLinkType ] = null;
-						}
-						var responseParams = {
-								ajaxResponseData : ajaxResponseData, 
-								ajaxRequestData : ajaxRequestData,
-								selectedLinkType : selectedLinkType,
-								$chart_outer_container_jq : $chart_outer_container_jq
-						};
-						objectThis.load_Data_ForLinkTypeResponse( responseParams );
-					} catch( e ) {
-						reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
-						throw e;
-					}
-				},
-				failure: function(errMsg) {
-					if ( _activeAjax ) {
-						_activeAjax[ selectedLinkType ] = null;
-					}
-					handleAJAXFailure( errMsg );
-				},
-				error : function(jqXHR, textStatus, errorThrown) {
-					if ( _activeAjax ) {
-						_activeAjax[ selectedLinkType ] = null;
-					}
-					if ( objectThis._passAJAXErrorTo_handleAJAXError(jqXHR, textStatus, errorThrown) ) {
-						handleAJAXError(jqXHR, textStatus, errorThrown);
-					}
+
+		const ajaxRequestData = { projectSearchIds : _project_search_ids, qcPageQueryJSONRoot : hash_json_Contents_COPY };
+
+		const url = "services/qc/dataPage/peptideLengthVsRetentionTime";
+
+		const webserviceCallStandardPostResult = webserviceCallStandardPost({ dataToSend : ajaxRequestData, url }); //  External Function
+
+		const promise_webserviceCallStandardPost = webserviceCallStandardPostResult.promise; 
+		_activeAjax[ selectedLinkType ] = webserviceCallStandardPostResult.api;
+
+		promise_webserviceCallStandardPost.catch( ( ) => { 
+			if ( _activeAjax ) {
+				_activeAjax[ selectedLinkType ] = null; 
+			}
+		} );
+
+		promise_webserviceCallStandardPost.then( ({ responseData }) => {
+			try {
+				if ( _activeAjax ) {
+					_activeAjax[ selectedLinkType ] = null;
 				}
-			});
+				var responseParams = {
+						ajaxResponseData : responseData, 
+						selectedLinkType : selectedLinkType,
+						$chart_outer_container_jq : $chart_outer_container_jq
+				};
+				objectThis.load_Data_ForLinkTypeResponse( responseParams );
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
+		});
 	};
 
 	/**
@@ -368,7 +354,6 @@ var QCPageChart_PeptideLength_Vs_RetentionTime_PSM = function() {
 		var objectThis = this;
 
 		var ajaxResponseData = params.ajaxResponseData;
-		var ajaxRequestData = params.ajaxRequestData;
 		var selectedLinkType = params.selectedLinkType;
 		var $chart_outer_container_jq = params.$chart_outer_container_jq;
 
@@ -407,9 +392,9 @@ var QCPageChart_PeptideLength_Vs_RetentionTime_PSM = function() {
 						
 		var downloadDataCallback = function( params ) {
 //			var clickedThis = params.clickedThis;
-
 			//  Download the data for params
-			qc_pages_Single_Merged_Common.submitDownloadForParams( { downloadStrutsAction : _downloadStrutsAction, project_search_ids : _project_search_ids, hash_json_Contents : hash_json_Contents } );
+			const dataToSend = { projectSearchIds : _project_search_ids, qcPageQueryJSONRoot : hash_json_Contents };
+			qc_pages_Single_Merged_Common.submitDownloadForParams( { downloadStrutsAction : _downloadStrutsAction, dataToSend } );
 		};
 		
 		//  Get Help tooltip HTML

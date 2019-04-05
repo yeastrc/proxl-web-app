@@ -15,6 +15,8 @@
 "use strict";
 
 
+import { webserviceCallStandardPost } from 'page_js/webservice_call_common/webserviceCallStandardPost.js';
+
 import { qc_pages_Single_Merged_Common } from './qc_pages_Single_Merged_Common.js';
 
 import { qcChartDownloadHelp } from './qcChart_Download_Help_HTMLBlock.js';
@@ -271,56 +273,38 @@ var QCMergedPageChartDigestionStatistics = function() {
 			messageSuffix:  _DUMMY_CHART_STATUS_TEXT_SUFFIX_LOADING
 		} );
 
-		var hash_json_field_Contents_JSONString = JSON.stringify( _get_hash_json_Contents() );
-		var ajaxRequestData = {
-				project_search_id : _project_search_ids,
-				filterCriteria : hash_json_field_Contents_JSONString
-		};
 		if ( _activeAjax ) {
 			_activeAjax.abort();
 			_activeAjax = null;
 		}
 
-		//  Set to returned jQuery XMLHttpRequest (jqXHR) object
-		_activeAjax =
-			$.ajax({
-				type : "POST",
-				url : "services/qc/dataPage/missingCleavages_Merged",
-				traditional: true,  //  Force traditional serialization of the data sent
-				//   One thing this means is that arrays are sent as the object property instead of object property followed by "[]".
-				//   So project_search_ids array is passed as "project_search_ids=<value>" which is what Jersey expects
-				data : ajaxRequestData,  // The data sent as params on the URL
-				dataType : "json",
-				success : function( ajaxResponseData ) {
-					try {
-						_activeAjax = null;
-						var responseParams = {
-								ajaxResponseData : ajaxResponseData, 
-								ajaxRequestData : ajaxRequestData
-//								,
-//								topTRelement : topTRelement
-						};
-						objectThis.loadMissingCleavageReportedPeptidesCountProcessResponse( responseParams );
-//						$topTRelement.data( _DATA_LOADED_DATA_KEY, true );
-					} catch( e ) {
-						reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
-						throw e;
-					}
-				},
-				failure: function(errMsg) {
-					_activeAjax = null;
-					handleAJAXFailure( errMsg );
-				},
-				error : function(jqXHR, textStatus, errorThrown) {
-					_activeAjax = null;
-					if ( objectThis._passAJAXErrorTo_handleAJAXError(jqXHR, textStatus, errorThrown) ) {
-						handleAJAXError(jqXHR, textStatus, errorThrown);
-					}
-				}
-			});
+		const hash_json_Contents = _get_hash_json_Contents();
 
+		const ajaxRequestData = { projectSearchIds : _project_search_ids, qcPageQueryJSONRoot : hash_json_Contents };
+
+		const url = "services/qc/dataPage/missingCleavages_Merged";
+
+		const webserviceCallStandardPostResult = webserviceCallStandardPost({ dataToSend : ajaxRequestData, url }); //  External Function
+
+		const promise_webserviceCallStandardPost = webserviceCallStandardPostResult.promise; 
+		_activeAjax = webserviceCallStandardPostResult.api;
+
+		promise_webserviceCallStandardPost.catch( ( ) => { _activeAjax = null; } );
+
+		promise_webserviceCallStandardPost.then( ({ responseData }) => {
+			try {
+				_activeAjax = null;
+				var responseParams = {
+					ajaxResponseData : responseData, 
+					ajaxRequestData : ajaxRequestData
+			};
+			objectThis.loadMissingCleavageReportedPeptidesCountProcessResponse( responseParams );
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
+		});
 	};
-
 
 	/**
 	 * Load the data for MissingCleavageReportedPeptidesCount
@@ -470,7 +454,8 @@ var QCMergedPageChartDigestionStatistics = function() {
 		var download_PeptideMissedCleavage_DataCallback = function( params ) {
 			//			var clickedThis = params.clickedThis;
 			//  Download the data for params
-			qc_pages_Single_Merged_Common.submitDownloadForParams( { downloadStrutsAction : _download_PeptideMissedCleavage_StrutsAction, project_search_ids : _project_search_ids, hash_json_Contents : hash_json_Contents } );
+			const dataToSend = { projectSearchIds : _project_search_ids, qcPageQueryJSONRoot : hash_json_Contents };
+			qc_pages_Single_Merged_Common.submitDownloadForParams( { downloadStrutsAction : _download_PeptideMissedCleavage_StrutsAction, dataToSend } );
 		};
 		
 		qcChartDownloadHelp.add_DownloadClickHandlers_HelpTooltip( { 
@@ -496,7 +481,8 @@ var QCMergedPageChartDigestionStatistics = function() {
 		var download_MissedCleavagePerPeptide_DataCallback = function( params ) {
 			//			var clickedThis = params.clickedThis;
 			//  Download the data for params
-			qc_pages_Single_Merged_Common.submitDownloadForParams( { downloadStrutsAction : _download_MissedCleavagePerPeptide_StrutsAction, project_search_ids : _project_search_ids, hash_json_Contents : hash_json_Contents } );
+			const dataToSend = { projectSearchIds : _project_search_ids, qcPageQueryJSONRoot : hash_json_Contents };
+			qc_pages_Single_Merged_Common.submitDownloadForParams( { downloadStrutsAction : _download_MissedCleavagePerPeptide_StrutsAction, dataToSend } );
 		};
 		
 		qcChartDownloadHelp.add_DownloadClickHandlers_HelpTooltip( { 
@@ -522,7 +508,8 @@ var QCMergedPageChartDigestionStatistics = function() {
 		var download_PsmMissedCleavage_DataCallback = function( params ) {
 			//			var clickedThis = params.clickedThis;
 			//  Download the data for params
-			qc_pages_Single_Merged_Common.submitDownloadForParams( { downloadStrutsAction : _download_PsmMissedCleavage_StrutsAction, project_search_ids : _project_search_ids, hash_json_Contents : hash_json_Contents } );
+			const dataToSend = { projectSearchIds : _project_search_ids, qcPageQueryJSONRoot : hash_json_Contents };
+			qc_pages_Single_Merged_Common.submitDownloadForParams( { downloadStrutsAction : _download_PsmMissedCleavage_StrutsAction, dataToSend } );
 		};
 		
 		qcChartDownloadHelp.add_DownloadClickHandlers_HelpTooltip( { 

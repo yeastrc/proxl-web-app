@@ -51,12 +51,12 @@ const mainConfig = {
 		
 		//  header_section_every_page
 
-		'header_section_every_page/header_section_every_page' : './src/js/page_js/common_all_pages/header_section_every_page/header_section_every_page_root.js',
+		'header_section_every_page/header_section_every_page' : './src/js/page_js/header_section_js_all_pages_main_pages/header_section_every_page/header_section_every_page_root.js',
 		
 
 		//  header_section_main_pages
 
-		'header_section_main_pages/header_section_main_pages' : './src/js/page_js/common_all_pages/header_section_main_pages/header_main.js',
+		'header_section_main_pages/header_section_main_pages' : './src/js/page_js/header_section_js_all_pages_main_pages/header_section_main_pages/header_main.js',
 		
 		//  Data Pages
 		//

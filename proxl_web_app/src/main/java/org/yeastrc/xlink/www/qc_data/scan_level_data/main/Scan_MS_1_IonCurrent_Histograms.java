@@ -30,7 +30,7 @@ public class Scan_MS_1_IonCurrent_Histograms {
 	 * 
 	 *  Increment this value whenever change the resulting image since Caching the resulting JSON
 	 */
-	static final int VERSION_FOR_CACHING = 2;
+	static final int VERSION_FOR_CACHING = 3;
 	
 	
 	/**
@@ -49,11 +49,11 @@ public class Scan_MS_1_IonCurrent_Histograms {
 	 * @return
 	 * @throws Exception 
 	 */
-	public byte[] getScan_MS_1_IonCurrent_HistogramsResult( int scanFileId, String requestQueryString ) throws Exception {
+	public byte[] getScan_MS_1_IonCurrent_HistogramsResult( int scanFileId, byte[] requestJSONBytes ) throws Exception {
 
 		byte[] resultsAsBytes = 
 				Scan_MS_1_IonCurrent_Histograms_CachedResultManager.getSingletonInstance()
-				.retrieveDataFromCache( scanFileId, requestQueryString );
+				.retrieveDataFromCache( scanFileId, requestJSONBytes );
 
 		if ( resultsAsBytes != null ) {
 			//  Have Cached data so return it
@@ -141,7 +141,7 @@ public class Scan_MS_1_IonCurrent_Histograms {
 		resultsAsBytes = jacksonJSON_Mapper.writeValueAsBytes( result );
 		
 		Scan_MS_1_IonCurrent_Histograms_CachedResultManager.getSingletonInstance()
-		.saveDataToCache( scanFileId, resultsAsBytes, requestQueryString );
+		.saveDataToCache( scanFileId, resultsAsBytes, requestJSONBytes );
 		
 		return resultsAsBytes;
 	}

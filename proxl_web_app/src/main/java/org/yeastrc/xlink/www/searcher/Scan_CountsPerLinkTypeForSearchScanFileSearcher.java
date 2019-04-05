@@ -119,6 +119,22 @@ public class Scan_CountsPerLinkTypeForSearchScanFileSearcher {
 			+ " ON unified_rp__search__rep_pept__generic_lookup.search_id = srch_id_rep_pep_id_for_mod_masses.search_id "
 			+ "    AND unified_rp__search__rep_pept__generic_lookup.reported_peptide_id = srch_id_rep_pep_id_for_mod_masses.reported_peptide_id \n";
 	
+	///////////////
+	
+	//   Filter on Proteins
+	private static final String SQL_PROTEIN_FILTER_JOIN_START = 
+			" INNER JOIN (";
+	private static final String SQL_PROTEIN_FILTER_INNER_SELECT_START = 
+			" SELECT DISTINCT search_id, reported_peptide_id "
+			+		" FROM protein_coverage "
+			+		" WHERE search_id = ? AND protein_sequence_version_id IN ( ";
+	private static final String SQL_PROTEIN_FILTER_JOIN_AFTER_PROTEIN_SEQUENCE_VERSION_IDS = // After protein_sequence_version_id 
+			" )  \n";
+
+	private static final String SQL_PROTEIN_FILTER_JOIN_END = 
+			" ) AS srch_id_rep_pep_id_for_protein_seq_v_ids "
+			+ " ON unified_rp__search__rep_pept__generic_lookup.search_id = srch_id_rep_pep_id_for_protein_seq_v_ids.search_id "
+			+ "    AND unified_rp__search__rep_pept__generic_lookup.reported_peptide_id = srch_id_rep_pep_id_for_protein_seq_v_ids.reported_peptide_id \n";
 	
 	
 	/**
@@ -148,7 +164,8 @@ public class Scan_CountsPerLinkTypeForSearchScanFileSearcher {
 			int searchId, 
 			int scanFileId,
 			SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel,
-			String[] modMassSelections  ) throws Exception {
+			String[] modMassSelections,
+			List<Integer> includeProteinSeqVIdsDecodedArray ) throws Exception {
 
 		PSM_CountsPerLinkTypeForSearchScanFileResult result = new PSM_CountsPerLinkTypeForSearchScanFileResult();
 
@@ -202,6 +219,7 @@ public class Scan_CountsPerLinkTypeForSearchScanFileSearcher {
 				}
 			}
 		}
+		
 		//////////////////////
 		/////   Start building the SQL
 		StringBuilder sqlSB = new StringBuilder( 1000 );
@@ -256,12 +274,14 @@ public class Scan_CountsPerLinkTypeForSearchScanFileSearcher {
 			}
 			//   Start Dynamic Mods subselect
 			sqlSB.append( SQL_DYNAMIC_MOD_INNER_SELECT_START );
-			sqlSB.append( modMassSelectionsWithoutNoMods.get( 0 ) );
-			// start at the second entry
-			for ( int index = 1; index < modMassSelectionsWithoutNoMods.size(); index++ ) {
-				sqlSB.append( ", " );
-				sqlSB.append( modMassSelectionsWithoutNoMods.get( index ) );
+			int modMassSelectionsWithoutNoModsSize = modMassSelectionsWithoutNoMods.size();
+			for ( int counter = 0; counter < modMassSelectionsWithoutNoModsSize; counter++ ) {
+				if ( counter != 0 ) {
+					sqlSB.append( ", " );
+				}
+				sqlSB.append( "? " );
 			}
+
 			sqlSB.append( SQL_DYNAMIC_MOD_JOIN_AFTER_MOD_MASSES );
 //			//  Process link types for Dynamic Mod subselect
 //			if ( linkTypes != null && ( linkTypes.length > 0 ) ) {
@@ -302,6 +322,28 @@ public class Scan_CountsPerLinkTypeForSearchScanFileSearcher {
 			sqlSB.append( SQL_DYNAMIC_MOD_JOIN_END );
 			sqlSB.append( "\n" );
 		}
+		
+		//  Selected Protein Sequence Version Ids to filter on 
+		
+		if ( includeProteinSeqVIdsDecodedArray != null && ( ! includeProteinSeqVIdsDecodedArray.isEmpty() ) ) {
+
+			sqlSB.append( SQL_PROTEIN_FILTER_JOIN_START );
+			sqlSB.append( SQL_PROTEIN_FILTER_INNER_SELECT_START );
+			
+			int includeProteinSeqVIdsDecodedArraySize = includeProteinSeqVIdsDecodedArray.size();
+			for ( int counter = 0; counter < includeProteinSeqVIdsDecodedArraySize; counter++ ) {
+				if ( counter != 0 ) {
+					sqlSB.append( ", " );
+				}
+				sqlSB.append( "? " );
+			}
+			
+			sqlSB.append( SQL_PROTEIN_FILTER_JOIN_AFTER_PROTEIN_SEQUENCE_VERSION_IDS );
+			
+			sqlSB.append( SQL_PROTEIN_FILTER_JOIN_END );
+		}
+		
+		
 		//////////
 		sqlSB.append( SQL_MAIN_WHERE_START );
 		//////////
@@ -436,7 +478,26 @@ public class Scan_CountsPerLinkTypeForSearchScanFileSearcher {
 				//  If Yes modifications, have search id in subselect
 				paramCounter++;
 				pstmt.setInt( paramCounter, searchId );
+
+				for ( String entry : modMassSelectionsWithoutNoMods ) {
+					paramCounter++; 
+					pstmt.setString( paramCounter, entry );
+				}
 			}
+			
+			if ( includeProteinSeqVIdsDecodedArray != null && ( ! includeProteinSeqVIdsDecodedArray.isEmpty() ) ) {
+				
+				//  Protein Sequence Version Ids selected to filter on
+				paramCounter++;
+				pstmt.setInt( paramCounter, searchId );
+
+				// search id in subselect
+				for ( Integer entry : includeProteinSeqVIdsDecodedArray ) {
+					paramCounter++; 
+					pstmt.setInt( paramCounter, entry );
+				}
+			}
+			
 			//   For:   unified_rp__search__rep_pept__generic_lookup.search_id = ? 
 			paramCounter++; 
 			pstmt.setInt( paramCounter, searchId );

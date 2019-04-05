@@ -11,7 +11,11 @@
   		<form-bean name="mergedSearchViewProteinForm" type="org.yeastrc.xlink.www.forms.MergedSearchViewProteinsForm" />
   		<form-bean name="downloadProteinCLMSForm" type="org.yeastrc.xlink.www.forms.DownloadProteinCLMSForm" />
   		
-  		<form-bean name="QCPlotRetentionTimeForm" type="org.yeastrc.xlink.www.forms.QCPlotRetentionTimeForm" />
+  		<!--  Standard form that contains single property for a single request JSON string
+			  Used for downloads and maybe other uses where only a POST of a single JSON string needs to be supported
+  		-->
+  		<form-bean name="singleRequestJSONStringFieldForm" type="org.yeastrc.xlink.www.forms.SingleRequestJSONStringFieldForm" />
+  		
   		<form-bean name="uploadPDBFileForm" type="org.yeastrc.xlink.www.forms.UploadPDBFileForm" />
   		<form-bean name="downloadStringAsFileForm" type="org.yeastrc.xlink.www.forms.DownloadStringAsFileForm" />
   		<form-bean name="convertAndDownloadSVGForm" type="org.yeastrc.xlink.www.forms.ConvertAndDownloadSVGForm" />
@@ -331,38 +335,38 @@
       	<action path="/downloadQC_SummaryPsmChartData"
 				type="org.yeastrc.xlink.www.actions.DownloadQC_Summary_PsmChartDataAction"
 				scope="request"
-				name="mergedSearchViewPeptideForm"
+				name="singleRequestJSONStringFieldForm"
 				validate="false">
 		</action>
       	<action path="/downloadQC_SummaryPeptideChartData"
 				type="org.yeastrc.xlink.www.actions.DownloadQC_Summary_PeptideChartDataAction"
 				scope="request"
-				name="mergedSearchViewPeptideForm"
+				name="singleRequestJSONStringFieldForm"
 				validate="false">
 		</action>
       	<action path="/downloadQC_SummaryProteinChartData"
 				type="org.yeastrc.xlink.www.actions.DownloadQC_Summary_ProteinChartDataAction"
 				scope="request"
-				name="mergedSearchViewPeptideForm"
+				name="singleRequestJSONStringFieldForm"
 				validate="false">
 		</action>
 
       	<action path="/downloadQC_Digestion_PeptideMissedCleavageChartData"
 				type="org.yeastrc.xlink.www.actions.DownloadQC_Digestion_PeptideMissedCleavageChartDataAction"
 				scope="request"
-				name="mergedSearchViewPeptideForm"
+				name="singleRequestJSONStringFieldForm"
 				validate="false">
 		</action>
       	<action path="/downloadQC_Digestion_MissedCleavagePerPeptideChartData"
 				type="org.yeastrc.xlink.www.actions.DownloadQC_Digestion_MissedCleavagePerPeptideChartDataAction"
 				scope="request"
-				name="mergedSearchViewPeptideForm"
+				name="singleRequestJSONStringFieldForm"
 				validate="false">
 		</action>
       	<action path="/downloadQC_Digestion_PsmMissedCleavageChartData"
 				type="org.yeastrc.xlink.www.actions.DownloadQC_Digestion_PsmMissedCleavageChartDataAction"
 				scope="request"
-				name="mergedSearchViewPeptideForm"
+				name="singleRequestJSONStringFieldForm"
 				validate="false">
 		</action>
 				
@@ -371,42 +375,42 @@
       	<action path="/downloadQC_PsmCountVsRetentionTimeChartData"
 				type="org.yeastrc.xlink.www.actions.DownloadQC_PSM_Count_Vs_RetentionTime_ChartDataAction"
 				scope="request"
-				name="mergedSearchViewPeptideForm"
+				name="singleRequestJSONStringFieldForm"
 				validate="false">
 		</action>
 		
       	<action path="/downloadQC_PsmChargeChartData"
 				type="org.yeastrc.xlink.www.actions.DownloadQC_PsmChargeChartDataAction"
 				scope="request"
-				name="mergedSearchViewPeptideForm"
+				name="singleRequestJSONStringFieldForm"
 				validate="false">
 		</action>
 		
       	<action path="/downloadQC_Psm_M_Over_Z_ChartData"
 				type="org.yeastrc.xlink.www.actions.DownloadQC_Psm_M_Over_Z_ChartDataAction"
 				scope="request"
-				name="mergedSearchViewPeptideForm"
+				name="singleRequestJSONStringFieldForm"
 				validate="false">
 		</action>
 		
       	<action path="/downloadQC_PeptideLengthVsPSMCountHistogramSingleSearchChartData"
 				type="org.yeastrc.xlink.www.actions.DownloadQC_PeptideLengthVsPSMCountHistogramSingleSearchChartDataAction"
 				scope="request"
-				name="mergedSearchViewPeptideForm"
+				name="singleRequestJSONStringFieldForm"
 				validate="false">
 		</action>
 		
       	<action path="/downloadQC_PeptideLengthVsPSMCountBoxplotChartData"
 				type="org.yeastrc.xlink.www.actions.DownloadQC_PeptideLengthVsPSMCountBoxplotChartDataAction"
 				scope="request"
-				name="mergedSearchViewPeptideForm"
+				name="singleRequestJSONStringFieldForm"
 				validate="false">
 		</action>
 		
       	<action path="/downloadQC_Psm_PeptideLength_VS_RT_ChartData"
 				type="org.yeastrc.xlink.www.actions.DownloadQC_Psm_PeptideLength_VS_RT_ChartDataAction"
 				scope="request"
-				name="mergedSearchViewPeptideForm"
+				name="singleRequestJSONStringFieldForm"
 				validate="false">
 		</action>
 		
@@ -415,35 +419,35 @@
       	<action path="/downloadQC_Psm_PPM_Error_ChartData"
 				type="org.yeastrc.xlink.www.actions.DownloadQC_Psm_PPM_Error_ChartDataAction"
 				scope="request"
-				name="mergedSearchViewPeptideForm"
+				name="singleRequestJSONStringFieldForm"
 				validate="false">
 		</action>
 		
       	<action path="/downloadQC_Psm_PPM_Error_VS_RT_ChartData"
 				type="org.yeastrc.xlink.www.actions.DownloadQC_Psm_PPM_Error_VS_RT_ChartDataAction"
 				scope="request"
-				name="mergedSearchViewPeptideForm"
+				name="singleRequestJSONStringFieldForm"
 				validate="false">
 		</action>
 		
       	<action path="/downloadQC_Psm_PPM_Error_VS_MZ_ChartData"
 				type="org.yeastrc.xlink.www.actions.DownloadQC_Psm_PPM_Error_VS_MZ_ChartDataAction"
 				scope="request"
-				name="mergedSearchViewPeptideForm"
+				name="singleRequestJSONStringFieldForm"
 				validate="false">
 		</action>
 
       	<action path="/downloadQC_PsmModificationChartData"
 				type="org.yeastrc.xlink.www.actions.DownloadQC_PsmModificationChartDataAction"
 				scope="request"
-				name="mergedSearchViewPeptideForm"
+				name="singleRequestJSONStringFieldForm"
 				validate="false">
 		</action>
 
       	<action path="/downloadQC_PeptideLengthChartData"
 				type="org.yeastrc.xlink.www.actions.DownloadQC_PeptideLengthChartDataAction"
 				scope="request"
-				name="mergedSearchViewPeptideForm"
+				name="singleRequestJSONStringFieldForm"
 				validate="false">
 		</action>		
 		
@@ -452,18 +456,21 @@
       	<action path="/download_MS1_VS_RetentionTime_ChartData"
 				type="org.yeastrc.xlink.www.actions.DownloadQC_MS1_VS_RetentionTime_ChartDataAction"
 				scope="request"
+				name="singleRequestJSONStringFieldForm"
 				validate="false">
 		</action>		
 		
       	<action path="/download_MS1_VS_M_Over_Z_ChartData"
 				type="org.yeastrc.xlink.www.actions.DownloadQC_MS1_VS_M_Over_Z_ChartDataAction"
 				scope="request"
+				name="singleRequestJSONStringFieldForm"
 				validate="false">
 		</action>		
 	
       	<action path="/download_MS1_VS_RetentionTime_VS_M_Over_Z_ChartData"
 				type="org.yeastrc.xlink.www.actions.DownloadQC_MS1_VS_RetentionTime_VS_M_Over_Z_ChartDataAction"
 				scope="request"
+				name="singleRequestJSONStringFieldForm"
 				validate="false">
 		</action>				
 				

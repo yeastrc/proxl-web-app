@@ -5,10 +5,10 @@ import java.util.List;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.GET;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
@@ -16,14 +16,18 @@ import javax.ws.rs.core.Response;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
+import org.yeastrc.xlink.www.qc_data.a_enums.ForDownload_Enum;
+import org.yeastrc.xlink.www.qc_data.a_request_json_root.QCPageRequestJSONRoot;
 import org.yeastrc.xlink.www.qc_data.summary_statistics.main.QC_SummaryCounts;
 import org.yeastrc.xlink.www.qc_data.summary_statistics.main.QC_SummaryCounts.QC_SummaryCounts_Method_Response;
 import org.yeastrc.xlink.www.qc_data.summary_statistics.objects.QC_SummaryCountsResults;
+import org.yeastrc.xlink.www.qc_data.utils.QC_DeserializeRequestJSON_To_QCPageRequestJSONRoot;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.dao.SearchDAO;
 import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
+import org.yeastrc.xlink.www.form_query_json_objects.QCPageQueryJSONRoot;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
 
@@ -37,17 +41,44 @@ public class QC_SummaryStatisticsService {
 
 	private static final Logger log = LoggerFactory.getLogger( QC_SummaryStatisticsService.class);
 	
-	@GET
+	@POST
+	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/summaryStatistics") 
 	public byte[]
-		getQC_SummaryStatistics( @QueryParam( "project_search_id" ) List<Integer> projectSearchIdList,
-										  @QueryParam( "filterCriteria" ) String filterCriteria_JSONString,
-										  @Context HttpServletRequest request )
+		getQC_SummaryStatistics( 
+				byte[] requestJSONBytes,
+				@Context HttpServletRequest request )
 	throws Exception {
-	
+		
+		if ( requestJSONBytes == null || requestJSONBytes.length == 0 ) {
+			String msg = "requestJSONBytes is null or requestJSONBytes is empty";
+			log.error( msg );
+		    throw new WebApplicationException(
+		    	      Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+//		    	        .entity(  )
+		    	        .build()
+		    	        );
+		}
+		QCPageRequestJSONRoot qcPageRequestJSONRoot = null;
+		try {
+			qcPageRequestJSONRoot =
+					QC_DeserializeRequestJSON_To_QCPageRequestJSONRoot.getInstance().deserializeRequestJSON_To_QCPageRequestJSONRoot( requestJSONBytes );
+		} catch ( Exception e ) {
+			String msg = "parse request failed";
+			log.error( msg );
+		    throw new WebApplicationException(
+		    	      Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+//		    	        .entity(  )
+		    	        .build()
+		    	        );
+		}
+		
+		List<Integer> projectSearchIdList = qcPageRequestJSONRoot.getProjectSearchIds();
+		QCPageQueryJSONRoot qcPageQueryJSONRoot = qcPageRequestJSONRoot.getQcPageQueryJSONRoot();
+		
 		if ( projectSearchIdList == null || projectSearchIdList.isEmpty() ) {
-			String msg = "Provided project_search_id is null or project_search_id is missing";
+			String msg = "Provided projectSearchIds is null or projectSearchIds is missing";
 			log.error( msg );
 		    throw new WebApplicationException(
 		    	      Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
@@ -64,8 +95,8 @@ public class QC_SummaryStatisticsService {
 		    	        .build()
 		    	        );
 		}
-		if ( StringUtils.isEmpty( filterCriteria_JSONString ) ) {
-			String msg = "Provided filterCriteria is null or filterCriteria is missing";
+		if ( qcPageQueryJSONRoot == null ) {
+			String msg = "qcPageQueryJSONRoot is null or qcPageQueryJSONRoot is missing";
 			log.error( msg );
 			throw new WebApplicationException(
 					Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
@@ -74,8 +105,6 @@ public class QC_SummaryStatisticsService {
 					);
 		}
 
-		String requestQueryString = request.getQueryString();
-		
 		int projectSearchId = projectSearchIdList.get( 0 );
 		
 		try {
@@ -150,9 +179,9 @@ public class QC_SummaryStatisticsService {
 			QC_SummaryCounts_Method_Response qc_SummaryCounts_Method_Response =
 					QC_SummaryCounts.getInstance()
 					.getQC_SummaryCounts( 
-							requestQueryString, 
-							QC_SummaryCounts.ForDownload.NO,
-							filterCriteria_JSONString, 
+							requestJSONBytes, 
+							ForDownload_Enum.NO,
+							qcPageQueryJSONRoot, 
 							search );
 
 			return qc_SummaryCounts_Method_Response.getResultsAsBytes();

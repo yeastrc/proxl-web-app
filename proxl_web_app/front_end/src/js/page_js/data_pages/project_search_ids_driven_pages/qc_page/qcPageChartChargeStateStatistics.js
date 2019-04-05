@@ -18,6 +18,8 @@
 //JavaScript directive:   all variables have to be declared with "var", maybe other things
 "use strict";
 
+import { webserviceCallStandardPost } from 'page_js/webservice_call_common/webserviceCallStandardPost.js';
+
 import { qc_pages_Single_Merged_Common } from './qc_pages_Single_Merged_Common.js';
 
 import { qcChartDownloadHelp } from './qcChart_Download_Help_HTMLBlock.js';
@@ -211,7 +213,7 @@ var QCPageChartChargeStateStatistics = function() {
 		var $PSMChargeStatesCountsBlock = $("#PSMChargeStatesCountsBlock");
 		$PSMChargeStatesCountsBlock.empty();
 		
-		var hash_json_Contents = _get_hash_json_Contents();
+		const hash_json_Contents = _get_hash_json_Contents();
 
 		var selectedLinkTypes = hash_json_Contents.linkTypes;
 
@@ -233,61 +235,40 @@ var QCPageChartChargeStateStatistics = function() {
 
 		}, this /* passed to function as this */ );
 
-		var hash_json_field_Contents_JSONString = JSON.stringify( hash_json_Contents );
-		var ajaxRequestData = {
-				project_search_id : _project_search_ids,
-				filterCriteria : hash_json_field_Contents_JSONString
-		};
+
 		if ( _activeAjax ) {
 			_activeAjax.abort();
 			_activeAjax = null;
 		}
-		//  Set to returned jQuery XMLHttpRequest (jqXHR) object
-		_activeAjax =
-			$.ajax({
-				url : "services/qc/dataPage/chargeCounts",
-				traditional: true,  //  Force traditional serialization of the data sent
-				//   One thing this means is that arrays are sent as the object property instead of object property followed by "[]".
-				//   So project_search_ids array is passed as "project_search_ids=<value>" which is what Jersey expects
-				data : ajaxRequestData,  // The data sent as params on the URL
-				dataType : "json",
-				success : function( ajaxResponseData ) {
-					try {
-						_activeAjax = null;
-						var responseParams = {
-								ajaxResponseData : ajaxResponseData, 
-								ajaxRequestData : ajaxRequestData
-//								,
-//								topTRelement : topTRelement
-						};
-						objectThis.loadChargeCountResponse( responseParams );
-//						$topTRelement.data( _DATA_LOADED_DATA_KEY, true );
-					} catch( e ) {
-						reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
-						throw e;
-					}
-				},
-				failure: function(errMsg) {
-					_activeAjax = null;
-					handleAJAXFailure( errMsg );
-				},
-				error : function(jqXHR, textStatus, errorThrown) {
-					_activeAjax = null;
-					if ( objectThis._passAJAXErrorTo_handleAJAXError(jqXHR, textStatus, errorThrown) ) {
-						handleAJAXError(jqXHR, textStatus, errorThrown);
-					}
-				}
-			});
+
+		const ajaxRequestData = { projectSearchIds : _project_search_ids, qcPageQueryJSONRoot : hash_json_Contents };
+
+		const url = "services/qc/dataPage/chargeCounts";
+
+		const webserviceCallStandardPostResult = webserviceCallStandardPost({ dataToSend : ajaxRequestData, url }); //  External Function
+
+		const promise_webserviceCallStandardPost = webserviceCallStandardPostResult.promise; 
+		_activeAjax = webserviceCallStandardPostResult.api;
+
+		promise_webserviceCallStandardPost.catch( ( ) => { _activeAjax = null; } );
+
+		promise_webserviceCallStandardPost.then( ({ responseData }) => {
+			try {
+				_activeAjax = null;
+				var responseParams = { ajaxResponseData : responseData };
+				objectThis.loadChargeCountResponse( responseParams );
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
+		});
 	};
-
-
 
 	/**
 	 * Load the data for Charge Counts
 	 */
 	this.loadChargeCountResponse = function( params ) {
 		var ajaxResponseData = params.ajaxResponseData;
-		var ajaxRequestData = params.ajaxRequestData;
 
 		var chargeStateCountsResults = ajaxResponseData.chargeStateCountsResults;
 		var resultsPerLinkTypeList = chargeStateCountsResults.resultsPerLinkTypeList;
@@ -334,7 +315,9 @@ var QCPageChartChargeStateStatistics = function() {
 //					var clickedThis = params.clickedThis;
 
 					//  Download the data for params
-					qc_pages_Single_Merged_Common.submitDownloadForParams( { downloadStrutsAction : _downloadStrutsAction, project_search_ids : _project_search_ids, hash_json_Contents : hash_json_Contents } );
+					const dataToSend = { projectSearchIds : _project_search_ids, qcPageQueryJSONRoot : hash_json_Contents };
+					qc_pages_Single_Merged_Common.submitDownloadForParams( { downloadStrutsAction : _downloadStrutsAction, dataToSend } );
+					// qc_pages_Single_Merged_Common.submitDownloadForParams( { downloadStrutsAction : _downloadStrutsAction, project_search_ids : _project_search_ids, hash_json_Contents : hash_json_Contents } );
 				};
 				
 				//  Get Help tooltip HTML

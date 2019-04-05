@@ -1,6 +1,5 @@
 package org.yeastrc.xlink.www.qc_data.reported_peptide_level_merged.main;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -19,9 +18,10 @@ import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappInternalErrorException;
 import org.yeastrc.xlink.www.form_query_json_objects.CutoffValuesRootLevel;
-import org.yeastrc.xlink.www.form_query_json_objects.MergedPeptideQueryJSONRoot;
+import org.yeastrc.xlink.www.form_query_json_objects.QCPageQueryJSONRoot;
 import org.yeastrc.xlink.www.form_query_json_objects.Z_CutoffValuesObjectsToOtherObjectsFactory;
 import org.yeastrc.xlink.www.form_query_json_objects.Z_CutoffValuesObjectsToOtherObjectsFactory.Z_CutoffValuesObjectsToOtherObjects_RootResult;
+import org.yeastrc.xlink.www.qc_data.a_enums.ForDownload_Enum;
 import org.yeastrc.xlink.www.qc_data.reported_peptide_level.main.PeptideLength_Histogram_For_PSMPeptideCutoffs;
 import org.yeastrc.xlink.www.qc_data.reported_peptide_level_merged.objects.PeptideLength_Histogram_For_PSMPeptideCutoffs_Merged_Results;
 import org.yeastrc.xlink.www.qc_data.reported_peptide_level_merged.objects.PeptideLength_Histogram_For_PSMPeptideCutoffs_Merged_Results.PeptideLength_Histogram_For_PSMPeptideCutoffsResultsForLinkType;
@@ -29,10 +29,6 @@ import org.yeastrc.xlink.www.qc_data.reported_peptide_level_merged.objects.Pepti
 import org.yeastrc.xlink.www.qc_data.utils.BoxPlotUtils;
 import org.yeastrc.xlink.www.qc_data.utils.BoxPlotUtils.GetBoxPlotValuesResult;
 import org.yeastrc.xlink.www.web_utils.GetLinkTypesForSearchers;
-
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * 
@@ -42,8 +38,6 @@ public class PeptideLength_Histogram_For_PSMPeptideCutoffs_Merged {
 
 	private static final Logger log = LoggerFactory.getLogger( PeptideLength_Histogram_For_PSMPeptideCutoffs_Merged.class);
 
-	public enum ForDownload { YES, NO }
-	
 	/**
 	 * private constructor
 	 */
@@ -114,14 +108,14 @@ public class PeptideLength_Histogram_For_PSMPeptideCutoffs_Merged {
 		
 	/**
 	 * @param forDownload
-	 * @param filterCriteriaJSON
+	 * @param qcPageQueryJSONRoot
 	 * @param searches
 	 * @return
 	 * @throws Exception
 	 */
 	public PeptideLength_Histogram_For_PSMPeptideCutoffs_Merged_Method_Response getPeptideLength_Histogram_For_PSMPeptideCutoffs_Merged( 			
-			ForDownload forDownload,
-			String filterCriteriaJSON, 
+			ForDownload_Enum forDownload,
+			QCPageQueryJSONRoot qcPageQueryJSONRoot, 
 			List<SearchDTO> searches ) throws Exception {
 
 		Collection<Integer> searchIds = new HashSet<>();
@@ -134,33 +128,13 @@ public class PeptideLength_Histogram_For_PSMPeptideCutoffs_Merged {
 			mapProjectSearchIdToSearchId.put( search.getProjectSearchId(), search.getSearchId() );
 		}
 
-		//  Jackson JSON Mapper object for JSON deserialization and serialization
-		ObjectMapper jacksonJSON_Mapper = new ObjectMapper();  //  Jackson JSON library object
-		//   deserialize 
-		MergedPeptideQueryJSONRoot mergedPeptideQueryJSONRoot = null;
-		try {
-			mergedPeptideQueryJSONRoot = jacksonJSON_Mapper.readValue( filterCriteriaJSON, MergedPeptideQueryJSONRoot.class );
-		} catch ( JsonParseException e ) {
-			String msg = "Failed to parse 'filterCriteriaJSON', JsonParseException.  filterCriteriaJSON: " + filterCriteriaJSON;
-			log.error( msg, e );
-			throw e;
-		} catch ( JsonMappingException e ) {
-			String msg = "Failed to parse 'filterCriteriaJSON', JsonMappingException.  filterCriteriaJSON: " + filterCriteriaJSON;
-			log.error( msg, e );
-			throw e;
-		} catch ( IOException e ) {
-			String msg = "Failed to parse 'filterCriteriaJSON', IOException.  filterCriteriaJSON: " + filterCriteriaJSON;
-			log.error( msg, e );
-			throw e;
-		}
-
 		//  Populate countForLinkType_ByLinkType for selected link types
-		if ( mergedPeptideQueryJSONRoot.getLinkTypes() == null || mergedPeptideQueryJSONRoot.getLinkTypes().length == 0 ) {
+		if ( qcPageQueryJSONRoot.getLinkTypes() == null || qcPageQueryJSONRoot.getLinkTypes().length == 0 ) {
 			String msg = "At least one linkType is required";
 			log.error( msg );
 			throw new Exception( msg );
 		} 
-		String[] linkTypesFromURL = mergedPeptideQueryJSONRoot.getLinkTypes();
+		String[] linkTypesFromURL = qcPageQueryJSONRoot.getLinkTypes();
 		
 		if ( linkTypesFromURL == null || linkTypesFromURL.length == 0 ) {
 			String msg = "At least one linkType is required";
@@ -196,17 +170,17 @@ public class PeptideLength_Histogram_For_PSMPeptideCutoffs_Merged {
 				linkTypesFromURLUpdatedIndex++;
 			}
 			linkTypesFromURL = linkTypesFromURLUpdated;
-			mergedPeptideQueryJSONRoot.setLinkTypes( linkTypesFromURLUpdated );
+			qcPageQueryJSONRoot.setLinkTypes( linkTypesFromURLUpdated );
 		}
 
 		///////////////////////////////////////////////////
 		//  Get LinkTypes for DB query - Sets to null when all selected as an optimization
-		String[] linkTypesForDBQuery = GetLinkTypesForSearchers.getInstance().getLinkTypesForSearchers( mergedPeptideQueryJSONRoot.getLinkTypes() );
+		String[] linkTypesForDBQuery = GetLinkTypesForSearchers.getInstance().getLinkTypesForSearchers( qcPageQueryJSONRoot.getLinkTypes() );
 		//   Mods for DB Query
-		String[] modsForDBQuery = mergedPeptideQueryJSONRoot.getMods();
+		String[] modsForDBQuery = qcPageQueryJSONRoot.getMods();
 		////////////
 		/////   Searcher cutoffs for all searches
-		CutoffValuesRootLevel cutoffValuesRootLevel = mergedPeptideQueryJSONRoot.getCutoffs();
+		CutoffValuesRootLevel cutoffValuesRootLevel = qcPageQueryJSONRoot.getCutoffs();
 		Z_CutoffValuesObjectsToOtherObjects_RootResult cutoffValuesObjectsToOtherObjects_RootResult =
 				Z_CutoffValuesObjectsToOtherObjectsFactory
 				.createSearcherCutoffValuesRootLevel( searchIds, cutoffValuesRootLevel );
@@ -216,13 +190,13 @@ public class PeptideLength_Histogram_For_PSMPeptideCutoffs_Merged {
 		//  Get Lists of peptideLength mapped by search id then link type
 		//  Map<[link type], Map<[Search Id],List<[Peptide Length]>>>
 		Map<String,Map<Integer,List<Integer>>> allSearchesCombinedPeptideLengthList_Map_KeyedOnSearchId_KeyedOnLinkType = 
-				getAllSearchesCombinedPeptideLengthList_Map_KeyedOnLinkType(searches, linkTypesForDBQuery, modsForDBQuery, searcherCutoffValuesRootLevel);
+				getAllSearchesCombinedPeptideLengthList_Map_KeyedOnLinkType( searches, linkTypesForDBQuery, modsForDBQuery, searcherCutoffValuesRootLevel, qcPageQueryJSONRoot );
 		
 		PeptideLength_Histogram_For_PSMPeptideCutoffs_Merged_Method_Response methodResponse = new PeptideLength_Histogram_For_PSMPeptideCutoffs_Merged_Method_Response();
 		
 		methodResponse.allSearchesCombinedPeptideLengthList_Map_KeyedOnSearchId_KeyedOnLinkType = allSearchesCombinedPeptideLengthList_Map_KeyedOnSearchId_KeyedOnLinkType;
 		
-		if ( forDownload == ForDownload.YES ) {
+		if ( forDownload == ForDownload_Enum.YES ) {
 			
 			Map<String,Map<Integer,Map<Integer,MutableInt>>> countsKeyPeptideLength_KeySearchId_KeyLinkType = 
 					remapForCountsPerPeptideLength( allSearchesCombinedPeptideLengthList_Map_KeyedOnSearchId_KeyedOnLinkType );
@@ -414,7 +388,8 @@ public class PeptideLength_Histogram_For_PSMPeptideCutoffs_Merged {
 			List<SearchDTO> searches, 
 			String[] linkTypesForDBQuery, 
 			String[] modsForDBQuery,
-			SearcherCutoffValuesRootLevel searcherCutoffValuesRootLevel) throws ProxlWebappDataException, Exception {
+			SearcherCutoffValuesRootLevel searcherCutoffValuesRootLevel,
+			QCPageQueryJSONRoot qcPageQueryJSONRoot ) throws ProxlWebappDataException, Exception {
 		
 		//  Get Lists of peptideLength mapped by search id then link type
 		/**
@@ -447,7 +422,8 @@ public class PeptideLength_Histogram_For_PSMPeptideCutoffs_Merged {
 							peptideDTO_MappedById, 
 							searchDTO, 
 							searchId, 
-							searcherCutoffValuesSearchLevel );
+							searcherCutoffValuesSearchLevel,
+							qcPageQueryJSONRoot );
 			
 			//  Link Type includes 'dimer' which has be combined with 'unlinked'
 			combineDimerListIntoUnlinkedList( peptideLengthList_Map_KeyedOnLinkType );

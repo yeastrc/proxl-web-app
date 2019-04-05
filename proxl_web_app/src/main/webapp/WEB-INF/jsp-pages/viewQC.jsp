@@ -256,7 +256,17 @@
 						</logic:iterate>
 					</td>
 				</tr>				
-
+				<tr>
+					<td valign="top" style="white-space: nowrap;">Only Include:</td>
+					<td colspan="2">
+				
+						<select name="includedProteins" multiple="multiple" id="includeProtein" >  
+						  	<c:forEach var="protein" items="${ proteinIdsAndNames  }">
+	  						  <option value="<c:out value="${ protein.proteinSequenceVersionId }"></c:out>"><c:out value="${ protein.annotationName }"></c:out></option>
+						  	</c:forEach>
+	  					</select>
+					</td>
+				</tr>	
 				<tr>
 					<td>&nbsp;</td>
 					<td>

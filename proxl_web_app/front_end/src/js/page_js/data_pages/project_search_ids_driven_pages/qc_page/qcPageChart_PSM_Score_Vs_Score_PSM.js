@@ -22,11 +22,14 @@ import { qcChartDownloadHelp } from './qcChart_Download_Help_HTMLBlock.js';
 
 import { downloadStringAsFile } from 'page_js/data_pages/project_search_ids_driven_pages/common/download-string-as-file.js';
 
+import { webserviceCallStandardPost } from 'page_js/webservice_call_common/webserviceCallStandardPost.js';
 
 /**
  * Constructor 
  */
 var QCPageChart_PSM_Score_Vs_Score_PSM = function() {
+
+	const _SELECT_ANNOTATION_CHOICE_OPTION_ENTRY_HTML_HANDLEBARS_TEMPLATE = '<option value="{{ id }}">{{ name }} ({{ searchProgramName }})</option>';
 
 	var _CHART_LEGEND_LABEL_CROSSLINK = "crosslink";
 	var _CHART_LEGEND_LABEL_LOOPLINK = "looplink";
@@ -577,27 +580,30 @@ var QCPageChart_PSM_Score_Vs_Score_PSM = function() {
 	this.psmScoreVsScoreQCPlot_getPSMFilterableAnnTypesForProjectSearchId = function( params ) {
 		var objectThis = this;
 
+		if ( _project_search_ids.length !== 1 ) {
+			throw Error("Unsupported: _project_search_ids.length !== 1.  length: " + _project_search_ids.length );
+		}
+
 		// TODO  Hard code taking first project search id
 		var projectSearchId = _project_search_ids[ 0 ];	
 		
-		var _URL = "services/annotationTypes/getAnnotationTypesPsmFilterableForProjectSearchId";
-		var requestData = {
-				projectSearchId : projectSearchId
-		};
-//		var request =
-		$.ajax({
-			type : "GET",
-			url : _URL,
-			data : requestData,
-			dataType : "json",
-			success : function(data) {
-				objectThis.psmScoreVsScoreQCPlot_getPSMFilterableAnnTypesForProjectSearchIdResponse(requestData, data, params);
-			},
-			failure: function(errMsg) {
-				handleAJAXFailure( errMsg );
-			},
-			error : function(jqXHR, textStatus, errorThrown) {
-				handleAJAXError(jqXHR, textStatus, errorThrown);
+		const ajaxRequestData = { projectSearchId : projectSearchId };
+
+		const url = "services/annotationTypes/getAnnotationTypesPsmFilterableForProjectSearchId";
+
+		const webserviceCallStandardPostResult = webserviceCallStandardPost({ dataToSend : ajaxRequestData, url }); //  External Function
+
+		const promise_webserviceCallStandardPost = webserviceCallStandardPostResult.promise; 
+		// _activeAjax = webserviceCallStandardPostResult.api;
+
+		promise_webserviceCallStandardPost.catch( ( ) => { } );
+
+		promise_webserviceCallStandardPost.then( ({ responseData }) => {
+			try {
+				objectThis.psmScoreVsScoreQCPlot_getPSMFilterableAnnTypesForProjectSearchIdResponse( responseData );
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
 			}
 		});
 	};
@@ -605,7 +611,7 @@ var QCPageChart_PSM_Score_Vs_Score_PSM = function() {
 	/**
 	 * 
 	 */
-	this.psmScoreVsScoreQCPlot_getPSMFilterableAnnTypesForProjectSearchIdResponse = function(requestData, responseData, originalParams) {
+	this.psmScoreVsScoreQCPlot_getPSMFilterableAnnTypesForProjectSearchIdResponse = function( responseData ) {
 		var annTypesSearchProgramsPerSearch = responseData.annotationTypeList;
 		if (  annTypesSearchProgramsPerSearch.length === 0 ) {
 			throw "annTypesSearchProgramsPerSearch.length === 0";
@@ -631,12 +637,13 @@ var QCPageChart_PSM_Score_Vs_Score_PSM = function() {
 		$psm_score_vs_score_qc_plot_score_type_id_1.empty();
 		var $psm_score_vs_score_qc_plot_score_type_id_2 = $("#psm_score_vs_score_qc_plot_score_type_id_2");
 		$psm_score_vs_score_qc_plot_score_type_id_2.empty();
+
+		var optionEntryTemplateCompiled = Handlebars.compile( _SELECT_ANNOTATION_CHOICE_OPTION_ENTRY_HTML_HANDLEBARS_TEMPLATE );
+
 		var optionsHTMLarray = [];
 		for ( var annTypesIndex = 0; annTypesIndex < annTypes.length; annTypesIndex++ ) {
 			var annType = annTypes[ annTypesIndex ];
-			var html = "<option value='" + annType.id + "'>" + annType.name +
-			" (" + annType.searchProgramName + ")" +
-			"</option>";
+			var html = optionEntryTemplateCompiled( annType );
 			optionsHTMLarray.push( html );
 		}
 		//  Add options for RT, Charge, preMZ
@@ -897,32 +904,26 @@ var QCPageChart_PSM_Score_Vs_Score_PSM = function() {
 		if ( scanFileId === "" || scanFileId === undefined || scanFileId === null ) {
 		} else {
 			//  Add scan file id
-			requestData.scanFileId = [ scanFileId ];
+			requestData.scanFileId = scanFileId;
 		}
 		
-		var _URL = "services/qcplot/getPsmScoreVsScore";
+		const url = "services/qcplot/getPsmScoreVsScore";
 
-//		var request =
-		$.ajax({
-			type : "GET",
-			url : _URL,
-			data : requestData,
-			traditional: true,  //  Force traditional serialization of the data sent
-//			One thing this means is that arrays are sent as the object property instead of object property followed by "[]".
-//			So scansFor array is passed as "scansFor=<value>" which is what Jersey expects
-			dataType : "json",
-			success : function(data) {
-				objectThis.psmScoreVsScoreQCPlot_createChartResponse(requestData, data, params);
-			},
-			failure: function(errMsg) {
-				handleAJAXFailure( errMsg );
-			},
-			error : function(jqXHR, textStatus, errorThrown) {
-				handleAJAXError(jqXHR, textStatus, errorThrown);
-//				alert( "exception: " + errorThrown + ", jqXHR: " + jqXHR + ",
-//				textStatus: " + textStatus );
+		const webserviceCallStandardPostResult = webserviceCallStandardPost({ dataToSend : requestData, url }); //  External Function
+
+		const promise_webserviceCallStandardPost = webserviceCallStandardPostResult.promise; 
+
+		promise_webserviceCallStandardPost.catch( ( ) => { } );
+
+		promise_webserviceCallStandardPost.then( ({ responseData }) => {
+			try {
+				objectThis.psmScoreVsScoreQCPlot_createChartResponse(requestData, responseData, params);
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
 			}
 		});
+
 	};
 
 	/**

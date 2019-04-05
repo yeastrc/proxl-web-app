@@ -18,6 +18,8 @@
 //JavaScript directive:   all variables have to be declared with "var", maybe other things
 "use strict";
 
+import { webserviceCallStandardPost } from 'page_js/webservice_call_common/webserviceCallStandardPost.js';
+
 import { qc_pages_Single_Merged_Common } from './qc_pages_Single_Merged_Common.js';
 
 import { qcChartDownloadHelp } from './qcChart_Download_Help_HTMLBlock.js';
@@ -587,12 +589,10 @@ var QCPageChart_PSM_Count_Vs_RetentionTime_PSM = function() {
 //		if ( ! qcRetentionTimeChartInitialized ) {
 //			throw "qcRetentionTimeChartInitialized is false"; 
 //		}
-		var _URL = "services/qcplot/getScanRetentionTime";
 
-		var hash_json_field_Contents_JSONString = JSON.stringify( hash_json_Contents );
 		var requestData = {
-				projectSearchId : projectSearchId,
-				filterCriteria : hash_json_field_Contents_JSONString
+				projectSearchIds : [ projectSearchId ],
+				qcPageQueryJSONRoot : hash_json_Contents
 		};
 		if ( userInputMaxXString !== "" ) {
 			requestData.retentionTimeInMinutesCutoff = userInputMaxXString;
@@ -604,41 +604,34 @@ var QCPageChart_PSM_Count_Vs_RetentionTime_PSM = function() {
 				throw Error("_scanFileIds empty or null" );
 			}
 			if ( _scanFileIds !== null && _scanFileIds !== undefined ) {
-				requestData.scanFileId = _scanFileIds;
+				requestData.scanFileIdList = _scanFileIds;
 			}
-			requestData.scanFileAll = "Y";
+			requestData.scanFileAllString = "Y";
 		} else {
-			requestData.scanFileId = [ scanFileId ];
+			requestData.scanFileIdList = [ scanFileId ];
 		}
-		
-//		var request =
-		$.ajax({
-			type : "GET",
-			url : _URL,
-			data : requestData,
-			traditional: true,  //  Force traditional serialization of the data sent
-//			One thing this means is that arrays are sent as the object property instead of object property followed by "[]".
-//			So scansFor array is passed as "scansFor=<value>" which is what Jersey expects
-			dataType : "json",
-			success : function(data) {
-				try {
-					objectThis.createRetentionTimeCountChartResponse(requestData, data, params);
-				} catch( e ) {
-					reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
-					throw e;
-				}
-			},
-			failure: function(errMsg) {
-				handleAJAXFailure( errMsg );
-			},
-			error : function(jqXHR, textStatus, errorThrown) {
-				handleAJAXError(jqXHR, textStatus, errorThrown);
-//				alert( "exception: " + errorThrown + ", jqXHR: " + jqXHR + ",
-//				textStatus: " + textStatus );
+
+		let _activeAjax = undefined;
+
+		const url = "services/qcplot/getScanRetentionTime";
+
+		const webserviceCallStandardPostResult = webserviceCallStandardPost({ dataToSend : requestData, url }); //  External Function
+
+		const promise_webserviceCallStandardPost = webserviceCallStandardPostResult.promise; 
+		_activeAjax = webserviceCallStandardPostResult.api;
+
+		promise_webserviceCallStandardPost.catch( ( ) => { _activeAjax = null; } );
+
+		promise_webserviceCallStandardPost.then( ({ responseData }) => {
+			try {
+				_activeAjax = null;
+				objectThis.createRetentionTimeCountChartResponse(requestData, responseData, params);
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
 			}
 		});
 	};
-
 
 	this.createRetentionTimeCountChartResponse = function(requestData, responseData, originalParams) {
 		var objectThis = this;
@@ -1036,34 +1029,24 @@ var QCPageChart_PSM_Count_Vs_RetentionTime_PSM = function() {
 			//  Set link types From overlay user selection
 			hash_json_Contents.linkTypes = scansForSelectedLinkTypes;
 		}
-		var hash_json_field_Contents_JSONString = JSON.stringify( hash_json_Contents );
-		var hash_json_field_Contents_JSONString_encodeURIComponent = encodeURIComponent(hash_json_field_Contents_JSONString  );
-
-
-		var urlQueryParamsArray = [];
+	
+		const dataToSend = { projectSearchIds : _project_search_ids, qcPageQueryJSONRoot : hash_json_Contents };
 		
-		_project_search_ids.forEach(function( projectSearchId, i, array) {
-			urlQueryParamsArray.push( "projectSearchId=" + projectSearchId  );
-		}, this );
 		
 		var $scan_retention_time_qc_plot_scan_file_id = $("#scan_retention_time_qc_plot_scan_file_id");
-		var scanFileId = $scan_retention_time_qc_plot_scan_file_id.val();
+		var scanFileIdString = $scan_retention_time_qc_plot_scan_file_id.val();
 
-		if ( scanFileId !== undefined && scanFileId !== null && scanFileId !== "" ) {
-			urlQueryParamsArray.push( "scanFileId=" + scanFileId );
+		if ( scanFileIdString !== undefined && scanFileIdString !== null && scanFileIdString !== "" ) {
+			const scanFileId = Number.parseInt( scanFileIdString );
+			if ( Number.isNaN( scanFileId ) ) {
+				throw Error("Scan Number parse to NAN: " + scanFileIdString );
+			}
+			dataToSend.scanFileIdList = [ scanFileId ];
 		} else {
-			urlQueryParamsArray.push( "scanFileAll=Y" );
+			dataToSend.scanFileAllString= "Y";
 		}
 
-		urlQueryParamsArray.push( "queryJSON=" + hash_json_field_Contents_JSONString_encodeURIComponent );
-
-		var urlQueryParams = urlQueryParamsArray.join( "&" );
-
-		var downloadURL = _downloadStrutsAction + "?" + urlQueryParams;
-
-		qc_pages_Single_Merged_Common.submitDownloadURL( { downloadURL : downloadURL } );
-
-		
+		qc_pages_Single_Merged_Common.submitDownloadForParams( { downloadStrutsAction : _downloadStrutsAction, dataToSend } );
 	};
 	
 };

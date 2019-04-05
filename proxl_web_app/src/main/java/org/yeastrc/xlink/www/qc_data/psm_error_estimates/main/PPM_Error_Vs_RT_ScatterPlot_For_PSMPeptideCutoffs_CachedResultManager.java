@@ -53,11 +53,11 @@ public class PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_CachedResultManag
 
 	/**
 	 * @param projectSearchId
-	 * @param requestedImageWidth
-	 * @param imageAsBytes
+	 * @param requestJSONBytes
+	 * @return
 	 * @throws Exception
 	 */
-	public PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_CachedResultManager_Result retrieveDataFromCache( int projectSearchId, String requestQueryString ) throws Exception {
+	public PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_CachedResultManager_Result retrieveDataFromCache( int projectSearchId, byte[] requestJSONBytes ) throws Exception {
 		
 		if ( ! CachedDataInFileMgmt.getSingletonInstance().isCachedDataFilesDirConfigured() ) {
 			return null;  //  EARLY EXIT
@@ -72,7 +72,7 @@ public class PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_CachedResultManag
 				CachedDataInFileMgmt.getSingletonInstance().retrieveCachedDataFileContents( 
 						PREFIX_FOR_CACHING /* namePrefix */, 
 						VERSION_FOR_CACHING_FROM_MAIN_CLASS /* version */, 
-						requestQueryString, 
+						requestJSONBytes, 
 						ids,
 						IdParamType.PROJECT_SEARCH_ID );
 				
@@ -81,10 +81,11 @@ public class PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_CachedResultManag
 	
 	/**
 	 * @param projectSearchId
-	 * @param imageAsBytes
+	 * @param chartJSONAsBytes
+	 * @param requestJSONBytes
 	 * @throws Exception
 	 */
-	public void saveDataToCache( int projectSearchId, byte[] chartJSONAsBytes, String requestQueryString ) throws Exception {
+	public void saveDataToCache( int projectSearchId, byte[] chartJSONAsBytes, byte[] requestJSONBytes ) throws Exception {
 		
 		if ( ! CachedDataInFileMgmt.getSingletonInstance().isCachedDataFilesDirConfigured() ) {
 			return;  //  EARLY EXIT
@@ -98,7 +99,7 @@ public class PPM_Error_Vs_RT_ScatterPlot_For_PSMPeptideCutoffs_CachedResultManag
 				ReplaceExistingValue.NO,
 				PREFIX_FOR_CACHING /* namePrefix */, 
 				VERSION_FOR_CACHING_FROM_MAIN_CLASS /* version */, 
-				requestQueryString, 
+				requestJSONBytes, 
 				ids,
 				IdParamType.PROJECT_SEARCH_ID );
 	}
