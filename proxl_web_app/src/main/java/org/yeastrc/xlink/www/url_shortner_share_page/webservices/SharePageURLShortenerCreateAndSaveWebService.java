@@ -207,6 +207,8 @@ public class SharePageURLShortenerCreateAndSaveWebService {
 			randomStringSB.append( encodedLongExtract );
 		}
 		String randomString = randomStringSB.toString();
+		randomString = randomString.replace( '/', 'Z' ); // Replace all '/' since is a URL path separator
+	    randomString = randomString.replace( '\\', 'X' ); // Replace all '\' Browser replaces it with '/' which is a URL path separator
 		return randomString;
 	}
 	
