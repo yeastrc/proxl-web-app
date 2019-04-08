@@ -44,7 +44,6 @@ import { getProteinSequenceVersionIdsForNrseqProteinIds } from 'page_js/data_pag
 import { getLooplinkDataCommon, getCrosslinkDataCommon, getMonolinkDataCommon, attachViewLinkInfoOverlayClickHandlers } from 'page_js/data_pages/project_search_ids_driven_pages/image_page__structure_page__shared/image_structure_click_element_common.js';
 
 import { downloadStringAsFile } from 'page_js/data_pages/project_search_ids_driven_pages/common/download-string-as-file.js';
-import { downloadStringAsFile_OnlyJS } from 'page_js/data_pages/project_search_ids_driven_pages/common/download-string-as-file-only-js.js';
 
 import { LinkExclusionHandler } from './link-exclusion-handler.js';
 
@@ -3298,7 +3297,7 @@ var StructurePagePrimaryRootCodeClass = function() {
 			}
 		}
 
-		downloadStringAsFile_OnlyJS( "peptides-for-all-mappable-udrs-skyline.txt", "text/plain", lines.join( "\n" ) );
+		downloadStringAsFile( "peptides-for-all-mappable-udrs-skyline.txt", "text/plain", lines.join( "\n" ) );
 	};
 
 	var getShortestDistanceForProteinPair = function( proteinPairObject ) {

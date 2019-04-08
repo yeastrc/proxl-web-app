@@ -17,7 +17,6 @@
   		<form-bean name="singleRequestJSONStringFieldForm" type="org.yeastrc.xlink.www.forms.SingleRequestJSONStringFieldForm" />
   		
   		<form-bean name="uploadPDBFileForm" type="org.yeastrc.xlink.www.forms.UploadPDBFileForm" />
-  		<form-bean name="downloadStringAsFileForm" type="org.yeastrc.xlink.www.forms.DownloadStringAsFileForm" />
   		<form-bean name="convertAndDownloadSVGForm" type="org.yeastrc.xlink.www.forms.ConvertAndDownloadSVGForm" />
 
 
@@ -206,13 +205,6 @@
 	 	<action path="/downloadPDBFile"
 				type="org.yeastrc.xlink.www.actions.DownloadPDBFileAction"
 				scope="request"
-				validate="false">
-		</action>
-
-  		<action path="/downloadStringAsFile"
-				type="org.yeastrc.xlink.www.actions.DownloadStringAsFileAction"
-				scope="request"
-				name="downloadStringAsFileForm"
 				validate="false">
 		</action>
 		

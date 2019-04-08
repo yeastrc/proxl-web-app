@@ -1,55 +1,27 @@
 
 /*
  * Takes a filename, mimetype, and string content and initiates a file download
- * of the content from the current page, without leaving the page. 
- * 
- * It is assumed jquery is loaded.
- * 
+ * of the content from the current page, without leaving the page.
  */
+
+import { saveAs } from 'file-saver';
+
 var downloadStringAsFile = function( filename, mimetype, content ) {
-	
+
 	try {
 
-		console.log( "downloadStringAsFile called." );
+		console.log( "downloadStringAsFile_OnlyJS called." );
 
-		var form = document.createElement( "form" );
+		var blob = new Blob([content], {type: "text/plain;charset=utf-8"});
 
-		$( form ).hide();
+		saveAs(blob, filename);
 
-		form.setAttribute( "method", "post" );
-		form.setAttribute( "action", "downloadStringAsFile.do" );
-		// form.setAttribute( "target", "_blank" );
-
-		var filenameField = document.createElement( "input" );
-		filenameField.setAttribute("name", "filename");
-		filenameField.setAttribute("value", filename);
-
-		var mimetypeField = document.createElement( "input" );
-		mimetypeField.setAttribute("name", "mimetype");
-		mimetypeField.setAttribute("value", mimetype);
-
-		var contentField = document.createElement( "textarea" );
-		contentField.setAttribute("name", "content");
-
-		$( contentField ).text( content );
-
-		form.appendChild( filenameField );
-		form.appendChild( mimetypeField );
-		form.appendChild( contentField );
-
-		document.body.appendChild(form);    // Not entirely sure if this is necessary			
-
-		form.submit();
-
-		document.body.removeChild( form );
-
-		
-		//window.open("data:" + mimetype + ";charset=utf-8," + encodeURIComponent(content));
 
 	} catch( e ) {
 		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
 		throw e;
 	}
 };
+
 
 export { downloadStringAsFile }
