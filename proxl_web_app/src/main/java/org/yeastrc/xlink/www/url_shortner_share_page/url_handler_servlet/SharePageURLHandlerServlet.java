@@ -25,6 +25,11 @@ public class SharePageURLHandlerServlet extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws ServletException, IOException {
 		try {
+			//  WARNING:
+			//   ShortenedURLKey  cannot be moved to path parameter from query string since existing key has '/'.
+			//     (This at least applies to using a framework like Spring MVC with path parsing.
+			//         Could take the rest of the path in a Servlet as the key.)
+			
 			String queryString = httpServletRequest.getQueryString();
 			URLShortenerDTO urlShortenerDTO = URLShortenerDAO.getInstance().getForShortenedURLKey(queryString);
 			String urlToRedirectTo = null;
