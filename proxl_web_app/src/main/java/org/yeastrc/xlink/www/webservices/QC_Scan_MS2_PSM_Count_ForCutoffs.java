@@ -26,6 +26,7 @@ import org.yeastrc.xlink.www.qc_data.utils.QC_DeserializeRequestJSON_To_QCPageRe
 import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
+import org.yeastrc.xlink.www.webservices_utils.Unmarshal_RestRequest_JSON_ToObject;
 
 /**
  * Number of MS2/PSM records that have PSMs that meet cutoffs
@@ -50,11 +51,6 @@ public class QC_Scan_MS2_PSM_Count_ForCutoffs {
 				byte[] requestJSONBytes,
 				@Context HttpServletRequest request ) {
 
-		
-//		@QueryParam( "project_search_id" ) Integer projectSearchId,
-//		@QueryParam( "scan_file_id" ) Integer scanFileId,
-//		@QueryParam( "filterCriteria" ) String filterCriteria_JSONString,
-
 		if ( requestJSONBytes == null || requestJSONBytes.length == 0 ) {
 			String msg = "requestJSONBytes is null or requestJSONBytes is empty";
 			log.warn( msg );
@@ -64,19 +60,10 @@ public class QC_Scan_MS2_PSM_Count_ForCutoffs {
 		    	        .build()
 		    	        );
 		}
-		QCPageRequestJSONRoot qcPageRequestJSONRoot = null;
-		try {
-			qcPageRequestJSONRoot =
-					QC_DeserializeRequestJSON_To_QCPageRequestJSONRoot.getInstance().deserializeRequestJSON_To_QCPageRequestJSONRoot( requestJSONBytes );
-		} catch ( Exception e ) {
-			String msg = "parse request failed";
-			log.warn( msg );
-		    throw new WebApplicationException(
-		    	      Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
-//		    	        .entity(  )
-		    	        .build()
-		    	        );
-		}
+		
+		QCPageRequestJSONRoot qcPageRequestJSONRoot = 
+				Unmarshal_RestRequest_JSON_ToObject.getInstance()
+				.getObjectFromJSONByteArray(requestJSONBytes, QCPageRequestJSONRoot.class );
 		
 		List<Integer> projectSearchIdList = qcPageRequestJSONRoot.getProjectSearchIds();
 		QCPageQueryJSONRoot qcPageQueryJSONRoot = qcPageRequestJSONRoot.getQcPageQueryJSONRoot();

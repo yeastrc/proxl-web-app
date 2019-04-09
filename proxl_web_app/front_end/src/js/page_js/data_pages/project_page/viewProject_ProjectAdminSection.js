@@ -6,6 +6,9 @@
 //JavaScript directive:   all variables have to be declared with "var", maybe other things
 "use strict";
 
+
+import { webserviceCallStandardPost } from 'page_js/webservice_call_common/webserviceCallStandardPost.js';
+
 ///////////////////////////////////////////
 
 //  Attach to 'window.' since used in other JS files
@@ -2021,36 +2024,31 @@ var updateInvitedPersonAccessLevel = function(params) {
 	if (adminGlobals.project_id === null) {
 		throw Error( "Unable to find input field for id 'project_id' " );
 	}
-	var _URL = "services/user/updateInviteAccessLevel";
-	var ajaxParams = {
+
+	var ajaxRequestData = {
 			inviteId : invited_person_entry_user_id,
 			personAccessLevel : newAccessLevel, // invited_person_entry_access_level_entry,
 			projectId : adminGlobals.project_id
 	};
-	// var request =
-	$.ajax({
-		type : "POST",
-		url : _URL,
-		data : ajaxParams,
-		dataType : "json",
-		success : function(data) {
-			try {
-				updateInvitedPersonAccessLevelResponse({
-					data : data,
-					clickThis : clickThis
-				});
-			} catch( e ) {
-				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
-				throw e;
-			}
-		},
-		failure: function(errMsg) {
-			handleAJAXFailure( errMsg );
-		},
-		error : function(jqXHR, textStatus, errorThrown) {
-			handleAJAXError(jqXHR, textStatus, errorThrown);
-			// alert( "exception: " + errorThrown + ", jqXHR: " + jqXHR + ",
-			// textStatus: " + textStatus );
+
+	const url = "services/user/updateInviteAccessLevel";
+
+	const webserviceCallStandardPostResult = webserviceCallStandardPost({ dataToSend : ajaxRequestData, url }); //  External Function
+
+	const promise_webserviceCallStandardPost = webserviceCallStandardPostResult.promise; 
+	//  activeAjax = webserviceCallStandardPostResult.api;
+
+	promise_webserviceCallStandardPost.catch( ( ) => { } );
+
+	promise_webserviceCallStandardPost.then( ({ responseData }) => {
+		try {
+			updateInvitedPersonAccessLevelResponse({
+				data : responseData,
+				clickThis : clickThis
+			});
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
 		}
 	});
 };

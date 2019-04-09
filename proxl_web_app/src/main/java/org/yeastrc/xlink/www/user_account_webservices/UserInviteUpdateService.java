@@ -4,7 +4,6 @@ package org.yeastrc.xlink.www.user_account_webservices;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.ws.rs.Consumes;
-import javax.ws.rs.FormParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -25,6 +24,7 @@ import org.yeastrc.xlink.www.user_account.UserSessionObject;
 import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
 import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
 import org.yeastrc.xlink.www.user_web_utils.ValidateUserAccessLevel;
+import org.yeastrc.xlink.www.webservices_utils.Unmarshal_RestRequest_JSON_ToObject;
 
 
 
@@ -33,21 +33,54 @@ public class UserInviteUpdateService {
 
 	private static final Logger log = LoggerFactory.getLogger( UserInviteUpdateService.class);
 	
-	
+	/**
+	 * 
+	 *
+	 */
+	public static class WebserviceRequest {
+		
+		private String inviteId;
+		private String personAccessLevel;
+		private String projectId;
+		public void setInviteId(String inviteId) {
+			this.inviteId = inviteId;
+		}
+		public void setPersonAccessLevel(String personAccessLevel) {
+			this.personAccessLevel = personAccessLevel;
+		}
+		public void setProjectId(String projectId) {
+			this.projectId = projectId;
+		}
+		
+	}
 	
 	@POST
-	@Consumes( MediaType.APPLICATION_FORM_URLENCODED )
+	@Consumes( MediaType.APPLICATION_JSON )
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/updateInviteAccessLevel") 
 	
 	public UserInviteUpdateAccessLevelResult updateInviteAccessLevel(   
-			@FormParam( "inviteId" ) String inviteIdString,
-			@FormParam( "personAccessLevel" ) String personAccessLevelString,
-			@FormParam( "projectId" ) String projectIdString,
+			byte[] requestJSONBytes,
 			@Context HttpServletRequest request )
 	throws Exception {
-		
 
+		if ( requestJSONBytes == null || requestJSONBytes.length == 0 ) {
+			String msg = "requestJSONBytes is null or requestJSONBytes is empty";
+			log.warn( msg );
+		    throw new WebApplicationException(
+		    	      Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+//		    	        .entity(  )
+		    	        .build()
+		    	        );
+		}
+		WebserviceRequest webserviceRequest = 
+				Unmarshal_RestRequest_JSON_ToObject.getInstance()
+				.getObjectFromJSONByteArray(requestJSONBytes, WebserviceRequest.class );
+		
+		String inviteIdString = webserviceRequest.inviteId;
+		String personAccessLevelString = webserviceRequest.personAccessLevel;
+		String projectIdString = webserviceRequest.projectId;
+		
 		UserInviteUpdateAccessLevelResult userInviteUpdateAccessLevelResult = new UserInviteUpdateAccessLevelResult();
 
 		

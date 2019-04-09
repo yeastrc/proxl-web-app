@@ -11,6 +11,10 @@
 // /////////////////////////////////////////
 ///////////////////////////////////////////
 
+
+import { webserviceCallStandardPost } from 'page_js/webservice_call_common/webserviceCallStandardPost.js';
+
+
 var adminGlobals = {
 	logged_in_user_id : null
 };
@@ -238,36 +242,36 @@ window.updateInvitedPersonAccessLevel = function(params) {
 //	.find(".current_user_entry_access_level_entry_field_jq");
 //	var invited_person_entry_access_level_entry = $invited_person_entry_access_level_entry_field_jq
 //	.val();
+
 	var invited_person_entry_user_id = $invited_person_entry_root_div_jq.attr("inviteId");
-	var _URL = "services/user/updateInviteAccessLevel";
-	var requestData = {
+
+	var ajaxRequestData = {
 			inviteId : invited_person_entry_user_id,
 			personAccessLevel : newAccessLevel
 	};
-	var requestDataJSON = JSON.stringify( requestData );
-//	var request =
-	$.ajax({
-		type : "POST",
-		url : _URL,
-	    data: requestDataJSON,
-	    contentType: "application/json; charset=utf-8",
-		dataType : "json",
-		success : function(data) {
+
+	const url = "services/user/updateInviteAccessLevel";
+
+	const webserviceCallStandardPostResult = webserviceCallStandardPost({ dataToSend : ajaxRequestData, url }); //  External Function
+
+	const promise_webserviceCallStandardPost = webserviceCallStandardPostResult.promise; 
+	//  activeAjax = webserviceCallStandardPostResult.api;
+
+	promise_webserviceCallStandardPost.catch( ( ) => { } );
+
+	promise_webserviceCallStandardPost.then( ({ responseData }) => {
+		try {
 			updateInvitedPersonAccessLevelResponse({
-				data : data,
+				data : responseData,
 				clickThis : clickThis
 			});
-		},
-        failure: function(errMsg) {
-        	handleAJAXFailure( errMsg );
-        },
-        error : function(jqXHR, textStatus, errorThrown) {
-			handleAJAXError(jqXHR, textStatus, errorThrown);
-//			alert( "exception: " + errorThrown + ", jqXHR: " + jqXHR + ",
-//			textStatus: " + textStatus );
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
 		}
 	});
 };
+
 window.updateInvitedPersonAccessLevelResponse = function(params) {
 	var data = params.data;
 	if (data.status) {
