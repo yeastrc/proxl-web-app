@@ -7,7 +7,9 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.slf4j.LoggerFactory;import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
 import org.yeastrc.xlink.base.file_import_proxl_xml_scans.dto.ProxlXMLFileImportTrackingSingleFileDTO;
 import org.yeastrc.xlink.dto.ScanFileDTO;
 import org.yeastrc.xlink.dto.ScanFileHeaderDTO;
@@ -170,7 +172,17 @@ public class Process_MzML_MzXml_File {
 					+ ", scanFileName (possibly different if uploaded) (reported to user submitting upload): " + scanFileName
 					+ ",  Throwing Data error since probably error in file format.";
 			log.error( msg, e );
-			String msgForException = "Error processing Scan file: " + scanFileName
+			
+			String scanFilenameForErrorMsg = scanFileName;
+			if ( scanFileFileContainer.getScanFileDBRecord() != null ) {
+				if ( scanFileFileContainer.getScanFileDBRecord().getFilenameInUpload() != null ) {
+					if ( StringUtils.isNotEmpty( scanFileFileContainer.getScanFileDBRecord().getFilenameInUpload() ) ) {
+						scanFilenameForErrorMsg = scanFileFileContainer.getScanFileDBRecord().getFilenameInUpload();
+						log.warn("Using scan filename from upload: " + scanFilenameForErrorMsg );
+					}
+				}
+			}
+			String msgForException = "Error processing Scan file: " + scanFilenameForErrorMsg
 					+ ".  Please check the file to ensure it contains the correct contents for a scan file based on the suffix of the file ('mzML' or 'mzXML')";
 			throw new ProxlImporterDataException( msgForException );
 		} finally {

@@ -2,6 +2,7 @@ package org.yeastrc.xlink.www.internal_services;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.auth.dao.AuthUserDAO;
+import org.yeastrc.xlink.base.config_system_table_common_access.ConfigSystemsKeysSharedConstants;
 import org.yeastrc.xlink.base.file_import_proxl_xml_scans.dto.ProxlXMLFileImportTrackingDTO;
 import org.yeastrc.xlink.base.file_import_proxl_xml_scans.dto.ProxlXMLFileImportTrackingRunDTO;
 import org.yeastrc.xlink.base.file_import_proxl_xml_scans.enum_classes.ProxlXMLFileImportStatus;
@@ -74,7 +75,7 @@ public class SendEmailForRunImportFinishInternalService {
 			throw new ProxlWebappDataException(msg);
 		}
 		
-		//  Generate email with invite code
+		//  Generate email 
 		// Generate and send the email to the user.
 		try {
         	SendEmailDTO sendEmailDTO = createMailMessageToSend( 
@@ -82,7 +83,8 @@ public class SendEmailForRunImportFinishInternalService {
         			proxlXMLFileImportTrackingDTO, 
         			proxlXMLFileImportTrackingRunDTO,
         			userMgmtGetUserDataResponse.getEmail(), // toEmailAddressParam
-        			null // userEmailAddressParam
+        			null, // userEmailAddressParam
+        			null // importerBaseDir
         			);
 			
         	if ( sendEmailDTO != null ) {
@@ -91,6 +93,17 @@ public class SendEmailForRunImportFinishInternalService {
         		String extraEmailAddressesToSendTo_CommaDelim =
         				ConfigSystemCaching.getInstance()
         				.getConfigValueForConfigKey( ConfigSystemsKeysConstants.RUN_IMPORT_EXTRA_EMAILS_TO_SEND_TO_KEY );
+        		
+        		String importerBaseDir = null;
+        		
+        		try {
+        			//  Get File Import base dir
+        			importerBaseDir = ConfigSystemCaching.getInstance()
+        					.getConfigValueForConfigKey( ConfigSystemsKeysSharedConstants.file_import_proxl_xml_scans_TEMP_DIR_KEY );
+    			} catch ( Throwable t ) {
+    				// Log and eat exception
+    				
+    			}
         		
         		if ( StringUtils.isNotEmpty( extraEmailAddressesToSendTo_CommaDelim ) ) {
         			String[] extraEmailAddressesToSendTo_Array = extraEmailAddressesToSendTo_CommaDelim.split( "," );
@@ -101,7 +114,8 @@ public class SendEmailForRunImportFinishInternalService {
         	        			proxlXMLFileImportTrackingDTO, 
         	        			proxlXMLFileImportTrackingRunDTO,
         	        			extraEmailAddressesToSendTo, // toEmailAddressParam
-        	        			userMgmtGetUserDataResponse.getEmail() // userEmailAddressParam
+        	        			userMgmtGetUserDataResponse.getEmail(), // userEmailAddressParam
+        	        			importerBaseDir // from config
         	        			);
         				
         				sendEmailDTO.setToEmailAddress( extraEmailAddressesToSendTo );
@@ -127,7 +141,8 @@ public class SendEmailForRunImportFinishInternalService {
 			ProxlXMLFileImportTrackingDTO proxlXMLFileImportTrackingDTO,
 			ProxlXMLFileImportTrackingRunDTO proxlXMLFileImportTrackingRunDTO,
 			String toEmailAddressParam,
-			String userEmailAddressParam ) throws Exception {
+			String userEmailAddressParam,
+			String importerBaseDir ) throws Exception {
 		
 		ProxlXMLFileImportStatus status = proxlXMLFileImportTrackingDTO.getStatus();
 		String statusText = null;
@@ -179,8 +194,21 @@ public class SendEmailForRunImportFinishInternalService {
 		
 		if ( email_Contents_Control == Email_Contents_Control.FOR_OTHER ) {
 			
+			String importTrackingLine = "";
+			if ( proxlXMLFileImportTrackingDTO != null ) {
+				importTrackingLine = "\nImportTrackId: " + proxlXMLFileImportTrackingDTO.getId();
+			}
+			
+			String importerBaseDirLine = "";
+			if ( StringUtils.isNotEmpty( importerBaseDir ) ) {
+				importerBaseDirLine = "\n Importer Base dir: " + importerBaseDir;
+			}
+			
+			
 			text += "\n\nThe above text was sent to email address: " + userEmailAddressParam + "\n"
-					+ "Project Id: " + proxlXMLFileImportTrackingDTO.getProjectId();
+					+ "Project Id: " + proxlXMLFileImportTrackingDTO.getProjectId()
+					+ importTrackingLine
+					+ importerBaseDirLine;
 		}
 		
 		String fromEmailAddress = GetEmailConfig.getFromAddress();

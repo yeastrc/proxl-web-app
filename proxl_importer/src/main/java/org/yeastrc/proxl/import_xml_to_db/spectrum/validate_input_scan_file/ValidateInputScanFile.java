@@ -60,14 +60,16 @@ public class ValidateInputScanFile {
 			
 			validateAllScans( scanFileReader, scanFile, scanFilenameString );
 
+		} catch ( ProxlImporterDataException e ) {
+			//  Logged already
+			throw e;
 		} catch ( Exception e ) {
 			String msg = "Error Exception processing mzML or mzXml Scan file: " + scanFile.getAbsolutePath()
 					+ ",  Throwing Data error since probably error in file format.";
 			log.error( msg, e );
-			String msgForException = "Error processing Scan file: " + scanFile.getAbsolutePath()
-					+ ".  Please check the file to ensure it contains the correct contents for "
-					+ "a scan file based on the suffix of the file ('mzML' or 'mzXML')";
-			throw new Exception( msgForException );
+			String msgForException = "Error processing Scan file: " + scanFilenameString
+					+ ".  Please check the file to ensure it contains the correct contents for a scan file based on the suffix of the file ('mzML' or 'mzXML')";
+			throw new ProxlImporterDataException( msgForException );
 		} finally {
 			if ( scanFileReader != null ) {
 				scanFileReader.close();
@@ -141,8 +143,7 @@ public class ValidateInputScanFile {
 					+ ",  Throwing Data error since probably error in file format.";
 			log.error( msg, e );
 			String msgForException = "Error processing Scan file: " + scanFilenameString
-					+ ".  Please check the file to ensure it contains the correct contents for "
-					+ "a scan file based on the suffix of the file ('mzML' or 'mzXML')";
+					+ ".  Please check the file to ensure it contains the correct contents for a scan file based on the suffix of the file ('mzML' or 'mzXML')";
 			throw new ProxlImporterDataException( msgForException );
 		}
 		
