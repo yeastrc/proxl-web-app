@@ -9,6 +9,8 @@
   		<form-bean name="searchViewPeptideForm" type="org.yeastrc.xlink.www.forms.SearchViewPeptidesForm" />
   		<form-bean name="mergedSearchViewPeptideForm" type="org.yeastrc.xlink.www.forms.MergedSearchViewPeptidesForm" />
   		<form-bean name="mergedSearchViewProteinForm" type="org.yeastrc.xlink.www.forms.MergedSearchViewProteinsForm" />
+  		<!-- Extensions to MergedSearchViewProteinsForm for download.  Not used in all downloads, only where extensions are needed -->
+  		<form-bean name="downloadMergedSearchViewProteinsForm" type="org.yeastrc.xlink.www.forms.DownloadMergedSearchViewProteinsForm" />
   		<form-bean name="downloadProteinCLMSForm" type="org.yeastrc.xlink.www.forms.DownloadProteinCLMSForm" />
   		
   		<!--  Standard form that contains single property for a single request JSON string
@@ -499,7 +501,7 @@
         <action path="/downloadMergedProteinsFASTA"
 				type="org.yeastrc.xlink.www.actions.DownloadMergedProteinsFASTAAction"
 				scope="request"
-				name="mergedSearchViewProteinForm"
+				name="downloadMergedSearchViewProteinsForm"
 				validate="false">
 		</action>
 		
@@ -513,14 +515,14 @@
 		<action path="/downloadMergedProteinsPeptidesSkylineShulman"
 				type="org.yeastrc.xlink.www.actions.DownloadMergedProteinsPeptidesSkylineShulmanAction"
 				scope="request"
-				name="downloadProteinCLMSForm"
+				name="downloadMergedSearchViewProteinsForm"
 				validate="false">
 		</action>
 
 		<action path="/downloadMergedProteinsPeptidesSkylineEng"
 				type="org.yeastrc.xlink.www.actions.DownloadMergedProteinsPeptidesSkylineEngAction"
 				scope="request"
-				name="downloadProteinCLMSForm"
+				name="downloadMergedSearchViewProteinsForm"
 				validate="false">
 		</action>
 		
@@ -534,21 +536,21 @@
 		<action path="/downloadMergedProteinsLengths"
 				type="org.yeastrc.xlink.www.actions.DownloadMergedProteinsXvisLengthsAction"
 				scope="request"
-				name="downloadProteinCLMSForm"
+				name="downloadMergedSearchViewProteinsForm"
 				validate="false">
 		</action>
   
   		<action path="/downloadMergedProteins"
 				type="org.yeastrc.xlink.www.actions.DownloadMergedSearchProteinsAction"
 				scope="request"
-				name="mergedSearchViewProteinForm"
+				name="downloadMergedSearchViewProteinsForm"
 				validate="false">
 		</action>
 		
   		<action path="/downloadMergedProteinUDRs"
 				type="org.yeastrc.xlink.www.actions.DownloadMergedSearchUDRsAction"
 				scope="request"
-				name="mergedSearchViewProteinForm"
+				name="downloadMergedSearchViewProteinsForm"
 				validate="false">
 		</action>
 		

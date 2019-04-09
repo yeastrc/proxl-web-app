@@ -8,10 +8,6 @@
  * Link exclusion means dimming and disabling links that have excluded.
  * 
  * The method of selecting links to exclude is to choose a pair of ( selected protein and/or selected protein region )
- *  
- * !!! The following global variables from "crosslink-image-viewer.js" are used in this file:
- * 
- * 	  
  */
 
 

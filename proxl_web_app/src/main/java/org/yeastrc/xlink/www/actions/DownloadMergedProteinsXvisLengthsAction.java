@@ -30,8 +30,9 @@ import org.yeastrc.xlink.www.constants.ServletOutputStreamCharacterSetConstant;
 import org.yeastrc.xlink.www.constants.StrutsGlobalForwardNames;
 import org.yeastrc.xlink.www.constants.WebConstants;
 import org.yeastrc.xlink.www.dao.SearchDAO;
+import org.yeastrc.xlink.www.download_data_utils.FilterProteinsOnSelectedLinks;
 import org.yeastrc.xlink.www.dto.SearchDTO;
-import org.yeastrc.xlink.www.forms.MergedSearchViewProteinsForm;
+import org.yeastrc.xlink.www.forms.DownloadMergedSearchViewProteinsForm;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
 import org.yeastrc.xlink.www.objects.MergedSearchProteinCrosslink;
 import org.yeastrc.xlink.www.objects.MergedSearchProteinLooplink;
@@ -47,6 +48,7 @@ public class DownloadMergedProteinsXvisLengthsAction extends Action {
 	
 	private static final Logger log = LoggerFactory.getLogger( DownloadMergedSearchProteinsAction.class);
 	
+	@Override
 	public ActionForward execute( ActionMapping mapping,
 			  ActionForm actionForm,
 			  HttpServletRequest request,
@@ -54,7 +56,7 @@ public class DownloadMergedProteinsXvisLengthsAction extends Action {
 					  throws Exception {
 		try {
 			// our form
-			MergedSearchViewProteinsForm form = (MergedSearchViewProteinsForm)actionForm;
+			DownloadMergedSearchViewProteinsForm form = (DownloadMergedSearchViewProteinsForm)actionForm;
 			// Get the session first.  
 //			HttpSession session = request.getSession();
 			//   Get the project id for these searches
@@ -144,6 +146,13 @@ public class DownloadMergedProteinsXvisLengthsAction extends Action {
 								projectSearchIdsListDeduppedSorted,
 								searches,
 								searchesMapOnSearchId  );
+
+				if ( StringUtils.isNoneEmpty( form.getSelectedCrosslinksLooplinksMonolinksJSON() ) ) {
+					FilterProteinsOnSelectedLinks.getInstance()
+					.filterProteinsOnSelectedLinks( 
+							proteinsMergedCommonPageDownloadResult, form.getSelectedCrosslinksLooplinksMonolinksJSON() );
+				}
+				
 				List<MergedSearchProteinCrosslink> crosslinks = proteinsMergedCommonPageDownloadResult.getCrosslinks();
 				List<MergedSearchProteinLooplink> looplinks = proteinsMergedCommonPageDownloadResult.getLooplinks();
 				

@@ -39,12 +39,13 @@ import org.yeastrc.xlink.www.constants.WebConstants;
 import org.yeastrc.xlink.www.dao.PeptideDAO;
 import org.yeastrc.xlink.www.dao.SearchDAO;
 import org.yeastrc.xlink.www.dao.SrchRepPeptPeptideDAO;
+import org.yeastrc.xlink.www.download_data_utils.FilterProteinsOnSelectedLinks;
 import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.www.dto.SrchRepPeptPeptideDTO;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappInternalErrorException;
 import org.yeastrc.xlink.www.form_query_json_objects.ProteinQueryJSONRoot;
-import org.yeastrc.xlink.www.forms.MergedSearchViewProteinsForm;
+import org.yeastrc.xlink.www.forms.DownloadMergedSearchViewProteinsForm;
 import org.yeastrc.xlink.www.linkable_positions.ILinker_Main_Objects_ForSearchId_Cached;
 import org.yeastrc.xlink.www.linkable_positions.ILinker_Main_Objects_ForSearchId_Cached.ILinker_Main_Objects_ForSearchId_Cached_Response;
 import org.yeastrc.xlink.www.objects.AuthAccessLevel;
@@ -67,6 +68,7 @@ public class DownloadMergedProteinsPeptidesSkylineShulmanAction extends Action {
 
 	private static final Logger log = LoggerFactory.getLogger( DownloadMergedSearchProteinsAction.class);
 
+	@Override
 	public ActionForward execute( ActionMapping mapping,
 			ActionForm actionForm,
 			HttpServletRequest request,
@@ -75,7 +77,7 @@ public class DownloadMergedProteinsPeptidesSkylineShulmanAction extends Action {
 		
 		try {
 			// our form
-			MergedSearchViewProteinsForm form = (MergedSearchViewProteinsForm)actionForm;
+			DownloadMergedSearchViewProteinsForm form = (DownloadMergedSearchViewProteinsForm)actionForm;
 			// Get the session first.  
 			//			HttpSession session = request.getSession();
 			//   Get the project id for these searches
@@ -335,6 +337,12 @@ public class DownloadMergedProteinsPeptidesSkylineShulmanAction extends Action {
 								searches,
 								searchesMapOnSearchId  );
 
+				if ( StringUtils.isNoneEmpty( form.getSelectedCrosslinksLooplinksMonolinksJSON() ) ) {
+					FilterProteinsOnSelectedLinks.getInstance()
+					.filterProteinsOnSelectedLinks( 
+							proteinsMergedCommonPageDownloadResult, form.getSelectedCrosslinksLooplinksMonolinksJSON() );
+				}
+				
 				ProteinQueryJSONRoot proteinQueryJSONRoot = proteinsMergedCommonPageDownloadResult.getProteinQueryJSONRoot();
 
 				//  Process Main Reported Peptides for Merged:

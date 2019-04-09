@@ -36,6 +36,7 @@ import org.yeastrc.xlink.www.web_utils.ExcludeLinksWith_Remove_NonUniquePSMs_Che
 import org.yeastrc.xlink.www.web_utils.GetAnnotationDisplayUserSelectionDetailsData;
 import org.yeastrc.xlink.www.web_utils.GetPageHeaderData;
 import org.yeastrc.xlink.www.web_utils.GetSearchDetailsData;
+import org.yeastrc.xlink.www.web_utils.IsShowDownloadLinks_Skyline_SetRequestParameters;
 import org.yeastrc.xlink.www.web_utils.ProteinListingTooltipConfigUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -184,7 +185,9 @@ public class ViewMergedSearchImageAction extends Action {
 			GetAnnotationDisplayUserSelectionDetailsData.getInstance().getSearchDetailsData( searches, request );
 			//  Populate request objects for excludeLinksWith_Remove_NonUniquePSMs_Checkbox_Fragment.jsp
 			ExcludeLinksWith_Remove_NonUniquePSMs_Checkbox_PopRequestItems.getInstance().excludeLinksWith_Remove_NonUniquePSMs_Checkbox_PopRequestItems( searches, request );
-
+			//  Populates request attribute
+			IsShowDownloadLinks_Skyline_SetRequestParameters.getInstance().isShowDownloadLinks_Skyline_SetRequestParameters( searchIds, request );
+			
 			boolean showStructureLink = true;
 			if ( authAccessLevel.isAssistantProjectOwnerAllowed()
 					|| authAccessLevel.isAssistantProjectOwnerIfProjectNotLockedAllowed() ) {

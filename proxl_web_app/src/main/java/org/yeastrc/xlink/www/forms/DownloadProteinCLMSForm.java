@@ -1,6 +1,6 @@
 package org.yeastrc.xlink.www.forms;
 
-public class DownloadProteinCLMSForm extends MergedSearchViewProteinsForm {
+public class DownloadProteinCLMSForm extends DownloadMergedSearchViewProteinsForm {
 
 	/**
 	 * 

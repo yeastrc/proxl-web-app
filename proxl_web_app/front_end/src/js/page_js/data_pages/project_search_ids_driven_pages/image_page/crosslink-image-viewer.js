@@ -77,6 +77,9 @@ import { getLooplinkDataForSpecificLinkInGraph, getCrosslinkDataForSpecificLinkI
 
 import { getLooplinkDataCommon, getCrosslinkDataCommon, getMonolinkDataCommon, attachViewLinkInfoOverlayClickHandlers } from 'page_js/data_pages/project_search_ids_driven_pages/image_page__structure_page__shared/image_structure_click_element_common.js';
 
+import { DownloadProteins, downloadProteins_pass_imagePagePrimaryRootCodeObject } from './image-viewer-download-proteins.js';
+
+
 /////////////////////////////
 
 //   Javascript Class Contructor that will hold all the Javascript code in this file 
@@ -244,6 +247,20 @@ var ImagePagePrimaryRootCodeClass = function() {
 		return getProteinName( proteinId );
 	}
 
+	/**
+	 * 
+	 */
+	this_OfOutermostObjectOfClass.call__getCrosslinkLineColor = function( params ) {
+		return getCrosslinkLineColor( params );
+	}
+
+	/**
+	 * 
+	 */
+	this_OfOutermostObjectOfClass.call__getLineColorSingleProteinBar = function( params ) {
+		return getLineColorSingleProteinBar( params );
+	}
+
 	////////////////////////////////
 
 	//  functions attached to 'this' to return 'global' constants inside this constructor
@@ -325,6 +342,10 @@ var ImagePagePrimaryRootCodeClass = function() {
 		return _linkExclusionDataManager;
 	}
 
+	this_OfOutermostObjectOfClass.getVariable__v_projectSearchIds = function() {
+		return _projectSearchIds;
+	}
+
 	this_OfOutermostObjectOfClass.getVariable__v_searches = function() {
 		return _searches;
 	}
@@ -371,6 +392,12 @@ var ImagePagePrimaryRootCodeClass = function() {
 
 	this_OfOutermostObjectOfClass.getVariable__v_proteinLinkPositions = function() {
 		return _proteinLinkPositions;
+	}
+	this_OfOutermostObjectOfClass.getVariable__v_proteinLooplinkPositions = function() {
+		return _proteinLooplinkPositions;
+	}
+	this_OfOutermostObjectOfClass.getVariable__v_proteinMonolinkPositions = function() {
+		return _proteinMonolinkPositions;
 	}
 
 	this_OfOutermostObjectOfClass.getVariable__v_proteinSequences = function() {
@@ -632,6 +659,9 @@ var ImagePagePrimaryRootCodeClass = function() {
 
 	var _colorManager = new ColorManager();
 	var _circlePlotViewer = new circlePlotViewer();
+
+	var _downloadProteins = new DownloadProteins();
+	
 
 
 	//   General
@@ -2264,7 +2294,7 @@ var ImagePagePrimaryRootCodeClass = function() {
 	/**
 	 * 
 	 */
-	function getNavigationJSON_Not_for_Image_Or_Structure() {
+	this_OfOutermostObjectOfClass.getNavigationJSON_Not_for_Image_Or_Structure = function() {
 		var json = getJsonFromHash();
 		///   Serialize cutoffs to JSON
 		var cutoffs = json.cutoffs;
@@ -2302,7 +2332,7 @@ var ImagePagePrimaryRootCodeClass = function() {
 		if ( _projectSearchIdsUserOrdered && _projectSearchIdsUserOrdered !== "" ) {
 			items.push( "ds=" + _projectSearchIdsUserOrdered );
 		}
-		var baseJSONObject = getNavigationJSON_Not_for_Image_Or_Structure();
+		var baseJSONObject = this_OfOutermostObjectOfClass.getNavigationJSON_Not_for_Image_Or_Structure();
 		var psmPeptideCutoffsForProjectSearchIds_JSONString = JSON.stringify( baseJSONObject );
 		var psmPeptideCutoffsForProjectSearchIds_JSONStringEncodedURIComponent = encodeURIComponent( psmPeptideCutoffsForProjectSearchIds_JSONString ); 
 		//  Parameter name matches standard form parameter name for JSON
@@ -6224,6 +6254,9 @@ var ImagePagePrimaryRootCodeClass = function() {
 
 		_proteinBarRegionSelectionsOverlayCode.init();
 		_linkExclusionSelectionsOverlayCode.init();
+
+		_downloadProteins.init({ _NOT_HIGHLIGHTED_LINE_COLOR });
+
 		loadDataFromService();
 	};
 
@@ -6268,6 +6301,7 @@ LegacyJSONUpdater_pass_imagePagePrimaryRootCodeObject( imagePagePrimaryRootCodeO
 customRegionManager_pass_imagePagePrimaryRootCodeObject( imagePagePrimaryRootCodeObject );
 ColorManager_pass_imagePagePrimaryRootCodeObject( imagePagePrimaryRootCodeObject );
 circlePlotViewer_pass_imagePagePrimaryRootCodeObject( imagePagePrimaryRootCodeObject );
+downloadProteins_pass_imagePagePrimaryRootCodeObject( imagePagePrimaryRootCodeObject );
 
 ///////////
 /**

@@ -63,69 +63,7 @@
 		
 			<%--  On this page Snap also used by crosslink-image-viewer.js and crosslink-image-viewer-click-element-handlers.js --%>				
 		<script type="text/javascript" src="js/libs/snap.svg-min.js"></script> <%--  Used by lorikeetPageProcessing.js --%>
-				
 
-		
-
-<%--  Replaced with the JS bundle listed next
-			 
-		<script type="text/javascript" src="js/lorikeetPageProcessing.js?x=${cacheBustValue}"></script>
-		
-		<script type="text/javascript" src="js/handleServicesAJAXErrors.js?x=${cacheBustValue}"></script> 
-		 
-		<script type="text/javascript" src="js/spinner.js?x=${cacheBustValue}"></script> 
-		
-		<script type="text/javascript" src="js/psmPeptideCutoffsCommon.js?x=${cacheBustValue}"></script>
-
-		<script type="text/javascript" src="js/psmPeptideAnnDisplayDataCommon.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="js/minimumPSM_Count_Filter.js?x=${cacheBustValue}"></script>
-
-		<script type="text/javascript" src="js/trypsinCutPointsForSequence.js?x=${cacheBustValue}"></script>
-
-		
-		<script type="text/javascript" src="js/crosslink-image-viewer-protein-annotation.js?x=${cacheBustValue}"></script>
-	
-		<script type="text/javascript" src="js/crosslink-image-viewer-legacy-handler.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="js/crosslink-image-viewer-index-manager.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="js/crosslink-image-viewer-custom-region-manager.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="js/crosslink-image-viewer-color-manager.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="js/crosslink-image-viewer-click-element-handlers.js?x=${cacheBustValue}"></script>
-
-		<script type="text/javascript" src="js/crosslink-image-viewer-per-protein-bar-data.js?x=${cacheBustValue}"></script> 
-		<script type="text/javascript" src="js/crosslink-image-viewer-region-selections.js?x=${cacheBustValue}"></script> 
-
-		<script type="text/javascript" src="js/crosslink-image-viewer-link-exclusion-manager.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="js/crosslink-image-viewer-link-exclusion-selections.js?x=${cacheBustValue}"></script>
-		
-
-		<script type="text/javascript" src="js/circle-plot-viewer.js?x=${cacheBustValue}"></script> 
-		
-		<script type="text/javascript" src="js/crosslink-image-viewer.js?x=${cacheBustValue}"></script>
-		
-		
-		Image page and Structure Page Shared
-		
-		<script type="text/javascript" src="js/nrseqProteinIdToProteinSequenceVersionIdLookup.js?x=${cacheBustValue}"></script>
-
-		<script type="text/javascript" src="js/image_structure_click_element_common.js?x=${cacheBustValue}"></script>
-
-		<script type="text/javascript" src="js/viewLooplinkReportedPeptidesLoadedFromWebServiceTemplate.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="js/viewCrosslinkReportedPeptidesLoadedFromWebServiceTemplate.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="js/viewMonolinkReportedPeptidesLoadedFromWebServiceTemplate.js?x=${cacheBustValue}"></script>
-		
-		<script type="text/javascript" src="js/viewPsmPerPeptideLoadedFromWebServiceTemplate.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="js/viewPsmsLoadedFromWebServiceTemplate.js?x=${cacheBustValue}"></script>
-		
-		<script type="text/javascript" src="js/sharePageURLShortener.js?x=${cacheBustValue}"></script>
-		
-		<script type="text/javascript" src="js/webserviceDataParamsDistribution.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="js/defaultPageView.js?x=${cacheBustValue}"></script>
-
-		<script type="text/javascript" src="js/toggleVisibility.js?x=${cacheBustValue}"></script>
-		
---%>
-		
-		<%--  Bundle version of core page JS --%>
 		<script type="text/javascript" src="static/js_generated_bundles/data_pages/imageView-bundle.js?x=${cacheBustValue}"></script>
 		
 				<%-- 
@@ -133,14 +71,7 @@
 					This include is required on this page:
 					/WEB-INF/jsp-includes/proteinNameTooltipDataForJSCode.jsp
 				  --%>
-<%--  Replaced with the JS bundle listed next
-			<script type="text/javascript" src="js/createTooltipForProteinNames.js?x=${cacheBustValue}"></script>
-  --%>
-  		
-		
-		
-		
-		
+
 				<%--  Color Picker - jQuery Plugin --%>
 		<script type="text/javascript" src="js/libs/colorpicker/colorpicker.js"></script>
 		
@@ -154,9 +85,6 @@
 		<link REL="stylesheet" TYPE="text/css" HREF="css/lorikeet.css">
 		<link rel="stylesheet" media="screen" type="text/css" href="css/libs/colorpicker_custom_colors.css" />
 		
-
-
-
 
 </c:set>
 
@@ -471,8 +399,60 @@
 								data-tooltip="Not supported in this browser." 
 								style="font-size:10pt;white-space:nowrap; display: none;" 
 								class="tool_tip_attached_jq download-svg-link-non-link">[Download SVG]</span>
-						
 					</span>
+					
+
+						<span id="data-download">
+							<a
+								data-tooltip="Download data" style="font-size:10pt;white-space:nowrap;" 
+								href="#" class="tool_tip_attached_jq download-link">[Download Data]</a>
+								
+							<span id="data-download-options">
+								Choose file format:
+								<%-- href="downloadMergedProteins.do?..."  --%>
+								<a id="download-protein-data" href="javascript:" class="download-option tool_tip_attached_jq" style="margin-top:5px;"
+									data-tooltip="Download all cross-links and mono-links as a tab-delimited file.">Download all cross-links and mono-links</a>
+								<%--  downloadMergedProteinUDRs.do?... --%>
+								<a id="download-protein-udrs" class="download-option tool_tip_attached_jq" href="javascript:"
+									data-tooltip="Download all distinct unique distance restraints (cross-links and loop-links) as tab-delimited text."
+									>Download distinct UDRs</a>
+								
+								<c:if test="${ showDownloadLinks_Skyline}">
+									<br><span style="font-size:15px;">Skyline export</span><br>
+									<c:if test="${ showDownloadLink_SkylineShulman }">
+										<%-- downloadMergedProteinsPeptidesSkylineShulman.do?... --%>
+										<a id="download-protein-shulman" class="download-option tool_tip_attached_jq" href="javascript:"
+											data-tooltip="Export peptides for listed proteins for import into Skyline quant. tool. (Shulman et al)"
+											>Export peptides for Skyline quant (Shulman et al)</a>
+									</c:if>
+									<%--  downloadMergedProteinsPeptidesSkylineEng.do?... --%>
+									<a id="download-protein-skyline-prm" class="download-option tool_tip_attached_jq" href="javascript:"
+										data-tooltip="Export peptides for listed proteins for Skyline PRM analysis. (Chavez et al)" 
+										>Export peptides for Skyline PRM (Chavez et al)</a>
+								</c:if>
+								
+								<br><span style="font-size:15px;">xiNET export</span><br>
+								<%-- downloadMergedProteinsFASTA.do?...  --%>
+								<a id="download-fasta-file" class="download-option tool_tip_attached_jq" href="javascript:"
+									data-tooltip="Download FASTA file for proteins found in cross-links or loop-links."
+									>Download FASTA file</a>
+								<%-- downloadMergedProteinsCLMS_CSV.do?...  --%>
+								<a id="download-protein-xinet" class="download-option tool_tip_attached_jq" href="javascript:"
+									data-tooltip="View CLMS-CSV formatted data for use in xiNET (http://crosslinkviewer.org/)" 
+									>Export data for xiNET visualization</a>
+								
+								<br><span style="font-size:15px;">xVis export</span><br>
+								<%--  downloadMergedProteinsLengths.do?... --%>
+								<a id="download-protein-lengths" class="download-option tool_tip_attached_jq" href="javascript:"
+									data-tooltip="Export protein lengths file for cross-links and loop-links. For use in xVis (https://xvis.genzentrum.lmu.de/)" 
+									>Export protein lengths for use in xVis.</a>
+									<%--  downloadMergedProteinsXvis.do?...  --%>
+								<a id="download-links-for-xvis" class="download-option tool_tip_attached_jq" href="javascript:"
+									data-tooltip="Export cross-links and loop-links for use in xVis (https://xvis.genzentrum.lmu.de/)" 
+									>Download cross-links and loop-links for use in xVis.</a>
+							</span>
+						</span>
+					
 				</div>	
 									
 					
