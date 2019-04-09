@@ -51,8 +51,6 @@
   		<div >
   The requested data is incorrect.
   <br><br>
-  Please start over.
-    <br><br>
   
 	  <c:choose>
 	   <c:when test="${ not empty project_id }">

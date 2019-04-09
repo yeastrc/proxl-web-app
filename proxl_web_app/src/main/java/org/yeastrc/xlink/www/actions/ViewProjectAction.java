@@ -25,7 +25,9 @@ import org.yeastrc.xlink.www.web_utils.AnyPDBFilesForProjectId;
 import org.yeastrc.xlink.www.web_utils.GetPageHeaderData;
 import org.yeastrc.xlink.www.web_utils.GetProjectPublicAccessData;
 import org.yeastrc.xlink.www.web_utils.ViewProjectSearchesInFolders;
+import org.yeastrc.xlink.www.config_system_table.ConfigSystemCaching;
 import org.yeastrc.xlink.www.constants.AuthAccessLevelConstants;
+import org.yeastrc.xlink.www.constants.ConfigSystemsKeysConstants;
 import org.yeastrc.xlink.www.dao.ProjectDAO;
 import org.yeastrc.xlink.dto.NoteDTO;
 import org.yeastrc.xlink.www.dto.ProjectDTO;
@@ -38,6 +40,11 @@ public class ViewProjectAction extends Action {
 	
 	private static final Logger log = LoggerFactory.getLogger( ViewProjectAction.class);
 	
+	//  For use in projectNotFound.jsp
+	
+	private static final String REQUEST_PROJECT_ID_FROM_VIEW_PROJECT_ACTION = "projectId_FromViewProjectAction";
+	private static final String REQUEST_ADMIN_EMAIL_ADDRESS = "adminEmailAddress";
+	
 	public ActionForward execute( ActionMapping mapping,
 			  ActionForm form,
 			  HttpServletRequest request,
@@ -47,17 +54,28 @@ public class ViewProjectAction extends Action {
 			// Get the session first.  
 //			HttpSession session = request.getSession();
 			//  First try to get project id from request as passed from another struts action
+			String projectIdString = null;
 			int projectId = 0;
 			Integer projectIdInteger = (Integer)request.getAttribute( WebConstants.REQUEST_PROJECT_ID );
 			if ( projectIdInteger != null ) {
 				projectId = projectIdInteger;
+				projectIdString = projectIdInteger.toString();
+
+				request.setAttribute( REQUEST_PROJECT_ID_FROM_VIEW_PROJECT_ACTION, projectIdString );
+				
 			} else {
 				//  get project id from query string
-				String projectIdString = request.getParameter( WebConstants.PARAMETER_PROJECT_ID );
+				projectIdString = request.getParameter( WebConstants.PARAMETER_PROJECT_ID );
+				
+				request.setAttribute( REQUEST_PROJECT_ID_FROM_VIEW_PROJECT_ACTION, projectIdString );
+				
 				try {
 					projectId = Integer.parseInt( projectIdString );
 				} catch ( Exception ex ) {
-					throw ex;
+					log.warn( "Failed to parse project id: " + projectIdString );
+					this.getDataForProjectNotFoundPage(request); 
+					GetPageHeaderData.getInstance().getPageHeaderDataWithoutProjectId(request);
+					return mapping.findForward( StrutsGlobalForwardNames.PROJECT_NOT_FOUND );
 				}
 			}
 			//  Confirm projectId is in database
@@ -65,8 +83,10 @@ public class ViewProjectAction extends Action {
 			if ( authShareableObjectId == null ) {
 				// should never happen
 				String msg = "Project id is not in database: " + projectId;
-				log.error( msg );
-				return mapping.findForward( StrutsGlobalForwardNames.INVALID_REQUEST_DATA );
+				log.warn( msg );
+				this.getDataForProjectNotFoundPage(request);
+				GetPageHeaderData.getInstance().getPageHeaderDataWithoutProjectId(request);
+				return mapping.findForward( StrutsGlobalForwardNames.PROJECT_NOT_FOUND );
 			}
 			AccessAndSetupWebSessionResult accessAndSetupWebSessionResult =
 					GetAccessAndSetupWebSession.getInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request, response );
@@ -92,6 +112,7 @@ public class ViewProjectAction extends Action {
 			ProjectDTO projectDTO = projectDAO.getProjectDTOForProjectId( projectId );
 			
 			if ( projectDTO == null || ( ! projectDTO.isEnabled() ) || ( projectDTO.isMarkedForDeletion() )  ) {
+				this.getDataForProjectNotFoundPage(request);
 				GetPageHeaderData.getInstance().getPageHeaderDataWithoutProjectId(request);
 				return mapping.findForward( StrutsGlobalForwardNames.PROJECT_NOT_FOUND );
 			}
@@ -162,6 +183,19 @@ public class ViewProjectAction extends Action {
 			log.error( msg, e );
 			throw e;
 		}
+	}
+	
+	/**
+	 * Set up request attributes for projectNotFound.jsp
+	 * @param request
+	 * @throws Exception 
+	 */
+	private void getDataForProjectNotFoundPage(HttpServletRequest request) throws Exception {
+		
+		String adminEmailAddress =
+				ConfigSystemCaching.getInstance()
+				.getConfigValueForConfigKey( ConfigSystemsKeysConstants.ADMIN_EMAIL_ADDRESS_KEY );
+		request.setAttribute( REQUEST_ADMIN_EMAIL_ADDRESS, adminEmailAddress );
 	}
 	
 

@@ -43,6 +43,7 @@ public class ConfigSystemsKeysConstants {
 	public static final String EMAIL_SMTP_SERVER_URL_KEY = "email_smtp_server_url";
 	public static final String EMAIL_FROM_ADDRESS_URL_KEY = "email_from_address";
 	
+	public static final String ADMIN_EMAIL_ADDRESS_KEY = "admin_email_address";
 
 	/////////   Run Importer Status Emails Config
 	
@@ -75,6 +76,7 @@ public class ConfigSystemsKeysConstants {
 		textConfigKeys.add( EMAIL_WEBSERVICE_URL_KEY );
 		textConfigKeys.add( EMAIL_SMTP_SERVER_URL_KEY );
 		textConfigKeys.add( EMAIL_FROM_ADDRESS_URL_KEY );
+		textConfigKeys.add( ADMIN_EMAIL_ADDRESS_KEY );
 		
 		textConfigKeys.add( FOOTER_CENTER_OF_PAGE_HTML_KEY );
 		textConfigKeys.add( GOOGLE_ANALYTICS_TRACKING_CODE_KEY );

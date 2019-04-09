@@ -95,6 +95,14 @@
 
 	<div style="margin-bottom: 10px;" >
 	  <div style="margin-bottom: 3px;">
+		Admin Email Address: 
+		<input type="text" class=" config_text_inputs_jq " id="input_email_from_address" style="width: 450px;"
+			data-config-key="<%= ConfigSystemsKeysConstants.ADMIN_EMAIL_ADDRESS_KEY %>">
+	  </div>
+	</div>
+			
+	<div style="margin-bottom: 10px;" >
+	  <div style="margin-bottom: 3px;">
 		From Address for emails sent: 
 		<input type="text" class=" config_text_inputs_jq " id="input_email_from_address" style="width: 450px;"
 			data-config-key="<%= ConfigSystemsKeysConstants.EMAIL_FROM_ADDRESS_URL_KEY %>">
