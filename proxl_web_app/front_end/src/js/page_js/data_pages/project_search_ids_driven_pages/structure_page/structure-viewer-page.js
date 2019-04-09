@@ -3494,21 +3494,6 @@ var StructurePagePrimaryRootCodeClass = function() {
 			for( let j = 0; j < chains1.length; j++ ) {
 				const chain1 = chains1[ j ];
 
-
-				/*
-										var atoms = findCAAtoms( proteinId, expPosition, [ chain ] );
-
-						if( !atoms || atoms.length < 1 ) {
-							reportText += "\t\t\n";
-						} else {
-
-							var atom = atoms[ 0 ];
-							var residue = atom.residue();
-							var num = residue.num();		// pdb number for this residue in this chain
-
-							var chain = residue.chain().name();
-				 */
-
 				const coordsArray1 = findCACoords( protein1, position1, [ chain1 ] );
 				if( coordsArray1 == undefined || coordsArray1.length < 1 ) { continue; }
 
