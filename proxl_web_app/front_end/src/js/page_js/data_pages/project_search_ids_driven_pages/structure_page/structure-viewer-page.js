@@ -1546,12 +1546,10 @@ var StructurePagePrimaryRootCodeClass = function() {
 
 	function collateAndDownloadDetailedUDRReport( data ) {
 
-		var reportText = "";
-		
 		/*
 		* Create the header of the report
 		*/
-		reportText = "link type\tprotein 1\tposition 1\tprotein 2\tposition 2\tdistance\tnum PSMs\tnumPeptides\tunique peptides\t";
+		let reportText = "link type\tprotein 1\tposition 1\tprotein 2\tposition 2\tdistance\tnum PSMs\tnumPeptides\tunique peptides\t";
 		
 		for( var i = 0; i < data[ "bestPSMValuesNames" ].length; i++ ) {
 			if( i != 0 ) { reportText += "\t"; }
@@ -3464,7 +3462,8 @@ var StructurePagePrimaryRootCodeClass = function() {
 	 */
 	var generateAllUDRsReport = function( data, onlyShortest ) {
 		
-		var response = "";
+		let response = "chain 1\tchain 1 position\tprotein 1\tposition 1\tchain 2\tchain 2 position\tprotein 2\tposition 2\tdistance\n";
+
 		var visibleProteinsMap = getVisibleProteins();
 		
 		for( var i = 0; i < data.length; i++ ) {
@@ -3492,26 +3491,70 @@ var StructurePagePrimaryRootCodeClass = function() {
 			}
 			
 
-			for( var j = 0; j < chains1.length; j++ ) {
-				var chain1 = chains1[ j ];
+			for( let j = 0; j < chains1.length; j++ ) {
+				const chain1 = chains1[ j ];
 
-				var coordsArray1 = findCACoords( protein1, position1, [ chain1 ] );			
+
+				/*
+										var atoms = findCAAtoms( proteinId, expPosition, [ chain ] );
+
+						if( !atoms || atoms.length < 1 ) {
+							reportText += "\t\t\n";
+						} else {
+
+							var atom = atoms[ 0 ];
+							var residue = atom.residue();
+							var num = residue.num();		// pdb number for this residue in this chain
+
+							var chain = residue.chain().name();
+				 */
+
+				const coordsArray1 = findCACoords( protein1, position1, [ chain1 ] );
 				if( coordsArray1 == undefined || coordsArray1.length < 1 ) { continue; }
-				
-				for( var k = 0; k < chains2.length; k++ ) {
-					var chain2 = chains2[ k ];
+
+				const atoms1 = findCAAtoms( protein1, position1, [ chain1 ] );
+				if( atoms1 === undefined || atoms1.length < 1 ) {
+					const message = "Error getting atom for alpha carbon for protein " + protein1 + ", position " + position1 + ", chain " + chain1;
+					console.log( message );
+					alert( message );
+					return;
+				}
+
+				if( atoms1.length > 1 ) {
+					console.log( "WARNING, got more than one alpha carbon for " + protein1 + ", position " + position1 + ", chain " + chain1 );
+				}
+				const atom1 = atoms1[ 0 ];
+				const pdbChainPosition1 = atom1.residue().num();
+
+				for( let k = 0; k < chains2.length; k++ ) {
+					const chain2 = chains2[ k ];
 					
 					if( chain1 == chain2 && protein1 == protein2 && position1 == position2 ) { continue; }
-					
-					var coordsArray2 = findCACoords( protein2, position2, [ chain2 ] );			
+
+					const coordsArray2 = findCACoords( protein2, position2, [ chain2 ] );
 					if( coordsArray1 == undefined || coordsArray2.length < 1 ) { continue; }
-					
-					var distance = calculateDistance( coordsArray1[ 0 ], coordsArray2[ 0 ] );
+
+
+					const atoms2 = findCAAtoms( protein2, position2, [ chain2 ] );
+					if( atoms2 === undefined || atoms2.length < 1 ) {
+						const message = "Error getting atom for alpha carbon for protein " + protein2 + ", position " + position2 + ", chain " + chain2;
+						console.log( message );
+						alert( message );
+						return;
+					}
+
+					if( atoms2.length > 1 ) {
+						console.log( "WARNING, got more than one alpha carbon for " + protein2 + ", position " + position2 + ", chain " + chain2 );
+					}
+					const atom2 = atoms2[ 0 ];
+					const pdbChainPosition2 = atom2.residue().num();
+
+					const distance = calculateDistance( coordsArray1[ 0 ], coordsArray2[ 0 ] );
 
 					if( !onlyShortest ) {
 					
-						response += chain1 + "\t" + _proteinNames[ protein1 ] + "\t" + position1 + "\t";
-						response += chain2 + "\t" + _proteinNames[ protein2 ] + "\t" + position2 + "\t";		
+						response += chain1 + "\t" + pdbChainPosition1 + "\t" + _proteinNames[ protein1 ] + "\t" + position1 + "\t";
+						response += chain2 + "\t" + pdbChainPosition2 + "\t" + _proteinNames[ protein2 ] + "\t" + position2 + "\t";
 						response += distance + "\n";	
 
 					} else {
@@ -3520,7 +3563,9 @@ var StructurePagePrimaryRootCodeClass = function() {
 
 							shortestLink = {
 												'chain1' : chain1,
+												'chainPosition1' : pdbChainPosition1,
 												'chain2' : chain2,
+												'chainPosition2' : pdbChainPosition2,
 												'protein1' : protein1,
 												'protein2' : protein2,
 												'position1' : position1,
@@ -3535,8 +3580,8 @@ var StructurePagePrimaryRootCodeClass = function() {
 			
 			if( onlyShortest && shortestLink ) {
 				
-				response += shortestLink.chain1 + "\t" + _proteinNames[ shortestLink.protein1 ] + "\t" + shortestLink.position1 + "\t";
-				response += shortestLink.chain2 + "\t" + _proteinNames[ shortestLink.protein2 ] + "\t" + shortestLink.position2 + "\t";		
+				response += shortestLink.chain1 + "\t" + shortestLink.chainPosition1 + "\t" + _proteinNames[ shortestLink.protein1 ] + "\t" + shortestLink.position1 + "\t";
+				response += shortestLink.chain2 + "\t" + shortestLink.chainPosition2 + "\t" + _proteinNames[ shortestLink.protein2 ] + "\t" + shortestLink.position2 + "\t";
 				response += shortestLink.distance + "\n";
 			}
 		}
