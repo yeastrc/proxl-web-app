@@ -8,4 +8,7 @@ public class FieldLengthConstants {
 	public static final int EMAIL_MAX_LENGTH = 255;
 	public static final int USERNAME_MAX_LENGTH = 40;
 	public static final int PASSWORD_MAX_LENGTH = 40;
+
+	public static final int PROJECT_SHORT_NAME_MAX_LENGTH = 100; // DB is 255
+
 }

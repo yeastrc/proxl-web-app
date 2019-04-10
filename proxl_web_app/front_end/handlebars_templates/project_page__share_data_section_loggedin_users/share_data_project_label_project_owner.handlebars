@@ -1,0 +1,88 @@
+{{!-- share_data_project_label_project_owner.handlebars
+
+    Share Data Section
+
+    Project Label for Project Owner, project not locked
+--}}
+{{!-- showAdd: No current value in DB --}}
+{{!-- showChangeRemove: Yes current value in DB --}}
+
+<div >
+    <div style="margin-top: 20px; margin-bottom: 10px; font-weight: bold;">
+        Current project URL: {{ currentProjectURL }}
+    </div>
+    <div >
+        <div >
+            Share this project using the above URL. 
+        </div>
+        <div >
+            If public access is disabled, only researchers listed on the project may access it.
+        </div>
+    </div>
+
+    <div style="margin-top: 10px; margin-bottom: 10px; font-weight: bold;">
+        Customize the URL for your project with a custom label
+    </div>
+    <div style="margin-bottom: 10px;" >
+        <div >
+            You can customize the URL for your project by providing a custom label. 
+        </div>
+        <div >
+            Use the form field below to enter a custom label. 
+        </div>
+        <div >
+            Note that removing or changing a custom label will invalidate links that use the old label.
+        </div>
+    </div>
+
+    {{#if showChangeRemove }} 
+        <div >
+            Current custom label: {{ urlBase }}<span style="font-size: 18px; font-weight: bold; ">{{ labelText }}</span>
+        </div>
+    {{/if}}
+    {{#if showAdd }} 
+        <div >
+            Custom label is not set.
+        </div>
+    {{/if}}    
+    
+
+    {{#if showChangeRemove }} 
+        <div  id="share_data_label_change_init_remove_container" style="margin-bottom: 10px; " >
+            <input type="button" id="share_data_label_change_init_button" value="Change Custom Label"> 
+            <input type="button" id="share_data_label_remove_button" value="Remove Custom Label"> 
+        </div>			
+    {{/if}}
+    <div id="share_data_label_change_container" style="margin-bottom: 10px; {{#if showChangeRemove }} display: none; {{/if}}">
+
+        <div style="margin-bottom: 10px;">
+            <div >
+                <div >
+                    Label: {{ urlBase }}<input type="text" id="share_data_label_input" style="width: 200px;" maxlength="{{ maxLength }}">
+                </div>
+                <div style="font-size: 12px;">
+                    (Only lowercase letters, numbers, hyphen '-', and underscore '_'.  {{ maxLength }} characters max length)
+                </div>
+            </div>
+            <div id="share_data_label_input_value_invalid" style="color: red; display: none; margin-top: 5px;">
+                Label value is invalid.
+            </div>
+            <div id="share_data_label_input_value_duplicate" style="color: red; display: none; margin-top: 5px;">
+                Label value is already in database.  Please enter a different string.
+            </div>
+        </div>
+
+        {{#if showAdd }} 
+            <div >
+                <input type="button" id="share_data_label_change_button" value="Add Custom Label"> 
+            </div>			
+        {{/if}}
+        {{#if showChangeRemove }} 
+            <div >
+                <input type="button" id="share_data_label_change_button" value="Change Custom Label"> 
+                <input type="button" id="share_data_label_cancel_change_button" value="Cancel"> 
+            </div>			
+        {{/if}}
+
+    </div>
+</div>

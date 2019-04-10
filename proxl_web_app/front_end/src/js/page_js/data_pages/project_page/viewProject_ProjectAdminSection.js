@@ -9,6 +9,12 @@
 
 import { webserviceCallStandardPost } from 'page_js/webservice_call_common/webserviceCallStandardPost.js';
 
+let projectPage_UserCustomProjectLabel_ProjectOwnerInteraction_Local = undefined;
+
+let set_projectPage_UserCustomProjectLabel_ProjectOwnerInteraction = function( projectPage_UserCustomProjectLabel_ProjectOwnerInteractionParam ) {
+	projectPage_UserCustomProjectLabel_ProjectOwnerInteraction_Local = projectPage_UserCustomProjectLabel_ProjectOwnerInteractionParam;
+}
+
 ///////////////////////////////////////////
 
 //  Attach to 'window.' since used in other JS files
@@ -1476,6 +1482,9 @@ var showPublicAccessControlDataButtonClicked = function(clickThis, eventObject) 
 };
 
 var loadPublicAccessControlData = function( clickParams ) {
+
+	projectPage_UserCustomProjectLabel_ProjectOwnerInteraction_Local.initialize();
+
 	var requestData = {
 			projectId : adminGlobals.project_id
 	};
@@ -2804,4 +2813,4 @@ $(document).ready(function() {
 // Something to export
 var viewProject_ProjectAdminSection = null;
 
-export { viewProject_ProjectAdminSection }
+export { viewProject_ProjectAdminSection, set_projectPage_UserCustomProjectLabel_ProjectOwnerInteraction }

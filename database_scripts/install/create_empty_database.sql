@@ -78,6 +78,7 @@ CREATE TABLE  project (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   auth_shareable_object_id INT UNSIGNED NOT NULL,
   title VARCHAR(255) NULL,
+  short_name VARCHAR(255) NULL,
   abstract TEXT NULL,
   enabled TINYINT UNSIGNED NOT NULL DEFAULT 1,
   marked_for_deletion TINYINT UNSIGNED NOT NULL DEFAULT 0,
@@ -95,6 +96,8 @@ CREATE TABLE  project (
 ENGINE = InnoDB;
 
 CREATE INDEX fk_auth_shareable_object_id_idx ON project (auth_shareable_object_id ASC);
+
+CREATE UNIQUE INDEX short_name ON project (short_name ASC);
 
 
 -- -----------------------------------------------------
@@ -2465,10 +2468,6 @@ COMMENT = 'Records for \"n\" and \"c\" terminus linkable';
 CREATE INDEX srchlnkrprsd_lnkbl_prtn_trmn_fkid_fk_idx ON search_linker_per_side_linkable_protein_termini_tbl (search_linker_per_side_definition_id ASC);
 
 
-SET SQL_MODE=@OLD_SQL_MODE;
-SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
-SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
-
 
 DELIMITER $$
 
@@ -2488,4 +2487,8 @@ END$$
 
 
 DELIMITER ;
+
+SET SQL_MODE=@OLD_SQL_MODE;
+SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
+SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
 

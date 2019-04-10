@@ -1,3 +1,4 @@
+<%@page import="org.yeastrc.xlink.www.constants.FieldLengthConstants"%>
 <%@page import="org.yeastrc.xlink.base.file_import_proxl_xml_scans.enum_classes.ProxlXMLFileImportStatus"%>
 <%@ include file="/WEB-INF/jsp-includes/pageEncodingDirective.jsp" %>
 <%@page import="org.yeastrc.xlink.www.constants.StrutsActionPathsConstants"%>
@@ -991,20 +992,54 @@
 				
 																
 				<div class="top-level-label">
-					Public Access 
+					Share Data  
 						(<span class="show_when_public_access_or_public_access_code_enabled_jq" 
 							style="${show_when_public_access_code_enabled_div_style_display_control}"
-							 >Enabled</span
+							 >Public Access Enabled</span
 							><span class="show_when_public_access_or_public_access_code_disabled_jq" 
 								style="${show_when_public_access_code_disabled_div_style_display_control}" 
-							 	>Disabled</span>)</div>
+							 	>Public Access Disabled</span>)</div>
 
 				<div class="top-level-label-bottom-border" ></div>
 									
 				<div class="public-access-block collapsable_jq" style="display: none;">
 				
+			
+					<%--  Label for Short URL access to Project  (<context>/p/<label>) --%>
+						
+					<c:choose >
+					  <c:when test="${ authAccessLevel.projectOwnerAllowed }" >
+					  
+					  	<script type="text/text" id="share_data_project_label_max_length"><%= FieldLengthConstants.PROJECT_SHORT_NAME_MAX_LENGTH %></script>
+					  
+						<div id="share_data_label_project_owner_project_not_locked_container">
+							LOADING
+						</div>
+							
+					  </c:when>
+					  <c:when test="${ authAccessLevel.projectOwnerIfProjectNotLockedAllowed }" >
+					  
+					  	<%--  User is Project Owner and Project is locked --%>
+					  	
+						<div id="share_data_label_project_owner_project_locked_or_researcher_container">
+							LOADING
+						</div>
+							
+					  </c:when>
+					  <c:otherwise>
+					  
+					     <%-- User is Researcher and project is not locked or locked (Controlled by top level <c:if> in this file)  --%>
+					     
+						<div id="share_data_label_project_owner_project_locked_or_researcher_container">
+							LOADING
+						</div>
+					  
+					  </c:otherwise>
+											  
+					</c:choose>
+				
 					
-					<div class="second-level-label ">Public access is currently 
+					<div class="second-level-label " style="margin-top: 20px;" >Public access is currently 
 						<span class=" show_when_public_access_or_public_access_code_enabled_jq " style="${show_when_public_access_code_enabled_div_style_display_control}" 
 								>enabled</span
 							><span class=" show_when_public_access_or_public_access_code_disabled_jq " style="${show_when_public_access_code_disabled_div_style_display_control}" 
@@ -1029,7 +1064,7 @@
 							id="require_public_access_code_yes_radio_button"
 							class=" first_enable_when_public_access_not_locked_jq "
 							allowed_to_enable="${ allowed_to_enable }"
-							<c:if test="${not authAccessLevel.projectOwnerAllowed}" > disabled </c:if>
+							<c:if test="${ not authAccessLevel.projectOwnerAllowed }" > disabled </c:if>
 							>Yes</label>
 							
 						<label ><input type="radio" value="no" 
@@ -1037,7 +1072,7 @@
 							id="require_public_access_code_no_radio_button"
 							class=" first_enable_when_public_access_not_locked_jq "
 							allowed_to_enable="${ allowed_to_enable }"
-							<c:if test="${not authAccessLevel.projectOwnerAllowed}" > disabled </c:if>
+							<c:if test="${ not authAccessLevel.projectOwnerAllowed }" > disabled </c:if>
 							>No</label>
 						
 						<div style="font-size: 80%;">

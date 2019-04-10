@@ -61,6 +61,19 @@
     <url-pattern>/go</url-pattern>
   </servlet-mapping>
 
+	<!--  Servlet for handling custom project label, redirects to standard project URL  -->
+
+  <servlet>
+    <servlet-name>ProjectLabel_Servlet</servlet-name>
+    <servlet-class>org.yeastrc.xlink.www.project_short_name_label.handler_servlet.ProjectLabelServlet</servlet-class>
+    <load-on-startup>4</load-on-startup>
+  </servlet>
+  
+  <servlet-mapping>
+    <servlet-name>ProjectLabel_Servlet</servlet-name>
+    <url-pattern>/p/*</url-pattern>
+  </servlet-mapping>
+  
   <!-- Filters - run on each request -->
    
 

@@ -153,6 +153,34 @@ public class ProjectDAO {
 	}
 	
 	/**
+	 * @param projectId
+	 * @return null if not found
+	 * @throws Exception
+	 */
+	public String get_ShortName_ForId( int id ) throws Exception {
+		
+		String result = null;
+		
+		final String querySQL = "SELECT short_name FROM project WHERE id = ?";
+		
+		try ( Connection dbConnection = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
+			     PreparedStatement preparedStatement = dbConnection.prepareStatement( querySQL ) ) {
+			
+			preparedStatement.setInt( 1, id );
+			try ( ResultSet rs = preparedStatement.executeQuery() ) {
+				if( rs.next() ) {
+					result = rs.getString( "short_name" );
+				}
+			}
+		} catch ( Exception e ) {
+			String msg = "Failed to select subset, id: " + id + ", sql: " + querySQL;
+			log.error( msg, e );
+			throw e;
+		}
+		return result;
+	}
+	
+	/**
 	 * @param rs
 	 * @return
 	 * @throws SQLException
@@ -587,4 +615,47 @@ public class ProjectDAO {
 			}
 		}
 	}
+
+	/**
+	 * Update short_name = ? 
+	 * @param id
+	 * @param shortName
+	 * @throws Exception
+	 */
+	public void updateShortName( String shortName, int id ) throws Exception {
+		
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		final String sql = "UPDATE project SET short_name = ? WHERE id = ?";
+		try {
+			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
+			pstmt = conn.prepareStatement( sql );
+			int counter = 0;
+			counter++;
+			pstmt.setString( counter, shortName );
+			counter++;
+			pstmt.setInt( counter, id );
+			pstmt.executeUpdate();
+		} catch ( Exception e ) {
+			String msg = "Failed to update , sql: " + sql;
+			log.error( msg, e );
+			throw e;
+		} finally {
+			// be sure database handles are closed
+			if( rs != null ) {
+				try { rs.close(); } catch( Throwable t ) { ; }
+				rs = null;
+			}
+			if( pstmt != null ) {
+				try { pstmt.close(); } catch( Throwable t ) { ; }
+				pstmt = null;
+			}
+			if( conn != null ) {
+				try { conn.close(); } catch( Throwable t ) { ; }
+				conn = null;
+			}
+		}
+	}
+
 }
