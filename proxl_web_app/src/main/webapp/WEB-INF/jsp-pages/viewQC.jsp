@@ -631,6 +631,7 @@ The total ion current in the bin is indicated by color, as indicated by the lege
 		<div >
 
 			<%--  Help Icon tooltip HTML for these charts --%>
+				<%--  Main Page Chart --%>
 <script id="psm_level_block_help_tooltip_psm_counts_vs_retention_time" type="text/text">
 <div >
 A histogram of the distribution of MS2 scans as a function of retention time (light pink). 
@@ -638,6 +639,14 @@ Another histogram of the number of MS2 scans that meet the current filtering cri
 Click on the plot to launch it in interactive mode.
 </div>
 </script>
+				<%--  Overlay Interactive Chart --%>
+<script id="psm_level_block_help_tooltip_psm_counts_vs_retention_time_overlay_interactive" type="text/text">
+<div >
+A histogram of the distribution of MS2 scans as a function of retention time (light pink). 
+Another histogram of the number of MS2 scans that meet the current filtering criteria is overlaid in dark red. 
+</div>
+</script>
+				<%--  Main Page Chart --%>
 <script id="psm_level_block_help_tooltip_psm_counts_vs_score" type="text/text">
 <div >
 For each type of peptide, the cumulative number of PSMs identified as a function of a user-choosable score from the search. 
@@ -645,11 +654,26 @@ All numeric, filterable scores are available for plotting.
 Click on the plot to launch it in interactive mode.
 </div>
 </script>
+				<%--  Overlay Interactive Chart --%>
+<script id="psm_level_block_help_tooltip_psm_counts_vs_score_overlay_interactive" type="text/text">
+<div >
+For each type of peptide, the cumulative number of PSMs identified as a function of a user-choosable score from the search. 
+All numeric, filterable scores are available for plotting. 
+</div>
+</script>
+				<%--  Main Page Chart --%>
 <script id="psm_level_block_help_tooltip_psm_score_vs_score" type="text/text">
 <div >
 For each type of peptide, a scatter plot of a user-choosable score vs/ another user-choosable score for PSMs from the search. 
 All numeric, filterable scores are available for plotting. 
 Click on the plot to launch it in interactive mode.
+</div>
+</script>
+				<%--  Overlay Interactive Chart --%>
+<script id="psm_level_block_help_tooltip_psm_score_vs_score_overlay_interactive" type="text/text">
+<div >
+For each type of peptide, a scatter plot of a user-choosable score vs/ another user-choosable score for PSMs from the search. 
+All numeric, filterable scores are available for plotting. 
 </div>
 </script>
 

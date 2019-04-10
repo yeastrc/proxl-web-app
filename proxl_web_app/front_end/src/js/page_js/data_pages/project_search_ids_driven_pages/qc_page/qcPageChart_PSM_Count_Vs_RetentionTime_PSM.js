@@ -112,6 +112,7 @@ var QCPageChart_PSM_Count_Vs_RetentionTime_PSM = function() {
 	var _scanFileIds = null;
 	
 	var _helpTooltipHTML = undefined;
+	var _help_InteractiveChart_TooltipHTML = undefined;
 
 	/**
 	 * Used by Retention Time Chart Code
@@ -182,12 +183,19 @@ var QCPageChart_PSM_Count_Vs_RetentionTime_PSM = function() {
 
 			_getScanFilesForProjectSearchId = params.getScanFilesForProjectSearchId; // function
 			
-			//  Get Help tooltip HTML
+			//  Get Help tooltip HTML - Main Page Chart
 			var $psm_level_block_help_tooltip_psm_counts_vs_retention_time = $("#psm_level_block_help_tooltip_psm_counts_vs_retention_time");
 			if ( $psm_level_block_help_tooltip_psm_counts_vs_retention_time.length === 0 ) {
 				throw Error( "No element found with id 'psm_level_block_help_tooltip_psm_counts_vs_retention_time' " );
 			}
 			_helpTooltipHTML = $psm_level_block_help_tooltip_psm_counts_vs_retention_time.html();
+
+			//  Get Help tooltip HTML - Overlay Interactive Chart
+			var $psm_level_block_help_tooltip_psm_counts_vs_retention_time_overlay_interactive = $("#psm_level_block_help_tooltip_psm_counts_vs_retention_time_overlay_interactive");
+			if ( $psm_level_block_help_tooltip_psm_counts_vs_retention_time_overlay_interactive.length === 0 ) {
+				throw Error( "No element found with id 'psm_level_block_help_tooltip_psm_counts_vs_retention_time_overlay_interactive' " );
+			}
+			_help_InteractiveChart_TooltipHTML = $psm_level_block_help_tooltip_psm_counts_vs_retention_time_overlay_interactive.html();
 
 			this.addClickAndOnChangeHandlers();
 
@@ -299,7 +307,7 @@ var QCPageChart_PSM_Count_Vs_RetentionTime_PSM = function() {
 		qcChartDownloadHelp.add_DownloadClickHandlers_HelpTooltip( { 
 			$chart_outer_container_for_download_jq :  $scan_retention_time_qc_plot_chartDiv_Container, 
 			downloadDataCallback : downloadDataCallback,
-			helpTooltipHTML : _helpTooltipHTML 
+			helpTooltipHTML : _help_InteractiveChart_TooltipHTML 
 		} );
 		
 	};

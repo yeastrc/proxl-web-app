@@ -120,7 +120,7 @@ var QCPageChart_PSM_Count_Vs_Score_PSM = function() {
 	//   Variables for this chart
 	
 	var _helpTooltipHTML = undefined;
-	
+	var _help_InteractiveChart_TooltipHTML = undefined;
 	
 	/**
 	 * Used by PSM Count Vs Scores Chart Code
@@ -197,6 +197,13 @@ var QCPageChart_PSM_Count_Vs_Score_PSM = function() {
 				throw Error( "No element found with id 'psm_level_block_help_tooltip_psm_counts_vs_score' " );
 			}
 			_helpTooltipHTML = $psm_level_block_help_tooltip_psm_counts_vs_score.html();
+
+			//  Get Help tooltip HTML - Overlay Interactive Chart
+			var $psm_level_block_help_tooltip_psm_counts_vs_score_overlay_interactive = $("#psm_level_block_help_tooltip_psm_counts_vs_score_overlay_interactive");
+			if ( $psm_level_block_help_tooltip_psm_counts_vs_score_overlay_interactive.length === 0 ) {
+				throw Error( "No element found with id 'psm_level_block_help_tooltip_psm_counts_vs_score_overlay_interactive' " );
+			}
+			_help_InteractiveChart_TooltipHTML = $psm_level_block_help_tooltip_psm_counts_vs_score_overlay_interactive.html();
 
 			this.addClickAndOnChangeHandlers();
 
@@ -300,7 +307,7 @@ var QCPageChart_PSM_Count_Vs_Score_PSM = function() {
 		qcChartDownloadHelp.add_DownloadClickHandlers_HelpTooltip( { 
 			$chart_outer_container_for_download_jq :  $psm_count_vs_score_qc_plot_chartDiv_Container, 
 			downloadDataCallback : downloadDataCallback,
-			helpTooltipHTML : _helpTooltipHTML 
+			helpTooltipHTML : _help_InteractiveChart_TooltipHTML 
 		} );
 		
 	};
