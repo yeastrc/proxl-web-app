@@ -117,8 +117,7 @@ public class ProjectUserCustomLabelAdmin_AddChange {
 			}
 			//  Test access to the project id
 			AuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getAuthAccessLevel();
-			if ( ! authAccessLevel.isAssistantProjectOwnerAllowed()
-					&& ! authAccessLevel.isAssistantProjectOwnerIfProjectNotLockedAllowed() ) {
+			if ( ! authAccessLevel.isProjectOwnerAllowed() ) {
 				//  No Access Allowed for this project id
 				throw new WebApplicationException(
 						Response.status( WebServiceErrorMessageConstants.NOT_AUTHORIZED_STATUS_CODE )  //  Send HTTP code

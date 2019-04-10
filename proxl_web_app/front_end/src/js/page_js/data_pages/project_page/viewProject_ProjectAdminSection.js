@@ -1483,8 +1483,10 @@ var showPublicAccessControlDataButtonClicked = function(clickThis, eventObject) 
 
 var loadPublicAccessControlData = function( clickParams ) {
 
-	projectPage_UserCustomProjectLabel_ProjectOwnerInteraction_Local.initialize();
-
+	if ( projectPage_UserCustomProjectLabel_ProjectOwnerInteraction_Local ) {
+		projectPage_UserCustomProjectLabel_ProjectOwnerInteraction_Local.initialize();
+	}
+	
 	var requestData = {
 			projectId : adminGlobals.project_id
 	};
