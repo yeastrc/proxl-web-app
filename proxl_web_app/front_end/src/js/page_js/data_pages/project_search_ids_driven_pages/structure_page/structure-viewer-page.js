@@ -46,6 +46,7 @@ import { getLooplinkDataCommon, getCrosslinkDataCommon, getMonolinkDataCommon, a
 import { downloadStringAsFile } from 'page_js/data_pages/project_search_ids_driven_pages/common/download-string-as-file.js';
 
 import { LinkExclusionHandler } from './link-exclusion-handler.js';
+import {BackboneColorManager} from "./backbone-color-manager";
 
 /////////////////////////////
 
@@ -399,6 +400,9 @@ var StructurePagePrimaryRootCodeClass = function() {
 
 	// object to handle link exclusions
 	var _linkExclusionHandler = new LinkExclusionHandler();
+
+	// object to handle chain colors
+	var _backboneColorManager = new BackboneColorManager();
 
 	//Loaded data:
 
@@ -1056,6 +1060,7 @@ var StructurePagePrimaryRootCodeClass = function() {
 		}
 
 		items[ 'le' ] = _linkExclusionHandler.getDataStructureForHash();
+		items[ 'bc' ] = _backboneColorManager.getDataStructureForHash();
 
 		updateURLHashWithJSONObject( items );
 	}
@@ -2356,6 +2361,7 @@ var StructurePagePrimaryRootCodeClass = function() {
 		var json = getJsonFromHash();
 
 		_linkExclusionHandler.populateDataFromJSON( json );
+		_backboneColorManager.populateDataFromJSON( json );
 
 		$( "input#show-looplinks" ).prop('checked', json[ 'show-looplinks' ] );
 		
@@ -4472,7 +4478,20 @@ var StructurePagePrimaryRootCodeClass = function() {
 			var chainDisplayName = chains[ i ].name();
 			if( chainDisplayName === "_" ) { chainDisplayName = "Default"; }
 
-			html = "<div style=\"margin-top:10px;\" id=\"chain-" + chains[ i ].name() + "-div\"><span style=\"font-size:14pt;\">Chain: " + chainDisplayName + "</span>\n";
+			html = "<div style=\"margin-top:10px;\" id=\"chain-" + chains[ i ].name() + "-div\">" +
+
+				"<span style=\"" +
+				"position:relative;" +
+				"top:-2px;" +
+				"margin-right:5px;" +
+				"width:15px;" +
+				"background-color:" + getRGBAForChain( chains[ i ].name() ) + ";" +
+				"border-style:solid;" +
+				"border-width:1px;" +
+				"border-color:black;" +
+				"\" class=\"chain-color-picker clickable\" data-chain-id=\"" + chains[ i ].name() + "\">&nbsp;&nbsp;&nbsp;</span>" +
+
+				"<span style=\"font-size:14pt;\">Chain: " + chainDisplayName + "</span>\n";
 
 			if( _PDB_FILES[ pdbFile.id ][ 'canEdit' ] ) {
 				if( PDBChainIsProtein( chains[ i ].name() ) ) {
@@ -4545,12 +4564,67 @@ var StructurePagePrimaryRootCodeClass = function() {
 			// add mouseover events for chains
 			addChainMouseover( chains[ i ].name() );
 
+
 		}
+
+		// add color picker handlers
+		addColorPickers( $chainsDiv );
+
+		html = "<div class=\"clickable\" style=\"margin-top:15px\;color:#A55353;\">[Reset Colors]</div>";
+		let $html = $(html);
+		$html.click( function() {
+			_backboneColorManager.resetColors();
+
+			const rgbaArray = _backboneColorManager.getDefaultColor();
+			$('.chain-color-picker').css('backgroundColor',
+				"rgba(" + rgbaArray[ 0 ] + "," + rgbaArray[ 1 ] + "," + rgbaArray[ 2 ] + "," + rgbaArray[ 3 ] + ")");
+
+			updateURLHash( false /* useSearchForm */ );
+			drawStructure();
+		});
+		$chainsDiv.append( $html );
+
 
 		if( doDraw ) {
 			drawStructure();
 		}
 		
+	};
+
+	const addColorPickers = function( $chainsDiv ) {
+
+		$chainsDiv.find( ".chain-color-picker" ).ColorPicker({
+			color:"#ff0000",
+			onSubmit: function(hsbColor, hexColor, rgbColor, htmlElement ) {
+
+				// update block on page with selected color
+
+				const $htmlElement = $( htmlElement );
+				const chainName = $htmlElement.data( 'chain-id' );
+				const rgbaArray = [ rgbColor.r, rgbColor.g, rgbColor.b, 1.0 ];
+
+				$htmlElement.css('backgroundColor', '#' + hexColor); // set HTML block color on page
+				//$htmlElement.data( 'backgroundHex', '#' + hexColor );
+				$htmlElement.ColorPickerHide();
+
+				_backboneColorManager.setChainColor( {chainName, color:rgbaArray } );
+
+				updateURLHash( false /* useSearchForm */ );
+				drawStructure();
+
+			},
+			onHide: function() {
+				//  called when hidden
+				// alert("On Hide");
+			}
+		});
+
+	};
+
+	const getRGBAForChain = function( chainName ) {
+		const rgbaArray = _backboneColorManager.getChainColor( chainName );
+
+		return "rgba(" + rgbaArray[ 0 ] + "," + rgbaArray[ 1 ] + "," + rgbaArray[ 2 ] + "," + rgbaArray[ 3 ] + ")";
 	};
 
 	var proteinClicked = function() {
@@ -5388,17 +5462,15 @@ var StructurePagePrimaryRootCodeClass = function() {
 			loadandShowVisibleProteinCoverage();
 		} else {
 			_VIEWER.clear();
-			
-			var renderMode = getRenderMode();
-			
-			if( renderMode === 'cartoon' || renderMode === 'trace' ) {
-				_VIEWER.renderAs( 'protein', _STRUCTURE, getRenderMode(), { color:color.uniform( _RESIDUE_COLOR_LIGHT ) } );
-			} else {
-				_VIEWER.renderAs( 'protein', _STRUCTURE, getRenderMode(), { color:color.uniform( _RESIDUE_COLOR_DARK ) } );
+
+			const chains = _STRUCTURE.chains();
+			for( let i = 0; i < chains.length; i++ ) {
+				const chain = _STRUCTURE.select({cname : chains[i].name()});
+
+				_VIEWER.renderAs( 'protein', chain, getRenderMode(), { color:color.uniform( getColorArrayForView( _backboneColorManager.getChainColor( chains[i].name() ) ) ) } );
 			}
-			
-			//_VIEWER.cartoon('protein', _STRUCTURE, { color:color.uniform( '#fefefe' ) });
-			
+
+
 			if( _VIEWER.proxlOb.viewerInitialLoad ) {
 				_VIEWER.autoZoom();
 				_VIEWER.proxlOb.viewerInitialLoad = 0;
@@ -5409,6 +5481,11 @@ var StructurePagePrimaryRootCodeClass = function() {
 			drawMeshesOnStructure();
 		}
 		
+	};
+
+	const getColorArrayForView = function( rgbaArray ) {
+
+		return [ rgbaArray[ 0 ] / 255, rgbaArray[ 1 ] / 255, rgbaArray[ 2 ] / 255, rgbaArray[ 3 ] ];
 	};
 
 	/**
