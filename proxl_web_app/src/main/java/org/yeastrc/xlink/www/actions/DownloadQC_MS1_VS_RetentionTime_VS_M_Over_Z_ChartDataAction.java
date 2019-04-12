@@ -21,7 +21,7 @@ import org.apache.struts.action.ActionMapping;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
-import org.yeastrc.xlink.www.objects.AuthAccessLevel;
+import org.yeastrc.xlink.www.access_control.result_objects.WebSessionAuthAccessLevel;
 import org.yeastrc.xlink.www.project_search__search__mapping.MapProjectSearchIdToSearchId;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
 import org.yeastrc.xlink.www.searcher.SearchIdScanFileIdCombinedRecordExistsSearcher;
@@ -33,8 +33,8 @@ import org.yeastrc.xlink.www.constants.StrutsGlobalForwardNames;
 import org.yeastrc.xlink.www.constants.WebConstants;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.forms.SingleRequestJSONStringFieldForm;
-import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
-import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
+import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result;
+import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId;
 import org.yeastrc.xlink.www.web_utils.UnmarshalJSON_ToObject;
 
 /**
@@ -103,9 +103,6 @@ public class DownloadQC_MS1_VS_RetentionTime_VS_M_Over_Z_ChartDataAction extends
 			scanFileId = downloadRequest.scanFileId;
 			projectSearchId = downloadRequest.projectSearchId;
 			
-			// Get the session first.  
-//			HttpSession session = request.getSession();
-			
 			if ( scanFileId == null ) {
 				log.warn( "parameter scanFileId is empty" );
 				response.sendError( 
@@ -143,14 +140,14 @@ public class DownloadQC_MS1_VS_RetentionTime_VS_M_Over_Z_ChartDataAction extends
 			int projectId = projectIdsFromSearchIds.get( 0 );
 			request.setAttribute( "projectId", projectId ); 
 			///////////////////////
-			AccessAndSetupWebSessionResult accessAndSetupWebSessionResult =
-					GetAccessAndSetupWebSession.getInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request );
+			GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result accessAndSetupWebSessionResult =
+					GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.getSinglesonInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request );
 			if ( accessAndSetupWebSessionResult.isNoSession() ) {
 				//  No User session 
 				return mapping.findForward( StrutsGlobalForwardNames.NO_USER_SESSION );
 			}
 			//  Test access to the project id
-			AuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getAuthAccessLevel();
+			WebSessionAuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getWebSessionAuthAccessLevel();
 			if ( ! authAccessLevel.isPublicAccessCodeReadAllowed() ) {
 				//  No Access Allowed for this project id
 				return mapping.findForward( StrutsGlobalForwardNames.INSUFFICIENT_ACCESS_PRIVILEGE );

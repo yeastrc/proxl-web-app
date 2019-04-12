@@ -38,20 +38,24 @@ public class WebReportedPeptideWrapper extends SortDisplayRecordsWrapperBase imp
 	//   Getters and Setters for access to wrapped object
 	
 
+	@Override
 	public List<String> getPsmAnnotationValueList() {
 		return webReportedPeptide.getPsmAnnotationValueList();
 	}
 
 
+	@Override
 	public void setPsmAnnotationValueList(List<String> psmAnnotationValueList) {
 		webReportedPeptide.setPsmAnnotationValueList( psmAnnotationValueList );
 	}
 
+	@Override
 	public List<String> getPeptideAnnotationValueList() {
 		return webReportedPeptide.getPeptideAnnotationValueList();
 	}
 
 
+	@Override
 	public void setPeptideAnnotationValueList(
 			List<String> peptideAnnotationValueList) {
 		webReportedPeptide.setPeptideAnnotationValueList( peptideAnnotationValueList );

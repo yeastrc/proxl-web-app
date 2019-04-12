@@ -1,7 +1,6 @@
 package org.yeastrc.xlink.www.webservices;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.POST;
@@ -19,14 +18,13 @@ import org.yeastrc.xlink.www.dao.ProjectDAO;
 import org.yeastrc.xlink.www.database_update_with_transaction_services.DeleteFolderResetSearchDisplayOrderUsingDBTransactionService;
 import org.yeastrc.xlink.www.dto.FolderForProjectDTO;
 import org.yeastrc.xlink.www.dto.ProjectDTO;
-import org.yeastrc.xlink.www.dto.XLinkUserDTO;
+
 import org.yeastrc.xlink.www.exceptions.ProxlWebappInternalErrorException;
-import org.yeastrc.xlink.www.objects.AuthAccessLevel;
-import org.yeastrc.auth.dto.AuthUserDTO;
-import org.yeastrc.xlink.www.constants.WebConstants;
+import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId;
+import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result;
+import org.yeastrc.xlink.www.access_control.result_objects.WebSessionAuthAccessLevel;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
-import org.yeastrc.xlink.www.user_account.UserSessionObject;
-import org.yeastrc.xlink.www.user_web_utils.GetAuthAccessLevelForWebRequest;
+import org.yeastrc.xlink.www.user_session_management.UserSession;
 
 /**
  * 
@@ -64,11 +62,9 @@ public class ProjectFolderMaintService {
 			    	        .build()
 			    	        );
 			}
-			// Get the session first.  
-			HttpSession session = request.getSession();
-			UserSessionObject userSessionObject 
-			= (UserSessionObject) session.getAttribute( WebConstants.SESSION_CONTEXT_USER_LOGGED_IN );
-			if ( userSessionObject == null ) {
+			GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result accessAndSetupWebSessionResult =
+					GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.getSinglesonInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request );
+			if ( accessAndSetupWebSessionResult.isNoSession() ) {
 				//  No User session 
 				throw new WebApplicationException(
 						Response.status( WebServiceErrorMessageConstants.NO_SESSION_STATUS_CODE )  //  Send HTTP code
@@ -76,9 +72,8 @@ public class ProjectFolderMaintService {
 						.build()
 						);
 			}
-			AuthAccessLevel authAccessLevel = 
-					GetAuthAccessLevelForWebRequest.getInstance()
-					.getAuthAccessLevelForWebRequestProjectId( userSessionObject, projectId );
+			WebSessionAuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getWebSessionAuthAccessLevel();
+			UserSession userSession = accessAndSetupWebSessionResult.getUserSession();
 			if ( ! authAccessLevel.isProjectOwnerAllowed() ) {
 				//  No Access Allowed for this project id
 				throw new WebApplicationException(
@@ -92,19 +87,12 @@ public class ProjectFolderMaintService {
 			//////////////////////////
 			
 			//  Get user
-			XLinkUserDTO xLinkUserDTO = userSessionObject.getUserDBObject();
-			if ( xLinkUserDTO == null ) {
-				String msg = "xLinkUserDTO == null for access level isProjectOwnerAllowed().";
+			Integer authUserId = userSession.getAuthUserId();
+			if ( authUserId == null ) {
+				String msg = "authUserId == null for access level isProjectOwnerAllowed().";
 				log.error( msg );
 				throw new ProxlWebappInternalErrorException( msg );
 			}
-			AuthUserDTO authUserDTO = xLinkUserDTO.getAuthUser();
-			if ( authUserDTO == null ) {
-				String msg = "authUserDTO == null for access level isProjectOwnerAllowed().";
-				log.error( msg );
-				throw new ProxlWebappInternalErrorException( msg );
-			}
-			int authUserId = authUserDTO.getId();
 
 			WebserviceResult webserviceResult = new WebserviceResult();
 			
@@ -175,18 +163,6 @@ public class ProjectFolderMaintService {
 			    	        .build()
 			    	        );
 			}
-			// Get the session first.  
-			HttpSession session = request.getSession();
-			UserSessionObject userSessionObject 
-			= (UserSessionObject) session.getAttribute( WebConstants.SESSION_CONTEXT_USER_LOGGED_IN );
-			if ( userSessionObject == null ) {
-				//  No User session 
-				throw new WebApplicationException(
-						Response.status( WebServiceErrorMessageConstants.NO_SESSION_STATUS_CODE )  //  Send HTTP code
-						.entity( WebServiceErrorMessageConstants.NO_SESSION_TEXT ) // This string will be passed to the client
-						.build()
-						);
-			}
 			Integer projectId =	FolderForProjectDAO.getInstance().getProjectId_ForId( folderId );
 			if ( projectId == null ) {
 				String msg = "'folderId' is not in database: " + folderId;
@@ -197,9 +173,18 @@ public class ProjectFolderMaintService {
 			    	        .build()
 			    	        );
 			}
-			AuthAccessLevel authAccessLevel = 
-					GetAuthAccessLevelForWebRequest.getInstance()
-					.getAuthAccessLevelForWebRequestProjectId( userSessionObject, projectId );
+			GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result accessAndSetupWebSessionResult =
+					GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.getSinglesonInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request );
+			if ( accessAndSetupWebSessionResult.isNoSession() ) {
+				//  No User session 
+				throw new WebApplicationException(
+						Response.status( WebServiceErrorMessageConstants.NO_SESSION_STATUS_CODE )  //  Send HTTP code
+						.entity( WebServiceErrorMessageConstants.NO_SESSION_TEXT ) // This string will be passed to the client
+						.build()
+						);
+			}
+			WebSessionAuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getWebSessionAuthAccessLevel();
+			UserSession userSession = accessAndSetupWebSessionResult.getUserSession();
 			if ( ! authAccessLevel.isProjectOwnerAllowed() ) {
 				//  No Access Allowed for this project id
 				throw new WebApplicationException(
@@ -211,18 +196,6 @@ public class ProjectFolderMaintService {
 			//  END Auth Check
 
 			//  Get user
-			XLinkUserDTO xLinkUserDTO = userSessionObject.getUserDBObject();
-			if ( xLinkUserDTO == null ) {
-				String msg = "xLinkUserDTO == null for access level isProjectOwnerAllowed().";
-				log.error( msg );
-				throw new ProxlWebappInternalErrorException( msg );
-			}
-			AuthUserDTO authUserDTO = xLinkUserDTO.getAuthUser();
-			if ( authUserDTO == null ) {
-				String msg = "authUserDTO == null for access level isProjectOwnerAllowed().";
-				log.error( msg );
-				throw new ProxlWebappInternalErrorException( msg );
-			}
 			
 			WebserviceResult webserviceResult = new WebserviceResult();
 			
@@ -261,7 +234,7 @@ public class ProjectFolderMaintService {
 			DeleteFolderResetSearchDisplayOrderUsingDBTransactionService.getInstance()
 			.deleteFolderResetSearchDisplayOrder( folderId );
 			
-			log.warn( "INFO: Folder for project deleted by user. username: " + authUserDTO.getUsername() + ", userId: " + authUserDTO.getId()
+			log.warn( "INFO: Folder for project deleted by user. username: " + userSession.getUsername() + ", userId: " + userSession.getAuthUserId()
 					+ ", projectId: " + projectId 
 					+ ", folder name: " + folderForProjectDTO.getName() );
 			
@@ -308,18 +281,6 @@ public class ProjectFolderMaintService {
 			    	        .build()
 			    	        );
 			}
-			// Get the session first.  
-			HttpSession session = request.getSession();
-			UserSessionObject userSessionObject 
-			= (UserSessionObject) session.getAttribute( WebConstants.SESSION_CONTEXT_USER_LOGGED_IN );
-			if ( userSessionObject == null ) {
-				//  No User session 
-				throw new WebApplicationException(
-						Response.status( WebServiceErrorMessageConstants.NO_SESSION_STATUS_CODE )  //  Send HTTP code
-						.entity( WebServiceErrorMessageConstants.NO_SESSION_TEXT ) // This string will be passed to the client
-						.build()
-						);
-			}
 			Integer projectId =	FolderForProjectDAO.getInstance().getProjectId_ForId( folderId );
 			if ( projectId == null ) {
 				String msg = "'folderId' is not in database: " + folderId;
@@ -330,10 +291,19 @@ public class ProjectFolderMaintService {
 			    	        .build()
 			    	        );
 			}
-			AuthAccessLevel authAccessLevel = 
-					GetAuthAccessLevelForWebRequest.getInstance()
-					.getAuthAccessLevelForWebRequestProjectId( userSessionObject, projectId );
-			if ( ! authAccessLevel.isProjectOwnerAllowed() ) {
+			GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result accessAndSetupWebSessionResult =
+					GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.getSinglesonInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request );
+			if ( accessAndSetupWebSessionResult.isNoSession() ) {
+				//  No User session 
+				throw new WebApplicationException(
+						Response.status( WebServiceErrorMessageConstants.NO_SESSION_STATUS_CODE )  //  Send HTTP code
+						.entity( WebServiceErrorMessageConstants.NO_SESSION_TEXT ) // This string will be passed to the client
+						.build()
+						);
+			}
+			WebSessionAuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getWebSessionAuthAccessLevel();
+			UserSession userSession = accessAndSetupWebSessionResult.getUserSession();
+						if ( ! authAccessLevel.isProjectOwnerAllowed() ) {
 				//  No Access Allowed for this project id
 				throw new WebApplicationException(
 						Response.status( WebServiceErrorMessageConstants.NOT_AUTHORIZED_STATUS_CODE )  //  Send HTTP code
@@ -344,19 +314,12 @@ public class ProjectFolderMaintService {
 			//  END Auth Check
 
 			//  Get user
-			XLinkUserDTO xLinkUserDTO = userSessionObject.getUserDBObject();
-			if ( xLinkUserDTO == null ) {
-				String msg = "xLinkUserDTO == null for access level isProjectOwnerAllowed().";
+			Integer authUserId = userSession.getAuthUserId();
+			if ( authUserId == null ) {
+				String msg = "authUserId == null for access level isProjectOwnerAllowed().";
 				log.error( msg );
 				throw new ProxlWebappInternalErrorException( msg );
 			}
-			AuthUserDTO authUserDTO = xLinkUserDTO.getAuthUser();
-			if ( authUserDTO == null ) {
-				String msg = "authUserDTO == null for access level isProjectOwnerAllowed().";
-				log.error( msg );
-				throw new ProxlWebappInternalErrorException( msg );
-			}
-			int authUserId = authUserDTO.getId();
 
 			WebserviceResult webserviceResult = new WebserviceResult();
 			

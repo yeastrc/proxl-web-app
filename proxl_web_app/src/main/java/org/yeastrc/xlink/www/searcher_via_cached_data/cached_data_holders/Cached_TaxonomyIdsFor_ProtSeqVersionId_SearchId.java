@@ -173,11 +173,11 @@ public class Cached_TaxonomyIdsFor_ProtSeqVersionId_SearchId implements CachedDa
 				}
 				
 				int cacheTimeout = CACHE_TIMEOUT_FULL_SIZE;
-				cacheMaxSize = parentObject.CACHE_MAX_SIZE_FULL_SIZE;
+				cacheMaxSize = Cached_TaxonomyIdsFor_ProtSeqVersionId_SearchId.CACHE_MAX_SIZE_FULL_SIZE;
 				if ( cachedDataSizeOptions == CachedDataSizeOptions.HALF ) {
 					cacheMaxSize = cacheMaxSize / 2;
 				} else if ( cachedDataSizeOptions == CachedDataSizeOptions.SMALL ) {
-					cacheMaxSize = parentObject.CACHE_MAX_SIZE_SMALL;
+					cacheMaxSize = Cached_TaxonomyIdsFor_ProtSeqVersionId_SearchId.CACHE_MAX_SIZE_SMALL;
 					cacheTimeout = CACHE_TIMEOUT_SMALL;
 				}
 				
@@ -186,6 +186,7 @@ public class Cached_TaxonomyIdsFor_ProtSeqVersionId_SearchId implements CachedDa
 						.maximumSize( cacheMaxSize )
 						.build(
 								new CacheLoader<TaxonomyIdsForProtSeqIdSearchId_Request, TaxonomyIdsForProtSeqIdSearchId_Result>() {
+									@Override
 									public TaxonomyIdsForProtSeqIdSearchId_Result load(TaxonomyIdsForProtSeqIdSearchId_Request taxonomyIdsForProtSeqIdSearchId_Request) throws Exception {
 										
 										//   WARNING  cannot return null.  

@@ -16,6 +16,7 @@ public class InternetExplorerNotSupportedAction extends Action {
 	
 	private static final Logger log = LoggerFactory.getLogger( InternetExplorerNotSupportedAction.class);
 	
+	@Override
 	public ActionForward execute( ActionMapping mapping,
 			  ActionForm form,
 			  HttpServletRequest request,

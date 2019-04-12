@@ -36,12 +36,14 @@ public class MergedSearchPeptideLooplink implements IMergedSearchLink {
 	public void setSearches(Collection<SearchDTO> searches) {
 		this.searches = searches;
 	}
+	@Override
 	public int hashCode() {
 		return (this.peptide.getSequence() + this.peptidePosition1 + this.peptidePosition2).hashCode();
 	}
 	/**
 	 * Returns true if both MergedSearchPeptideLooplink objects describe the same two peptides at the same two positions in each respective peptide
 	 */
+	@Override
 	public boolean equals( Object o ) {
 		if( !( o instanceof MergedSearchPeptideLooplink ) ) return false;
 		MergedSearchPeptideLooplink mrpc = (MergedSearchPeptideLooplink)o;

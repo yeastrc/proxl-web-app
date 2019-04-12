@@ -2,14 +2,15 @@ package org.yeastrc.xlink.www.user_account;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
 import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.yeastrc.xlink.www.constants.WebConstants;
+import org.yeastrc.xlink.www.config_system_table.ConfigSystemCaching;
+import org.yeastrc.xlink.www.constants.ConfigSystemsKeysConstants;
+import org.yeastrc.xlink.www.user_session_management.UserSession;
+import org.yeastrc.xlink.www.user_session_management.UserSessionManager;
 
 /**
  *  action to init insufficient_access_privilege.jsp
@@ -21,7 +22,10 @@ public class UserInsufficientAccessPrivilegePageInitAction extends Action {
 
 	private static final Logger log = LoggerFactory.getLogger( UserInsufficientAccessPrivilegePageInitAction.class);
 	
+	private static final String REQUEST_ADMIN_EMAIL_ADDRESS = "adminEmailAddress";
+	
 
+	@Override
 	public ActionForward execute( ActionMapping mapping,
 			  ActionForm form,
 			  HttpServletRequest request,
@@ -30,19 +34,12 @@ public class UserInsufficientAccessPrivilegePageInitAction extends Action {
 				
 		try {
 
-			// Get the session first.  
-			HttpSession session = request.getSession();
+			UserSession userSession = UserSessionManager.getSinglesonInstance().getUserSession(request);
 
-
-			UserSessionObject userSessionObject 
-			= (UserSessionObject) session.getAttribute( WebConstants.SESSION_CONTEXT_USER_LOGGED_IN );
-
-			if ( userSessionObject != null 
-					&& userSessionObject.getUserDBObject() != null 
-					&& userSessionObject.getUserDBObject().getAuthUser() != null ) {
+			if ( userSession != null ) {
 				
-				if ( ( ! userSessionObject.getUserDBObject().getAuthUser().isEnabledAppSpecific() )
-						|| ( ! ! userSessionObject.getUserDBObject().getAuthUser().isEnabledUserMgmtGlobalLevel() ) ) {
+				if ( ( ! userSession.isEnabledAppSpecific() )
+						|| ( ! userSession.isEnabled() ) ) {
 				
 					//  User is Disabled 
 
@@ -51,7 +48,11 @@ public class UserInsufficientAccessPrivilegePageInitAction extends Action {
 				
 				request.setAttribute( "userLoggedIn", true );
 			}
-			
+
+			String adminEmailAddress =
+					ConfigSystemCaching.getInstance()
+					.getConfigValueForConfigKey( ConfigSystemsKeysConstants.ADMIN_EMAIL_ADDRESS_KEY );
+			request.setAttribute( REQUEST_ADMIN_EMAIL_ADDRESS, adminEmailAddress );
 
 			return mapping.findForward( "Success" );
 			

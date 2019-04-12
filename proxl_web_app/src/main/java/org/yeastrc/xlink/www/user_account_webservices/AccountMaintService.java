@@ -1,7 +1,6 @@
 package org.yeastrc.xlink.www.user_account_webservices;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.POST;
@@ -13,21 +12,20 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
-import org.yeastrc.auth.dto.AuthUserDTO;
-import org.yeastrc.xlink.www.dto.XLinkUserDTO;
 import org.yeastrc.xlink.www.dto.ZzUserDataMirrorDTO;
 import org.yeastrc.xlink.www.constants.FieldLengthConstants;
-import org.yeastrc.xlink.www.constants.WebConstants;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.dao.ZzUserDataMirrorDAO;
-import org.yeastrc.xlink.www.user_account.UserSessionObject;
+import org.yeastrc.xlink.www.user_session_management.UserSession;
+import org.yeastrc.xlink.www.user_session_management.UserSessionBuilder;
+import org.yeastrc.xlink.www.user_session_management.UserSessionManager;
 import org.yeastrc.xlink.www.user_mgmt_webapp_access.UserMgmtCentralWebappWebserviceAccess;
 import org.yeastrc.xlink.www.user_mgmt_webapp_access.UserMgmtChangePasswordRequest;
 import org.yeastrc.xlink.www.user_mgmt_webapp_access.UserMgmtChangePasswordResponse;
 import org.yeastrc.xlink.www.user_mgmt_webapp_access.UserMgmtManageAccountRequest;
 import org.yeastrc.xlink.www.user_mgmt_webapp_access.UserMgmtManageAccountResponse;
-import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
-import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
+import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result;
+import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId;
 import org.yeastrc.xlink.www.web_utils.TestIsUserSignedIn;
 
 
@@ -63,10 +61,9 @@ public class AccountMaintService {
 //		if (true)
 //		throw new Exception("Forced Error");
 		try {
-			// Get their session first.  
-//			HttpSession session = request.getSession();
-			AccessAndSetupWebSessionResult accessAndSetupWebSessionResult =
-					GetAccessAndSetupWebSession.getInstance().getAccessAndSetupWebSessionNoProjectId( request );
+			GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result accessAndSetupWebSessionResult =
+					GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.getSinglesonInstance().getAccessAndSetupWebSessionNoProjectId( request );
+			UserSession userSession = accessAndSetupWebSessionResult.getUserSession();
 			if ( accessAndSetupWebSessionResult.isNoSession() ) {
 				//  No User session 
 				throw new WebApplicationException(
@@ -75,8 +72,7 @@ public class AccountMaintService {
 						.build()
 						);
 			}
-			UserSessionObject userSessionObject = accessAndSetupWebSessionResult.getUserSessionObject();
-			if ( ! TestIsUserSignedIn.getInstance().testIsUserSignedIn( userSessionObject ) ) {
+			if ( ! TestIsUserSignedIn.getInstance().testIsUserSignedIn( userSession ) ) {
 				//  No Access Allowed if not a logged in user
 				throw new WebApplicationException(
 						Response.status( WebServiceErrorMessageConstants.NOT_AUTHORIZED_STATUS_CODE )  //  Send HTTP code
@@ -85,7 +81,7 @@ public class AccountMaintService {
 						);
 			}
 			UserMgmtManageAccountRequest userMgmtManageAccountRequest = new UserMgmtManageAccountRequest();
-			userMgmtManageAccountRequest.setSessionKey( userSessionObject.getUserLoginSessionKey() );
+			userMgmtManageAccountRequest.setSessionKey( userSession.getUserMgmtSessionKey() );
 			userMgmtManageAccountRequest.setFirstName( firstName );
 			UserMgmtManageAccountResponse userMgmtManageAccountResponse =
 					UserMgmtCentralWebappWebserviceAccess.getInstance().
@@ -95,13 +91,18 @@ public class AccountMaintService {
 				return accountMaintResult; // EARLY RETURN
 			}
 
-			XLinkUserDTO userDBObject = userSessionObject.getUserDBObject();
 			ZzUserDataMirrorDTO zzUserDataMirrorDTO = new ZzUserDataMirrorDTO();
-			zzUserDataMirrorDTO.setAuthUserId( userDBObject.getAuthUser().getId() );
+			zzUserDataMirrorDTO.setAuthUserId( userSession.getAuthUserId() );
 			zzUserDataMirrorDTO.setFirstName( firstName );
 			ZzUserDataMirrorDAO.getInstance().updateRecord( zzUserDataMirrorDTO );
 			
-			userDBObject.setFirstName( firstName );
+			// Update session with new value for firstName
+			UserSession userSession_Updated =
+					UserSessionBuilder.getBuilder()
+					.fromUserSession( userSession )
+					.setFirstName( firstName )
+					.build();
+			UserSessionManager.getSinglesonInstance().setUserSession( userSession_Updated, request );
 			
 	        accountMaintResult.setStatus(true);
 			return accountMaintResult;
@@ -145,10 +146,10 @@ public class AccountMaintService {
 					);
 		}
 		try {
-			// Get their session first.  
-			HttpSession session = request.getSession();
-			UserSessionObject userSessionObject = (UserSessionObject) session.getAttribute( WebConstants.SESSION_CONTEXT_USER_LOGGED_IN );
-			if ( userSessionObject == null ) {
+			GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result accessAndSetupWebSessionResult =
+					GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.getSinglesonInstance().getAccessAndSetupWebSessionNoProjectId( request );
+			UserSession userSession = accessAndSetupWebSessionResult.getUserSession();
+			if ( accessAndSetupWebSessionResult.isNoSession() ) {
 				//  No User session 
 				throw new WebApplicationException(
 						Response.status( WebServiceErrorMessageConstants.NO_SESSION_STATUS_CODE )  //  Send HTTP code
@@ -156,7 +157,7 @@ public class AccountMaintService {
 						.build()
 						);
 			}
-			if ( ! TestIsUserSignedIn.getInstance().testIsUserSignedIn( userSessionObject ) ) {
+			if ( ! TestIsUserSignedIn.getInstance().testIsUserSignedIn( userSession ) ) {
 				//  No Access Allowed if not a logged in user
 				throw new WebApplicationException(
 						Response.status( WebServiceErrorMessageConstants.NOT_AUTHORIZED_STATUS_CODE )  //  Send HTTP code
@@ -165,7 +166,7 @@ public class AccountMaintService {
 						);
 			}
 			UserMgmtManageAccountRequest userMgmtManageAccountRequest = new UserMgmtManageAccountRequest();
-			userMgmtManageAccountRequest.setSessionKey( userSessionObject.getUserLoginSessionKey() );
+			userMgmtManageAccountRequest.setSessionKey( userSession.getUserMgmtSessionKey() );
 			userMgmtManageAccountRequest.setLastName( lastName );
 			UserMgmtManageAccountResponse userMgmtManageAccountResponse =
 					UserMgmtCentralWebappWebserviceAccess.getInstance().
@@ -175,14 +176,19 @@ public class AccountMaintService {
 				return accountMaintResult; // EARLY RETURN
 			}
 
-			XLinkUserDTO userDBObject = userSessionObject.getUserDBObject();
 			ZzUserDataMirrorDTO zzUserDataMirrorDTO = new ZzUserDataMirrorDTO();
-			zzUserDataMirrorDTO.setAuthUserId( userDBObject.getAuthUser().getId() );
+			zzUserDataMirrorDTO.setAuthUserId( userSession.getAuthUserId() );
 			zzUserDataMirrorDTO.setLastName( lastName );
 			ZzUserDataMirrorDAO.getInstance().updateRecord( zzUserDataMirrorDTO );
+
+			// Update session with new value for lastName
+			UserSession userSession_Updated =
+					UserSessionBuilder.getBuilder()
+					.fromUserSession( userSession )
+					.setLastName( lastName )
+					.build();
+			UserSessionManager.getSinglesonInstance().setUserSession( userSession_Updated, request );
 			
-			userDBObject.setLastName( lastName );
-	        
 			accountMaintResult.setStatus(true);
 			return accountMaintResult;
 			
@@ -225,11 +231,10 @@ public class AccountMaintService {
 					);
 		}
 		try {
-			// Get their session first.  
-			HttpSession session = request.getSession();
-			UserSessionObject userSessionObject 
-			= (UserSessionObject) session.getAttribute( WebConstants.SESSION_CONTEXT_USER_LOGGED_IN );
-			if ( userSessionObject == null ) {
+			GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result accessAndSetupWebSessionResult =
+					GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.getSinglesonInstance().getAccessAndSetupWebSessionNoProjectId( request );
+			UserSession userSession = accessAndSetupWebSessionResult.getUserSession();
+			if ( accessAndSetupWebSessionResult.isNoSession() ) {
 				//  No User session 
 				throw new WebApplicationException(
 						Response.status( WebServiceErrorMessageConstants.NO_SESSION_STATUS_CODE )  //  Send HTTP code
@@ -237,7 +242,7 @@ public class AccountMaintService {
 						.build()
 						);
 			}
-			if ( ! TestIsUserSignedIn.getInstance().testIsUserSignedIn( userSessionObject ) ) {
+			if ( ! TestIsUserSignedIn.getInstance().testIsUserSignedIn( userSession ) ) {
 				//  No Access Allowed if not a logged in user
 				throw new WebApplicationException(
 						Response.status( WebServiceErrorMessageConstants.NOT_AUTHORIZED_STATUS_CODE )  //  Send HTTP code
@@ -246,7 +251,7 @@ public class AccountMaintService {
 						);
 			}
 			UserMgmtManageAccountRequest userMgmtManageAccountRequest = new UserMgmtManageAccountRequest();
-			userMgmtManageAccountRequest.setSessionKey( userSessionObject.getUserLoginSessionKey() );
+			userMgmtManageAccountRequest.setSessionKey( userSession.getUserMgmtSessionKey() );
 			userMgmtManageAccountRequest.setOrganization( organization );
 			UserMgmtManageAccountResponse userMgmtManageAccountResponse =
 					UserMgmtCentralWebappWebserviceAccess.getInstance().
@@ -256,13 +261,18 @@ public class AccountMaintService {
 				return accountMaintResult; // EARLY RETURN
 			}
 
-			XLinkUserDTO userDBObject = userSessionObject.getUserDBObject();
 			ZzUserDataMirrorDTO zzUserDataMirrorDTO = new ZzUserDataMirrorDTO();
-			zzUserDataMirrorDTO.setAuthUserId( userDBObject.getAuthUser().getId() );
+			zzUserDataMirrorDTO.setAuthUserId( userSession.getAuthUserId() );
 			zzUserDataMirrorDTO.setOrganization( organization );
 			ZzUserDataMirrorDAO.getInstance().updateRecord( zzUserDataMirrorDTO );
 			
-			userDBObject.setOrganization( organization );
+			// Update session with new value for organization
+			UserSession userSession_Updated =
+					UserSessionBuilder.getBuilder()
+					.fromUserSession( userSession )
+					.setOrganization( organization )
+					.build();
+			UserSessionManager.getSinglesonInstance().setUserSession( userSession_Updated, request );
 			
 	        accountMaintResult.setStatus(true);
 			return accountMaintResult;
@@ -306,11 +316,10 @@ public class AccountMaintService {
 					);
 		}
 		try {
-			// Get their session first.  
-			HttpSession session = request.getSession();
-			UserSessionObject userSessionObject 
-			= (UserSessionObject) session.getAttribute( WebConstants.SESSION_CONTEXT_USER_LOGGED_IN );
-			if ( userSessionObject == null ) {
+			GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result accessAndSetupWebSessionResult =
+					GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.getSinglesonInstance().getAccessAndSetupWebSessionNoProjectId( request );
+			UserSession userSession = accessAndSetupWebSessionResult.getUserSession();
+			if ( accessAndSetupWebSessionResult.isNoSession() ) {
 				//  No User session 
 				throw new WebApplicationException(
 						Response.status( WebServiceErrorMessageConstants.NO_SESSION_STATUS_CODE )  //  Send HTTP code
@@ -318,7 +327,7 @@ public class AccountMaintService {
 						.build()
 						);
 			}
-			if ( ! TestIsUserSignedIn.getInstance().testIsUserSignedIn( userSessionObject ) ) {
+			if ( ! TestIsUserSignedIn.getInstance().testIsUserSignedIn( userSession ) ) {
 				//  No Access Allowed if not a logged in user
 				throw new WebApplicationException(
 						Response.status( WebServiceErrorMessageConstants.NOT_AUTHORIZED_STATUS_CODE )  //  Send HTTP code
@@ -327,7 +336,7 @@ public class AccountMaintService {
 						);
 			}
 			UserMgmtManageAccountRequest userMgmtManageAccountRequest = new UserMgmtManageAccountRequest();
-			userMgmtManageAccountRequest.setSessionKey( userSessionObject.getUserLoginSessionKey() );
+			userMgmtManageAccountRequest.setSessionKey( userSession.getUserMgmtSessionKey() );
 			userMgmtManageAccountRequest.setEmail( email );
 			UserMgmtManageAccountResponse userMgmtManageAccountResponse =
 					UserMgmtCentralWebappWebserviceAccess.getInstance().
@@ -340,9 +349,8 @@ public class AccountMaintService {
 				return accountMaintResult;   //  EARLY EXIT
 			}
 
-			XLinkUserDTO userDBObject = userSessionObject.getUserDBObject();
 			ZzUserDataMirrorDTO zzUserDataMirrorDTO = new ZzUserDataMirrorDTO();
-			zzUserDataMirrorDTO.setAuthUserId( userDBObject.getAuthUser().getId() );
+			zzUserDataMirrorDTO.setAuthUserId( userSession.getAuthUserId() );
 			zzUserDataMirrorDTO.setEmail( email );
 			ZzUserDataMirrorDAO.getInstance().updateRecord( zzUserDataMirrorDTO );
 			
@@ -388,11 +396,10 @@ public class AccountMaintService {
 					);
 		}
 		try {
-			// Get their session first.  
-			HttpSession session = request.getSession();
-			UserSessionObject userSessionObject 
-			= (UserSessionObject) session.getAttribute( WebConstants.SESSION_CONTEXT_USER_LOGGED_IN );
-			if ( userSessionObject == null ) {
+			GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result accessAndSetupWebSessionResult =
+					GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.getSinglesonInstance().getAccessAndSetupWebSessionNoProjectId( request );
+			UserSession userSession = accessAndSetupWebSessionResult.getUserSession();
+			if ( accessAndSetupWebSessionResult.isNoSession() ) {
 				//  No User session 
 				throw new WebApplicationException(
 						Response.status( WebServiceErrorMessageConstants.NO_SESSION_STATUS_CODE )  //  Send HTTP code
@@ -400,7 +407,7 @@ public class AccountMaintService {
 						.build()
 						);
 			}
-			if ( ! TestIsUserSignedIn.getInstance().testIsUserSignedIn( userSessionObject ) ) {
+			if ( ! TestIsUserSignedIn.getInstance().testIsUserSignedIn( userSession ) ) {
 				//  No Access Allowed if not a logged in user
 				throw new WebApplicationException(
 						Response.status( WebServiceErrorMessageConstants.NOT_AUTHORIZED_STATUS_CODE )  //  Send HTTP code
@@ -409,7 +416,7 @@ public class AccountMaintService {
 						);
 			}
 			UserMgmtManageAccountRequest userMgmtManageAccountRequest = new UserMgmtManageAccountRequest();
-			userMgmtManageAccountRequest.setSessionKey( userSessionObject.getUserLoginSessionKey() );
+			userMgmtManageAccountRequest.setSessionKey( userSession.getUserMgmtSessionKey() );
 			userMgmtManageAccountRequest.setUsername( username );
 			UserMgmtManageAccountResponse userMgmtManageAccountResponse =
 					UserMgmtCentralWebappWebserviceAccess.getInstance().
@@ -422,14 +429,18 @@ public class AccountMaintService {
 				return accountMaintResult;   //  EARLY EXIT
 			}
 
-			XLinkUserDTO userDBObject = userSessionObject.getUserDBObject();
 			ZzUserDataMirrorDTO zzUserDataMirrorDTO = new ZzUserDataMirrorDTO();
-			zzUserDataMirrorDTO.setAuthUserId( userDBObject.getAuthUser().getId() );
+			zzUserDataMirrorDTO.setAuthUserId( userSession.getAuthUserId() );
 			zzUserDataMirrorDTO.setUsername( username );
 			ZzUserDataMirrorDAO.getInstance().updateRecord( zzUserDataMirrorDTO );
-			
-			AuthUserDTO authUserDTO = userDBObject.getAuthUser();
-			authUserDTO.setUsername( username );
+
+			// Update session with new value for username
+			UserSession userSession_Updated =
+					UserSessionBuilder.getBuilder()
+					.fromUserSession( userSession )
+					.setUsername( username )
+					.build();
+			UserSessionManager.getSinglesonInstance().setUserSession( userSession_Updated, request );
 			
 	        accountMaintResult.setStatus(true);
 			return accountMaintResult;
@@ -485,11 +496,10 @@ public class AccountMaintService {
 					);
 		}
 		try {
-			// Get their session first.  
-			HttpSession session = request.getSession();
-			UserSessionObject userSessionObject 
-			= (UserSessionObject) session.getAttribute( WebConstants.SESSION_CONTEXT_USER_LOGGED_IN );
-			if ( userSessionObject == null ) {
+			GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result accessAndSetupWebSessionResult =
+					GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.getSinglesonInstance().getAccessAndSetupWebSessionNoProjectId( request );
+			UserSession userSession = accessAndSetupWebSessionResult.getUserSession();
+			if ( accessAndSetupWebSessionResult.isNoSession() ) {
 				//  No User session 
 				throw new WebApplicationException(
 						Response.status( WebServiceErrorMessageConstants.NO_SESSION_STATUS_CODE )  //  Send HTTP code
@@ -497,7 +507,7 @@ public class AccountMaintService {
 						.build()
 						);
 			}
-			if ( ! TestIsUserSignedIn.getInstance().testIsUserSignedIn( userSessionObject ) ) {
+			if ( ! TestIsUserSignedIn.getInstance().testIsUserSignedIn( userSession ) ) {
 				//  No Access Allowed if not a logged in user
 				throw new WebApplicationException(
 						Response.status( WebServiceErrorMessageConstants.NOT_AUTHORIZED_STATUS_CODE )  //  Send HTTP code
@@ -507,7 +517,7 @@ public class AccountMaintService {
 			}
 			
 			UserMgmtChangePasswordRequest userMgmtChangePasswordRequest = new UserMgmtChangePasswordRequest();
-			userMgmtChangePasswordRequest.setSessionKey( userSessionObject.getUserLoginSessionKey() );
+			userMgmtChangePasswordRequest.setSessionKey( userSession.getUserMgmtSessionKey() );
 			userMgmtChangePasswordRequest.setOldPassword( oldPassword );
 			userMgmtChangePasswordRequest.setNewPassword( password );
 			userMgmtChangePasswordRequest.setUserRemoteIP( request.getRemoteAddr() );

@@ -7,30 +7,28 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.yeastrc.auth.dto.AuthUserDTO;
+import org.yeastrc.auth.dao.AuthUserDAO;
 import org.yeastrc.xlink.www.constants.StrutsGlobalForwardNames;
 import org.yeastrc.xlink.www.constants.WebConstants;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.dao.ProjectDAO;
 import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.www.internal_services.GetUserDisplayListForSharedObjectId;
-import org.yeastrc.xlink.www.objects.AuthAccessLevel;
+import org.yeastrc.xlink.www.access_control.result_objects.WebSessionAuthAccessLevel;
 import org.yeastrc.xlink.www.objects.ProjectTblSubPartsForProjectLists;
 import org.yeastrc.xlink.www.objects.UserDisplay;
 import org.yeastrc.xlink.www.searcher.SearchSearcher;
-import org.yeastrc.xlink.www.user_account.UserSessionObject;
-import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
-import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
+import org.yeastrc.xlink.www.user_session_management.UserSession;
+import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result;
+import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId;
 import org.yeastrc.xlink.www.web_utils.GetPageHeaderData;
 import org.yeastrc.xlink.www.web_utils.GetProjectListForCurrentLoggedInUser;
 /**
@@ -41,45 +39,50 @@ public class ProjectsSearchListAction extends Action {
 	
 	private static final Logger log = LoggerFactory.getLogger( ProjectsSearchListAction.class);
 	
+	@Override
 	public ActionForward execute( ActionMapping mapping,
 			  ActionForm form,
 			  HttpServletRequest request,
 			  HttpServletResponse response ) throws Exception {
 		try {
-			// Get their session first.  
-			HttpSession session = request.getSession( false );
-			AccessAndSetupWebSessionResult accessAndSetupWebSessionResult =
-					GetAccessAndSetupWebSession.getInstance().getAccessAndSetupWebSessionNoProjectId( request, response );
+			GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result accessAndSetupWebSessionResult =
+					GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.getSinglesonInstance().getAccessAndSetupWebSessionNoProjectId( request, response );
 			if ( accessAndSetupWebSessionResult.isNoSession() ) {
 				//  No User session 
 				return mapping.findForward( StrutsGlobalForwardNames.NO_USER_SESSION );
 			}
 			//  Test access to application no project id
-			AuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getAuthAccessLevel();
+			WebSessionAuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getWebSessionAuthAccessLevel();
 			if ( ! authAccessLevel.isPublicAccessCodeReadAllowed() ) {
 				//  No Access Allowed
 				return mapping.findForward( StrutsGlobalForwardNames.INSUFFICIENT_ACCESS_PRIVILEGE );
 			}
 			request.setAttribute( WebConstants.REQUEST_AUTH_ACCESS_LEVEL, authAccessLevel );
-			UserSessionObject userSessionObject = null;
-			if ( session != null ) {
-				userSessionObject = (UserSessionObject) session.getAttribute( WebConstants.SESSION_CONTEXT_USER_LOGGED_IN );
-			}
-			if ( userSessionObject == null ) {
+			
+			UserSession userSession = accessAndSetupWebSessionResult.getUserSession();
+			if ( userSession == null ) {
 				//  No User session 
 				return mapping.findForward( StrutsGlobalForwardNames.NO_USER_SESSION );
 			}
-			if ( userSessionObject.getUserDBObject() == null || userSessionObject.getUserDBObject().getAuthUser() == null  ) {
+
+			if ( userSession == null ) {
+				//  No User session 
+				return mapping.findForward( StrutsGlobalForwardNames.NO_USER_SESSION );
+			}
+			if ( userSession.getAuthUserId() == null ) {
 				//  No Access Allowed since not a logged in user
-				log.warn( "Forward to StrutsGlobalForwardNames.INSUFFICIENT_ACCESS_PRIVILEGE, IP: " + request.getRemoteAddr() );
 				return mapping.findForward( StrutsGlobalForwardNames.INSUFFICIENT_ACCESS_PRIVILEGE );
 			}
-			AuthUserDTO authUser = userSessionObject.getUserDBObject().getAuthUser();
-			if ( ! authUser.isEnabledAppSpecific() ) {
+			Boolean userEnabledAppSpecific = AuthUserDAO.getInstance().getUserEnabledAppSpecific( userSession.getAuthUserId() );
+			if ( userEnabledAppSpecific == null ) {
+				//  No Access Allowed since not a logged in user
+				return mapping.findForward( StrutsGlobalForwardNames.INSUFFICIENT_ACCESS_PRIVILEGE );
+			}
+			if ( ! userEnabledAppSpecific.booleanValue() ) {
 				//  No Access Allowed since user is disabled
 				return mapping.findForward( StrutsGlobalForwardNames.ACCOUNT_DISABLED );
 			}
-
+			
 			///    Done Processing Auth Check and Auth Level
 			//////////////////////////////
 			
@@ -104,16 +107,19 @@ public class ProjectsSearchListAction extends Action {
 							.build()
 							);
 				}
+				
+				//  Get Last Name and First Name of users on Project
 				List<UserDisplay> userListForProject = GetUserDisplayListForSharedObjectId.getInstance().getUserDisplayListExcludeAdminGlobalNoAccessAccountsForSharedObjectId( projectSharedObjectId );
+				
 				//  Sort on last name then first name
 				Collections.sort( userListForProject, new Comparator<UserDisplay>() {
 					@Override
 					public int compare(UserDisplay o1, UserDisplay o2) {
-						int lastNameCompare = o1.getxLinkUserDTO().getLastName().compareTo( o2.getxLinkUserDTO().getLastName() );
+						int lastNameCompare = o1.getLastName().compareTo( o2.getLastName() );
 						if ( lastNameCompare != 0 ) {
 							return lastNameCompare;
 						}
-						return o1.getxLinkUserDTO().getFirstName().compareTo( o2.getxLinkUserDTO().getFirstName() );
+						return o1.getFirstName().compareTo( o2.getFirstName() );
 					}
 				});
 				StringBuilder usersSB = new StringBuilder( 1000 );
@@ -121,9 +127,9 @@ public class ProjectsSearchListAction extends Action {
 					if ( usersSB.length() != 0 ) {
 						usersSB.append( ", " );
 					}
-					usersSB.append( userDisplay.getxLinkUserDTO().getFirstName() );
+					usersSB.append( userDisplay.getFirstName() );
 					usersSB.append( " " );
-					usersSB.append( userDisplay.getxLinkUserDTO().getLastName() );
+					usersSB.append( userDisplay.getLastName() );
 				}
 				String users = usersSB.toString();
 				projectForDisplay.users = users;

@@ -3,7 +3,6 @@ package org.yeastrc.auth.dto;
 /**
  * table auth_user record - specific to Proxl
  *
- * Includes other properties for data that used to be in the auth_user table
  */
 public class AuthUserDTO {
 
@@ -24,23 +23,7 @@ public class AuthUserDTO {
 	 */
 	private boolean enabledAppSpecific = true;
 	
-	//  These used to be in the auth_user table but now come from the User Mgmt Webapp
-	private String username;
-	private String email;
 	
-	/**
-	 * Default to true unless set to false
-	 */
-	private boolean enabledUserMgmtGlobalLevel = true;
-	
-	
-	
-	public boolean isEnabledUserMgmtGlobalLevel() {
-		return enabledUserMgmtGlobalLevel;
-	}
-	public void setEnabledUserMgmtGlobalLevel(boolean enabledUserMgmtGlobalLevel) {
-		this.enabledUserMgmtGlobalLevel = enabledUserMgmtGlobalLevel;
-	}
 	public int getUserMgmtUserId() {
 		return userMgmtUserId;
 	}
@@ -64,18 +47,6 @@ public class AuthUserDTO {
 	}
 	public void setUserAccessLevel(Integer userAccessLevel) {
 		this.userAccessLevel = userAccessLevel;
-	}
-	public String getUsername() {
-		return username;
-	}
-	public void setUsername(String username) {
-		this.username = username;
-	}
-	public String getEmail() {
-		return email;
-	}
-	public void setEmail(String email) {
-		this.email = email;
 	}
 	/**
 	 * Not always set

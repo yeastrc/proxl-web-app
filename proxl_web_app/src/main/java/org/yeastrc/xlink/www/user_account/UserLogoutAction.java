@@ -3,14 +3,12 @@ package org.yeastrc.xlink.www.user_account;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
 import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.yeastrc.xlink.www.constants.WebConstants;
+import org.yeastrc.xlink.www.user_session_management.UserSessionManager;
 
 /**
  * 
@@ -20,6 +18,7 @@ public class UserLogoutAction extends Action {
 	
 	private static final Logger log = LoggerFactory.getLogger( UserLogoutAction.class);
 
+	@Override
 	public ActionForward execute( ActionMapping mapping,
 			  ActionForm actionForm,
 			  HttpServletRequest request,
@@ -27,16 +26,7 @@ public class UserLogoutAction extends Action {
 					  throws Exception {
 
 		try {
-
-
-			// Get their session first.  
-			HttpSession session = request.getSession();
-
-			session.removeAttribute( WebConstants.SESSION_CONTEXT_USER_LOGGED_IN );
-
-			session.invalidate();
-
-
+			UserSessionManager.getSinglesonInstance().invalidateUserSession( request );
 
 			return mapping.findForward( "Success" );
 			

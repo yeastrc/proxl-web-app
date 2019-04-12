@@ -36,7 +36,7 @@ import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.constants.WebServiceURLConstants;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
 import org.yeastrc.xlink.www.factories.ProteinSequenceVersionObjectFactory;
-import org.yeastrc.xlink.www.objects.AuthAccessLevel;
+import org.yeastrc.xlink.www.access_control.result_objects.WebSessionAuthAccessLevel;
 import org.yeastrc.xlink.www.objects.ProteinSequenceVersionObject;
 import org.yeastrc.xlink.www.project_search__search__mapping.MapProjectSearchIdToSearchId;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
@@ -44,8 +44,8 @@ import org.yeastrc.xlink.www.searcher.ProteinSequenceAnnotationSearcher;
 import org.yeastrc.xlink.www.searcher_via_cached_data.cached_data_holders.Cached_TaxonomyIdsFor_ProtSeqVersionId_SearchId;
 import org.yeastrc.xlink.www.searcher_via_cached_data.request_objects_for_searchers_for_cached_data.TaxonomyIdsForProtSeqIdSearchId_Request;
 import org.yeastrc.xlink.www.searcher_via_cached_data.return_objects_from_searchers_for_cached_data.TaxonomyIdsForProtSeqIdSearchId_Result;
-import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
-import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
+import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result;
+import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId;
 
 /**
  * Get Protein PDR Data for Tooltip
@@ -94,8 +94,6 @@ public class ProteinNameForTooltipService {
 		    	        );
 		}
 		try {
-			// Get the session first.  
-//			HttpSession session = request.getSession();
 			Set<Integer> projectSearchIdsSet = new HashSet<Integer>( );
 			projectSearchIdsSet.addAll( projectSearchIdList );
 			List<Integer> projectIdsFromSearchIds = ProjectIdsForProjectSearchIdsSearcher.getInstance().getProjectIdsForProjectSearchIds( projectSearchIdsSet );
@@ -121,9 +119,9 @@ public class ProteinNameForTooltipService {
 						);
 			}
 			int projectId = projectIdsFromSearchIds.get( 0 );
-			AccessAndSetupWebSessionResult accessAndSetupWebSessionResult =
-					GetAccessAndSetupWebSession.getInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request );
-//			UserSessionObject userSessionObject = accessAndSetupWebSessionResult.getUserSessionObject();
+			GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result accessAndSetupWebSessionResult =
+					GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.getSinglesonInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request );
+//			UserSession userSession = accessAndSetupWebSessionResult.getUserSession();
 			if ( accessAndSetupWebSessionResult.isNoSession() ) {
 				//  No User session 
 				throw new WebApplicationException(
@@ -133,7 +131,7 @@ public class ProteinNameForTooltipService {
 						);
 			}
 			//  Test access to the project id
-			AuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getAuthAccessLevel();
+			WebSessionAuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getWebSessionAuthAccessLevel();
 			//  Test access to the project id
 			if ( ! authAccessLevel.isPublicAccessCodeReadAllowed() ) {
 				//  No Access Allowed for this project id

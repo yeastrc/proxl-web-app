@@ -16,11 +16,11 @@ import org.yeastrc.xlink.base.file_import_proxl_xml_scans.dto.ProxlXMLFileImport
 import org.yeastrc.xlink.base.file_import_proxl_xml_scans.enum_classes.ProxlXMLFileImportStatus;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
-import org.yeastrc.xlink.www.objects.AuthAccessLevel;
+import org.yeastrc.xlink.www.access_control.result_objects.WebSessionAuthAccessLevel;
 import org.yeastrc.xlink.www.file_import_proxl_xml_scans.dao.ProxlXMLFileImportTracking_ForWebAppDAO;
-import org.yeastrc.xlink.www.user_account.UserSessionObject;
-import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
-import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
+import org.yeastrc.xlink.www.user_session_management.UserSession;
+import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result;
+import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId;
 
 
 @Path("/file_import_proxl_xml_scans")
@@ -95,8 +95,6 @@ public class ProxlXMLFileImportTrackingItemDeleteItemService {
 						.build()
 						);
 			}
-			// Get the session first.  
-			//			HttpSession session = request.getSession();
 			//   Get the project id for this tracking id
 			ProxlXMLFileImportTracking_ForWebAppDAO proxlXMLFileImportTracking_ForWebAppDAO = ProxlXMLFileImportTracking_ForWebAppDAO.getInstance();
 			ProxlXMLFileImportTrackingDTO proxlXMLFileImportTrackingDTO = 
@@ -110,9 +108,9 @@ public class ProxlXMLFileImportTrackingItemDeleteItemService {
 						);
 			}
 			int projectId = proxlXMLFileImportTrackingDTO.getProjectId();
-			AccessAndSetupWebSessionResult accessAndSetupWebSessionResult =
-					GetAccessAndSetupWebSession.getInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request );
-			//			UserSessionObject userSessionObject = accessAndSetupWebSessionResult.getUserSessionObject();
+			GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result accessAndSetupWebSessionResult =
+					GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.getSinglesonInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request );
+			//			UserSession userSession = accessAndSetupWebSessionResult.getUserSession();
 			if ( accessAndSetupWebSessionResult.isNoSession() ) {
 				//  No User session 
 				throw new WebApplicationException(
@@ -122,7 +120,7 @@ public class ProxlXMLFileImportTrackingItemDeleteItemService {
 						);
 			}
 			//  Test access to the project id
-			AuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getAuthAccessLevel();
+			WebSessionAuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getWebSessionAuthAccessLevel();
 			if ( ! authAccessLevel.isProjectOwnerAllowed() ) {
 				//  No Access Allowed for this project id
 				throw new WebApplicationException(
@@ -137,10 +135,10 @@ public class ProxlXMLFileImportTrackingItemDeleteItemService {
 				//  Either no update needed since marked for deletion or status not queued
 				return cancelQueuedImportResult;
 			}
-			UserSessionObject userSessionObject = accessAndSetupWebSessionResult.getUserSessionObject();
-			if ( userSessionObject == null ) {
+			UserSession userSession = accessAndSetupWebSessionResult.getUserSession();
+			if ( userSession == null ) {
 			}
-			int authUserId = userSessionObject.getUserDBObject().getAuthUser().getId();
+			int authUserId = userSession.getAuthUserId();
 			boolean recordUpdated =
 					proxlXMLFileImportTracking_ForWebAppDAO
 					.updateMarkedForDeletionForIdStatus( 
@@ -294,8 +292,6 @@ public class ProxlXMLFileImportTrackingItemDeleteItemService {
 						.build()
 						);
 			}
-			// Get the session first.  
-			//			HttpSession session = request.getSession();
 			//   Get the project id for this tracking id
 			ProxlXMLFileImportTrackingDTO proxlXMLFileImportTrackingDTO = 
 					ProxlXMLFileImportTracking_Base_DAO.getInstance().getItem( trackingId );
@@ -308,9 +304,9 @@ public class ProxlXMLFileImportTrackingItemDeleteItemService {
 						);
 			}
 			int projectId = proxlXMLFileImportTrackingDTO.getProjectId();
-			AccessAndSetupWebSessionResult accessAndSetupWebSessionResult =
-					GetAccessAndSetupWebSession.getInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request );
-			//			UserSessionObject userSessionObject = accessAndSetupWebSessionResult.getUserSessionObject();
+			GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result accessAndSetupWebSessionResult =
+					GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.getSinglesonInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request );
+			//			UserSession userSession = accessAndSetupWebSessionResult.getUserSession();
 			if ( accessAndSetupWebSessionResult.isNoSession() ) {
 				//  No User session 
 				throw new WebApplicationException(
@@ -320,7 +316,7 @@ public class ProxlXMLFileImportTrackingItemDeleteItemService {
 						);
 			}
 			//  Test access to the project id
-			AuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getAuthAccessLevel();
+			WebSessionAuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getWebSessionAuthAccessLevel();
 			if ( ! authAccessLevel.isProjectOwnerAllowed() ) {
 				//  No Access Allowed for this project id
 				throw new WebApplicationException(
@@ -334,10 +330,10 @@ public class ProxlXMLFileImportTrackingItemDeleteItemService {
 				//  Either no update needed since marked for deletion or status not failed
 				return removeFailedImportResult;
 			}
-			UserSessionObject userSessionObject = accessAndSetupWebSessionResult.getUserSessionObject();
-			if ( userSessionObject == null ) {
+			UserSession userSession = accessAndSetupWebSessionResult.getUserSession();
+			if ( userSession == null ) {
 			}
-			int authUserId = userSessionObject.getUserDBObject().getAuthUser().getId();
+			int authUserId = userSession.getAuthUserId();
 			boolean recordUpdated =
 					ProxlXMLFileImportTracking_ForWebAppDAO.getInstance()
 					.updateMarkedForDeletionForIdStatus( 
@@ -475,8 +471,6 @@ public class ProxlXMLFileImportTrackingItemDeleteItemService {
 						.build()
 						);
 			}
-			// Get the session first.  
-			//			HttpSession session = request.getSession();
 			//   Get the project id for this tracking id
 			ProxlXMLFileImportTrackingDTO proxlXMLFileImportTrackingDTO = 
 					ProxlXMLFileImportTracking_Base_DAO.getInstance().getItem( trackingId );
@@ -489,9 +483,9 @@ public class ProxlXMLFileImportTrackingItemDeleteItemService {
 						);
 			}
 			int projectId = proxlXMLFileImportTrackingDTO.getProjectId();
-			AccessAndSetupWebSessionResult accessAndSetupWebSessionResult =
-					GetAccessAndSetupWebSession.getInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request );
-			//			UserSessionObject userSessionObject = accessAndSetupWebSessionResult.getUserSessionObject();
+			GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result accessAndSetupWebSessionResult =
+					GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.getSinglesonInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request );
+			//			UserSession userSession = accessAndSetupWebSessionResult.getUserSession();
 			if ( accessAndSetupWebSessionResult.isNoSession() ) {
 				//  No User session 
 				throw new WebApplicationException(
@@ -501,7 +495,7 @@ public class ProxlXMLFileImportTrackingItemDeleteItemService {
 						);
 			}
 			//  Test access to the project id
-			AuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getAuthAccessLevel();
+			WebSessionAuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getWebSessionAuthAccessLevel();
 			if ( ! authAccessLevel.isProjectOwnerAllowed() ) {
 				//  No Access Allowed for this project id
 				throw new WebApplicationException(
@@ -515,10 +509,10 @@ public class ProxlXMLFileImportTrackingItemDeleteItemService {
 				//  Either no update needed since marked for deletion or status not failed
 				return removeCompletedImportResult;
 			}
-			UserSessionObject userSessionObject = accessAndSetupWebSessionResult.getUserSessionObject();
-			if ( userSessionObject == null ) {
+			UserSession userSession = accessAndSetupWebSessionResult.getUserSession();
+			if ( userSession == null ) {
 			}
-			int authUserId = userSessionObject.getUserDBObject().getAuthUser().getId();
+			int authUserId = userSession.getAuthUserId();
 			boolean recordUpdated =
 					ProxlXMLFileImportTracking_ForWebAppDAO.getInstance()
 					.updateMarkedForDeletionForIdStatus( 

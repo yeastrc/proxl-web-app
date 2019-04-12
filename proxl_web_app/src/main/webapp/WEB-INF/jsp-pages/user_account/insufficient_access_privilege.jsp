@@ -1,5 +1,6 @@
 <%@ include file="/WEB-INF/jsp-includes/pageEncodingDirective.jsp" %>
 
+<%--  user_account/insufficient_access_privilege.jsp --%>
 
 <%@ include file="/WEB-INF/jsp-includes/strutsTaglibImport.jsp" %>
 <%@ include file="/WEB-INF/jsp-includes/jstlTaglibImport.jsp" %>
@@ -31,46 +32,35 @@
 
 
 <div class="page-content-outer-container" >	
- <div class="page-content-container" >	
+ <div class="page-content-container" style="width: 699px;" >	
   <div class="page-content" >	
 
 	<div class="logo-large-container" >
 		<img src="images/logo-large.png" />
 	</div>
   	
-  	<div  style="position: relative;" class="page-label">
+  	<div  style="position: relative; margin-left: 10px; margin-right: 10px; text-align: center;" class="page-label">
   	
-  		<div style="font-weight: bold; padding-left: 10px; padding-right: 10px; ">Insufficient access privilege to access or update this data.</div>
+	  	<div >
+		  You have not been given permission to view this project or its data.
+		</div>
+		<c:if test="${ not empty adminEmailAddress }">
+			<div style="margin-top: 15px;">
+				If you believe this is in error, please email us at
+				<a href="mailto:<c:out value="${ adminEmailAddress }"></c:out>" target="_top"><c:out value="${ adminEmailAddress }"></c:out></a>.
+			</div> 
+		</c:if>
+		<div style="margin-top: 15px; margin-bottom: 20px;"> 
+			<a href="home.do" >Go back to proxl home page</a>.
+		</div> 
 
-  		
-  		<div >
-		  	<logic:messagesPresent message="false">
-		  		
-			     <html:messages id="message" >
-			     	<div>
-			         <bean:write name="message" filter="false"/>
-			        </div>
-			     </html:messages>
-		 	</logic:messagesPresent>
-  		</div>
-
-	  <c:if test="${ userLoggedIn }">
-  		<br>
-  		<a href="home.do" >return to home page</a>
-  	  </c:if>
-  		
 	</div>
-	
+  
   </div>
-  <div class="bottom-tab">
-		<a href="http://www.yeastrc.org/proxl_docs/" >Get Help</a>  		
-  </div>
-  <div class="bottom-tab" style="border-right-width: 0px;">
-		<a href="user_loginPage.do?useDefaultURL=true" >Sign In</a>
   </div>
   
  </div>
-</div>
-
   
 <%@ include file="/WEB-INF/jsp-includes/footer_main.jsp" %>
+
+

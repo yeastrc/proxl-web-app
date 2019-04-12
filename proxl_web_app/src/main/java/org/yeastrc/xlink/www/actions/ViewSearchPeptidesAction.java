@@ -25,7 +25,7 @@ import org.yeastrc.xlink.www.searcher_via_cached_data.a_return_data_from_searche
 import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.www.nav_links_image_structure.PopulateRequestDataForImageAndStructureAndQC_NavLinks;
 import org.yeastrc.xlink.www.no_data_validation.ThrowExceptionOnNoDataConfig;
-import org.yeastrc.xlink.www.objects.AuthAccessLevel;
+import org.yeastrc.xlink.www.access_control.result_objects.WebSessionAuthAccessLevel;
 import org.yeastrc.xlink.www.objects.SearchPeptideCrosslink;
 import org.yeastrc.xlink.www.objects.SearchProteinPosition;
 import org.yeastrc.xlink.www.objects.ViewSearchPeptidesPageDataRoot;
@@ -47,8 +47,8 @@ import org.yeastrc.xlink.www.form_query_json_objects.Z_CutoffValuesObjectsToOthe
 import org.yeastrc.xlink.www.form_query_json_objects.Z_CutoffValuesObjectsToOtherObjectsFactory.Z_CutoffValuesObjectsToOtherObjects_PerSearchResult;
 import org.yeastrc.xlink.www.form_utils.Update__A_QueryBase_JSONRoot__ForCurrentSearchIds;
 import org.yeastrc.xlink.www.forms.SearchViewPeptidesForm;
-import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
-import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
+import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result;
+import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId;
 import org.yeastrc.xlink.www.web_utils.ExcludeLinksWith_Remove_NonUniquePSMs_Checkbox_PopRequestItems;
 import org.yeastrc.xlink.www.web_utils.GetAnnotationDisplayUserSelectionDetailsData;
 import org.yeastrc.xlink.www.web_utils.GetLinkTypesForSearchers;
@@ -74,6 +74,7 @@ public class ViewSearchPeptidesAction extends Action {
 	/* (non-Javadoc)
 	 * @see org.apache.struts.action.Action#execute(org.apache.struts.action.ActionMapping, org.apache.struts.action.ActionForm, javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
 	 */
+	@Override
 	public ActionForward execute( ActionMapping mapping,
 			  ActionForm actionForm,
 			  HttpServletRequest request,
@@ -93,8 +94,6 @@ public class ViewSearchPeptidesAction extends Action {
 			request.setAttribute( "strutsActionForm", form );
 			int projectSearchId = form.getProjectSearchIdSingle();
 			viewSearchPeptidesPageDataRoot.setProjectSearchId( projectSearchId );
-			// Get the session first.  
-//			HttpSession session = request.getSession();
 			//   Get the project id for this search
 			Collection<Integer> projectSearchIdsSet = new HashSet<>();
 			projectSearchIdsSet.add( projectSearchId );
@@ -113,14 +112,14 @@ public class ViewSearchPeptidesAction extends Action {
 			request.setAttribute( "projectId", projectId );
 			request.setAttribute( "project_id", projectId );
 			///////////////////////
-			AccessAndSetupWebSessionResult accessAndSetupWebSessionResult =
-					GetAccessAndSetupWebSession.getInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request, response );
+			GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result accessAndSetupWebSessionResult =
+					GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.getSinglesonInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request, response );
 			if ( accessAndSetupWebSessionResult.isNoSession() ) {
 				//  No User session 
 				return mapping.findForward( StrutsGlobalForwardNames.NO_USER_SESSION );
 			}
 			//  Test access to the project id
-			AuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getAuthAccessLevel();
+			WebSessionAuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getWebSessionAuthAccessLevel();
 			if ( ! authAccessLevel.isPublicAccessCodeReadAllowed() ) {
 				//  No Access Allowed for this project id
 				return mapping.findForward( StrutsGlobalForwardNames.INSUFFICIENT_ACCESS_PRIVILEGE );

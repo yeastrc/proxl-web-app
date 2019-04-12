@@ -21,24 +21,28 @@ public class SearchProteinCrosslink implements IProteinCrosslink {
 	
 	private static final Logger log = LoggerFactory.getLogger( SearchProteinCrosslink.class);
 	
+	@Override
 	public SearchProtein getProtein1() {
 		return protein1;
 	}
 	public void setProtein1(SearchProtein protein1) {
 		this.protein1 = protein1;
 	}
+	@Override
 	public SearchProtein getProtein2() {
 		return protein2;
 	}
 	public void setProtein2(SearchProtein protein2) {
 		this.protein2 = protein2;
 	}
+	@Override
 	public int getProtein1Position() {
 		return protein1Position;
 	}
 	public void setProtein1Position(int protein1Position) {
 		this.protein1Position = protein1Position;
 	}
+	@Override
 	public int getProtein2Position() {
 		return protein2Position;
 	}

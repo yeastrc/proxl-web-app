@@ -64,11 +64,7 @@
   </div>
   
  </div>
-</div>
+  
+<%@ include file="/WEB-INF/jsp-includes/footer_main.jsp" %>
 
-
-
-</body>
-
-</html>
 

@@ -34,6 +34,7 @@ public class MergedSearchProtein implements IProtein {
 		return nameLowercase;
 	}
 	// Get the name(s) for this protein from the searches
+	@Override
 	public String getName() throws Exception {
 		if ( ! nameSet ) {
 			Set<String> names = new HashSet<String>();
@@ -56,6 +57,7 @@ public class MergedSearchProtein implements IProtein {
 		return name;
 	}
 	// Get the description(s) for this protein from the searches
+	@Override
 	public String getDescription() throws Exception {
 		Set<String> descriptions = new HashSet<String>();
 		for( SearchDTO search : searchs ) {
@@ -71,6 +73,7 @@ public class MergedSearchProtein implements IProtein {
 		}
 		return StringUtils.join( descriptions, ", " );
 	}
+	@Override
 	public ProteinSequenceVersionObject getProteinSequenceVersionObject() {
 		return proteinSequenceVersionObject;
 	}

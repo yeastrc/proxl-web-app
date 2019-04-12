@@ -21,10 +21,10 @@ import org.yeastrc.xlink.dto.SearchFileProjectSearchDTO;
 import org.yeastrc.xlink.www.constants.StrutsGlobalForwardNames;
 import org.yeastrc.xlink.www.constants.WebConstants;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
-import org.yeastrc.xlink.www.objects.AuthAccessLevel;
+import org.yeastrc.xlink.www.access_control.result_objects.WebSessionAuthAccessLevel;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
-import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
-import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
+import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result;
+import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId;
 
 /**
  * 
@@ -34,6 +34,7 @@ public class DownloadSearchFileAction extends Action {
 	
 	private static final Logger log = LoggerFactory.getLogger( DownloadSearchFileAction.class);
 	
+	@Override
 	public ActionForward execute( ActionMapping mapping,
 			  ActionForm form,
 			  HttpServletRequest request,
@@ -54,8 +55,6 @@ public class DownloadSearchFileAction extends Action {
 				log.error( msg );
 				throw e;
 			}
-			// Get the session first.  
-//			HttpSession session = request.getSession();
 			
 			SearchFileProjectSearchDTO searchFileProjectSearchDTO =
 					SearchFileProjectSearchDAO.getInstance().getSearchFileProjectSearchDTOForId( fileId );
@@ -85,14 +84,14 @@ public class DownloadSearchFileAction extends Action {
 			int projectId = projectIdsFromSearchIds.get( 0 );
 			request.setAttribute( "projectId", projectId ); 
 			///////////////////////
-			AccessAndSetupWebSessionResult accessAndSetupWebSessionResult =
-					GetAccessAndSetupWebSession.getInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request, response );
+			GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result accessAndSetupWebSessionResult =
+					GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.getSinglesonInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request, response );
 			if ( accessAndSetupWebSessionResult.isNoSession() ) {
 				//  No User session 
 				return mapping.findForward( StrutsGlobalForwardNames.NO_USER_SESSION );
 			}
 			//  Test access to the project id
-			AuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getAuthAccessLevel();
+			WebSessionAuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getWebSessionAuthAccessLevel();
 			if ( ! authAccessLevel.isPublicAccessCodeReadAllowed() ) {
 				//  No Access Allowed for this project id
 				return mapping.findForward( StrutsGlobalForwardNames.INSUFFICIENT_ACCESS_PRIVILEGE );

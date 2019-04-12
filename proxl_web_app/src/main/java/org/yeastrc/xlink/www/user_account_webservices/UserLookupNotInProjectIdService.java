@@ -15,9 +15,9 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.www.dao.ProjectDAO;
-import org.yeastrc.xlink.www.dto.XLinkUserDTO;
+
 import org.yeastrc.xlink.www.exceptions.ProxlWebappInternalErrorException;
-import org.yeastrc.xlink.www.objects.AuthAccessLevel;
+import org.yeastrc.xlink.www.access_control.result_objects.WebSessionAuthAccessLevel;
 import org.yeastrc.xlink.www.searcher.UserSearcherForSharedObjectIdNotUserGlobalNoAccess;
 import org.yeastrc.xlink.www.user_mgmt_webapp_access.UserMgmtCentralWebappWebserviceAccess;
 import org.yeastrc.xlink.www.user_mgmt_webapp_access.UserMgmtGetUserDataRequest;
@@ -25,16 +25,34 @@ import org.yeastrc.xlink.www.user_mgmt_webapp_access.UserMgmtGetUserDataResponse
 import org.yeastrc.xlink.www.user_mgmt_webapp_access.UserMgmtSearchUserDataRequest;
 import org.yeastrc.xlink.www.user_mgmt_webapp_access.UserMgmtSearchUserDataResponse;
 import org.yeastrc.auth.dao.AuthUserDAO;
-import org.yeastrc.auth.dto.AuthUserDTO;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
-import org.yeastrc.xlink.www.objects.UserQueryResult;
-import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
-import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
+import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result;
+import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId;
 
 
 @Path("/user")
 public class UserLookupNotInProjectIdService {
 	private static final Logger log = LoggerFactory.getLogger( UserLookupNotInProjectIdService.class);
+	
+	public static class WebserviceResponseItem {
+		private String firstName;
+		private String lastName;
+		private String email;
+		private Integer authUserId;
+		
+		public String getFirstName() {
+			return firstName;
+		}
+		public String getLastName() {
+			return lastName;
+		}
+		public String getEmail() {
+			return email;
+		}
+		public Integer getAuthUserId() {
+			return authUserId;
+		}
+	}
 	
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
@@ -53,8 +71,8 @@ public class UserLookupNotInProjectIdService {
 						.build()
 						);
 			} 
-			AccessAndSetupWebSessionResult accessAndSetupWebSessionResult =
-					GetAccessAndSetupWebSession.getInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request );
+			GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result accessAndSetupWebSessionResult =
+					GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.getSinglesonInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request );
 			if ( accessAndSetupWebSessionResult.isNoSession() ) {
 				//  No User session 
 				throw new WebApplicationException(
@@ -63,7 +81,7 @@ public class UserLookupNotInProjectIdService {
 						.build()
 						);
 			}
-			AuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getAuthAccessLevel();
+			WebSessionAuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getWebSessionAuthAccessLevel();
 			//  Test access to the project id
 			if ( ! authAccessLevel.isAssistantProjectOwnerAllowed() ) {
 				//  No Access Allowed for this project id
@@ -76,7 +94,7 @@ public class UserLookupNotInProjectIdService {
 			///   Auth Check Complete
 			////////////////////////////
 			
-			String sessionKey = accessAndSetupWebSessionResult.getUserSessionObject().getUserLoginSessionKey();
+			String sessionKey = accessAndSetupWebSessionResult.getUserSession().getUserMgmtSessionKey();
 			UserMgmtSearchUserDataRequest userMgmtSearchUserDataRequest = new UserMgmtSearchUserDataRequest();
 			userMgmtSearchUserDataRequest.setSessionKey( sessionKey );
 			userMgmtSearchUserDataRequest.setSearchString( query );
@@ -97,7 +115,7 @@ public class UserLookupNotInProjectIdService {
 			
 			List<Integer> userMgmtUserIdsForQueryParam = userMgmtSearchUserDataResponse.getUserIdList();
 			
-			List<XLinkUserDTO> queryResultList = getUserResultList( projectId, userMgmtUserIdsForQueryParam );
+			List<WebserviceResponseItem> queryResultList = getUserResultList( projectId, userMgmtUserIdsForQueryParam );
 			
 			UserQueryResult userQueryResult = new UserQueryResult();
 			userQueryResult.setQueryResultList( queryResultList );
@@ -132,8 +150,8 @@ public class UserLookupNotInProjectIdService {
 						.build()
 						);
 			} 
-			AccessAndSetupWebSessionResult accessAndSetupWebSessionResult =
-					GetAccessAndSetupWebSession.getInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request );
+			GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result accessAndSetupWebSessionResult =
+					GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.getSinglesonInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request );
 			if ( accessAndSetupWebSessionResult.isNoSession() ) {
 				//  No User session 
 				throw new WebApplicationException(
@@ -142,7 +160,7 @@ public class UserLookupNotInProjectIdService {
 						.build()
 						);
 			}
-			AuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getAuthAccessLevel();
+			WebSessionAuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getWebSessionAuthAccessLevel();
 			//  Test access to the project id
 			if ( ! authAccessLevel.isAssistantProjectOwnerAllowed() ) {
 				//  No Access Allowed for this project id
@@ -155,7 +173,7 @@ public class UserLookupNotInProjectIdService {
 			///   Auth Check Complete
 			////////////////////////////
 			
-			String sessionKey = accessAndSetupWebSessionResult.getUserSessionObject().getUserLoginSessionKey();
+			String sessionKey = accessAndSetupWebSessionResult.getUserSession().getUserMgmtSessionKey();
 			UserMgmtSearchUserDataRequest userMgmtSearchUserDataRequest = new UserMgmtSearchUserDataRequest();
 			userMgmtSearchUserDataRequest.setSessionKey( sessionKey );
 			userMgmtSearchUserDataRequest.setSearchString( query );
@@ -176,7 +194,7 @@ public class UserLookupNotInProjectIdService {
 			
 			List<Integer> userMgmtUserIdsForQueryParam = userMgmtSearchUserDataResponse.getUserIdList();
 			
-			List<XLinkUserDTO> queryResultList = getUserResultList( projectId, userMgmtUserIdsForQueryParam );
+			List<WebserviceResponseItem> queryResultList = getUserResultList( projectId, userMgmtUserIdsForQueryParam );
 			
 			UserQueryResult userQueryResult = new UserQueryResult();
 			userQueryResult.setQueryResultList( queryResultList );
@@ -199,7 +217,7 @@ public class UserLookupNotInProjectIdService {
 	 * @throws ProxlWebappInternalErrorException
 	 * @throws WebApplicationException
 	 */
-	private List<XLinkUserDTO> getUserResultList(Integer projectId, List<Integer> userMgmtUserIdsForQueryParam )
+	private List<WebserviceResponseItem> getUserResultList(Integer projectId, List<Integer> userMgmtUserIdsForQueryParam )
 			throws Exception, ProxlWebappInternalErrorException, WebApplicationException {
 
 		Integer authShareableObjectIdForProjectId = ProjectDAO.getInstance().getAuthShareableObjectIdForProjectId( projectId );
@@ -223,7 +241,7 @@ public class UserLookupNotInProjectIdService {
 				UserSearcherForSharedObjectIdNotUserGlobalNoAccess.getInstance().
 				getUserMgmtUserIdListForSharedObjectId( authShareableObjectIdForProjectId );
 		
-		List<XLinkUserDTO> queryResultList = new ArrayList<XLinkUserDTO>( userMgmtUserIdsForQueryParam.size() );
+		List<WebserviceResponseItem> queryResultList = new ArrayList<WebserviceResponseItem>( userMgmtUserIdsForQueryParam.size() );
 
 		for ( int userMgmtUserId : userMgmtUserIdsForQueryParam ) {
 			if ( authUserIdsInProjectOrGlobalNoAccessSet.contains( userMgmtUserId ) ) {
@@ -278,21 +296,29 @@ public class UserLookupNotInProjectIdService {
 				throw new ProxlWebappInternalErrorException(msg);
 			}
 
-			XLinkUserDTO xLinkUserDTO = new XLinkUserDTO();
-			AuthUserDTO authUserDTO = new AuthUserDTO();
-			xLinkUserDTO.setAuthUser(authUserDTO);
+			WebserviceResponseItem webserviceResponseItem = new WebserviceResponseItem();
+			webserviceResponseItem.authUserId = authUserId;
+			webserviceResponseItem.email = userMgmtGetUserDataResponse.getEmail();
+			webserviceResponseItem.firstName = userMgmtGetUserDataResponse.getFirstName();
+			webserviceResponseItem.lastName = userMgmtGetUserDataResponse.getLastName();
 			
-			authUserDTO.setId( authUserId );
-			authUserDTO.setUsername( userMgmtGetUserDataResponse.getUsername() );
-			authUserDTO.setEmail( userMgmtGetUserDataResponse.getEmail() );
-			authUserDTO.setUserAccessLevel( userAccessLevel );
-			
-			xLinkUserDTO.setFirstName( userMgmtGetUserDataResponse.getFirstName() );
-			xLinkUserDTO.setLastName( userMgmtGetUserDataResponse.getLastName() );
-			xLinkUserDTO.setOrganization( userMgmtGetUserDataResponse.getOrganization() );
-			
-			queryResultList.add( xLinkUserDTO );
+			queryResultList.add( webserviceResponseItem );
 		}
 		return queryResultList;
+	}
+	
+	
+	public static class UserQueryResult {
+	
+		private List<WebserviceResponseItem> queryResultList;
+	
+		public List<WebserviceResponseItem> getQueryResultList() {
+			return queryResultList;
+		}
+	
+		public void setQueryResultList(List<WebserviceResponseItem> queryResultList) {
+			this.queryResultList = queryResultList;
+		}
+	
 	}
 }

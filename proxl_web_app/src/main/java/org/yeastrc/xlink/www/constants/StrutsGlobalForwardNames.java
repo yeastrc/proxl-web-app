@@ -17,8 +17,6 @@ public class StrutsGlobalForwardNames {
 	
 	public final static String INVALID_REQUEST_DATA = "invalidRequestData";
 	
-	public final static String PROJECT_NOT_FOUND = "ProjectNotFound";
-	
 	public final static String GENERAL_ERROR = "generalError";
 	
 	public final static String HOME = "home";

@@ -17,8 +17,8 @@ import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.www.factories.ProteinSequenceVersionObjectFactory;
 import org.yeastrc.xlink.www.objects.ProteinSequenceVersionObject;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
-import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
-import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
+import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result;
+import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId;
 
 @Path("/proteinSequence")
 public class ViewerProteinSequenceService {
@@ -52,11 +52,9 @@ public class ViewerProteinSequenceService {
 		    	        );
 		}
 		try {
-			// Get the session first.  
-//			HttpSession session = request.getSession();
-			AccessAndSetupWebSessionResult accessAndSetupWebSessionResult =
-					GetAccessAndSetupWebSession.getInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request );
-//			UserSessionObject userSessionObject = accessAndSetupWebSessionResult.getUserSessionObject();
+			GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result accessAndSetupWebSessionResult =
+					GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.getSinglesonInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request );
+//			UserSession userSession = accessAndSetupWebSessionResult.getUserSession();
 			if ( accessAndSetupWebSessionResult.isNoSession() ) {
 				//  No User session 
 				throw new WebApplicationException(

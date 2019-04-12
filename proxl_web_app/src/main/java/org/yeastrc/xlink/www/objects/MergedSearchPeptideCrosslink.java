@@ -40,12 +40,14 @@ public class MergedSearchPeptideCrosslink implements IMergedSearchLink {
 	public void setSearches(Collection<SearchDTO> searches) {
 		this.searches = searches;
 	}
+	@Override
 	public int hashCode() {
 		return (this.peptide1.getSequence() + this.peptide1Position + this.peptide2.getSequence() + this.peptide2Position).hashCode();
 	}
 	/**
 	 * Returns true if both MergedSearchPeptideCrosslink objects describe the same two peptides at the same two positions in each respective peptide
 	 */
+	@Override
 	public boolean equals( Object o ) {
 		if( !( o instanceof MergedSearchPeptideCrosslink ) ) return false;
 		MergedSearchPeptideCrosslink mrpc = (MergedSearchPeptideCrosslink)o;

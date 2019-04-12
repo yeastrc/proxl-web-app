@@ -172,11 +172,11 @@ public class Cached_Related_peptides_unique_for_search_For_SearchId_ReportedPept
 				}
 				
 				int cacheTimeout = CACHE_TIMEOUT_FULL_SIZE;
-				cacheMaxSize = parentObject.CACHE_MAX_SIZE_FULL_SIZE;
+				cacheMaxSize = Cached_Related_peptides_unique_for_search_For_SearchId_ReportedPeptideId.CACHE_MAX_SIZE_FULL_SIZE;
 				if ( cachedDataSizeOptions == CachedDataSizeOptions.HALF ) {
 					cacheMaxSize = cacheMaxSize / 2;
 				} else if ( cachedDataSizeOptions == CachedDataSizeOptions.SMALL ) {
-					cacheMaxSize = parentObject.CACHE_MAX_SIZE_SMALL;
+					cacheMaxSize = Cached_Related_peptides_unique_for_search_For_SearchId_ReportedPeptideId.CACHE_MAX_SIZE_SMALL;
 					cacheTimeout = CACHE_TIMEOUT_SMALL;
 				}
 				
@@ -185,6 +185,7 @@ public class Cached_Related_peptides_unique_for_search_For_SearchId_ReportedPept
 						.maximumSize( cacheMaxSize )
 						.build(
 								new CacheLoader<Related_peptides_unique_for_search_For_SearchId_ReportedPeptideId_Request, Related_peptides_unique_for_search_For_SearchId_ReportedPeptideId_Result>() {
+									@Override
 									public Related_peptides_unique_for_search_For_SearchId_ReportedPeptideId_Result load(Related_peptides_unique_for_search_For_SearchId_ReportedPeptideId_Request related_peptides_unique_for_search_For_SearchId_ReportedPeptideId_Request) throws Exception {
 										
 										//   WARNING  cannot return null.  

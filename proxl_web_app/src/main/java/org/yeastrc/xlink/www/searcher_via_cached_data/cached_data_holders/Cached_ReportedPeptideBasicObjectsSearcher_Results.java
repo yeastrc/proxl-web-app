@@ -198,11 +198,11 @@ public class Cached_ReportedPeptideBasicObjectsSearcher_Results implements Cache
 
 				{	//  Create cache for Default cutoffs
 					int cacheTimeout = CACHE_TIMEOUT_FULL_SIZE_DEFAULT_CUTOFFS;
-					cacheMaxSizeDefaultCutoffs = parentObject.CACHE_MAX_SIZE_FULL_SIZE_DEFAULT_CUTOFFS;
+					cacheMaxSizeDefaultCutoffs = Cached_ReportedPeptideBasicObjectsSearcher_Results.CACHE_MAX_SIZE_FULL_SIZE_DEFAULT_CUTOFFS;
 					if ( cachedDataSizeOptions == CachedDataSizeOptions.HALF ) {
 						cacheMaxSizeDefaultCutoffs = cacheMaxSizeDefaultCutoffs / 2;
 					} else if ( cachedDataSizeOptions == CachedDataSizeOptions.SMALL ) {
-						cacheMaxSizeDefaultCutoffs = parentObject.CACHE_MAX_SIZE_SMALL;
+						cacheMaxSizeDefaultCutoffs = Cached_ReportedPeptideBasicObjectsSearcher_Results.CACHE_MAX_SIZE_SMALL;
 						cacheTimeout = CACHE_TIMEOUT_SMALL;
 					}
 
@@ -211,6 +211,7 @@ public class Cached_ReportedPeptideBasicObjectsSearcher_Results implements Cache
 							.maximumSize( cacheMaxSizeDefaultCutoffs )
 							.build(
 									new CacheLoader<ReportedPeptideBasicObjectsSearcherRequestParameters, ReportedPeptideBasicObjectsSearcherResult>() {
+										@Override
 										public ReportedPeptideBasicObjectsSearcherResult load(ReportedPeptideBasicObjectsSearcherRequestParameters reportedPeptideBasicObjectsSearcherRequestParameters) throws Exception {
 
 											//   WARNING  cannot return null.  
@@ -224,11 +225,11 @@ public class Cached_ReportedPeptideBasicObjectsSearcher_Results implements Cache
 				}
 				{	//  Create cache for NOT Default cutoffs
 					int cacheTimeout = CACHE_TIMEOUT_FULL_SIZE__NOT__DEFAULT_CUTOFFS;
-					cacheMaxSize_NOT_DefaultCutoffs = parentObject.CACHE_MAX_SIZE_FULL_SIZE__NOT__DEFAULT_CUTOFFS;
+					cacheMaxSize_NOT_DefaultCutoffs = Cached_ReportedPeptideBasicObjectsSearcher_Results.CACHE_MAX_SIZE_FULL_SIZE__NOT__DEFAULT_CUTOFFS;
 					if ( cachedDataSizeOptions == CachedDataSizeOptions.HALF ) {
 						cacheMaxSize_NOT_DefaultCutoffs = cacheMaxSize_NOT_DefaultCutoffs / 2;
 					} else if ( cachedDataSizeOptions == CachedDataSizeOptions.SMALL ) {
-						cacheMaxSize_NOT_DefaultCutoffs = parentObject.CACHE_MAX_SIZE_SMALL;
+						cacheMaxSize_NOT_DefaultCutoffs = Cached_ReportedPeptideBasicObjectsSearcher_Results.CACHE_MAX_SIZE_SMALL;
 						cacheTimeout = CACHE_TIMEOUT_SMALL;
 					}
 
@@ -237,6 +238,7 @@ public class Cached_ReportedPeptideBasicObjectsSearcher_Results implements Cache
 							.maximumSize( cacheMaxSize_NOT_DefaultCutoffs )
 							.build(
 									new CacheLoader<ReportedPeptideBasicObjectsSearcherRequestParameters, ReportedPeptideBasicObjectsSearcherResult>() {
+										@Override
 										public ReportedPeptideBasicObjectsSearcherResult load(ReportedPeptideBasicObjectsSearcherRequestParameters reportedPeptideBasicObjectsSearcherRequestParameters) throws Exception {
 
 											//   WARNING  cannot return null.  

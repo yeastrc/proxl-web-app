@@ -30,24 +30,28 @@ public class SrchRepPeptProtSeqIdPosUnlinkedDTO implements SrchRepPeptProtSeqIdP
 	public void setId(int id) {
 		this.id = id;
 	}
+	@Override
 	public int getSearchId() {
 		return searchId;
 	}
 	public void setSearchId(int searchId) {
 		this.searchId = searchId;
 	}
+	@Override
 	public int getReportedPeptideId() {
 		return reportedPeptideId;
 	}
 	public void setReportedPeptideId(int reportedPeptideId) {
 		this.reportedPeptideId = reportedPeptideId;
 	}
+	@Override
 	public int getSearchReportedPeptidepeptideId() {
 		return searchReportedPeptidepeptideId;
 	}
 	public void setSearchReportedPeptidepeptideId(int searchReportedPeptidepeptideId) {
 		this.searchReportedPeptidepeptideId = searchReportedPeptidepeptideId;
 	}
+	@Override
 	public int getProteinSequenceVersionId() {
 		return proteinSequenceVersionId;
 	}

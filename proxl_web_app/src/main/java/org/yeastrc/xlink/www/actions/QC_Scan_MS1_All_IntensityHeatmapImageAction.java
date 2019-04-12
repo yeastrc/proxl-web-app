@@ -18,14 +18,14 @@ import org.apache.struts.action.ActionMapping;
 import org.yeastrc.xlink.www.constants.StrutsGlobalForwardNames;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
-import org.yeastrc.xlink.www.objects.AuthAccessLevel;
+import org.yeastrc.xlink.www.access_control.result_objects.WebSessionAuthAccessLevel;
 import org.yeastrc.xlink.www.project_search__search__mapping.MapProjectSearchIdToSearchId;
 import org.yeastrc.xlink.www.qc_data.scan_ms1_all_scan_intensity_heatmap.main.MS1_All_IntensityHeatmapImage;
 import org.yeastrc.xlink.www.qc_data.scan_ms1_all_scan_intensity_heatmap.main.MS1_All_IntensityHeatmapImage.MS1_All_IntensityHeatmapImageResult;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
 import org.yeastrc.xlink.www.searcher.SearchIdScanFileIdCombinedRecordExistsSearcher;
-import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
-import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
+import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result;
+import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId;
 
 /**
  * MS1 All scans Intensity Heatmap Image
@@ -38,6 +38,7 @@ public class QC_Scan_MS1_All_IntensityHeatmapImageAction extends Action {
 
 	private static final Logger log = LoggerFactory.getLogger( QC_Scan_MS1_All_IntensityHeatmapImageAction.class);
 
+	@Override
 	public ActionForward execute( ActionMapping mapping,
 			ActionForm actionForm,
 			HttpServletRequest request,
@@ -145,9 +146,9 @@ public class QC_Scan_MS1_All_IntensityHeatmapImageAction extends Action {
 				}
 			}
 			int projectId = projectIdsFromSearchIds.get( 0 );
-			AccessAndSetupWebSessionResult accessAndSetupWebSessionResult =
-					GetAccessAndSetupWebSession.getInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request );
-			//			UserSessionObject userSessionObject = accessAndSetupWebSessionResult.getUserSessionObject();
+			GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result accessAndSetupWebSessionResult =
+					GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.getSinglesonInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request );
+			//			UserSession userSession = accessAndSetupWebSessionResult.getUserSession();
 			if ( accessAndSetupWebSessionResult.isNoSession() ) {
 				//  No User session 
 				if ( requestedImageWidthProvided ) {
@@ -160,7 +161,7 @@ public class QC_Scan_MS1_All_IntensityHeatmapImageAction extends Action {
 				}
 			}
 			//  Test access to the project id
-			AuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getAuthAccessLevel();
+			WebSessionAuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getWebSessionAuthAccessLevel();
 			//  Test access to the project id
 			if ( ! authAccessLevel.isPublicAccessCodeReadAllowed() ) {
 				//  No Access Allowed for this project id

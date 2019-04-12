@@ -21,6 +21,7 @@ public class TermsOfServicePageAction extends Action {
 	
 	private static final Logger log = LoggerFactory.getLogger( TermsOfServicePageAction.class);
 	
+	@Override
 	public ActionForward execute( ActionMapping mapping,
 			  ActionForm form,
 			  HttpServletRequest request,

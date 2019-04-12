@@ -595,7 +595,8 @@ public class ProteinsAllMergedCommonPageDownload {
      *
      */
     public class SortSearchProtein implements Comparator<SearchProtein> {
-        public int compare(SearchProtein o1, SearchProtein o2) {
+        @Override
+		public int compare(SearchProtein o1, SearchProtein o2) {
             try { return o1.getName().toLowerCase().compareTo(o2.getName().toLowerCase()); }
             catch( Exception e ) { return 0; }
         }
@@ -679,6 +680,7 @@ public class ProteinsAllMergedCommonPageDownload {
 		public void setProteinMapOnSearchId(Map<Integer, ProteinSingleEntry> proteinMapOnSearchId) {
 			this.proteinMapOnSearchId = proteinMapOnSearchId;
 		}
+		@Override
 		public List<SearchDTO> getSearches() {
 			return searches;
 		}

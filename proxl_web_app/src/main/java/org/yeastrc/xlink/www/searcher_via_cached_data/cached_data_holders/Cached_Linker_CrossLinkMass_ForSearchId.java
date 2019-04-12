@@ -173,11 +173,11 @@ public class Cached_Linker_CrossLinkMass_ForSearchId implements CachedDataCommon
 				}
 				
 				int cacheTimeout = CACHE_TIMEOUT_FULL_SIZE;
-				cacheMaxSize = parentObject.CACHE_MAX_SIZE_FULL_SIZE;
+				cacheMaxSize = Cached_Linker_CrossLinkMass_ForSearchId.CACHE_MAX_SIZE_FULL_SIZE;
 				if ( cachedDataSizeOptions == CachedDataSizeOptions.HALF ) {
 					cacheMaxSize = cacheMaxSize / 2;
 				} else if ( cachedDataSizeOptions == CachedDataSizeOptions.SMALL ) {
-					cacheMaxSize = parentObject.CACHE_MAX_SIZE_SMALL;
+					cacheMaxSize = Cached_Linker_CrossLinkMass_ForSearchId.CACHE_MAX_SIZE_SMALL;
 					cacheTimeout = CACHE_TIMEOUT_SMALL;
 				}
 				
@@ -186,6 +186,7 @@ public class Cached_Linker_CrossLinkMass_ForSearchId implements CachedDataCommon
 						.maximumSize( cacheMaxSize )
 						.build(
 								new CacheLoader<Integer, Linker_CrosslinkMass_ForSearchId_Response>() {
+									@Override
 									public Linker_CrosslinkMass_ForSearchId_Response load(Integer searchId) throws Exception {
 										
 										//   WARNING  cannot return null.  

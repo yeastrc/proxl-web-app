@@ -175,11 +175,11 @@ public class Cached_LooplinkProteinPositionsFor_LooplinkPeptide implements Cache
 				}
 				
 				int cacheTimeout = CACHE_TIMEOUT_FULL_SIZE;
-				cacheMaxSize = parentObject.CACHE_MAX_SIZE_FULL_SIZE;
+				cacheMaxSize = Cached_LooplinkProteinPositionsFor_LooplinkPeptide.CACHE_MAX_SIZE_FULL_SIZE;
 				if ( cachedDataSizeOptions == CachedDataSizeOptions.HALF ) {
 					cacheMaxSize = cacheMaxSize / 2;
 				} else if ( cachedDataSizeOptions == CachedDataSizeOptions.SMALL ) {
-					cacheMaxSize = parentObject.CACHE_MAX_SIZE_SMALL;
+					cacheMaxSize = Cached_LooplinkProteinPositionsFor_LooplinkPeptide.CACHE_MAX_SIZE_SMALL;
 					cacheTimeout = CACHE_TIMEOUT_SMALL;
 				}
 				
@@ -188,6 +188,7 @@ public class Cached_LooplinkProteinPositionsFor_LooplinkPeptide implements Cache
 						.maximumSize( cacheMaxSize )
 						.build(
 								new CacheLoader<LooplinkProteinPositionsFor_LooplinkPeptide_Request, LooplinkProteinPositionsFor_LooplinkPeptide_Result>() {
+									@Override
 									public LooplinkProteinPositionsFor_LooplinkPeptide_Result load(LooplinkProteinPositionsFor_LooplinkPeptide_Request looplinkProteinPositionsFor_LooplinkPeptide_Request) throws Exception {
 										
 										//   WARNING  cannot return null.  

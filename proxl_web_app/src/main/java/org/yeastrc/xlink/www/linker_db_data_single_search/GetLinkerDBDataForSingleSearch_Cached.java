@@ -213,12 +213,12 @@ public class GetLinkerDBDataForSingleSearch_Cached implements CachedDataCommonIF
 //				}
 				
 				int cacheTimeout = CACHE_TIMEOUT_FULL_SIZE;
-				cacheMaxSize = parentObject.CACHE_MAX_SIZE_FULL_SIZE;
+				cacheMaxSize = GetLinkerDBDataForSingleSearch_Cached.CACHE_MAX_SIZE_FULL_SIZE;
 				if ( cachedDataSizeOptions == CachedDataSizeOptions.HALF ) {
 					cacheMaxSize = cacheMaxSize / 2;
 				} else if ( cachedDataSizeOptions == CachedDataSizeOptions.SMALL
 						|| cachedDataSizeOptions == CachedDataSizeOptions.FEW ) {
-					cacheMaxSize = parentObject.CACHE_MAX_SIZE_SMALL_FEW;
+					cacheMaxSize = GetLinkerDBDataForSingleSearch_Cached.CACHE_MAX_SIZE_SMALL_FEW;
 					cacheTimeout = CACHE_TIMEOUT_SMALL;
 				}
 				
@@ -227,6 +227,7 @@ public class GetLinkerDBDataForSingleSearch_Cached implements CachedDataCommonIF
 						.maximumSize( cacheMaxSize )
 						.build(
 								new CacheLoader<LocalCacheKey, LocalCacheValue>() {
+									@Override
 									public LocalCacheValue load( LocalCacheKey LocalCacheKey ) throws Exception {
 										
 										//   WARNING  cannot return null.  

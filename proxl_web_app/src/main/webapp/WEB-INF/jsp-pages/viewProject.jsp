@@ -43,17 +43,6 @@
 		<!-- use minimized version  -->
 		<script type="text/javascript" src="js/libs/handlebars-v2.0.0.min.js"></script>
 		
-			
-<%--  Moved to Front End Build Bundles
-		
-		<script type="text/javascript" src="js/viewProjectPage.js?x=${cacheBustValue}"></script> 
-
-		<script type="text/javascript" src="js/handleServicesAJAXErrors.js?x=${cacheBustValue}"></script> 
-		
-		<script type="text/javascript" src="js/spinner.js"></script>
-				
- --%>
- 
  
 	<%-- Choose which Javascript bundle to load, based on user type --%>
 <c:choose>
@@ -910,7 +899,7 @@
 				</c:if>
 				
 				 <td nowrap>
-				 	<span class="current_user_entry_name_jq">{{xLinkUserDTO.firstName}} {{xLinkUserDTO.lastName}}</span>
+				 	<span class="current_user_entry_name_jq">{{ firstName }} {{ lastName }}</span>
 				 </td>
 				 
 				 <td nowrap style="padding-left: 5px; padding-right: 5px;">

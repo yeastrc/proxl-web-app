@@ -27,7 +27,7 @@ import org.yeastrc.xlink.www.dao.SearchDAO;
 import org.yeastrc.xlink.www.objects.ProteinSequenceVersionObject;
 import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesRootLevel;
-import org.yeastrc.xlink.www.objects.AuthAccessLevel;
+import org.yeastrc.xlink.www.access_control.result_objects.WebSessionAuthAccessLevel;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
@@ -38,8 +38,8 @@ import org.yeastrc.xlink.www.objects.SequenceCoverageData;
 import org.yeastrc.xlink.www.objects.SequenceCoverageRange;
 import org.yeastrc.xlink.www.protein_coverage.ProteinSequenceCoverage;
 import org.yeastrc.xlink.www.protein_coverage.ProteinSequenceCoverageFactory;
-import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
-import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
+import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result;
+import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId;
 import org.yeastrc.xlink.www.webservices_cache_response.ViewerSequenceCoverageService_Results_CachedResultManager;
 import org.yeastrc.xlink.www.webservices_cache_response.ViewerSequenceCoverageService_Results_CachedResultManager.ViewerSequenceCoverageService_Results_CachedResultManager_Result;
 
@@ -100,8 +100,6 @@ public class ViewerSequenceCoverageService {
 					);
 		}
 		try {
-			// Get the session first.  
-//			HttpSession session = request.getSession();
 			//   Get the project id for this search
 			Set<Integer> projectSearchIdsSet = new HashSet<Integer>( );
 			projectSearchIdsSet.addAll( projectSearchIdList );
@@ -128,9 +126,9 @@ public class ViewerSequenceCoverageService {
 						);
 			}
 			int projectId = projectIdsFromSearchIds.get( 0 );
-			AccessAndSetupWebSessionResult accessAndSetupWebSessionResult =
-					GetAccessAndSetupWebSession.getInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request );
-//			UserSessionObject userSessionObject = accessAndSetupWebSessionResult.getUserSessionObject();
+			GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result accessAndSetupWebSessionResult =
+					GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.getSinglesonInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request );
+//			UserSession userSession = accessAndSetupWebSessionResult.getUserSession();
 			if ( accessAndSetupWebSessionResult.isNoSession() ) {
 				//  No User session 
 				throw new WebApplicationException(
@@ -140,7 +138,7 @@ public class ViewerSequenceCoverageService {
 						);
 			}
 			//  Test access to the project id
-			AuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getAuthAccessLevel();
+			WebSessionAuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getWebSessionAuthAccessLevel();
 			//  Test access to the project id
 			if ( ! authAccessLevel.isPublicAccessCodeReadAllowed() ) {
 				//  No Access Allowed for this project id

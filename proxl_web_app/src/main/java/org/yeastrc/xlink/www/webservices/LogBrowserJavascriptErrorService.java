@@ -1,7 +1,6 @@
 package org.yeastrc.xlink.www.webservices;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -12,10 +11,9 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
-import org.yeastrc.auth.dto.AuthUserDTO;
-import org.yeastrc.xlink.www.constants.WebConstants;
+import org.yeastrc.xlink.www.access_control.common.AccessControl_GetUserSession_RefreshAccessEnabled;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
-import org.yeastrc.xlink.www.user_account.UserSessionObject;
+import org.yeastrc.xlink.www.user_session_management.UserSession;
 
 
 /**
@@ -73,28 +71,19 @@ public class LogBrowserJavascriptErrorService {
 	/**
 	 * @param httpRequest
 	 * @return - null if no username
+	 * @throws Exception 
 	 */
-	private String getUsername( HttpServletRequest httpRequest ) {
-	
-		HttpSession session = httpRequest.getSession();
-		UserSessionObject userSessionObject = (UserSessionObject) session.getAttribute( WebConstants.SESSION_CONTEXT_USER_LOGGED_IN );
-		if ( userSessionObject == null ) {
+	private String getUsername( HttpServletRequest httpRequest ) throws Exception {
+
+		UserSession userSession =
+				AccessControl_GetUserSession_RefreshAccessEnabled.getSinglesonInstance()
+				.getUserSession_RefreshAccessEnabled( httpRequest );
+		
+		if ( userSession == null ) {
 			//  No User session 
 			return null;
 		}
-		if ( userSessionObject.getUserDBObject() != null && userSessionObject.getUserDBObject().getAuthUser() != null  ) {
-			//  have a logged in user
-			AuthUserDTO authUser = null;
-			if ( userSessionObject.getUserDBObject() != null && userSessionObject.getUserDBObject().getAuthUser() != null ) {
-				authUser = userSessionObject.getUserDBObject().getAuthUser();
-				if ( authUser != null ) {
-					return authUser.getUsername();
-				}
-			}
-		}
-		
-		//  No User session 
-		return null;
+		return userSession.getUsername();
 	}
 	
 	public static class LogBrowserJavascriptErrorsRequest {

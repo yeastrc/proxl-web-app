@@ -32,7 +32,7 @@ import org.yeastrc.xlink.dto.SearchScanFilenameDTO;
 import org.yeastrc.xlink.dto.SrchRepPeptPeptDynamicModDTO;
 import org.yeastrc.xlink.enum_classes.FilterableDescriptiveAnnotationType;
 import org.yeastrc.xlink.enum_classes.PsmPeptideAnnotationType;
-import org.yeastrc.xlink.www.objects.AuthAccessLevel;
+import org.yeastrc.xlink.www.access_control.result_objects.WebSessionAuthAccessLevel;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
 import org.yeastrc.xlink.www.searcher.PsmPerPeptideAnnotationDataSearcher;
 import org.yeastrc.xlink.www.searcher.SrchRepPeptPeptDynamicModSearcher;
@@ -48,8 +48,8 @@ import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.www.dto.SrchRepPeptPeptideDTO;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappInternalErrorException;
-import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
-import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
+import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result;
+import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId;
 import org.yeastrc.xlink.www.web_utils.RetentionTimeScalingAndRounding;
 
 
@@ -87,8 +87,6 @@ public class PsmPerPeptideService {
 		}
 
 		try {
-			// Get the session first.  
-			//			HttpSession session = request.getSession();
 			//   Get the project id for this search
 			Collection<Integer> projectSearchIdsCollection = new HashSet<Integer>( );
 			projectSearchIdsCollection.add( projectSearchId );
@@ -113,9 +111,9 @@ public class PsmPerPeptideService {
 						);
 			}
 			int projectId = projectIdsFromSearchIds.get( 0 );
-			AccessAndSetupWebSessionResult accessAndSetupWebSessionResult =
-					GetAccessAndSetupWebSession.getInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request );
-			//			UserSessionObject userSessionObject = accessAndSetupWebSessionResult.getUserSessionObject();
+			GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result accessAndSetupWebSessionResult =
+					GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.getSinglesonInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request );
+			//			UserSession userSession = accessAndSetupWebSessionResult.getUserSession();
 			if ( accessAndSetupWebSessionResult.isNoSession() ) {
 				//  No User session 
 				throw new WebApplicationException(
@@ -125,7 +123,7 @@ public class PsmPerPeptideService {
 						);
 			}
 			//  Test access to the project id
-			AuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getAuthAccessLevel();
+			WebSessionAuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getWebSessionAuthAccessLevel();
 			//  Test access to the project id
 			if ( ! authAccessLevel.isPublicAccessCodeReadAllowed() ) {
 				//  No Access Allowed for this project id

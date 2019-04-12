@@ -1,7 +1,6 @@
 package org.yeastrc.xlink.www.user_account_webservices;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -11,8 +10,8 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
-import org.yeastrc.xlink.www.constants.WebConstants;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
+import org.yeastrc.xlink.www.user_session_management.UserSessionManager;
 
 @Path("/user")
 public class LogoutService {
@@ -29,10 +28,7 @@ public class LogoutService {
 //		if (true)
 //		throw new Exception("Forced Error");
 		try {
-			// Get their session first.  
-			HttpSession session = request.getSession();
-			session.removeAttribute( WebConstants.SESSION_CONTEXT_USER_LOGGED_IN );
-			session.invalidate();
+			UserSessionManager.getSinglesonInstance().invalidateUserSession(request);
 		} catch ( WebApplicationException e ) {
 			throw e;
 		} catch ( Exception e ) {

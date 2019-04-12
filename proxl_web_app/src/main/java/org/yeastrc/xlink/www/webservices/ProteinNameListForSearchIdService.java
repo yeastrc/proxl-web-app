@@ -17,14 +17,14 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
-import org.yeastrc.xlink.www.objects.AuthAccessLevel;
+import org.yeastrc.xlink.www.access_control.result_objects.WebSessionAuthAccessLevel;
 import org.yeastrc.xlink.www.objects.ProteinSequenceVersionIdProteinAnnotationName;
 import org.yeastrc.xlink.www.project_search__search__mapping.MapProjectSearchIdToSearchId;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
 import org.yeastrc.xlink.www.searcher.ProteinSequenceVersionIdAnnotationNameSearcher;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
-import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
-import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
+import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result;
+import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId;
 import org.yeastrc.xlink.www.web_utils.CombineProteinAnnNamesForSameSeqVId;
 import org.yeastrc.xlink.www.web_utils.UnmarshalJSON_ToObject;
 
@@ -90,8 +90,6 @@ public class ProteinNameListForSearchIdService {
 		Integer projectSearchId = webserviceRequest.projectSearchId;
 		
 		try {
-			// Get the session first.  
-//			HttpSession session = request.getSession();
 			//   Get the project id for this search
 			Collection<Integer> projectSearchIdsCollection = new HashSet<Integer>( );
 			projectSearchIdsCollection.add( projectSearchId );
@@ -115,9 +113,9 @@ public class ProteinNameListForSearchIdService {
 						);
 			}
 			int projectId = projectIdsFromSearchIds.get( 0 );
-			AccessAndSetupWebSessionResult accessAndSetupWebSessionResult =
-					GetAccessAndSetupWebSession.getInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request );
-//			UserSessionObject userSessionObject = accessAndSetupWebSessionResult.getUserSessionObject();
+			GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result accessAndSetupWebSessionResult =
+					GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.getSinglesonInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request );
+//			UserSession userSession = accessAndSetupWebSessionResult.getUserSession();
 			if ( accessAndSetupWebSessionResult.isNoSession() ) {
 				//  No User session 
 				throw new WebApplicationException(
@@ -127,7 +125,7 @@ public class ProteinNameListForSearchIdService {
 						);
 			}
 			//  Test access to the project id
-			AuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getAuthAccessLevel();
+			WebSessionAuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getWebSessionAuthAccessLevel();
 			if ( ! authAccessLevel.isPublicAccessCodeReadAllowed() ) {
 				//  No Access Allowed for this project id
 				throw new WebApplicationException(

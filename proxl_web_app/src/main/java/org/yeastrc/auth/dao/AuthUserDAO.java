@@ -3,6 +3,7 @@ package org.yeastrc.auth.dao;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.auth.db.AuthLibraryDBConnectionFactory;
@@ -54,6 +55,51 @@ public class AuthUserDAO implements Runnable {
 		}
 	}
 
+	/**
+	 * @param id
+	 * @return null if not found
+	 * @throws Exception 
+	 */
+	public AuthUserDTO getForId( int id ) throws Exception {
+		
+		AuthUserDTO result = null;
+
+		final String querySQL = "SELECT user_mgmt_user_id, user_access_level, enabled_app_specific FROM auth_user WHERE id = ?";
+		
+		try ( Connection dbConnection = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
+			     PreparedStatement preparedStatement = dbConnection.prepareStatement( querySQL ) ) {
+			
+			preparedStatement.setInt( 1, id );
+			
+			try ( ResultSet rs = preparedStatement.executeQuery() ) {
+				if ( rs.next() ) {
+					result = new AuthUserDTO();
+					result.setId( id );
+					result.setUserMgmtUserId( rs.getInt( "user_mgmt_user_id" ) );
+					int userAccessLevel = rs.getInt( "user_access_level" );
+					if ( ! rs.wasNull() ) {
+						result.setUserAccessLevel( userAccessLevel );
+					}
+					int enabledInt = rs.getInt( "enabled_app_specific" );
+					if ( enabledInt == Database_OneTrueZeroFalse_Constants.DATABASE_FIELD_TRUE ) {
+						result.setEnabledAppSpecific( true );
+					} else {
+						result.setEnabledAppSpecific( false );
+					}
+				}
+			}
+		} catch ( RuntimeException e ) {
+			String msg = "SQL: " + querySQL;
+			log.error( msg, e );
+			throw e;
+		} catch ( SQLException e ) {
+			String msg = "SQL: " + querySQL;
+			log.error( msg, e );
+			throw e;
+		}
+		
+		return result;
+	}
 	/**
 	 * @param id
 	 * @return

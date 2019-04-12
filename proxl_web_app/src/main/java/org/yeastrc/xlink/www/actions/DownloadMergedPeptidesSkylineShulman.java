@@ -46,15 +46,15 @@ import org.yeastrc.xlink.www.form_query_json_objects.MergedPeptideQueryJSONRoot;
 import org.yeastrc.xlink.www.forms.MergedSearchViewPeptidesForm;
 import org.yeastrc.xlink.www.linkable_positions.ILinker_Main_Objects_ForSearchId_Cached;
 import org.yeastrc.xlink.www.linkable_positions.ILinker_Main_Objects_ForSearchId_Cached.ILinker_Main_Objects_ForSearchId_Cached_Response;
-import org.yeastrc.xlink.www.objects.AuthAccessLevel;
+import org.yeastrc.xlink.www.access_control.result_objects.WebSessionAuthAccessLevel;
 import org.yeastrc.xlink.www.objects.PsmWebDisplayWebServiceResult;
 import org.yeastrc.xlink.www.objects.WebMergedProteinPosition;
 import org.yeastrc.xlink.www.objects.WebMergedReportedPeptide;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
 import org.yeastrc.xlink.www.searcher.PsmWebDisplaySearcher;
 import org.yeastrc.xlink.www.searcher.ReportedPeptideIdsForSearchIdsUnifiedPeptideIdSearcher;
-import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
-import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
+import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result;
+import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId;
 import org.yeastrc.xlink.www.web_utils.SearchLinkerAndLinkerAbbreviationForLinkerMass_SingleSearch_Util;
 import org.yeastrc.xlink.www.web_utils.SearchLinkerAndLinkerAbbreviationForLinkerMass_SingleSearch_Util.SearchLinkerAndLinkerAbbreviationForLinkerMass_SingleSearch_Util_Response;
 
@@ -69,6 +69,7 @@ public class DownloadMergedPeptidesSkylineShulman extends Action {
 	/* (non-Javadoc)
 	 * @see org.apache.struts.action.Action#execute(org.apache.struts.action.ActionMapping, org.apache.struts.action.ActionForm, javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
 	 */
+	@Override
 	public ActionForward execute( ActionMapping mapping,
 			  ActionForm actionForm,
 			  HttpServletRequest request,
@@ -80,8 +81,6 @@ public class DownloadMergedPeptidesSkylineShulman extends Action {
 			// our form
 			MergedSearchViewPeptidesForm form = (MergedSearchViewPeptidesForm)actionForm;
 			request.setAttribute( "mergedSearchViewCrosslinkPeptideForm", form );
-			// Get the session first.  
-//			HttpSession session = request.getSession();
 			int[] projectSearchIds = form.getProjectSearchId();
 			if ( projectSearchIds.length == 0 ) {
 				return mapping.findForward( StrutsGlobalForwardNames.INVALID_REQUEST_DATA );
@@ -110,14 +109,14 @@ public class DownloadMergedPeptidesSkylineShulman extends Action {
 			int projectId = projectIdsFromSearchIds.get( 0 );
 			request.setAttribute( "projectId", projectId ); 
 			///////////////////////
-			AccessAndSetupWebSessionResult accessAndSetupWebSessionResult =
-					GetAccessAndSetupWebSession.getInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request );
+			GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result accessAndSetupWebSessionResult =
+					GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.getSinglesonInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request );
 			if ( accessAndSetupWebSessionResult.isNoSession() ) {
 				//  No User session 
 				return mapping.findForward( StrutsGlobalForwardNames.NO_USER_SESSION );
 			}
 			//  Test access to the project id
-			AuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getAuthAccessLevel();
+			WebSessionAuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getWebSessionAuthAccessLevel();
 			if ( ! authAccessLevel.isPublicAccessCodeReadAllowed() ) {
 				//  No Access Allowed for this project id
 				return mapping.findForward( StrutsGlobalForwardNames.INSUFFICIENT_ACCESS_PRIVILEGE );

@@ -191,7 +191,7 @@ public class PSMMassCalculator {
 				double staticMass = staticMod.getMass().doubleValue();
 				int count = getNumberOfTimesResidueOccurs( staticMod.getResidue(), peptide.getSequence() );
 				
-				mass += staticMass * (double)count;
+				mass += staticMass * count;
 			}
 		}
 		

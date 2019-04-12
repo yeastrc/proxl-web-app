@@ -10,10 +10,10 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.yeastrc.xlink.www.config_system_table.ConfigSystemCaching;
 import org.yeastrc.xlink.www.constants.StrutsGlobalForwardNames;
-import org.yeastrc.xlink.www.objects.AuthAccessLevel;
-import org.yeastrc.xlink.www.user_account.UserSessionObject;
-import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
-import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
+import org.yeastrc.xlink.www.access_control.result_objects.WebSessionAuthAccessLevel;
+import org.yeastrc.xlink.www.user_session_management.UserSession;
+import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result;
+import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId;
 import org.yeastrc.xlink.www.web_utils.TestIsUserSignedIn;
 
 /**
@@ -24,27 +24,28 @@ public class CacheDataClearConfigDataAction extends Action {
 
 	private static final Logger log = LoggerFactory.getLogger( CacheDataClearConfigDataAction.class );
 	
+	@Override
 	public ActionForward execute( ActionMapping mapping,
 			  ActionForm form,
 			  HttpServletRequest request,
 			  HttpServletResponse response )
 					  throws Exception {
 				
-		AccessAndSetupWebSessionResult accessAndSetupWebSessionResult =
-				GetAccessAndSetupWebSession.getInstance().getAccessAndSetupWebSessionNoProjectId( request, response );
+		GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result accessAndSetupWebSessionResult =
+				GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.getSinglesonInstance().getAccessAndSetupWebSessionNoProjectId( request, response );
 
 		if ( accessAndSetupWebSessionResult.isNoSession() ) {
 			//  No User session 
 			response.setStatus( 401 );
 			return mapping.findForward( StrutsGlobalForwardNames.NO_USER_SESSION );
 		}
-		UserSessionObject userSessionObject = accessAndSetupWebSessionResult.getUserSessionObject();
-		if ( ! TestIsUserSignedIn.getInstance().testIsUserSignedIn( userSessionObject ) ) {
+		UserSession userSession = accessAndSetupWebSessionResult.getUserSession();
+		if ( ! TestIsUserSignedIn.getInstance().testIsUserSignedIn( userSession ) ) {
 			//  No User session 
 			response.setStatus( 401 );
 			return mapping.findForward( StrutsGlobalForwardNames.NO_USER_SESSION );
 		}
-		AuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getAuthAccessLevel();
+		WebSessionAuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getWebSessionAuthAccessLevel();
 		if ( authAccessLevel == null || ( ! authAccessLevel.isAdminAllowed() ) ) {
 			response.setStatus( 403 );
 			return mapping.findForward( StrutsGlobalForwardNames.INSUFFICIENT_ACCESS_PRIVILEGE );

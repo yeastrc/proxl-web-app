@@ -17,6 +17,7 @@ public class WebMergedProteinPosition {
 	
 	
 	
+	@Override
 	public String toString() {
 		
 		if ( protein == null ) {

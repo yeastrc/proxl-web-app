@@ -471,6 +471,7 @@ public class WebMergedReportedPeptide implements IMergedSearchLink {
 
 
 
+	@Override
 	public Collection<SearchDTO> getSearches() {
 		return searches;
 	}

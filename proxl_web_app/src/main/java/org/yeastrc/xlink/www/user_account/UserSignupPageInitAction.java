@@ -25,6 +25,7 @@ public class UserSignupPageInitAction  extends Action {
 	
 	private static final Logger log = LoggerFactory.getLogger( UserSignupPageInitAction.class);
 
+	@Override
 	public ActionForward execute( ActionMapping mapping,
 			  ActionForm actionForm,
 			  HttpServletRequest request,

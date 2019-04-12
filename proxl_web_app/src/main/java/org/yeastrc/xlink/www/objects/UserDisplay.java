@@ -1,6 +1,6 @@
 package org.yeastrc.xlink.www.objects;
 
-import org.yeastrc.xlink.www.dto.XLinkUserDTO;
+
 
 
 /**
@@ -16,9 +16,8 @@ public class UserDisplay {
 	private String userAccessDescription;
 	private int userAccessLevelId;
 
-	private XLinkUserDTO xLinkUserDTO;
-
-	
+	private String firstName;
+	private String lastName;
 
 	public int getUserAccessLevelId() {
 		return userAccessLevelId;
@@ -56,13 +55,20 @@ public class UserDisplay {
 		this.userId = userId;
 	}
 
-
-	public XLinkUserDTO getxLinkUserDTO() {
-		return xLinkUserDTO;
+	public String getLastName() {
+		return lastName;
 	}
 
-	public void setxLinkUserDTO(XLinkUserDTO xLinkUserDTO) {
-		this.xLinkUserDTO = xLinkUserDTO;
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
+	}
+
+	public String getFirstName() {
+		return firstName;
+	}
+
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
 	}
 }
 

@@ -23,14 +23,14 @@ import org.yeastrc.xlink.www.dao.ConfigSystemDAO;
 import org.yeastrc.xlink.www.form_query_json_objects.CutoffValuesRootLevel;
 import org.yeastrc.xlink.www.forms.MergedSearchViewProteinsForm;
 import org.yeastrc.xlink.www.forms.PeptideProteinCommonForm;
-import org.yeastrc.xlink.www.objects.AuthAccessLevel;
+import org.yeastrc.xlink.www.access_control.result_objects.WebSessionAuthAccessLevel;
 import org.yeastrc.xlink.www.constants.ConfigSystemsKeysConstants;
 import org.yeastrc.xlink.www.constants.StrutsGlobalForwardNames;
 import org.yeastrc.xlink.www.constants.WebConstants;
 import org.yeastrc.xlink.www.cutoff_processing_web.GetDefaultPsmPeptideCutoffs;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
-import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
-import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
+import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result;
+import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId;
 import org.yeastrc.xlink.www.web_utils.AnyPDBFilesForProjectId;
 import org.yeastrc.xlink.www.web_utils.ExcludeLinksWith_Remove_NonUniquePSMs_Checkbox_PopRequestItems;
 import org.yeastrc.xlink.www.web_utils.GetAnnotationDisplayUserSelectionDetailsData;
@@ -48,14 +48,13 @@ public class ViewMergedSearchImageAction extends Action {
 	
 	private static final Logger log = LoggerFactory.getLogger( ViewMergedSearchImageAction.class);
 	
+	@Override
 	public ActionForward execute( ActionMapping mapping,
 			  ActionForm actionForm,
 			  HttpServletRequest request,
 			  HttpServletResponse response ) throws Exception {
 		try {
 			MergedSearchViewProteinsForm form = (MergedSearchViewProteinsForm) actionForm;
-			// Get the session first.  
-//			HttpSession session = request.getSession();
 			int[] projectSearchIdsFromForm = form.getProjectSearchId();
 			if ( projectSearchIdsFromForm.length == 0 ) {
 				return mapping.findForward( StrutsGlobalForwardNames.INVALID_REQUEST_DATA );
@@ -87,14 +86,14 @@ public class ViewMergedSearchImageAction extends Action {
 			request.setAttribute( "projectId", projectId ); 
 			request.setAttribute( "project_id", projectId );
 			///////////////////////
-			AccessAndSetupWebSessionResult accessAndSetupWebSessionResult =
-					GetAccessAndSetupWebSession.getInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request, response );
+			GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result accessAndSetupWebSessionResult =
+					GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.getSinglesonInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request, response );
 			if ( accessAndSetupWebSessionResult.isNoSession() ) {
 				//  No User session 
 				return mapping.findForward( StrutsGlobalForwardNames.NO_USER_SESSION );
 			}
 			//  Test access to the project id
-			AuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getAuthAccessLevel();
+			WebSessionAuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getWebSessionAuthAccessLevel();
 			if ( ! authAccessLevel.isPublicAccessCodeReadAllowed() ) {
 				//  No Access Allowed for this project id
 				return mapping.findForward( StrutsGlobalForwardNames.INSUFFICIENT_ACCESS_PRIVILEGE );

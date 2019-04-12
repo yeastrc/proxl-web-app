@@ -197,11 +197,11 @@ public class Cached_ProjectTblSubPartsForProjectLists implements CachedDataCommo
 				}
 				
 				int cacheTimeout = CACHE_TIMEOUT_FULL_SIZE;
-				cacheMaxSize = parentObject.CACHE_MAX_SIZE_FULL_SIZE;
+				cacheMaxSize = Cached_ProjectTblSubPartsForProjectLists.CACHE_MAX_SIZE_FULL_SIZE;
 				if ( cachedDataSizeOptions == CachedDataSizeOptions.HALF ) {
 					cacheMaxSize = cacheMaxSize / 2;
 				} else if ( cachedDataSizeOptions == CachedDataSizeOptions.SMALL ) {
-					cacheMaxSize = parentObject.CACHE_MAX_SIZE_SMALL;
+					cacheMaxSize = Cached_ProjectTblSubPartsForProjectLists.CACHE_MAX_SIZE_SMALL;
 					cacheTimeout = CACHE_TIMEOUT_SMALL;
 				}
 				
@@ -210,6 +210,7 @@ public class Cached_ProjectTblSubPartsForProjectLists implements CachedDataCommo
 						.maximumSize( cacheMaxSize )
 						.build(
 								new CacheLoader<Integer, ProjectTblSubPartsForProjectLists>() {
+									@Override
 									public ProjectTblSubPartsForProjectLists load(Integer projectId) throws Exception {
 										
 										//   WARNING  cannot return null.  

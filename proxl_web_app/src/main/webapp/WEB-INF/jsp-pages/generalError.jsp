@@ -19,8 +19,6 @@
 
 	<script type="text/javascript" src="static/js_generated_bundles/header_section_every_page/header_section_every_page-bundle.js?x=${ cacheBustValue }"></script>
 
-		<script type="text/javascript" src="js/viewProjectPage.js?x=${cacheBustValue}"></script> 
-
 </c:set>
 
 

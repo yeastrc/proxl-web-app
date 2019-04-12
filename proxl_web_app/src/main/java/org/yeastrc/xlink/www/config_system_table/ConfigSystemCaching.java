@@ -65,6 +65,7 @@ public class ConfigSystemCaching implements IConfigSystemTableGetValue, CachedDa
 	 * @return null if not found
 	 * @throws Exception
 	 */
+	@Override
 	public String getConfigValueForConfigKey( String configKey ) throws Exception {
 		try {
 			LocalCacheKey localCacheKey = new LocalCacheKey();
@@ -87,7 +88,8 @@ public class ConfigSystemCaching implements IConfigSystemTableGetValue, CachedDa
 			    .maximumSize( CACHE_MAX_SIZE )
 			    .build(
 			    		new CacheLoader<LocalCacheKey, LocalCacheValue>() {
-			    			public LocalCacheValue load(LocalCacheKey localCacheKey) throws Exception {
+			    			@Override
+							public LocalCacheValue load(LocalCacheKey localCacheKey) throws Exception {
 			    				//   WARNING  cannot return null.  
 			    				//   If would return null, throw ProxlWebappDataNotFoundException and catch at the .get(...)
 			    				//  value is NOT in cache so get it and return it

@@ -135,11 +135,13 @@ public class PsmWebDisplayWebServiceResult extends SortDisplayRecordsWrapperBase
 	
 	
 
+	@Override
 	public List<String> getPsmAnnotationValueList() {
 		return psmAnnotationValueList;
 	}
 
 
+	@Override
 	public void setPsmAnnotationValueList(List<String> psmAnnotationValueList) {
 		this.psmAnnotationValueList = psmAnnotationValueList;
 	}

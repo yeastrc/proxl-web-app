@@ -2,7 +2,6 @@ package org.yeastrc.xlink.www.user_account_webservices;
 
 import java.sql.SQLException;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.POST;
@@ -19,7 +18,7 @@ import org.yeastrc.auth.dto.AuthUserDTO;
 import org.yeastrc.auth.dto.AuthUserInviteTrackingDTO;
 import org.yeastrc.xlink.www.database_update_with_transaction_services.AddNewUserUsingDBTransactionService;
 import org.yeastrc.xlink.www.dto.TermsOfServiceUserAcceptedVersionHistoryDTO;
-import org.yeastrc.xlink.www.dto.XLinkUserDTO;
+
 import org.yeastrc.xlink.www.dto.ZzUserDataMirrorDTO;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappInternalErrorException;
 import org.yeastrc.xlink.base.config_system_table_common_access.ConfigSystemsKeysSharedConstants;
@@ -31,20 +30,21 @@ import org.yeastrc.xlink.www.constants.AuthAccessLevelConstants;
 import org.yeastrc.xlink.www.constants.ConfigSystemsKeysConstants;
 import org.yeastrc.xlink.www.constants.FieldLengthConstants;
 import org.yeastrc.xlink.www.constants.UserSignupConstants;
-import org.yeastrc.xlink.www.constants.WebConstants;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.dao.TermsOfServiceTextVersionsDAO;
 import org.yeastrc.xlink.www.dao.TermsOfServiceUserAcceptedVersionHistoryDAO;
-import org.yeastrc.xlink.www.objects.AuthAccessLevel;
+import org.yeastrc.xlink.www.access_control.result_objects.WebSessionAuthAccessLevel;
 import org.yeastrc.xlink.www.objects.CreateAccountResult;
-import org.yeastrc.xlink.www.user_account.UserSessionObject;
+import org.yeastrc.xlink.www.user_session_management.UserSession;
+import org.yeastrc.xlink.www.user_session_management.UserSessionBuilder;
+import org.yeastrc.xlink.www.user_session_management.UserSessionManager;
 import org.yeastrc.xlink.www.user_mgmt_webapp_access.UserMgmtCentralWebappWebserviceAccess;
 import org.yeastrc.xlink.www.user_mgmt_webapp_access.UserMgmtCreateAccountRequest;
 import org.yeastrc.xlink.www.user_mgmt_webapp_access.UserMgmtCreateAccountResponse;
 import org.yeastrc.xlink.www.user_mgmt_webapp_access.UserMgmtLoginRequest;
 import org.yeastrc.xlink.www.user_mgmt_webapp_access.UserMgmtLoginResponse;
-import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
-import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
+import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result;
+import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId;
 import org.yeastrc.xlink.www.user_web_utils.ValidateUserInviteTrackingCode;
 import org.yeastrc.xlink.www.web_utils.GetMessageTextFromKeyFrom_web_app_application_properties;
 
@@ -114,10 +114,8 @@ public class UserCreateAccountService {
 			}
 
 			//  Restricted to users with ACCESS_LEVEL_ADMIN or better
-			// Get the session first.  
-			//		HttpSession session = request.getSession();
-			AccessAndSetupWebSessionResult accessAndSetupWebSessionResult =
-					GetAccessAndSetupWebSession.getInstance().getAccessAndSetupWebSessionNoProjectId( request );
+			GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result accessAndSetupWebSessionResult =
+					GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.getSinglesonInstance().getAccessAndSetupWebSessionNoProjectId( request );
 			if ( accessAndSetupWebSessionResult.isNoSession() ) {
 				//  No User session 
 				throw new WebApplicationException(
@@ -126,9 +124,9 @@ public class UserCreateAccountService {
 						.build()
 						);
 			}
-			//		UserSessionObject userSessionObject = accessAndSetupWebSessionResult.getUserSessionObject();
+			//		UserSession userSession = accessAndSetupWebSessionResult.getUserSession();
 			//  Test access at global level
-			AuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getAuthAccessLevel();
+			WebSessionAuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getWebSessionAuthAccessLevel();
 			if ( ! authAccessLevel.isAdminAllowed() ) {
 				//  No Access Allowed 
 				throw new WebApplicationException(
@@ -529,8 +527,6 @@ public class UserCreateAccountService {
 			
 			//  After user added to User Mgmt, add to proxl DB
 			
-			XLinkUserDTO userDatabaseRecord = null;
-			
 			ZzUserDataMirrorDTO zzUserDataMirrorDTO = new ZzUserDataMirrorDTO();
 			// zzUserDataMirrorDTO.setAuthUserId( XXX );  AuthUserId set later
 			zzUserDataMirrorDTO.setUsername( username );
@@ -558,16 +554,6 @@ public class UserCreateAccountService {
 					//  user is not linked to a project so just add the user
 					AddNewUserUsingDBTransactionService.getInstance().addNewUserForUserInvite( authUserDTO, zzUserDataMirrorDTO, null /* authUserInviteTrackingDTO */ );
 				}
-				
-				userDatabaseRecord = new XLinkUserDTO();
-				userDatabaseRecord.setAuthUser(authUserDTO);
-				
-				authUserDTO.setUsername( username );
-				authUserDTO.setEmail( email );
-				
-				userDatabaseRecord.setFirstName( firstName );
-				userDatabaseRecord.setLastName( lastName );
-				userDatabaseRecord.setOrganization( organization );
 				
 			} catch ( SQLException sqlException ) {
 				
@@ -605,13 +591,22 @@ public class UserCreateAccountService {
 					throw new ProxlWebappInternalErrorException( msg );
 				}
 
-				UserSessionObject userSessionObject = new UserSessionObject();
-				userSessionObject.setUserDBObject( userDatabaseRecord );
-				userSessionObject.setUserLoginSessionKey( userMgmtLoginResponse.getSessionKey() );
-				// Get their session   
-				HttpSession session = request.getSession();
-				session.setAttribute( WebConstants.SESSION_CONTEXT_USER_LOGGED_IN, userSessionObject );
-
+				UserSession userSession = UserSessionBuilder.getBuilder()
+						.setAuthUserId( authUserDTO.getId() )
+						.setUserMgmtUserId( createdUserMgmtUserId )
+						.setUserAccessLevel( authUserDTO.getUserAccessLevel() )
+						.setEnabledAppSpecific( true )
+						.setUserMgmtSessionKey( userMgmtLoginResponse.getSessionKey() )
+						.setUsername( username )
+						.setEmail( email )
+						.setFirstName( firstName )
+						.setLastName( lastName )
+						.setOrganization( organization )
+						.setEnabled( true )
+						.setGlobalAdminUser( false )
+						.build();
+				
+				UserSessionManager.getSinglesonInstance().setUserSession( userSession , request );
 			}
 
 			createAccountResult.setStatus(true);

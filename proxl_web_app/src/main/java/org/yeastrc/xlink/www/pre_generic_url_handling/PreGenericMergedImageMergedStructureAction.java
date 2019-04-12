@@ -31,6 +31,7 @@ public class PreGenericMergedImageMergedStructureAction extends Action {
 
 	private static final Logger log = LoggerFactory.getLogger( PreGenericPeptideRedirectAction.class);
 
+	@Override
 	public ActionForward execute( ActionMapping mapping,
 			ActionForm actionForm,
 			HttpServletRequest request,

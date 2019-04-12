@@ -3,7 +3,6 @@ package org.yeastrc.xlink.www.webservices;
 import java.util.ArrayList;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -21,17 +20,15 @@ import org.yeastrc.xlink.www.dao.ProjectDAO;
 import org.yeastrc.xlink.www.database_update_with_transaction_services.CopyProjectSearchIdToNewProjectUsingDBTransactionService;
 import org.yeastrc.xlink.www.database_update_with_transaction_services.MoveProjectSearchIdToNewProjectUsingDBTransactionService;
 import org.yeastrc.xlink.www.dto.ProjectDTO;
-import org.yeastrc.xlink.www.objects.AuthAccessLevel;
+import org.yeastrc.xlink.www.access_control.result_objects.WebSessionAuthAccessLevel;
 import org.yeastrc.xlink.www.objects.ProjectToCopyToResultItem;
 import org.yeastrc.xlink.www.searcher.ProjectSearchIdAssocSearchIdInProjectIdSearcher;
 import org.yeastrc.xlink.www.searcher.ProjectToCopyToSearcher;
 import org.yeastrc.xlink.www.constants.AuthAccessLevelConstants;
-import org.yeastrc.xlink.www.constants.WebConstants;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
-import org.yeastrc.xlink.www.user_account.UserSessionObject;
-import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
-import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
-import org.yeastrc.xlink.www.user_web_utils.GetAuthAccessLevelForWebRequest;
+import org.yeastrc.xlink.www.user_session_management.UserSession;
+import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result;
+import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId;
 
 /**
  * 
@@ -95,11 +92,9 @@ public class ProjectCopySearchesService {
 		    	        );
 		}
 		try {
-			// Get the session first.  
-//			HttpSession session = request.getSession();
-			AccessAndSetupWebSessionResult accessAndSetupWebSessionResult =
-					GetAccessAndSetupWebSession.getInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request );
-			UserSessionObject userSessionObject = accessAndSetupWebSessionResult.getUserSessionObject();
+			GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result accessAndSetupWebSessionResult =
+					GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.getSinglesonInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request );
+			UserSession userSession = accessAndSetupWebSessionResult.getUserSession();
 			if ( accessAndSetupWebSessionResult.isNoSession() ) {
 				//  No User session 
 				throw new WebApplicationException(
@@ -109,7 +104,7 @@ public class ProjectCopySearchesService {
 						);
 			}
 			//  Test access to the project id
-			AuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getAuthAccessLevel();
+			WebSessionAuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getWebSessionAuthAccessLevel();
 			if ( ! authAccessLevel.isProjectOwnerAllowed() ) {
 				//  No Access Allowed for this project id
 				throw new WebApplicationException(
@@ -130,7 +125,7 @@ public class ProjectCopySearchesService {
 						ProjectToCopyToSearcher.getInstance().getAllExcludingProjectId( projectId );
 			} else {
 				//  Get projects this user is owner for
-				int authUserId = userSessionObject.getUserDBObject().getAuthUser().getId();
+				int authUserId = userSession.getAuthUserId();
 				int maxAuthLevel = AuthAccessLevelConstants.ACCESS_LEVEL_PROJECT_OWNER;
 				projectToCopyToResultItemList = 
 						ProjectToCopyToSearcher.getInstance()
@@ -240,11 +235,9 @@ public class ProjectCopySearchesService {
 		    	        );
 		}
 		try {
-			// Get the session first.  
-//			HttpSession session = request.getSession();
-			AccessAndSetupWebSessionResult accessAndSetupWebSessionResultForProjectId =
-					GetAccessAndSetupWebSession.getInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request );
-//			UserSessionObject userSessionObject = accessAndSetupWebSessionResultForProjectId.getUserSessionObject();
+			GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result accessAndSetupWebSessionResultForProjectId =
+					GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.getSinglesonInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request );
+//			UserSession userSession = accessAndSetupWebSessionResultForProjectId.getUserSession();
 			if ( accessAndSetupWebSessionResultForProjectId.isNoSession() ) {
 				//  No User session 
 				throw new WebApplicationException(
@@ -254,7 +247,7 @@ public class ProjectCopySearchesService {
 						);
 			}
 			//  Test access to the project id
-			AuthAccessLevel authAccessLevel = accessAndSetupWebSessionResultForProjectId.getAuthAccessLevel();
+			WebSessionAuthAccessLevel authAccessLevel = accessAndSetupWebSessionResultForProjectId.getWebSessionAuthAccessLevel();
 			if ( ! authAccessLevel.isProjectOwnerAllowed() ) {
 				//  No Access Allowed for this project id
 				throw new WebApplicationException(
@@ -408,35 +401,39 @@ public class ProjectCopySearchesService {
 			    	        .build()
 			    	        );
 			}
-			// Get the session first.  
-			HttpSession session = request.getSession();
-			UserSessionObject userSessionObject 
-			= (UserSessionObject) session.getAttribute( WebConstants.SESSION_CONTEXT_USER_LOGGED_IN );
-			if ( userSessionObject == null ) {
-				//  No User session 
-				throw new WebApplicationException(
-						Response.status( WebServiceErrorMessageConstants.NO_SESSION_STATUS_CODE )  //  Send HTTP code
-						.entity( WebServiceErrorMessageConstants.NO_SESSION_TEXT ) // This string will be passed to the client
-						.build()
-						);
+			{
+				GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result accessAndSetupWebSessionResult =
+						GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.getSinglesonInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request );
+				if ( accessAndSetupWebSessionResult.isNoSession() ) {
+					//  No User session 
+					throw new WebApplicationException(
+							Response.status( WebServiceErrorMessageConstants.NO_SESSION_STATUS_CODE )  //  Send HTTP code
+							.entity( WebServiceErrorMessageConstants.NO_SESSION_TEXT ) // This string will be passed to the client
+							.build()
+							);
+				}
+				WebSessionAuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getWebSessionAuthAccessLevel();
+				if ( ! authAccessLevel.isProjectOwnerAllowed() ) {
+					//  No Access Allowed for this project id
+					throw new WebApplicationException(
+							Response.status( WebServiceErrorMessageConstants.NOT_AUTHORIZED_STATUS_CODE )  //  Send HTTP code
+							.entity( WebServiceErrorMessageConstants.NOT_AUTHORIZED_TEXT ) // This string will be passed to the client
+							.build()
+							);
+				}
 			}
-			AuthAccessLevel authAccessLevel = GetAuthAccessLevelForWebRequest.getInstance().getAuthAccessLevelForWebRequestProjectId( userSessionObject, projectId );
-			if ( ! authAccessLevel.isProjectOwnerAllowed() ) {
-				//  No Access Allowed for this project id
-				throw new WebApplicationException(
-						Response.status( WebServiceErrorMessageConstants.NOT_AUTHORIZED_STATUS_CODE )  //  Send HTTP code
-						.entity( WebServiceErrorMessageConstants.NOT_AUTHORIZED_TEXT ) // This string will be passed to the client
-						.build()
-						);
-			}
-			AuthAccessLevel authAccessLevelMoveToProject = GetAuthAccessLevelForWebRequest.getInstance().getAuthAccessLevelForWebRequestProjectId( userSessionObject, copyToProjectId );
-			if ( ! authAccessLevelMoveToProject.isProjectOwnerAllowed() ) {
-				//  No Access Allowed for move to project id
-				throw new WebApplicationException(
-						Response.status( WebServiceErrorMessageConstants.NOT_AUTHORIZED_STATUS_CODE )  //  Send HTTP code
-						.entity( WebServiceErrorMessageConstants.NOT_AUTHORIZED_TEXT ) // This string will be passed to the client
-						.build()
-						);
+			{
+				GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result accessAndSetupWebSessionResultMoveToProject =
+						GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.getSinglesonInstance().getAccessAndSetupWebSessionWithProjectId( copyToProjectId, request );
+				WebSessionAuthAccessLevel authAccessLevelMoveToProject = accessAndSetupWebSessionResultMoveToProject.getWebSessionAuthAccessLevel();
+				if ( ! authAccessLevelMoveToProject.isProjectOwnerAllowed() ) {
+					//  No Access Allowed for move to project id
+					throw new WebApplicationException(
+							Response.status( WebServiceErrorMessageConstants.NOT_AUTHORIZED_STATUS_CODE )  //  Send HTTP code
+							.entity( WebServiceErrorMessageConstants.NOT_AUTHORIZED_TEXT ) // This string will be passed to the client
+							.build()
+							);
+				}
 			}
 
 			////////   Auth complete

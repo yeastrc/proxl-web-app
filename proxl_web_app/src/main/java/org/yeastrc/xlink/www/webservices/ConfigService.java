@@ -16,10 +16,9 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
-import org.yeastrc.auth.dto.AuthUserDTO;
 import org.yeastrc.xlink.base.config_system_table_common_access.ConfigSystemsKeysSharedConstants;
 import org.yeastrc.xlink.base.config_system_table_common_access.ConfigSystemsValuesSharedConstants;
-import org.yeastrc.xlink.www.objects.AuthAccessLevel;
+import org.yeastrc.xlink.www.access_control.result_objects.WebSessionAuthAccessLevel;
 import org.yeastrc.xlink.www.searcher_via_cached_data.cached_data_holders.Cached_ReportedPeptideBasicObjectsSearcher_Results;
 import org.yeastrc.xlink.www.config_system_table.ConfigSystemCaching;
 import org.yeastrc.xlink.www.constants.ConfigSystemsKeysConstants;
@@ -29,12 +28,12 @@ import org.yeastrc.xlink.www.dao.ConfigSystemDAO;
 import org.yeastrc.xlink.www.dao.TermsOfServiceTextVersionsDAO;
 import org.yeastrc.xlink.www.dto.ConfigSystemDTO;
 import org.yeastrc.xlink.www.dto.TermsOfServiceTextVersionsDTO;
-import org.yeastrc.xlink.www.dto.XLinkUserDTO;
+
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappInternalErrorException;
-import org.yeastrc.xlink.www.user_account.UserSessionObject;
-import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
-import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
+import org.yeastrc.xlink.www.user_session_management.UserSession;
+import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result;
+import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId;
 import org.yeastrc.xlink.www.web_utils.IsTermsOfServiceEnabled;
 import com.google.common.io.BaseEncoding;
 import com.google.common.primitives.Longs;
@@ -51,10 +50,8 @@ public class ConfigService {
 	throws Exception {
 		try {
 			//  Restricted to users with ACCESS_LEVEL_ADMIN or better
-			// Get the session first.  
-//			HttpSession session = request.getSession();
-			AccessAndSetupWebSessionResult accessAndSetupWebSessionResult =
-					GetAccessAndSetupWebSession.getInstance().getAccessAndSetupWebSessionNoProjectId( request );
+			GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result accessAndSetupWebSessionResult =
+					GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.getSinglesonInstance().getAccessAndSetupWebSessionNoProjectId( request );
 			if ( accessAndSetupWebSessionResult.isNoSession() ) {
 				//  No User session 
 				throw new WebApplicationException(
@@ -63,9 +60,9 @@ public class ConfigService {
 						.build()
 						);
 			}
-//			UserSessionObject userSessionObject = accessAndSetupWebSessionResult.getUserSessionObject();
+//			UserSession userSession = accessAndSetupWebSessionResult.getUserSession();
 			//  Test access at global level
-			AuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getAuthAccessLevel();
+			WebSessionAuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getWebSessionAuthAccessLevel();
 			if ( ! authAccessLevel.isAdminAllowed() ) {
 				//  No Access Allowed 
 				throw new WebApplicationException(
@@ -126,10 +123,8 @@ public class ConfigService {
 			@Context HttpServletRequest request ) throws Exception {
 		try {
 			//  Restricted to users with ACCESS_LEVEL_ADMIN or better
-			// Get the session first.  
-//			HttpSession session = request.getSession();
-			AccessAndSetupWebSessionResult accessAndSetupWebSessionResult =
-					GetAccessAndSetupWebSession.getInstance().getAccessAndSetupWebSessionNoProjectId( request );
+			GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result accessAndSetupWebSessionResult =
+					GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.getSinglesonInstance().getAccessAndSetupWebSessionNoProjectId( request );
 			if ( accessAndSetupWebSessionResult.isNoSession() ) {
 				//  No User session 
 				throw new WebApplicationException(
@@ -138,9 +133,9 @@ public class ConfigService {
 						.build()
 						);
 			}
-//			UserSessionObject userSessionObject = accessAndSetupWebSessionResult.getUserSessionObject();
+//			UserSession userSession = accessAndSetupWebSessionResult.getUserSession();
 			//  Test access at global level
-			AuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getAuthAccessLevel();
+			WebSessionAuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getWebSessionAuthAccessLevel();
 			if ( ! authAccessLevel.isAdminAllowed() ) {
 				//  No Access Allowed 
 				throw new WebApplicationException(
@@ -268,10 +263,8 @@ public class ConfigService {
 	throws Exception {
 		try {
 			//  Restricted to users with ACCESS_LEVEL_ADMIN or better
-			// Get the session first.  
-//			HttpSession session = request.getSession();
-			AccessAndSetupWebSessionResult accessAndSetupWebSessionResult =
-					GetAccessAndSetupWebSession.getInstance().getAccessAndSetupWebSessionNoProjectId( request );
+			GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result accessAndSetupWebSessionResult =
+					GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.getSinglesonInstance().getAccessAndSetupWebSessionNoProjectId( request );
 			if ( accessAndSetupWebSessionResult.isNoSession() ) {
 				//  No User session 
 				throw new WebApplicationException(
@@ -280,9 +273,9 @@ public class ConfigService {
 						.build()
 						);
 			}
-//			UserSessionObject userSessionObject = accessAndSetupWebSessionResult.getUserSessionObject();
+//			UserSession userSession = accessAndSetupWebSessionResult.getUserSession();
 			//  Test access at global level
-			AuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getAuthAccessLevel();
+			WebSessionAuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getWebSessionAuthAccessLevel();
 			if ( ! authAccessLevel.isAdminAllowed() ) {
 				//  No Access Allowed 
 				throw new WebApplicationException(
@@ -374,10 +367,8 @@ public class ConfigService {
 			    	        );
 			}
 			//  Restricted to users with ACCESS_LEVEL_ADMIN or better
-			// Get the session first.  
-//			HttpSession session = request.getSession();
-			AccessAndSetupWebSessionResult accessAndSetupWebSessionResult =
-					GetAccessAndSetupWebSession.getInstance().getAccessAndSetupWebSessionNoProjectId( request );
+			GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result accessAndSetupWebSessionResult =
+					GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.getSinglesonInstance().getAccessAndSetupWebSessionNoProjectId( request );
 			if ( accessAndSetupWebSessionResult.isNoSession() ) {
 				//  No User session 
 				throw new WebApplicationException(
@@ -386,9 +377,9 @@ public class ConfigService {
 						.build()
 						);
 			}
-			UserSessionObject userSessionObject = accessAndSetupWebSessionResult.getUserSessionObject();
+			UserSession userSession = accessAndSetupWebSessionResult.getUserSession();
 			//  Test access at global level
-			AuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getAuthAccessLevel();
+			WebSessionAuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getWebSessionAuthAccessLevel();
 			if ( ! authAccessLevel.isAdminAllowed() ) {
 				//  No Access Allowed 
 				throw new WebApplicationException(
@@ -399,16 +390,11 @@ public class ConfigService {
 			}
 			////////   Auth complete
 			//////////////////////////////////////////
+			
 			//  Get auth user id
-			XLinkUserDTO userDBObject = userSessionObject.getUserDBObject();
-			if ( userDBObject == null ) {
-				String msg = "authAccessLevel.isAdminAllowed() but no XLinkUserDTO object on session object";
-				log.error( msg );
-				throw new ProxlWebappInternalErrorException(msg);
-			}
-			AuthUserDTO authUserDTO = userDBObject.getAuthUser();
-			if ( authUserDTO == null ) {
-				String msg = "authAccessLevel.isAdminAllowed() but no authUserDTO object on session object";
+			Integer authUserId = userSession.getAuthUserId();
+			if ( authUserId == null ) {
+				String msg = "authAccessLevel.isAdminAllowed() but no authUserId object on session object";
 				log.error( msg );
 				throw new ProxlWebappInternalErrorException(msg);
 			}
@@ -430,7 +416,7 @@ public class ConfigService {
 			TermsOfServiceTextVersionsDTO termsOfServiceTextVersionsDTO = new TermsOfServiceTextVersionsDTO();
 			termsOfServiceTextVersionsDTO.setIdString( tosKey );
 			termsOfServiceTextVersionsDTO.setTermsOfServiceText( termsOfServiceText );
-			termsOfServiceTextVersionsDTO.setCreatedAuthUserId( authUserDTO.getId() );
+			termsOfServiceTextVersionsDTO.setCreatedAuthUserId( authUserId );
 			TermsOfServiceTextVersionsDAO.getInstance().save( termsOfServiceTextVersionsDTO );
 			//   Change config record for TERMS_OF_SERVICE_ENABLED to true
 			ConfigSystemDTO configSystemDTO = new ConfigSystemDTO();
@@ -481,10 +467,8 @@ public class ConfigService {
 		DisableTermsOfServiceResult webserviceResult = new DisableTermsOfServiceResult();
 		try {
 			//  Restricted to users with ACCESS_LEVEL_ADMIN or better
-			// Get the session first.  
-//			HttpSession session = request.getSession();
-			AccessAndSetupWebSessionResult accessAndSetupWebSessionResult =
-					GetAccessAndSetupWebSession.getInstance().getAccessAndSetupWebSessionNoProjectId( request );
+			GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result accessAndSetupWebSessionResult =
+					GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.getSinglesonInstance().getAccessAndSetupWebSessionNoProjectId( request );
 			if ( accessAndSetupWebSessionResult.isNoSession() ) {
 				//  No User session 
 				throw new WebApplicationException(
@@ -493,9 +477,9 @@ public class ConfigService {
 						.build()
 						);
 			}
-//			UserSessionObject userSessionObject = accessAndSetupWebSessionResult.getUserSessionObject();
+//			UserSession userSession = accessAndSetupWebSessionResult.getUserSession();
 			//  Test access at global level
-			AuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getAuthAccessLevel();
+			WebSessionAuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getWebSessionAuthAccessLevel();
 			if ( ! authAccessLevel.isAdminAllowed() ) {
 				//  No Access Allowed 
 				throw new WebApplicationException(
@@ -554,10 +538,8 @@ public class ConfigService {
 		EnableTermsOfServiceResult webserviceResult = new EnableTermsOfServiceResult();
 		try {
 			//  Restricted to users with ACCESS_LEVEL_ADMIN or better
-			// Get the session first.  
-//			HttpSession session = request.getSession();
-			AccessAndSetupWebSessionResult accessAndSetupWebSessionResult =
-					GetAccessAndSetupWebSession.getInstance().getAccessAndSetupWebSessionNoProjectId( request );
+			GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result accessAndSetupWebSessionResult =
+					GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.getSinglesonInstance().getAccessAndSetupWebSessionNoProjectId( request );
 			if ( accessAndSetupWebSessionResult.isNoSession() ) {
 				//  No User session 
 				throw new WebApplicationException(
@@ -566,9 +548,9 @@ public class ConfigService {
 						.build()
 						);
 			}
-//			UserSessionObject userSessionObject = accessAndSetupWebSessionResult.getUserSessionObject();
+//			UserSession userSession = accessAndSetupWebSessionResult.getUserSession();
 			//  Test access at global level
-			AuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getAuthAccessLevel();
+			WebSessionAuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getWebSessionAuthAccessLevel();
 			if ( ! authAccessLevel.isAdminAllowed() ) {
 				//  No Access Allowed 
 				throw new WebApplicationException(

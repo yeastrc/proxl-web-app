@@ -44,7 +44,7 @@ import org.yeastrc.xlink.www.lorikeet_dto.LorikeetPerPeptideData;
 import org.yeastrc.xlink.www.lorikeet_dto.LorikeetRootData;
 import org.yeastrc.xlink.www.lorikeet_dto.LorikeetStaticMod;
 import org.yeastrc.xlink.www.lorikeet_dto.LorikeetVariableMod;
-import org.yeastrc.xlink.www.objects.AuthAccessLevel;
+import org.yeastrc.xlink.www.access_control.result_objects.WebSessionAuthAccessLevel;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.dto.SrchRepPeptPeptideDTO;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
@@ -59,8 +59,8 @@ import org.yeastrc.xlink.www.searcher_via_cached_data.cached_data_holders.Cached
 import org.yeastrc.xlink.www.searcher_via_cached_data.request_objects_for_searchers_for_cached_data.SrchRepPeptPeptideDTO_ForSrchIdRepPeptId_ReqParams;
 import org.yeastrc.xlink.www.searcher_via_cached_data.return_objects_from_searchers_for_cached_data.SrchRepPeptPeptideDTO_ForSrchIdRepPeptId_Result;
 import org.yeastrc.xlink.www.spectral_storage_service_interface.Call_Get_ScanDataFromScanNumbers_SpectralStorageWebservice;
-import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
-import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
+import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result;
+import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId;
 import org.yeastrc.xlink.www.web_utils.SearchLinkerAndLinkerAbbreviationForLinkerMass_SingleSearch_Util;
 
 /**
@@ -100,8 +100,6 @@ public class LorikeetSpectrumService {
 		    	        );
 		}
 		try {
-			// Get the session first.  
-//			HttpSession session = request.getSession();
 			PsmDTO psmDTO = null;
 			//  Test access to the data
 			try {
@@ -152,16 +150,16 @@ public class LorikeetSpectrumService {
         					);
         		}
         		int projectId = projectIdsFromSearchIds.get( 0 );
-        		AccessAndSetupWebSessionResult accessAndSetupWebSessionResult =
-        				GetAccessAndSetupWebSession.getInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request );
-        		//			UserSessionObject userSessionObject = accessAndSetupWebSessionResult.getUserSessionObject();
+        		GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result accessAndSetupWebSessionResult =
+        				GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.getSinglesonInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request );
+        		//			UserSession userSession = accessAndSetupWebSessionResult.getUserSession();
         		if ( accessAndSetupWebSessionResult.isNoSession() ) {
         			//  No user session so not allowed
         			continue;
         		}
         		allAuthHaveNoSession = false;
 //        		//  Test access to the project id
-        		AuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getAuthAccessLevel();
+        		WebSessionAuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getWebSessionAuthAccessLevel();
         		if ( authAccessLevel.isPublicAccessCodeReadAllowed() ) {
         			accessAllowed = true;
         			break;

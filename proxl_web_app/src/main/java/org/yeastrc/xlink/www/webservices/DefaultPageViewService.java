@@ -15,16 +15,16 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
-import org.yeastrc.xlink.www.objects.AuthAccessLevel;
+import org.yeastrc.xlink.www.access_control.result_objects.WebSessionAuthAccessLevel;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.default_page_view.DefaultPageViewSaveOrUpdate;
 import org.yeastrc.xlink.www.default_page_view.GetDefaultURLFromPageURL;
 import org.yeastrc.xlink.www.dto.DefaultPageViewGenericDTO;
 import org.yeastrc.xlink.www.objects.GenericWebserviceResult;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
-import org.yeastrc.xlink.www.user_account.UserSessionObject;
-import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
-import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
+import org.yeastrc.xlink.www.user_session_management.UserSession;
+import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result;
+import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId;
 
 
 @Path("/defaultPageView")
@@ -83,8 +83,6 @@ public class DefaultPageViewService {
 			    	        .build()
 			    	        );
 			}
-			// Get the session first.  
-//			HttpSession session = request.getSession();
 			//   Get the project id for this search
 			Collection<Integer> projectSearchIdsCollection = new HashSet<Integer>( );
 			projectSearchIdsCollection.add( projectSearchId );
@@ -108,9 +106,9 @@ public class DefaultPageViewService {
 						);
 			}
 			int projectId = projectIdsFromSearchIds.get( 0 );
-			AccessAndSetupWebSessionResult accessAndSetupWebSessionResult =
-					GetAccessAndSetupWebSession.getInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request );
-			UserSessionObject userSessionObject = accessAndSetupWebSessionResult.getUserSessionObject();
+			GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result accessAndSetupWebSessionResult =
+					GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.getSinglesonInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request );
+			UserSession userSession = accessAndSetupWebSessionResult.getUserSession();
 			if ( accessAndSetupWebSessionResult.isNoSession() ) {
 				//  No User session 
 				throw new WebApplicationException(
@@ -120,7 +118,7 @@ public class DefaultPageViewService {
 						);
 			}
 			//  Test access to the project id
-			AuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getAuthAccessLevel();
+			WebSessionAuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getWebSessionAuthAccessLevel();
 			if ( ! authAccessLevel.isProjectOwnerAllowed() ) {
 				//  No Access Allowed for this project id
 				throw new WebApplicationException(
@@ -138,8 +136,8 @@ public class DefaultPageViewService {
 			defaultPageViewDTO.setUrl( defaultURLFromPageURLString );
 			defaultPageViewDTO.setQueryJSON( pageQueryJSON );
 			defaultPageViewDTO.setProjectSearchId( projectSearchId );
-			defaultPageViewDTO.setAuthUserIdCreated( userSessionObject.getUserDBObject().getAuthUser().getId() );
-			defaultPageViewDTO.setAuthUserIdLastUpdated( userSessionObject.getUserDBObject().getAuthUser().getId() );
+			defaultPageViewDTO.setAuthUserIdCreated( userSession.getAuthUserId() );
+			defaultPageViewDTO.setAuthUserIdLastUpdated( userSession.getAuthUserId() );
 			DefaultPageViewSaveOrUpdate.getInstance().defaultPageViewSaveOrUpdate( defaultPageViewDTO );
 			genericWebserviceResult.setStatus(true);
 			return genericWebserviceResult;

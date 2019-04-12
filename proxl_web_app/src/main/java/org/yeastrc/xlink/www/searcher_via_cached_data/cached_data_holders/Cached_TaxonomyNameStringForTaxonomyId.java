@@ -171,11 +171,11 @@ public class Cached_TaxonomyNameStringForTaxonomyId implements CachedDataCommonI
 				}
 				
 				int cacheTimeout = CACHE_TIMEOUT_FULL_SIZE;
-				cacheMaxSize = parentObject.CACHE_MAX_SIZE_FULL_SIZE;
+				cacheMaxSize = Cached_TaxonomyNameStringForTaxonomyId.CACHE_MAX_SIZE_FULL_SIZE;
 				if ( cachedDataSizeOptions == CachedDataSizeOptions.HALF ) {
 					cacheMaxSize = cacheMaxSize / 2;
 				} else if ( cachedDataSizeOptions == CachedDataSizeOptions.SMALL ) {
-					cacheMaxSize = parentObject.CACHE_MAX_SIZE_SMALL;
+					cacheMaxSize = Cached_TaxonomyNameStringForTaxonomyId.CACHE_MAX_SIZE_SMALL;
 					cacheTimeout = CACHE_TIMEOUT_SMALL;
 				}
 				
@@ -184,6 +184,7 @@ public class Cached_TaxonomyNameStringForTaxonomyId implements CachedDataCommonI
 						.maximumSize( cacheMaxSize )
 						.build(
 								new CacheLoader<Integer, TaxonomyNameStringForTaxonomyId_Result>() {
+									@Override
 									public TaxonomyNameStringForTaxonomyId_Result load(Integer taxonomyId) throws Exception {
 										
 										//   WARNING  cannot return null.  

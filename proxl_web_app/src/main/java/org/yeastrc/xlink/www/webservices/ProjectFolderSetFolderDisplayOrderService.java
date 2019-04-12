@@ -1,7 +1,6 @@
 package org.yeastrc.xlink.www.webservices;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -15,11 +14,10 @@ import org.yeastrc.xlink.www.dao.FolderForProjectDAO;
 import org.yeastrc.xlink.www.dao.ProjectDAO;
 import org.yeastrc.xlink.www.database_update_with_transaction_services.UpdateProjectFolderDisplayOrderUsingDBTransactionService;
 import org.yeastrc.xlink.www.dto.ProjectDTO;
-import org.yeastrc.xlink.www.objects.AuthAccessLevel;
-import org.yeastrc.xlink.www.constants.WebConstants;
+import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId;
+import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result;
+import org.yeastrc.xlink.www.access_control.result_objects.WebSessionAuthAccessLevel;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
-import org.yeastrc.xlink.www.user_account.UserSessionObject;
-import org.yeastrc.xlink.www.user_web_utils.GetAuthAccessLevelForWebRequest;
 
 @Path("/project/folder")
 public class ProjectFolderSetFolderDisplayOrderService {
@@ -52,18 +50,6 @@ public class ProjectFolderSetFolderDisplayOrderService {
 			    	        .build()
 			    	        );
 			}
-			// Get the session first.  
-			HttpSession session = request.getSession();
-			UserSessionObject userSessionObject 
-			= (UserSessionObject) session.getAttribute( WebConstants.SESSION_CONTEXT_USER_LOGGED_IN );
-			if ( userSessionObject == null ) {
-				//  No User session 
-				throw new WebApplicationException(
-						Response.status( WebServiceErrorMessageConstants.NO_SESSION_STATUS_CODE )  //  Send HTTP code
-						.entity( WebServiceErrorMessageConstants.NO_SESSION_TEXT ) // This string will be passed to the client
-						.build()
-						);
-			}
 			Integer projectId = null;
 			for( int folderId : foldersInOrder ) {
 				Integer projectIdFromFolderId =	FolderForProjectDAO.getInstance().getProjectId_ForId( folderId );
@@ -92,9 +78,17 @@ public class ProjectFolderSetFolderDisplayOrderService {
 					}
 				}
 			}
-			AuthAccessLevel authAccessLevel = 
-					GetAuthAccessLevelForWebRequest.getInstance()
-					.getAuthAccessLevelForWebRequestProjectId( userSessionObject, projectId );
+			GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result accessAndSetupWebSessionResult =
+					GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.getSinglesonInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request );
+			if ( accessAndSetupWebSessionResult.isNoSession() ) {
+				//  No User session 
+				throw new WebApplicationException(
+						Response.status( WebServiceErrorMessageConstants.NO_SESSION_STATUS_CODE )  //  Send HTTP code
+						.entity( WebServiceErrorMessageConstants.NO_SESSION_TEXT ) // This string will be passed to the client
+						.build()
+						);
+			}
+			WebSessionAuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getWebSessionAuthAccessLevel();
 			if ( ! authAccessLevel.isProjectOwnerAllowed() ) {
 				//  No Access Allowed for this project id
 				throw new WebApplicationException(

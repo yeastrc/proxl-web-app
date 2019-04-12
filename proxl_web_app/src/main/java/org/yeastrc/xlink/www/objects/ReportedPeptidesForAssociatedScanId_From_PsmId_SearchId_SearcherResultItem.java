@@ -31,16 +31,20 @@ public class ReportedPeptidesForAssociatedScanId_From_PsmId_SearchId_SearcherRes
 	public void setWebReportedPeptide(WebReportedPeptide webReportedPeptide) {
 		this.webReportedPeptide = webReportedPeptide;
 	}
+	@Override
 	public Map<Integer, AnnotationDataBaseDTO> getPsmAnnotationDTOMap() {
 		return psmAnnotationDTOMap;
 	}
+	@Override
 	public void setPsmAnnotationDTOMap(
 			Map<Integer, AnnotationDataBaseDTO> psmAnnotationDTOMap) {
 		this.psmAnnotationDTOMap = psmAnnotationDTOMap;
 	}
+	@Override
 	public Map<Integer, AnnotationDataBaseDTO> getPeptideAnnotationDTOMap() {
 		return peptideAnnotationDTOMap;
 	}
+	@Override
 	public void setPeptideAnnotationDTOMap(
 			Map<Integer, AnnotationDataBaseDTO> peptideAnnotationDTOMap) {
 		this.peptideAnnotationDTOMap = peptideAnnotationDTOMap;

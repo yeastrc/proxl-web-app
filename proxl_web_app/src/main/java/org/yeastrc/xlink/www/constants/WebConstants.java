@@ -28,12 +28,7 @@ public class WebConstants {
 	
 	//////////    Values stored in the HTTP Session
 
-	//  Main user for standard login
-	public static final String SESSION_CONTEXT_USER_LOGGED_IN = "user";
-	
-	//  User object stored for Forgot Password Processing
-	public static final String SESSION_CONTEXT_USER_FORGOT_RESET_PROCESSING = "user_forgotPassword";
-	
+	//   None listed here.  See class UserSessionManager for what it stores in HTTP Session
 	
 	//////////     Values stored in the HTTP Request
 	
@@ -101,7 +96,7 @@ public class WebConstants {
 	/**
 	 * This must start with a "/"
 	 * 
-	 * What the filter will redirect to if there is no UserSessionObject in SESSION_CONTEXT_USER_LOGGED_IN
+	 * What the filter will redirect to if there is no UserSession in SESSION_CONTEXT_USER_LOGGED_IN
 	 */
 //	public static final String REDIRECT_URL_NO_WEB_SESSION = "/user_noSession.do";
 }

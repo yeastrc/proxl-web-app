@@ -16,12 +16,12 @@ import javax.ws.rs.core.Response;
 import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.dao.SearchCommentDAO;
 import org.yeastrc.xlink.dto.SearchCommentDTO;
-import org.yeastrc.xlink.www.objects.AuthAccessLevel;
+import org.yeastrc.xlink.www.access_control.result_objects.WebSessionAuthAccessLevel;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
-import org.yeastrc.xlink.www.user_account.UserSessionObject;
-import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
-import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
+import org.yeastrc.xlink.www.user_session_management.UserSession;
+import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result;
+import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId;
 
 @Path("/searchComment")
 public class SearchCommentService {
@@ -49,8 +49,6 @@ public class SearchCommentService {
 			    	        .build()
 			    	        );
 			}
-			// Get the session first.  
-//			HttpSession session = request.getSession();
 			SearchCommentDTO comment = SearchCommentDAO.getInstance().load( id );
 			if ( comment == null ) {
 				String msg = "Failed to load comment, comment == null,  for id: " + id;
@@ -85,9 +83,9 @@ public class SearchCommentService {
 						);
 			}
 			int projectId = projectIdsFromSearchIds.get( 0 );
-			AccessAndSetupWebSessionResult accessAndSetupWebSessionResult =
-					GetAccessAndSetupWebSession.getInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request );
-//			UserSessionObject userSessionObject = accessAndSetupWebSessionResult.getUserSessionObject();
+			GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result accessAndSetupWebSessionResult =
+					GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.getSinglesonInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request );
+//			UserSession userSession = accessAndSetupWebSessionResult.getUserSession();
 			if ( accessAndSetupWebSessionResult.isNoSession() ) {
 				//  No User session 
 				throw new WebApplicationException(
@@ -97,7 +95,7 @@ public class SearchCommentService {
 						);
 			}
 			//  Test access to the project id
-			AuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getAuthAccessLevel();
+			WebSessionAuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getWebSessionAuthAccessLevel();
 			if ( ! authAccessLevel.isWriteAllowed() ) {
 				//  No Access Allowed for this search id
 				throw new WebApplicationException(
@@ -139,8 +137,6 @@ public class SearchCommentService {
 		    	        );
 		}
 		try {
-			// Get the session first.  
-//			HttpSession session = request.getSession();
 			//   Get the project id for this search
 			Collection<Integer> searchIdsCollection = new HashSet<Integer>( );
 			searchIdsCollection.add( searchId );
@@ -164,9 +160,9 @@ public class SearchCommentService {
 						);
 			}
 			int projectId = projectIdsFromSearchIds.get( 0 );
-			AccessAndSetupWebSessionResult accessAndSetupWebSessionResult =
-					GetAccessAndSetupWebSession.getInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request );
-			UserSessionObject userSessionObject = accessAndSetupWebSessionResult.getUserSessionObject();
+			GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result accessAndSetupWebSessionResult =
+					GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.getSinglesonInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request );
+			UserSession userSession = accessAndSetupWebSessionResult.getUserSession();
 			if ( accessAndSetupWebSessionResult.isNoSession() ) {
 				//  No User session 
 				throw new WebApplicationException(
@@ -176,7 +172,7 @@ public class SearchCommentService {
 						);
 			}
 			//  Test access to the project id
-			AuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getAuthAccessLevel();
+			WebSessionAuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getWebSessionAuthAccessLevel();
 			if ( ! authAccessLevel.isWriteAllowed() ) {
 				//  No Access Allowed for this search id
 				throw new WebApplicationException(
@@ -188,7 +184,7 @@ public class SearchCommentService {
 			///    Done Processing Auth Check and Auth Level
 			//////////////////////////////
 
-			int authUserId = userSessionObject.getUserDBObject().getAuthUser().getId();
+			int authUserId = userSession.getAuthUserId();
 			SearchCommentDTO commentDTO  = new SearchCommentDTO( searchId, comment, authUserId );
 			SearchCommentDAO.getInstance().save( commentDTO );	
 			return commentDTO;
@@ -227,8 +223,6 @@ public class SearchCommentService {
 		    	        );
 		}
 		try {
-			// Get the session first.  
-//			HttpSession session = request.getSession();
 			SearchCommentDTO searchCommentDTOToGetSearchId = SearchCommentDAO.getInstance().load( id );
 			if ( searchCommentDTOToGetSearchId == null ) {
 				String msg = "Failed to load comment, comment == null,  for id: " + id;
@@ -263,9 +257,9 @@ public class SearchCommentService {
 						);
 			}
 			int projectId = projectIdsFromSearchIds.get( 0 );
-			AccessAndSetupWebSessionResult accessAndSetupWebSessionResult =
-					GetAccessAndSetupWebSession.getInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request );
-			UserSessionObject userSessionObject = accessAndSetupWebSessionResult.getUserSessionObject();
+			GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result accessAndSetupWebSessionResult =
+					GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.getSinglesonInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request );
+			UserSession userSession = accessAndSetupWebSessionResult.getUserSession();
 			if ( accessAndSetupWebSessionResult.isNoSession() ) {
 				//  No User session 
 				throw new WebApplicationException(
@@ -275,7 +269,7 @@ public class SearchCommentService {
 						);
 			}
 			//  Test access to the project id
-			AuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getAuthAccessLevel();
+			WebSessionAuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getWebSessionAuthAccessLevel();
 			if ( ! authAccessLevel.isWriteAllowed() ) {
 				//  No Access Allowed for this search id
 				throw new WebApplicationException(
@@ -287,7 +281,7 @@ public class SearchCommentService {
 			///    Done Processing Auth Check and Auth Level
 			//////////////////////////////
 
-			int authUserId = userSessionObject.getUserDBObject().getAuthUser().getId();
+			int authUserId = userSession.getAuthUserId();
 			SearchCommentDTO commentDTOForUpdate  = new SearchCommentDTO();
 			commentDTOForUpdate.setId( id );
 			commentDTOForUpdate.setComment( commentString );
@@ -331,11 +325,6 @@ public class SearchCommentService {
 //		
 //		try {
 //
-//			// Get the session first.  
-//			HttpSession session = request.getSession();
-//
-//
-//
 //			//   Get the project id for this search
 //			
 //			Collection<Integer> searchIdsCollection = new HashSet<Integer>( );
@@ -374,10 +363,10 @@ public class SearchCommentService {
 //			int projectId = projectIdsFromSearchIds.get( 0 );
 //			
 //
-//			AccessAndSetupWebSessionResult accessAndSetupWebSessionResult =
-//					GetAccessAndSetupWebSession.getInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request );
+//			GetWebSessionAuthAccessLevelForProjectIds_Result accessAndSetupWebSessionResult =
+//					GetWebSessionAuthAccessLevelForProjectIds.getSinglesonInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request );
 //			
-//			UserSessionObject userSessionObject = accessAndSetupWebSessionResult.getUserSessionObject();
+//			UserSession userSession = accessAndSetupWebSessionResult.getUserSession();
 //
 //			if ( accessAndSetupWebSessionResult.isNoSession() ) {
 //
@@ -392,7 +381,7 @@ public class SearchCommentService {
 //			
 //			//  Test access to the project id
 //			
-//			AuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getAuthAccessLevel();
+//			WebSessionAuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getWebSessionAuthAccessLevel();
 //
 //			if ( ! authAccessLevel.isPublicAccessCodeReadAllowed() ) {
 //

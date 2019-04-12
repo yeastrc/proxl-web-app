@@ -185,11 +185,11 @@ public class ILinker_Main_Objects_ForSearchId_Cached implements CachedDataCommon
 				}
 				
 				int cacheTimeout = CACHE_TIMEOUT_FULL_SIZE;
-				cacheMaxSize = parentObject.CACHE_MAX_SIZE_FULL_SIZE;
+				cacheMaxSize = ILinker_Main_Objects_ForSearchId_Cached.CACHE_MAX_SIZE_FULL_SIZE;
 				if ( cachedDataSizeOptions == CachedDataSizeOptions.HALF ) {
 					cacheMaxSize = cacheMaxSize / 2;
 				} else if ( cachedDataSizeOptions == CachedDataSizeOptions.SMALL ) {
-					cacheMaxSize = parentObject.CACHE_MAX_SIZE_SMALL;
+					cacheMaxSize = ILinker_Main_Objects_ForSearchId_Cached.CACHE_MAX_SIZE_SMALL;
 					cacheTimeout = CACHE_TIMEOUT_SMALL;
 				}
 				
@@ -198,6 +198,7 @@ public class ILinker_Main_Objects_ForSearchId_Cached implements CachedDataCommon
 						.maximumSize( cacheMaxSize )
 						.build(
 								new CacheLoader<Integer, ILinker_Main_Objects_ForSearchId_Cached_Response>() {
+									@Override
 									public ILinker_Main_Objects_ForSearchId_Cached_Response load(Integer searchId) throws Exception {
 										
 										//   WARNING  cannot return null.  

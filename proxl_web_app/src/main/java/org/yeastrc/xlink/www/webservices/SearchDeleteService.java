@@ -16,14 +16,13 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.www.dao.ProjectSearchDAO;
-import org.yeastrc.xlink.www.objects.AuthAccessLevel;
-import org.yeastrc.auth.dto.AuthUserDTO;
+import org.yeastrc.xlink.www.access_control.result_objects.WebSessionAuthAccessLevel;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
 import org.yeastrc.xlink.www.searcher_via_cached_data.cached_data_holders.Cached_Search_Core_DTO;
-import org.yeastrc.xlink.www.user_account.UserSessionObject;
-import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
-import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
+import org.yeastrc.xlink.www.user_session_management.UserSession;
+import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result;
+import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId;
 
 
 /**
@@ -54,8 +53,6 @@ public class SearchDeleteService {
 		    	        );
 		}
 		try {
-			// Get the session first.  
-//			HttpSession session = request.getSession();
 			//   Get the project id for this search
 			Collection<Integer> projectSearchIdsCollection = new HashSet<Integer>( );
 			projectSearchIdsCollection.add( projectSearchId );
@@ -79,9 +76,9 @@ public class SearchDeleteService {
 						);
 			}
 			int projectId = projectIdsFromSearchIds.get( 0 );
-			AccessAndSetupWebSessionResult accessAndSetupWebSessionResult =
-					GetAccessAndSetupWebSession.getInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request );
-//			UserSessionObject userSessionObject = accessAndSetupWebSessionResult.getUserSessionObject();
+			GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result accessAndSetupWebSessionResult =
+					GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.getSinglesonInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request );
+//			UserSession userSession = accessAndSetupWebSessionResult.getUserSession();
 			if ( accessAndSetupWebSessionResult.isNoSession() ) {
 				//  No User session 
 				throw new WebApplicationException(
@@ -91,7 +88,7 @@ public class SearchDeleteService {
 						);
 			}
 			//  Test access to the project id
-			AuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getAuthAccessLevel();
+			WebSessionAuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getWebSessionAuthAccessLevel();
 			if ( ! authAccessLevel.isSearchDeleteAllowed() ) {
 				//  No Access Allowed for this search id
 				throw new WebApplicationException(
@@ -104,9 +101,9 @@ public class SearchDeleteService {
 			////////   Auth complete
 			//////////////////////////////////////////
 
-			UserSessionObject userSessionObject = accessAndSetupWebSessionResult.getUserSessionObject();
-			AuthUserDTO authUserDTO = userSessionObject.getUserDBObject().getAuthUser();
-			ProjectSearchDAO.getInstance().deleteProjectSearchId( projectSearchId, authUserDTO.getId() );
+			UserSession userSession = accessAndSetupWebSessionResult.getUserSession();
+			Integer authUserId = userSession.getAuthUserId();
+			ProjectSearchDAO.getInstance().deleteProjectSearchId( projectSearchId, authUserId );
 			Cached_Search_Core_DTO.getInstance().invalidateProjectSearchId( projectSearchId );
 			
 			SearchDeleteServiceResult result = new SearchDeleteServiceResult();

@@ -174,11 +174,11 @@ public class Cached_CrosslinkProteinPositionsFor_CrosslinkPeptide implements Cac
 				}
 				
 				int cacheTimeout = CACHE_TIMEOUT_FULL_SIZE;
-				cacheMaxSize = parentObject.CACHE_MAX_SIZE_FULL_SIZE;
+				cacheMaxSize = Cached_CrosslinkProteinPositionsFor_CrosslinkPeptide.CACHE_MAX_SIZE_FULL_SIZE;
 				if ( cachedDataSizeOptions == CachedDataSizeOptions.HALF ) {
 					cacheMaxSize = cacheMaxSize / 2;
 				} else if ( cachedDataSizeOptions == CachedDataSizeOptions.SMALL ) {
-					cacheMaxSize = parentObject.CACHE_MAX_SIZE_SMALL;
+					cacheMaxSize = Cached_CrosslinkProteinPositionsFor_CrosslinkPeptide.CACHE_MAX_SIZE_SMALL;
 					cacheTimeout = CACHE_TIMEOUT_SMALL;
 				}
 				
@@ -187,6 +187,7 @@ public class Cached_CrosslinkProteinPositionsFor_CrosslinkPeptide implements Cac
 						.maximumSize( cacheMaxSize )
 						.build(
 								new CacheLoader<CrosslinkProteinPositionsFor_CrosslinkPeptide_Request, CrosslinkProteinPositionsFor_CrosslinkPeptide_Result>() {
+									@Override
 									public CrosslinkProteinPositionsFor_CrosslinkPeptide_Result load(CrosslinkProteinPositionsFor_CrosslinkPeptide_Request crosslinkProteinPositionsFor_CrosslinkPeptide_Request) throws Exception {
 										
 										//   WARNING  cannot return null.  

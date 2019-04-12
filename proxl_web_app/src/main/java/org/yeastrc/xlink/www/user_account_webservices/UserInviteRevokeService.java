@@ -2,7 +2,6 @@ package org.yeastrc.xlink.www.user_account_webservices;
 
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.POST;
@@ -18,14 +17,12 @@ import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.auth.dao.AuthUserInviteTrackingDAO;
 import org.yeastrc.auth.dto.AuthUserInviteTrackingDTO;
 import org.yeastrc.xlink.www.constants.AuthAccessLevelConstants;
-import org.yeastrc.xlink.www.internal_services.GetAuthLevelFromXLinkData;
-import org.yeastrc.xlink.www.objects.AuthAccessLevel;
+import org.yeastrc.xlink.www.access_control.result_objects.WebSessionAuthAccessLevel;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.objects.GenericWebserviceResult;
-import org.yeastrc.xlink.www.user_account.UserSessionObject;
-import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
-import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
-import org.yeastrc.xlink.www.user_web_utils.GetAuthAccessLevelForWebRequest;
+import org.yeastrc.xlink.www.user_session_management.UserSession;
+import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result;
+import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId;
 
 
 
@@ -88,14 +85,8 @@ public class UserInviteRevokeService {
 //		throw new Exception("Forced Error");
 		
 		try {
-
-			// Get the session first.  
-			HttpSession session = request.getSession();
-
-
-
-			AccessAndSetupWebSessionResult accessAndSetupWebSessionResult =
-					GetAccessAndSetupWebSession.getInstance().getAccessAndSetupWebSessionNoProjectId( request );
+			GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result accessAndSetupWebSessionResult =
+					GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.getSinglesonInstance().getAccessAndSetupWebSessionNoProjectId( request );
 
 			if ( accessAndSetupWebSessionResult.isNoSession() ) {
 
@@ -108,12 +99,22 @@ public class UserInviteRevokeService {
 						);
 			}
 			
-			UserSessionObject userSessionObject = accessAndSetupWebSessionResult.getUserSessionObject();
-			
+			UserSession userSession = accessAndSetupWebSessionResult.getUserSession();
+
+			if ( userSession == null || ( ! userSession.isActualUser() ) ) {
+
+				//  No User session 
+
+				throw new WebApplicationException(
+						Response.status( WebServiceErrorMessageConstants.NO_SESSION_STATUS_CODE )  //  Send HTTP code
+						.entity( WebServiceErrorMessageConstants.NO_SESSION_TEXT ) // This string will be passed to the client
+						.build()
+						);
+			}
 			
 			//  Test access at global level
 
-			AuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getAuthAccessLevel();
+			WebSessionAuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getWebSessionAuthAccessLevel();
 
 			
 			AuthUserInviteTrackingDAO authUserInviteTrackingDAO = AuthUserInviteTrackingDAO.getInstance();
@@ -156,10 +157,7 @@ public class UserInviteRevokeService {
 
 
 				if ( invitedSharedObjectId == null ) {
-
-
-					authAccessLevel = GetAuthAccessLevelForWebRequest.getInstance().getAuthAccessLevelForWebRequest_NonProjectUsageOnly( userSessionObject );
-
+					
 					if ( ! authAccessLevel.isAdminAllowed() ) {
 
 						//  No Access Allowed at global access level
@@ -172,8 +170,11 @@ public class UserInviteRevokeService {
 					}
 
 				} else {
+					GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result getWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result_invitedSharedObjectId =
+							GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.getSinglesonInstance()
+							.getAccessAndSetupWebSessionWithProjectId( invitedSharedObjectId, request );
 
-					authAccessLevel = GetAuthLevelFromXLinkData.getInstance().getAuthLevelForAuthUserIdShareableObjectId( userSessionObject.getUserDBObject(), invitedSharedObjectId );
+					authAccessLevel = getWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result_invitedSharedObjectId.getWebSessionAuthAccessLevel();
 
 
 					if ( ! authAccessLevel.isAssistantProjectOwnerAllowed() ) {
@@ -208,7 +209,7 @@ public class UserInviteRevokeService {
 			}
 			
 
-			int revokeAuthUserId = userSessionObject.getUserDBObject().getAuthUser().getId();
+			int revokeAuthUserId = userSession.getAuthUserId();
 			
 			authUserInviteTrackingDAO.updateRevokedInviteFields( inviteId, revokeAuthUserId );
 			

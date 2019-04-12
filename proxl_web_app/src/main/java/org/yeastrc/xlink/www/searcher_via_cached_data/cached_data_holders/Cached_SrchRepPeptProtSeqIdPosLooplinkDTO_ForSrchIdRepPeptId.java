@@ -175,11 +175,11 @@ public class Cached_SrchRepPeptProtSeqIdPosLooplinkDTO_ForSrchIdRepPeptId implem
 				}
 				
 				int cacheTimeout = CACHE_TIMEOUT_FULL_SIZE;
-				cacheMaxSize = parentObject.CACHE_MAX_SIZE_FULL_SIZE;
+				cacheMaxSize = Cached_SrchRepPeptProtSeqIdPosLooplinkDTO_ForSrchIdRepPeptId.CACHE_MAX_SIZE_FULL_SIZE;
 				if ( cachedDataSizeOptions == CachedDataSizeOptions.HALF ) {
 					cacheMaxSize = cacheMaxSize / 2;
 				} else if ( cachedDataSizeOptions == CachedDataSizeOptions.SMALL ) {
-					cacheMaxSize = parentObject.CACHE_MAX_SIZE_SMALL;
+					cacheMaxSize = Cached_SrchRepPeptProtSeqIdPosLooplinkDTO_ForSrchIdRepPeptId.CACHE_MAX_SIZE_SMALL;
 					cacheTimeout = CACHE_TIMEOUT_SMALL;
 				}
 				
@@ -188,6 +188,7 @@ public class Cached_SrchRepPeptProtSeqIdPosLooplinkDTO_ForSrchIdRepPeptId implem
 						.maximumSize( cacheMaxSize )
 						.build(
 								new CacheLoader<SrchRepPeptProtSeqIdPosLooplinkDTO_ForSrchIdRepPeptId_ReqParams, SrchRepPeptProtSeqIdPosLooplinkDTO_ForSrchIdRepPeptId_Result>() {
+									@Override
 									public SrchRepPeptProtSeqIdPosLooplinkDTO_ForSrchIdRepPeptId_Result load(SrchRepPeptProtSeqIdPosLooplinkDTO_ForSrchIdRepPeptId_ReqParams srchRepPeptProtSeqIdPosLooplinkDTO_ForSrchIdRepPeptId_ReqParams) throws Exception {
 										
 										//   WARNING  cannot return null.  

@@ -32,7 +32,7 @@ import org.yeastrc.xlink.www.linked_positions.LinkedPositions_FilterExcludeLinks
 import org.yeastrc.xlink.www.linked_positions.LooplinkLinkedPositions;
 import org.yeastrc.xlink.www.nav_links_image_structure.PopulateRequestDataForImageAndStructureAndQC_NavLinks;
 import org.yeastrc.xlink.www.no_data_validation.ThrowExceptionOnNoDataConfig;
-import org.yeastrc.xlink.www.objects.AuthAccessLevel;
+import org.yeastrc.xlink.www.access_control.result_objects.WebSessionAuthAccessLevel;
 import org.yeastrc.xlink.www.objects.SearchProtein;
 import org.yeastrc.xlink.www.objects.SearchProteinCrosslink;
 import org.yeastrc.xlink.www.objects.SearchProteinCrosslinkWrapper;
@@ -51,8 +51,8 @@ import org.yeastrc.xlink.www.form_query_json_objects.Z_CutoffValuesObjectsToOthe
 import org.yeastrc.xlink.www.form_query_json_objects.Z_CutoffValuesObjectsToOtherObjectsFactory.Z_CutoffValuesObjectsToOtherObjects_PerSearchResult;
 import org.yeastrc.xlink.www.form_utils.GetProteinQueryJSONRootFromFormData;
 import org.yeastrc.xlink.www.forms.SearchViewProteinsForm;
-import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
-import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
+import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result;
+import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId;
 import org.yeastrc.xlink.www.web_utils.ExcludeLinksWith_Remove_NonUniquePSMs_Checkbox_PopRequestItems;
 import org.yeastrc.xlink.www.web_utils.ExcludeOnTaxonomyForProteinSequenceVersionIdSearchId;
 import org.yeastrc.xlink.www.web_utils.GetAnnotationDisplayUserSelectionDetailsData;
@@ -75,6 +75,7 @@ public class ViewSearchProteinsAction extends Action {
 	
 	private static final Logger log = LoggerFactory.getLogger( ViewSearchProteinsAction.class);
 	
+	@Override
 	public ActionForward execute( ActionMapping mapping,
 			  ActionForm actionForm,
 			  HttpServletRequest request,
@@ -93,8 +94,6 @@ public class ViewSearchProteinsAction extends Action {
 			SearchViewProteinsForm form = (SearchViewProteinsForm)actionForm;
 			request.setAttribute( "searchViewCrosslinkProteinForm", form );
 			int projectSearchId = form.getProjectSearchIdSingle();
-			// Get the session first.  
-//			HttpSession session = request.getSession();
 			//   Get the project id for this search
 			Collection<Integer> projectSearchIdsSet = new HashSet<>();
 			projectSearchIdsSet.add( projectSearchId );
@@ -113,14 +112,14 @@ public class ViewSearchProteinsAction extends Action {
 			request.setAttribute( "projectId", projectId ); 
 			request.setAttribute( "project_id", projectId );
 			///////////////////////
-			AccessAndSetupWebSessionResult accessAndSetupWebSessionResult =
-					GetAccessAndSetupWebSession.getInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request, response );
+			GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result accessAndSetupWebSessionResult =
+					GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.getSinglesonInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request, response );
 			if ( accessAndSetupWebSessionResult.isNoSession() ) {
 				//  No User session 
 				return mapping.findForward( StrutsGlobalForwardNames.NO_USER_SESSION );
 			}
 			//  Test access to the project id
-			AuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getAuthAccessLevel();
+			WebSessionAuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getWebSessionAuthAccessLevel();
 			if ( ! authAccessLevel.isPublicAccessCodeReadAllowed() ) {
 				//  No Access Allowed for this project id
 				return mapping.findForward( StrutsGlobalForwardNames.INSUFFICIENT_ACCESS_PRIVILEGE );
@@ -652,7 +651,8 @@ public class ViewSearchProteinsAction extends Action {
      *
      */
     public class SortSearchProtein implements Comparator<SearchProtein> {
-        public int compare(SearchProtein o1, SearchProtein o2) {
+        @Override
+		public int compare(SearchProtein o1, SearchProtein o2) {
             try { return o1.getName().toLowerCase().compareTo(o2.getName().toLowerCase()); }
             catch( Exception e ) { return 0; }
         }

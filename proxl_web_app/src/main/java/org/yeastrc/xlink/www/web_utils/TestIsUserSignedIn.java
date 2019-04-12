@@ -1,7 +1,7 @@
 package org.yeastrc.xlink.www.web_utils;
 
 //import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
-import org.yeastrc.xlink.www.user_account.UserSessionObject;
+import org.yeastrc.xlink.www.user_session_management.UserSession;
 /**
  * 
  *
@@ -16,17 +16,17 @@ public class TestIsUserSignedIn {
 	/**
 	 * Is there an actual user signed on
 	 * 
-	 * @param userSessionObject
+	 * @param userSession
 	 * @return
 	 * @throws Exception
 	 */
-	public boolean testIsUserSignedIn( UserSessionObject userSessionObject )
+	public boolean testIsUserSignedIn( UserSession userSession )
 					  throws Exception {
-		if ( userSessionObject == null ) {
+		if ( userSession == null ) {
 			//  No User session 
 			return false;
 		}
-		if ( userSessionObject.getUserDBObject() == null ) {
+		if ( ! userSession.isActualUser() ) {
 			//  No User session 
 			return false;
 		}

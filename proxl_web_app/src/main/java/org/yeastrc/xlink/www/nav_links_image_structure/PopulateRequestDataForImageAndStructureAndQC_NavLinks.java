@@ -9,7 +9,7 @@ import org.yeastrc.xlink.www.form_query_json_objects.ImageStructure_QC_QueryJSON
 import org.yeastrc.xlink.www.form_query_json_objects.PeptideQueryJSONRoot;
 import org.yeastrc.xlink.www.form_query_json_objects.ProteinQueryJSONRoot;
 import org.yeastrc.xlink.www.forms.PeptideProteinCommonForm;
-import org.yeastrc.xlink.www.objects.AuthAccessLevel;
+import org.yeastrc.xlink.www.access_control.result_objects.WebSessionAuthAccessLevel;
 import org.yeastrc.xlink.www.web_utils.AnyPDBFilesForProjectId;
 import org.yeastrc.xlink.www.web_utils.URLEncodeDecodeAURL;
 
@@ -47,7 +47,7 @@ public class PopulateRequestDataForImageAndStructureAndQC_NavLinks {
 
 			PeptideQueryJSONRoot peptideQueryJSONRoot,
 			int projectId,
-			AuthAccessLevel authAccessLevel,
+			WebSessionAuthAccessLevel authAccessLevel,
 			PeptideProteinCommonForm form, 
 			HttpServletRequest request ) throws ProxlWebappDataException {
 
@@ -68,7 +68,7 @@ public class PopulateRequestDataForImageAndStructureAndQC_NavLinks {
 			
 			ProteinQueryJSONRoot proteinQueryJSONRoot,
 			int projectId,
-			AuthAccessLevel authAccessLevel,
+			WebSessionAuthAccessLevel authAccessLevel,
 			PeptideProteinCommonForm form, 
 			HttpServletRequest request ) throws ProxlWebappDataException {
 		
@@ -91,7 +91,7 @@ public class PopulateRequestDataForImageAndStructureAndQC_NavLinks {
 			ImageStructure_QC_QueryJSONRoot imageStructure_QC_QueryJSONRoot,
 			PeptideProteinCommonForm form, 
 			int projectId,
-			AuthAccessLevel authAccessLevel,
+			WebSessionAuthAccessLevel authAccessLevel,
 			HttpServletRequest request ) throws ProxlWebappDataException {
 		
 		request.setAttribute( "formDataForImageStructure_QC", form );

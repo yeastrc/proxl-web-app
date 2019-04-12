@@ -18,7 +18,7 @@ import javax.ws.rs.core.Response;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
-import org.yeastrc.xlink.www.objects.AuthAccessLevel;
+import org.yeastrc.xlink.www.access_control.result_objects.WebSessionAuthAccessLevel;
 import org.yeastrc.xlink.www.qc_data.a_enums.ForDownload_Enum;
 import org.yeastrc.xlink.www.qc_data.a_request_json_root.QCPageRequestJSONRoot;
 import org.yeastrc.xlink.www.qc_data.scan_level_data_merged.main.Scan_Statistics_Merged;
@@ -29,8 +29,8 @@ import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.dao.SearchDAO;
 import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.www.form_query_json_objects.QCPageQueryJSONRoot;
-import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
-import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
+import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result;
+import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId;
 
 /**
  * Merged
@@ -95,8 +95,6 @@ public class QC_Scan_Statistics_Merged_Service {
 		}
 
 		try {
-			// Get the session first.  
-//			HttpSession session = request.getSession();
 			//   Get the project id for this search
 			//   Get the project id for these searches
 			Set<Integer> projectSearchIdsSet = new HashSet<Integer>( );
@@ -128,9 +126,9 @@ public class QC_Scan_Statistics_Merged_Service {
 						);
 			}
 			int projectId = projectIdsFromProjectSearchIds.get( 0 );
-			AccessAndSetupWebSessionResult accessAndSetupWebSessionResult =
-					GetAccessAndSetupWebSession.getInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request );
-//			UserSessionObject userSessionObject = accessAndSetupWebSessionResult.getUserSessionObject();
+			GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result accessAndSetupWebSessionResult =
+					GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.getSinglesonInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request );
+//			UserSession userSession = accessAndSetupWebSessionResult.getUserSession();
 			if ( accessAndSetupWebSessionResult.isNoSession() ) {
 				//  No User session 
 				throw new WebApplicationException(
@@ -140,7 +138,7 @@ public class QC_Scan_Statistics_Merged_Service {
 						);
 			}
 			//  Test access to the project id
-			AuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getAuthAccessLevel();
+			WebSessionAuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getWebSessionAuthAccessLevel();
 			if ( ! authAccessLevel.isPublicAccessCodeReadAllowed() ) {
 				//  No Access Allowed for this search id
 				throw new WebApplicationException(

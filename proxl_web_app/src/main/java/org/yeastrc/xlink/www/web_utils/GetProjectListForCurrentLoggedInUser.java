@@ -3,14 +3,12 @@ package org.yeastrc.xlink.www.web_utils;
 import java.util.ArrayList;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-import org.yeastrc.auth.dto.AuthUserDTO;
+import org.yeastrc.auth.dao.AuthUserDAO;
 import org.yeastrc.xlink.www.constants.AuthAccessLevelConstants;
 import org.yeastrc.xlink.www.objects.ProjectTblSubPartsForProjectLists;
-import org.yeastrc.xlink.www.internal_services.UpdateAuthUserUserAccessLevelEnabled;
-import org.yeastrc.xlink.www.constants.WebConstants;
 import org.yeastrc.xlink.www.searcher.ProjectSearcher;
-import org.yeastrc.xlink.www.user_account.UserSessionObject;
+import org.yeastrc.xlink.www.user_session_management.UserSession;
+import org.yeastrc.xlink.www.user_session_management.UserSessionManager;
 /**
  * This class is for getting the project list for the current logged in user  
  *
@@ -26,24 +24,26 @@ public class GetProjectListForCurrentLoggedInUser {
 	 * @throws Exception 
 	 */
 	public List<ProjectTblSubPartsForProjectLists> getProjectListForCurrentLoggedInUser( HttpServletRequest request ) throws Exception {
-		// Get their session first.  
-		HttpSession session = request.getSession();
-		UserSessionObject userSessionObject 
-		= (UserSessionObject) session.getAttribute( WebConstants.SESSION_CONTEXT_USER_LOGGED_IN );
-		if ( userSessionObject == null || userSessionObject.getUserDBObject() == null || userSessionObject.getUserDBObject().getAuthUser() == null ) {
+		
+		UserSession userSession = UserSessionManager.getSinglesonInstance().getUserSession(request);
+		
+		if ( userSession == null || ( ! userSession.isActualUser() ) ) {
+			//  No User session 
+			return new ArrayList<>();
+		}
+		Integer authUserId = userSession.getAuthUserId();
+		if ( authUserId == null ) {
 			//  No User session 
 			return new ArrayList<>();
 		}
 		List<ProjectTblSubPartsForProjectLists> projects = null;
-		AuthUserDTO authUser = userSessionObject.getUserDBObject().getAuthUser();
-		///  Refresh with latest
-		UpdateAuthUserUserAccessLevelEnabled.getInstance().updateAuthUserUserAccessLevelEnabled( authUser );
-		if ( authUser != null 
-				&& authUser.getUserAccessLevel() != null
-				&& authUser.getUserAccessLevel() == AuthAccessLevelConstants.ACCESS_LEVEL_ADMIN ) {
+		//  Get User acess level
+		Integer userAccessLevel = AuthUserDAO.getInstance().getUserAccessLevel( authUserId );
+		if ( userAccessLevel != null
+				&& userAccessLevel == AuthAccessLevelConstants.ACCESS_LEVEL_ADMIN ) {
 			projects = ProjectSearcher.getInstance().getAllProjects();
 		} else {
-			int authUserId = authUser.getId();
+			
 			//  Get projects currently authorized
 			projects = ProjectSearcher.getInstance().getProjectsForAuthUserId( authUserId );
 		}

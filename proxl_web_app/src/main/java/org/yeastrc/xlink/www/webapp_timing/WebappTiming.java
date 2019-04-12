@@ -4,7 +4,7 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
+import org.slf4j.Logger;
 
 /**
  * Used for timing the web app

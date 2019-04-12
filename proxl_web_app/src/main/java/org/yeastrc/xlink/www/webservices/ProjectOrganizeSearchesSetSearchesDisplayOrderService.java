@@ -1,7 +1,6 @@
 package org.yeastrc.xlink.www.webservices;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -15,12 +14,13 @@ import org.yeastrc.xlink.www.dao.SearchDAO;
 import org.yeastrc.xlink.www.dao.ProjectDAO;
 import org.yeastrc.xlink.www.database_update_with_transaction_services.UpdateSearchDisplayOrderUsingDBTransactionService;
 import org.yeastrc.xlink.www.dto.ProjectDTO;
-import org.yeastrc.xlink.www.objects.AuthAccessLevel;
+import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId;
+import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result;
+import org.yeastrc.xlink.www.access_control.common.AccessControl_GetUserSession_RefreshAccessEnabled;
+import org.yeastrc.xlink.www.access_control.result_objects.WebSessionAuthAccessLevel;
 import org.yeastrc.xlink.www.searcher_via_cached_data.cached_data_holders.Cached_Search_Core_DTO;
-import org.yeastrc.xlink.www.constants.WebConstants;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
-import org.yeastrc.xlink.www.user_account.UserSessionObject;
-import org.yeastrc.xlink.www.user_web_utils.GetAuthAccessLevelForWebRequest;
+import org.yeastrc.xlink.www.user_session_management.UserSession;
 
 @Path("/project")
 public class ProjectOrganizeSearchesSetSearchesDisplayOrderService {
@@ -53,11 +53,12 @@ public class ProjectOrganizeSearchesSetSearchesDisplayOrderService {
 			    	        .build()
 			    	        );
 			}
-			// Get the session first.  
-			HttpSession session = request.getSession();
-			UserSessionObject userSessionObject 
-			= (UserSessionObject) session.getAttribute( WebConstants.SESSION_CONTEXT_USER_LOGGED_IN );
-			if ( userSessionObject == null ) {
+
+			UserSession userSession =
+					AccessControl_GetUserSession_RefreshAccessEnabled.getSinglesonInstance()
+					.getUserSession_RefreshAccessEnabled( request );
+			
+			if ( userSession == null || ( ! userSession.isActualUser() ) ) {
 				//  No User session 
 				throw new WebApplicationException(
 						Response.status( WebServiceErrorMessageConstants.NO_SESSION_STATUS_CODE )  //  Send HTTP code
@@ -92,9 +93,10 @@ public class ProjectOrganizeSearchesSetSearchesDisplayOrderService {
 					}
 				}
 			}
-			AuthAccessLevel authAccessLevel = 
-					GetAuthAccessLevelForWebRequest.getInstance()
-					.getAuthAccessLevelForWebRequestProjectId( userSessionObject, projectId );
+			GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result getWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result =
+					GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.getSinglesonInstance()
+					.getAccessAndSetupWebSessionWithProjectId( projectId, request );
+			WebSessionAuthAccessLevel authAccessLevel = getWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result.getWebSessionAuthAccessLevel();
 			if ( ! authAccessLevel.isProjectOwnerAllowed() ) {
 				//  No Access Allowed for this project id
 				throw new WebApplicationException(

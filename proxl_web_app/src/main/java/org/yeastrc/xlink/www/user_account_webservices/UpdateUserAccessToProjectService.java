@@ -2,7 +2,6 @@ package org.yeastrc.xlink.www.user_account_webservices;
 
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.POST;
@@ -19,12 +18,12 @@ import org.yeastrc.auth.dao.AuthSharedObjectUsersDAO;
 import org.yeastrc.auth.dto.AuthSharedObjectUsersDTO;
 import org.yeastrc.xlink.www.constants.AuthAccessLevelConstants;
 import org.yeastrc.xlink.www.dao.ProjectDAO;
-import org.yeastrc.xlink.www.objects.AuthAccessLevel;
+import org.yeastrc.xlink.www.access_control.result_objects.WebSessionAuthAccessLevel;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.objects.UpdateUserAccessToProjectResult;
-import org.yeastrc.xlink.www.user_account.UserSessionObject;
-import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
-import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
+import org.yeastrc.xlink.www.user_session_management.UserSession;
+import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result;
+import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId;
 import org.yeastrc.xlink.www.user_web_utils.ValidateUserAccessLevel;
 
 
@@ -145,13 +144,8 @@ public class UpdateUserAccessToProjectService {
 		
 		try {
 
-			// Get the session first.  
-			HttpSession session = request.getSession();
-
-
-
-			AccessAndSetupWebSessionResult accessAndSetupWebSessionResult =
-					GetAccessAndSetupWebSession.getInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request );
+			GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result accessAndSetupWebSessionResult =
+					GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.getSinglesonInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request );
 
 			if ( accessAndSetupWebSessionResult.isNoSession() ) {
 
@@ -164,13 +158,13 @@ public class UpdateUserAccessToProjectService {
 						);
 			}
 			
-			UserSessionObject userSessionObject = accessAndSetupWebSessionResult.getUserSessionObject();
+			UserSession userSession = accessAndSetupWebSessionResult.getUserSession();
 			
 			
-			AuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getAuthAccessLevel();
+			WebSessionAuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getWebSessionAuthAccessLevel();
 
 						
-			if ( userSessionObject.getUserDBObject().getAuthUser().getId() == personId ) {
+			if ( userSession.getAuthUserId() == personId ) {
 
 				//  Not allowed to update own access
 				

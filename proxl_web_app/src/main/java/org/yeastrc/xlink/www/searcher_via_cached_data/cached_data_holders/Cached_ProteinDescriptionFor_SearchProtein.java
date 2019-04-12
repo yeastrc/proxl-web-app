@@ -173,11 +173,11 @@ public class Cached_ProteinDescriptionFor_SearchProtein implements CachedDataCom
 				}
 				
 				int cacheTimeout = CACHE_TIMEOUT_FULL_SIZE;
-				cacheMaxSize = parentObject.CACHE_MAX_SIZE_FULL_SIZE;
+				cacheMaxSize = Cached_ProteinDescriptionFor_SearchProtein.CACHE_MAX_SIZE_FULL_SIZE;
 				if ( cachedDataSizeOptions == CachedDataSizeOptions.HALF ) {
 					cacheMaxSize = cacheMaxSize / 2;
 				} else if ( cachedDataSizeOptions == CachedDataSizeOptions.SMALL ) {
-					cacheMaxSize = parentObject.CACHE_MAX_SIZE_SMALL;
+					cacheMaxSize = Cached_ProteinDescriptionFor_SearchProtein.CACHE_MAX_SIZE_SMALL;
 					cacheTimeout = CACHE_TIMEOUT_SMALL;
 				}
 				
@@ -186,6 +186,7 @@ public class Cached_ProteinDescriptionFor_SearchProtein implements CachedDataCom
 						.maximumSize( cacheMaxSize )
 						.build(
 								new CacheLoader<ProteinDescriptionFor_SearchProtein_Request, ProteinDescriptionFor_SearchProtein_Result>() {
+									@Override
 									public ProteinDescriptionFor_SearchProtein_Result load(ProteinDescriptionFor_SearchProtein_Request proteinDescriptionFor_SearchProtein_Request) throws Exception {
 										
 										//   WARNING  cannot return null.  

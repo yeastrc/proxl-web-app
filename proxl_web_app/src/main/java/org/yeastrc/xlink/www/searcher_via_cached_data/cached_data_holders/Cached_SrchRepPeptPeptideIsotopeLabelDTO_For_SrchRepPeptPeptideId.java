@@ -175,11 +175,11 @@ public class Cached_SrchRepPeptPeptideIsotopeLabelDTO_For_SrchRepPeptPeptideId i
 				}
 				
 				int cacheTimeout = CACHE_TIMEOUT_FULL_SIZE;
-				cacheMaxSize = parentObject.CACHE_MAX_SIZE_FULL_SIZE;
+				cacheMaxSize = Cached_SrchRepPeptPeptideIsotopeLabelDTO_For_SrchRepPeptPeptideId.CACHE_MAX_SIZE_FULL_SIZE;
 				if ( cachedDataSizeOptions == CachedDataSizeOptions.HALF ) {
 					cacheMaxSize = cacheMaxSize / 2;
 				} else if ( cachedDataSizeOptions == CachedDataSizeOptions.SMALL ) {
-					cacheMaxSize = parentObject.CACHE_MAX_SIZE_SMALL;
+					cacheMaxSize = Cached_SrchRepPeptPeptideIsotopeLabelDTO_For_SrchRepPeptPeptideId.CACHE_MAX_SIZE_SMALL;
 					cacheTimeout = CACHE_TIMEOUT_SMALL;
 				}
 				
@@ -188,6 +188,7 @@ public class Cached_SrchRepPeptPeptideIsotopeLabelDTO_For_SrchRepPeptPeptideId i
 						.maximumSize( cacheMaxSize )
 						.build(
 								new CacheLoader<SrchRepPeptPeptideIsotopeLabelDTO_For_SrchRepPeptPeptideId_ReqParams, SrchRepPeptPeptideIsotopeLabelDTO_For_SrchRepPeptPeptideId_Result>() {
+									@Override
 									public SrchRepPeptPeptideIsotopeLabelDTO_For_SrchRepPeptPeptideId_Result load(SrchRepPeptPeptideIsotopeLabelDTO_For_SrchRepPeptPeptideId_ReqParams srchRepPeptPeptideDTO_ForSrchIdRepPeptId_ReqParams) throws Exception {
 										
 										//   WARNING  cannot return null.  

@@ -26,6 +26,7 @@ public class UserInviteCreateNewUserInitPageAction extends Action {
 
 	private static final Logger log = LoggerFactory.getLogger( UserInviteCreateNewUserInitPageAction.class);
 
+	@Override
 	public ActionForward execute( ActionMapping mapping,
 			  ActionForm actionForm,
 			  HttpServletRequest request,

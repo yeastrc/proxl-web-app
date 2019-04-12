@@ -9,14 +9,14 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.yeastrc.xlink.www.access_control.common.AccessControl_GetUserSession_RefreshAccessEnabled;
 import org.yeastrc.xlink.www.browser_type_checking.IsBrowserIsInternetExplorer;
 import org.yeastrc.xlink.www.constants.StrutsActionPathsConstants;
-//import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.www.constants.WebConstants;
 import org.yeastrc.xlink.www.servlet_context.CurrentContext;
-import org.yeastrc.xlink.www.user_account.UserSessionObject;
+import org.yeastrc.xlink.www.user_session_management.UserSession;
 
 /**
  * This filter will be the first called for a request and does initial setup
@@ -24,7 +24,7 @@ import org.yeastrc.xlink.www.user_account.UserSessionObject;
  */
 public class InitialServletFilter implements Filter {
 	
-//	private static final Logger log = LoggerFactory.getLogger( InitialServletFilter.class);
+	private static final Logger log = LoggerFactory.getLogger( InitialServletFilter.class );
 	
 	@Override
 	public void destroy() {
@@ -36,7 +36,6 @@ public class InitialServletFilter implements Filter {
 			FilterChain chain) throws IOException, ServletException {
 		HttpServletRequest httpRequest = (HttpServletRequest) request;
 		HttpServletResponse httpResponse = (HttpServletResponse) response;
-		HttpSession httpSession = httpRequest.getSession();
 		String requestURL = httpRequest.getRequestURL().toString();
 		String queryString = httpRequest.getQueryString();
 		if (queryString == null){
@@ -52,12 +51,20 @@ public class InitialServletFilter implements Filter {
 		//  Does NOT include slash after web app context
 		String requestURLIncludingWebAppContext = requestURL.substring(0, indexPlusOneEndOfWebAppContextInRequestURL);
 		httpRequest.setAttribute( WebConstants.REQUEST_URL_ONLY_UP_TO_WEB_APP_CONTEXT, requestURLIncludingWebAppContext );
-		UserSessionObject userSessionObject 
-		= (UserSessionObject) httpSession.getAttribute( WebConstants.SESSION_CONTEXT_USER_LOGGED_IN );
-		if ( userSessionObject != null ) {
+
+		UserSession userSession;
+		try {
+			userSession = AccessControl_GetUserSession_RefreshAccessEnabled.getSinglesonInstance()
+			.getUserSession_RefreshAccessEnabled( httpRequest );
+		} catch (Exception e) {
+			log.error( "Fail calling AccessControl_GetUserSession_RefreshAccessEnabled ", e );
+			throw new ServletException( e );
+		}
+		
+		if ( userSession != null ) {
 			/////  If a user is logged in, copy the user id to a request variable for placement on all pages 
-			if ( userSessionObject.getUserDBObject() != null && userSessionObject.getUserDBObject().getAuthUser() != null ) {
-				int loggedInUserId = userSessionObject.getUserDBObject().getAuthUser().getId();
+			if ( userSession.getAuthUserId() != null ) {
+				int loggedInUserId = userSession.getAuthUserId();
 				httpRequest.setAttribute( WebConstants.REQUEST_LOGGED_IN_USER_ID, loggedInUserId );
 			}
 		}

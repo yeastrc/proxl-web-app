@@ -1,7 +1,6 @@
 package org.yeastrc.xlink.www.webservices;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.POST;
@@ -17,14 +16,13 @@ import org.yeastrc.xlink.dao.NoteDAO;
 import org.yeastrc.xlink.www.dao.ProjectDAO;
 import org.yeastrc.xlink.dto.NoteDTO;
 import org.yeastrc.xlink.www.dto.ProjectDTO;
-import org.yeastrc.xlink.www.objects.AuthAccessLevel;
-import org.yeastrc.xlink.www.constants.WebConstants;
+import org.yeastrc.xlink.www.access_control.result_objects.WebSessionAuthAccessLevel;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.objects.ProjectNoteAdminResult;
-import org.yeastrc.xlink.www.user_account.UserSessionObject;
-import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
-import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
-import org.yeastrc.xlink.www.user_web_utils.GetAuthAccessLevelForWebRequest;
+import org.yeastrc.xlink.www.user_session_management.UserSession;
+import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result;
+import org.yeastrc.xlink.www.access_control.common.AccessControl_GetUserSession_RefreshAccessEnabled;
+import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId;
 
 @Path("/project")
 public class ProjectNoteAdminService {
@@ -66,11 +64,9 @@ public class ProjectNoteAdminService {
 			    	        .build()
 			    	        );
 			}
-			// Get the session first.  
-//			HttpSession session = request.getSession();
-			AccessAndSetupWebSessionResult accessAndSetupWebSessionResult =
-					GetAccessAndSetupWebSession.getInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request );
-			UserSessionObject userSessionObject = accessAndSetupWebSessionResult.getUserSessionObject();
+			GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result accessAndSetupWebSessionResult =
+					GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.getSinglesonInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request );
+			UserSession userSession = accessAndSetupWebSessionResult.getUserSession();
 			if ( accessAndSetupWebSessionResult.isNoSession() ) {
 				//  No User session 
 				throw new WebApplicationException(
@@ -80,7 +76,7 @@ public class ProjectNoteAdminService {
 						);
 			}
 			//  Test access to the project id
-			AuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getAuthAccessLevel();
+			WebSessionAuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getWebSessionAuthAccessLevel();
 			if ( ! authAccessLevel.isAssistantProjectOwnerAllowed() ) {
 				//  No Access Allowed for this project id
 				throw new WebApplicationException(
@@ -99,7 +95,7 @@ public class ProjectNoteAdminService {
 						.build()
 						);
 			}
-			int loggedInAuthUserId = userSessionObject.getUserDBObject().getAuthUser().getId();
+			int loggedInAuthUserId = userSession.getAuthUserId();
 			NoteDTO noteDTO = new NoteDTO();
 			noteDTO.setProjectId( projectId );
 			noteDTO.setNoteText( noteText );
@@ -154,11 +150,12 @@ public class ProjectNoteAdminService {
 			    	        .build()
 			    	        );
 			}
-			// Get the session first.  
-			HttpSession session = request.getSession();
-			UserSessionObject userSessionObject 
-			= (UserSessionObject) session.getAttribute( WebConstants.SESSION_CONTEXT_USER_LOGGED_IN );
-			if ( userSessionObject == null ) {
+
+			UserSession userSession =
+					AccessControl_GetUserSession_RefreshAccessEnabled.getSinglesonInstance()
+					.getUserSession_RefreshAccessEnabled( request );
+			
+			if ( userSession == null || ( ! userSession.isActualUser() ) ) {
 				//  No User session 
 				throw new WebApplicationException(
 						Response.status( WebServiceErrorMessageConstants.NO_SESSION_STATUS_CODE )  //  Send HTTP code
@@ -177,7 +174,10 @@ public class ProjectNoteAdminService {
 						);
 			}
 			int projectId = noteDTO.getProjectId();
-			AuthAccessLevel authAccessLevel = GetAuthAccessLevelForWebRequest.getInstance().getAuthAccessLevelForWebRequestProjectId( userSessionObject, projectId );
+			GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result getWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result =
+					GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.getSinglesonInstance()
+					.getAccessAndSetupWebSessionWithProjectId( projectId, request );
+			WebSessionAuthAccessLevel authAccessLevel = getWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result.getWebSessionAuthAccessLevel();
 			if ( ! authAccessLevel.isAssistantProjectOwnerAllowed() ) {
 				//  No Access Allowed for this project id
 				throw new WebApplicationException(
@@ -186,7 +186,7 @@ public class ProjectNoteAdminService {
 						.build()
 						);
 			}
-			int loggedInAuthUserId = userSessionObject.getUserDBObject().getAuthUser().getId();
+			int loggedInAuthUserId = userSession.getAuthUserId();
 			noteDAO.updateNoteText( noteId, noteText, loggedInAuthUserId );
 			projectNoteAdminResult.setStatus(true);
 			return projectNoteAdminResult;
@@ -223,11 +223,12 @@ public class ProjectNoteAdminService {
 			    	        .build()
 			    	        );
 			}
-			// Get the session first.  
-			HttpSession session = request.getSession();
-			UserSessionObject userSessionObject 
-			= (UserSessionObject) session.getAttribute( WebConstants.SESSION_CONTEXT_USER_LOGGED_IN );
-			if ( userSessionObject == null ) {
+
+			UserSession userSession =
+					AccessControl_GetUserSession_RefreshAccessEnabled.getSinglesonInstance()
+					.getUserSession_RefreshAccessEnabled( request );
+			
+			if ( userSession == null || ( ! userSession.isActualUser() ) ) {
 				//  No User session 
 				throw new WebApplicationException(
 						Response.status( WebServiceErrorMessageConstants.NO_SESSION_STATUS_CODE )  //  Send HTTP code
@@ -246,7 +247,10 @@ public class ProjectNoteAdminService {
 						);
 			}
 			int projectId = noteDTO.getProjectId();
-			AuthAccessLevel authAccessLevel = GetAuthAccessLevelForWebRequest.getInstance().getAuthAccessLevelForWebRequestProjectId( userSessionObject, projectId );
+			GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result getWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result =
+					GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.getSinglesonInstance()
+					.getAccessAndSetupWebSessionWithProjectId( projectId, request );
+			WebSessionAuthAccessLevel authAccessLevel = getWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result.getWebSessionAuthAccessLevel();
 			if ( ! authAccessLevel.isAssistantProjectOwnerAllowed() ) {
 				//  No Access Allowed for this project id
 				throw new WebApplicationException(
@@ -255,7 +259,7 @@ public class ProjectNoteAdminService {
 						.build()
 						);
 			}
-//			int loggedInAuthUserId = userSessionObject.getUserDBObject().getAuthUser().getId();
+//			int loggedInAuthUserId = userSession.getAuthUserId();
 			noteDAO.deleteNote( noteId );
 			projectNoteAdminResult.setStatus(true);
 			return projectNoteAdminResult;

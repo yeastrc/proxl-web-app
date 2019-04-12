@@ -27,7 +27,7 @@ import org.yeastrc.xlink.www.dao.SearchDAO;
 import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesRootLevel;
-import org.yeastrc.xlink.www.objects.AuthAccessLevel;
+import org.yeastrc.xlink.www.access_control.result_objects.WebSessionAuthAccessLevel;
 import org.yeastrc.xlink.www.constants.ServletOutputStreamCharacterSetConstant;
 import org.yeastrc.xlink.www.constants.StrutsGlobalForwardNames;
 import org.yeastrc.xlink.www.constants.WebConstants;
@@ -47,8 +47,8 @@ import org.yeastrc.xlink.www.linked_positions.LinkedPositions_FilterExcludeLinks
 import org.yeastrc.xlink.www.objects.ProteinCoverageData;
 import org.yeastrc.xlink.www.protein_coverage.ProteinCoverageCompute;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
-import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
-import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
+import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result;
+import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId;
 
 /**
  * 
@@ -58,6 +58,7 @@ public class DownloadProteinCoverageReportAction extends Action {
 	
 	private static final Logger log = LoggerFactory.getLogger( DownloadProteinCoverageReportAction.class);
 	
+	@Override
 	public ActionForward execute( ActionMapping mapping,
 			  ActionForm actionForm,
 			  HttpServletRequest request,
@@ -66,8 +67,6 @@ public class DownloadProteinCoverageReportAction extends Action {
 		try {
 			// our form
 			MergedSearchViewProteinsForm form = (MergedSearchViewProteinsForm)actionForm;
-			// Get the session first.  
-//			HttpSession session = request.getSession();
 			//   Get the project id for this search
 			int[] projectSearchIds = form.getProjectSearchId();
 			if ( projectSearchIds.length == 0 ) {
@@ -97,14 +96,14 @@ public class DownloadProteinCoverageReportAction extends Action {
 			int projectId = projectIdsFromSearchIds.get( 0 );
 			request.setAttribute( "projectId", projectId ); 
 			///////////////////////
-			AccessAndSetupWebSessionResult accessAndSetupWebSessionResult =
-					GetAccessAndSetupWebSession.getInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request, response );
+			GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result accessAndSetupWebSessionResult =
+					GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.getSinglesonInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request, response );
 			if ( accessAndSetupWebSessionResult.isNoSession() ) {
 				//  No User session 
 				return mapping.findForward( StrutsGlobalForwardNames.NO_USER_SESSION );
 			}
 			//  Test access to the project id
-			AuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getAuthAccessLevel();
+			WebSessionAuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getWebSessionAuthAccessLevel();
 			if ( ! authAccessLevel.isPublicAccessCodeReadAllowed() ) {
 				//  No Access Allowed for this project id
 				return mapping.findForward( StrutsGlobalForwardNames.INSUFFICIENT_ACCESS_PRIVILEGE );
@@ -171,6 +170,7 @@ public class DownloadProteinCoverageReportAction extends Action {
 				writer = new OutputStreamWriter( bos , ServletOutputStreamCharacterSetConstant.outputStreamCharacterSet );
 				// sort our searches by ID
 				Collections.sort( searches, new Comparator<SearchDTO>() {
+					@Override
 					public int compare( SearchDTO r1, SearchDTO r2 ) {
 						return r1.getSearchId() - r2.getSearchId();
 					}

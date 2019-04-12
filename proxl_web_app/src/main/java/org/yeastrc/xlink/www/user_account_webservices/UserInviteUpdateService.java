@@ -2,7 +2,6 @@ package org.yeastrc.xlink.www.user_account_webservices;
 
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -16,13 +15,13 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.auth.dao.AuthUserInviteTrackingDAO;
 import org.yeastrc.auth.dto.AuthUserInviteTrackingDTO;
-import org.yeastrc.xlink.www.objects.AuthAccessLevel;
+import org.yeastrc.xlink.www.access_control.result_objects.WebSessionAuthAccessLevel;
 import org.yeastrc.xlink.www.objects.UserInviteUpdateAccessLevelResult;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.dao.ProjectDAO;
-import org.yeastrc.xlink.www.user_account.UserSessionObject;
-import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
-import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
+import org.yeastrc.xlink.www.user_session_management.UserSession;
+import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result;
+import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId;
 import org.yeastrc.xlink.www.user_web_utils.ValidateUserAccessLevel;
 import org.yeastrc.xlink.www.webservices_utils.Unmarshal_RestRequest_JSON_ToObject;
 
@@ -183,17 +182,10 @@ public class UserInviteUpdateService {
 //		throw new Exception("Forced Error");
 		
 		try {
-
-			// Get the session first.  
-			HttpSession session = request.getSession();
-
-
-
-
 			//  Test for Admin level 
 
-			AccessAndSetupWebSessionResult accessAndSetupWebSessionResult =
-					GetAccessAndSetupWebSession.getInstance().getAccessAndSetupWebSessionNoProjectId( request );
+			GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result accessAndSetupWebSessionResult =
+					GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.getSinglesonInstance().getAccessAndSetupWebSessionNoProjectId( request );
 
 			if ( accessAndSetupWebSessionResult.isNoSession() ) {
 
@@ -206,7 +198,7 @@ public class UserInviteUpdateService {
 						);
 			}
 			
-			UserSessionObject userSessionObject = accessAndSetupWebSessionResult.getUserSessionObject();
+			UserSession userSession = accessAndSetupWebSessionResult.getUserSession();
 			
 			
 			
@@ -217,7 +209,7 @@ public class UserInviteUpdateService {
 
 			//  Test access at global level
 
-			AuthAccessLevel authAccessLevelGlobal = accessAndSetupWebSessionResult.getAuthAccessLevel();
+			WebSessionAuthAccessLevel authAccessLevelGlobal = accessAndSetupWebSessionResult.getWebSessionAuthAccessLevel();
 
 			if ( authAccessLevelGlobal.isAdminAllowed() ) {
 
@@ -251,10 +243,10 @@ public class UserInviteUpdateService {
 
 					//  Test access to the project id
 
-					AccessAndSetupWebSessionResult accessAndSetupWebSessionResultProjectLevel =
-							GetAccessAndSetupWebSession.getInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request );
+					GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result accessAndSetupWebSessionResultProjectLevel =
+							GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.getSinglesonInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request );
 
-					AuthAccessLevel authAccessLevel = accessAndSetupWebSessionResultProjectLevel.getAuthAccessLevel();
+					WebSessionAuthAccessLevel authAccessLevel = accessAndSetupWebSessionResultProjectLevel.getWebSessionAuthAccessLevel();
 
 					if ( ! authAccessLevel.isProjectOwnerAllowed() ) {
 

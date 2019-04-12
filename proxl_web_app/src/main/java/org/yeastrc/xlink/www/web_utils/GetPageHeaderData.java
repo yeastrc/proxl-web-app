@@ -3,15 +3,13 @@ package org.yeastrc.xlink.www.web_utils;
 import java.util.ArrayList;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-import org.yeastrc.auth.dto.AuthUserDTO;
-import org.yeastrc.xlink.www.internal_services.UpdateAuthUserUserAccessLevelEnabled;
+import org.yeastrc.auth.dao.AuthUserDAO;
 import org.yeastrc.xlink.www.objects.ProjectTblSubPartsForProjectLists;
 import org.yeastrc.xlink.www.objects.ProjectTitleHeaderDisplay;
 import org.yeastrc.xlink.www.searcher_via_cached_data.cached_data_holders.Cached_ProjectTblSubPartsForProjectLists;
 import org.yeastrc.xlink.www.constants.AuthAccessLevelConstants;
-import org.yeastrc.xlink.www.constants.WebConstants;
-import org.yeastrc.xlink.www.user_account.UserSessionObject;
+import org.yeastrc.xlink.www.user_session_management.UserSession;
+import org.yeastrc.xlink.www.user_session_management.UserSessionManager;
 import org.yeastrc.xlink.www.user_web_utils.TruncateProjectTitleForDisplay;
 /**
  * This class is for putting data in the "request" scope for the page header 
@@ -48,30 +46,26 @@ public class GetPageHeaderData {
 	 * @throws Exception 
 	 */
 	private void getPageHeaderData( Integer projectId, HttpServletRequest request ) throws Exception {
-		// Get their session first.  
-		HttpSession session = request.getSession();
-		UserSessionObject userSessionObject 
-		= (UserSessionObject) session.getAttribute( WebConstants.SESSION_CONTEXT_USER_LOGGED_IN );
-		if ( userSessionObject == null ) {
+
+		UserSession userSession = UserSessionManager.getSinglesonInstance().getUserSession(request);
+		
+		if ( userSession == null ) {
 			//  No User session 
 			return;
 		}
-		if ( userSessionObject.getUserDBObject() != null && userSessionObject.getUserDBObject().getAuthUser() != null  ) {
+		Integer authUserId = userSession.getAuthUserId();
+		if ( userSession.isActualUser() && authUserId != null ) {
 			//  have a logged in user
-			AuthUserDTO authUser = null;
-			if ( userSessionObject.getUserDBObject() != null && userSessionObject.getUserDBObject().getAuthUser() != null ) {
-				authUser = userSessionObject.getUserDBObject().getAuthUser();
-				///  Refresh with latest
-				UpdateAuthUserUserAccessLevelEnabled.getInstance().updateAuthUserUserAccessLevelEnabled( authUser );
-				userSessionObject.getUserDBObject().setAuthUser( authUser );
+			if ( authUserId != null ) {
+				Integer userAccessLevel = AuthUserDAO.getInstance().getUserAccessLevel( authUserId );
 				boolean headerUserIsAdmin = false;
-				if ( authUser.getUserAccessLevel() != null 
-						&& authUser.getUserAccessLevel() == AuthAccessLevelConstants.ACCESS_LEVEL_ADMIN ) {
+				if ( userAccessLevel != null 
+						&& userAccessLevel == AuthAccessLevelConstants.ACCESS_LEVEL_ADMIN ) {
 					headerUserIsAdmin = true;
 				}
 				request.setAttribute( "headerUserIsAdmin", headerUserIsAdmin );
 			}
-			request.setAttribute( "headerUser", userSessionObject.getUserDBObject() );
+			request.setAttribute( "headerUser", userSession );
 			List<ProjectTblSubPartsForProjectLists> projectsFromDB = GetProjectListForCurrentLoggedInUser.getInstance().getProjectListForCurrentLoggedInUser( request );
 			List<ProjectTitleHeaderDisplay> projects = new ArrayList<ProjectTitleHeaderDisplay>( projectsFromDB.size() );
 			for ( ProjectTblSubPartsForProjectLists projectFromDB : projectsFromDB ) {

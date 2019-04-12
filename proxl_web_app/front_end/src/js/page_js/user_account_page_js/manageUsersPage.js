@@ -395,24 +395,6 @@ window.getCurrentUserAccessResponse = function(requestData, responseData) {
 	var $invited_people_current_users = $("#invited_people_current_users");
 //	$invited_people_current_users.empty();
 	var users = responseData.users;
-	var currentUser = responseData.currentUser;
-	if ( currentUser === undefined || currentUser === null ) {
-	} else {
-		var source = $("#current_account_template").html();
-		if  ( source !== undefined && source !== null && source !== "" ) {
-			var template = Handlebars.compile(source);
-			if ( template === undefined ) {
-				throw Error( '$("#current_account_template").html() === undefined' );
-			}
-			if ( template === null ) {
-				throw Error( '$("#current_account_template").html() === null' );
-			}
-			var context = currentUser;
-			var html = template(context);
-//			var $current_user_entry = 
-			$(html).appendTo($current_account);
-		}
-	}
 	if ( users === undefined || users === null || users.length === 0 ) {
 		$("#no_users").show();
 	} else {
@@ -452,9 +434,9 @@ window.getCurrentUserAccessResponse = function(requestData, responseData) {
 			var html = template(context);
 			var $user_entry = $(html).appendTo($invited_people_current_users);
 			$user_entry.data("context", context);
-			var userAccessLevel = userDataItem.authUser.userAccessLevel;
-			var userEnabledAppSpecific =  userDataItem.authUser.enabledAppSpecific;
-			var userEnabledUserMgmtGlobalLevel =  userDataItem.authUser.enabledUserMgmtGlobalLevel;
+			var userAccessLevel = userDataItem.userAccessLevel;
+			var userEnabledAppSpecific =  userDataItem.enabledAppSpecific;
+			var userEnabledUserMgmtGlobalLevel =  userDataItem.enabledUserMgmtGlobalLevel;
 //			var $active_user_entry_access_level_update_button_jq  
 //				= $active_user_entry.find(".current_user_entry_access_level_update_button_jq");
 //
@@ -464,7 +446,7 @@ window.getCurrentUserAccessResponse = function(requestData, responseData) {
 //				updateUserAccessLevel( clickThis );
 //			});
 			//  If record being processed is the currently logged in user
-			if ( adminGlobals.logged_in_user_id === userDataItem.authUser.id ) {
+			if ( adminGlobals.logged_in_user_id === userDataItem.authUserId ) {
 				// Show the user's level
 				if ( userAccessLevel === access_level_id_administrator ) {
 					var $access_level_administrator_jq = $user_entry.find(".access_level_administrator_jq");

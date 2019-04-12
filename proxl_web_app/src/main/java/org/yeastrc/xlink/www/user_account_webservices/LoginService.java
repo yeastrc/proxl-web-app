@@ -1,7 +1,6 @@
 package org.yeastrc.xlink.www.user_account_webservices;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.POST;
@@ -22,7 +21,6 @@ import org.yeastrc.xlink.www.dao.TermsOfServiceUserAcceptedVersionHistoryDAO;
 import org.yeastrc.xlink.www.database_update_with_transaction_services.AddNewUserUsingDBTransactionService;
 import org.yeastrc.xlink.www.dto.TermsOfServiceTextVersionsDTO;
 import org.yeastrc.xlink.www.dto.TermsOfServiceUserAcceptedVersionHistoryDTO;
-import org.yeastrc.xlink.www.dto.XLinkUserDTO;
 import org.yeastrc.xlink.www.dto.ZzUserDataMirrorDTO;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappConfigException;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappInternalErrorException;
@@ -35,14 +33,15 @@ import org.yeastrc.xlink.www.constants.AsyncItemToRunPriorityConstants;
 import org.yeastrc.xlink.www.constants.AuthAccessLevelConstants;
 import org.yeastrc.xlink.www.constants.ConfigSystemsKeysConstants;
 import org.yeastrc.xlink.www.constants.UserSignupConstants;
-import org.yeastrc.xlink.www.constants.WebConstants;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
-import org.yeastrc.xlink.www.user_account.UserSessionObject;
 import org.yeastrc.xlink.www.user_mgmt_webapp_access.UserMgmtCentralWebappWebserviceAccess;
 import org.yeastrc.xlink.www.user_mgmt_webapp_access.UserMgmtGetUserDataRequest;
 import org.yeastrc.xlink.www.user_mgmt_webapp_access.UserMgmtGetUserDataResponse;
 import org.yeastrc.xlink.www.user_mgmt_webapp_access.UserMgmtLoginRequest;
 import org.yeastrc.xlink.www.user_mgmt_webapp_access.UserMgmtLoginResponse;
+import org.yeastrc.xlink.www.user_session_management.UserSession;
+import org.yeastrc.xlink.www.user_session_management.UserSessionBuilder;
+import org.yeastrc.xlink.www.user_session_management.UserSessionManager;
 import org.yeastrc.xlink.www.user_web_utils.ValidateUserInviteTrackingCode;
 
 @Path("/user")
@@ -113,8 +112,6 @@ public class LoginService {
 //		if (true)
 //		throw new Exception("Forced Error");
 		try {
-			// Get their session first.  
-			HttpSession session = request.getSession();
 			UserMgmtLoginRequest userMgmtLoginRequest = new UserMgmtLoginRequest();
 			userMgmtLoginRequest.setUsername( username );
 			userMgmtLoginRequest.setPassword( password );
@@ -280,35 +277,41 @@ public class LoginService {
 					}
 				}
 			}
-			XLinkUserDTO userDatabaseRecord = new XLinkUserDTO();
-			AuthUserDTO authUserDTO = new AuthUserDTO();
-			userDatabaseRecord.setAuthUser(authUserDTO);
-			authUserDTO.setId( proxlAuthUserId );
-			authUserDTO.setUserMgmtUserId( userMgmtUserId );
-			authUserDTO.setUsername( userMgmtGetUserDataResponse.getUsername() );
-			authUserDTO.setEmail( userMgmtGetUserDataResponse.getEmail() );
-			authUserDTO.setUserAccessLevel( userAccessLevel );
-			authUserDTO.setEnabledAppSpecific(true);
-			authUserDTO.setEnabledUserMgmtGlobalLevel(true);
-			authUserDTO.setLastLoginIP( request.getRemoteAddr() );
-
-			//  Update last login, using Async executor
-			AuthUserDAO authUserDAO = AuthUserDAO.getNewInstance();
-			authUserDAO.setAuthUserDTO_ToUseInRun( authUserDTO );
-			authUserDAO.setMethodToExecuteAsRunnable( AuthUserDAO.MethodToExecuteAsRunnable.UPDATE_LAST_LOGIN );
-			AsyncItemToRun asyncItemToRun = 
-					AsyncItemToRunFactory.createAsyncItemToRun( authUserDAO, AsyncItemToRunPriorityConstants.PRIORITY_AUTH_USER_UPDATE_LAST_LOGIN_IP );
-			AsyncActionViaExecutorService.getInstance().addAsyncItemToRunToQueue( asyncItemToRun );
 			
-			userDatabaseRecord.setFirstName( userMgmtGetUserDataResponse.getFirstName() );
-			userDatabaseRecord.setLastName( userMgmtGetUserDataResponse.getLastName() );
-			userDatabaseRecord.setOrganization( userMgmtGetUserDataResponse.getOrganization() );
-			long currentTime = System.currentTimeMillis();
-			UserSessionObject userSessionObject = new UserSessionObject();
-			userSessionObject.setLastPingToSSOServer( currentTime );
-			userSessionObject.setUserLoginSessionKey( userMgmtLoginResponse.getSessionKey() );
-			userSessionObject.setUserDBObject( userDatabaseRecord );
-			session.setAttribute( WebConstants.SESSION_CONTEXT_USER_LOGGED_IN, userSessionObject );
+			{
+				AuthUserDTO authUserDTO = new AuthUserDTO();
+				authUserDTO.setId( proxlAuthUserId );
+				authUserDTO.setLastLoginIP( request.getRemoteAddr() );
+	
+				//  Update last login, using Async executor
+				AuthUserDAO authUserDAO = AuthUserDAO.getNewInstance();
+				authUserDAO.setAuthUserDTO_ToUseInRun( authUserDTO );
+				authUserDAO.setMethodToExecuteAsRunnable( AuthUserDAO.MethodToExecuteAsRunnable.UPDATE_LAST_LOGIN );
+				AsyncItemToRun asyncItemToRun = 
+						AsyncItemToRunFactory.createAsyncItemToRun( authUserDAO, AsyncItemToRunPriorityConstants.PRIORITY_AUTH_USER_UPDATE_LAST_LOGIN_IP );
+				AsyncActionViaExecutorService.getInstance().addAsyncItemToRunToQueue( asyncItemToRun );
+			}
+			
+			UserSession userSession = 
+					UserSessionBuilder.getBuilder()
+					
+					.setAuthUserId( proxlAuthUserId )
+					.setUserMgmtUserId( userMgmtUserId )
+					.setUserAccessLevel( userAccessLevel )
+					.setEnabledAppSpecific( true )
+					//  From User Mgmt
+					.setUserMgmtSessionKey( userMgmtLoginResponse.getSessionKey() )
+					.setUsername( userMgmtGetUserDataResponse.getUsername() )
+					.setEmail( userMgmtGetUserDataResponse.getEmail() )
+					.setFirstName( userMgmtGetUserDataResponse.getFirstName() )
+					.setLastName( userMgmtGetUserDataResponse.getLastName() )
+					.setOrganization( userMgmtGetUserDataResponse.getOrganization() )
+					.setEnabled( userMgmtGetUserDataResponse.isEnabled() )
+					.setGlobalAdminUser( userMgmtGetUserDataResponse.isGlobalAdminUser() )
+					.build();
+			
+			UserSessionManager.getSinglesonInstance().createNewUserSession( userSession, request );
+					
 			loginResult.setStatus(true);
 			return loginResult;
 			

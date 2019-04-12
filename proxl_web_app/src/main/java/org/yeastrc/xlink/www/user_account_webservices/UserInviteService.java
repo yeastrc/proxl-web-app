@@ -25,25 +25,24 @@ import org.yeastrc.xlink.www.constants.AuthAccessLevelConstants;
 import org.yeastrc.xlink.www.dao.ProjectDAO;
 import org.yeastrc.xlink.www.database_update_with_transaction_services.AddNewUserUsingDBTransactionService;
 import org.yeastrc.xlink.www.dto.ProjectDTO;
-import org.yeastrc.xlink.www.dto.XLinkUserDTO;
+
 import org.yeastrc.xlink.www.dto.ZzUserDataMirrorDTO;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappInternalErrorException;
-import org.yeastrc.xlink.www.objects.AuthAccessLevel;
+import org.yeastrc.xlink.www.access_control.result_objects.WebSessionAuthAccessLevel;
 import org.yeastrc.xlink.www.constants.StrutsActionPathsConstants;
 import org.yeastrc.xlink.www.constants.WebConstants;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
-import org.yeastrc.xlink.www.objects.UserInviteResult;
 import org.yeastrc.xlink.www.send_email.GetEmailConfig;
 import org.yeastrc.xlink.www.send_email.SendEmail;
 import org.yeastrc.xlink.www.send_email.SendEmailDTO;
-import org.yeastrc.xlink.www.user_account.UserSessionObject;
+import org.yeastrc.xlink.www.user_session_management.UserSession;
 import org.yeastrc.xlink.www.user_mgmt_webapp_access.UserMgmtCentralWebappWebserviceAccess;
 import org.yeastrc.xlink.www.user_mgmt_webapp_access.UserMgmtGetUserDataRequest;
 import org.yeastrc.xlink.www.user_mgmt_webapp_access.UserMgmtGetUserDataResponse;
 import org.yeastrc.xlink.www.user_mgmt_webapp_access.UserMgmtSearchUserDataRequest;
 import org.yeastrc.xlink.www.user_mgmt_webapp_access.UserMgmtSearchUserDataResponse;
-import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
-import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
+import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result;
+import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId;
 import org.yeastrc.xlink.www.user_web_utils.ValidateUserAccessLevel;
 
 /**
@@ -72,7 +71,9 @@ public class UserInviteService {
 			@FormParam( "projectId" ) String projectIdString,
 			@Context HttpServletRequest request )
 	throws Exception {
+		
 		UserInviteResult userInviteResult = new UserInviteResult();
+		
 		//  Restricted to users with ACCESS_LEVEL_ASSISTANT_PROJECT_OWNER or better
 		if ( invitedPersonUserIdString != null ) {
 			invitedPersonUserIdString = invitedPersonUserIdString.trim();
@@ -151,11 +152,9 @@ public class UserInviteService {
 			}
 		}
 		try {
-			// Get the session first.  
-//			HttpSession session = request.getSession();
 			//  Test for Admin level 
-			AccessAndSetupWebSessionResult accessAndSetupWebSessionResult =
-					GetAccessAndSetupWebSession.getInstance().getAccessAndSetupWebSessionNoProjectId( request );
+			GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result accessAndSetupWebSessionResult =
+					GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.getSinglesonInstance().getAccessAndSetupWebSessionNoProjectId( request );
 			if ( accessAndSetupWebSessionResult.isNoSession() ) {
 				//  No User session 
 				throw new WebApplicationException(
@@ -164,9 +163,9 @@ public class UserInviteService {
 						.build()
 						);
 			}
-			UserSessionObject userSessionObject = accessAndSetupWebSessionResult.getUserSessionObject();
+			UserSession userSession = accessAndSetupWebSessionResult.getUserSession();
 			//  Test access at global level
-			AuthAccessLevel authAccessLevelGlobal = accessAndSetupWebSessionResult.getAuthAccessLevel();
+			WebSessionAuthAccessLevel authAccessLevelGlobal = accessAndSetupWebSessionResult.getWebSessionAuthAccessLevel();
 			Integer projectAuthShareableObjectId = null;
 			if ( authAccessLevelGlobal.isAdminAllowed() ) {
 				// User is Admin so always allow
@@ -187,9 +186,9 @@ public class UserInviteService {
 					}
 				} else {
 					//  Test access to the project id
-					AccessAndSetupWebSessionResult accessAndSetupWebSessionResultProjectLevel =
-							GetAccessAndSetupWebSession.getInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request );
-					AuthAccessLevel authAccessLevel = accessAndSetupWebSessionResultProjectLevel.getAuthAccessLevel();
+					GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result accessAndSetupWebSessionResultProjectLevel =
+							GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.getSinglesonInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request );
+					WebSessionAuthAccessLevel authAccessLevel = accessAndSetupWebSessionResultProjectLevel.getWebSessionAuthAccessLevel();
 					if ( ! authAccessLevel.isAssistantProjectOwnerAllowed() ) {
 						//  No Access Allowed for this project id
 						throw new WebApplicationException(
@@ -238,7 +237,7 @@ public class UserInviteService {
 			//   DONE  validating the request
 			////////////////////////
 
-			String sessionKey = accessAndSetupWebSessionResult.getUserSessionObject().getUserLoginSessionKey();
+			String sessionKey = accessAndSetupWebSessionResult.getUserSession().getUserMgmtSessionKey();
 
 			//   Process the request
 			if ( invitedPersonUserId != null ) {
@@ -303,7 +302,7 @@ public class UserInviteService {
 				} else {
 					//  no account with this email exists
 					inviteNewUserUsingEmail( invitedPersonEmail, request, 
-												invitedPersonAccessLevel, userSessionObject, projectAuthShareableObjectId,
+												invitedPersonAccessLevel, userSession, projectAuthShareableObjectId,
 												userInviteResult );
 				}
 			}
@@ -461,24 +460,10 @@ public class UserInviteService {
 				}
 			}
 			
-			XLinkUserDTO existingUserThatWasAdded = new XLinkUserDTO();
-			AuthUserDTO authUserDTO = new AuthUserDTO();
-			existingUserThatWasAdded.setAuthUser(authUserDTO);
-			
-			authUserDTO.setId( invitedPersonUserId );
-			authUserDTO.setUsername( userMgmtGetUserDataResponse.getUsername() );
-			authUserDTO.setEmail( userMgmtGetUserDataResponse.getEmail() );
-			authUserDTO.setUserAccessLevel( userAccessLevel );
-			
-			existingUserThatWasAdded.setFirstName( userMgmtGetUserDataResponse.getFirstName() );
-			existingUserThatWasAdded.setLastName( userMgmtGetUserDataResponse.getLastName() );
-			existingUserThatWasAdded.setOrganization( userMgmtGetUserDataResponse.getOrganization() );
-			
 			authSharedObjectUsersDAO.save( authSharedObjectUsersDTO );
 			userInviteResult.setStatus(true);
 			userInviteResult.setAddedExistingUser(true);
 			
-			userInviteResult.setExistingUserThatWasAdded( existingUserThatWasAdded );
 		} catch ( SQLException sqlException ) {
 			String exceptionMessage = sqlException.getMessage();
 			if ( exceptionMessage != null && exceptionMessage.startsWith( "Duplicate entry" ) ) {
@@ -496,7 +481,7 @@ public class UserInviteService {
 	 * @param invitedPersonEmail
 	 * @param request
 	 * @param invitedPersonAccessLevel
-	 * @param userSessionObject
+	 * @param userSession
 	 * @param projectAuthShareableObjectId
 	 * @throws Exception
 	 */
@@ -504,7 +489,7 @@ public class UserInviteService {
 			String invitedPersonEmail,
 			HttpServletRequest request, 
 			int invitedPersonAccessLevel,
-			UserSessionObject userSessionObject,
+			UserSession userSession,
 			Integer projectAuthShareableObjectId,
 			UserInviteResult userInviteResult ) throws Exception {
 		AuthUserInviteTrackingDTO authUserInviteTrackingDTO = new AuthUserInviteTrackingDTO();
@@ -514,13 +499,12 @@ public class UserInviteService {
 		if ( projectAuthShareableObjectId != null ) {
 			authUserInviteTrackingDTO.setInvitedSharedObjectId( projectAuthShareableObjectId );
 		}
-		XLinkUserDTO userDatabaseRecord = userSessionObject.getUserDBObject();
-		authUserInviteTrackingDTO.setSubmittingAuthUserId( userDatabaseRecord.getAuthUser().getId() );
+		authUserInviteTrackingDTO.setSubmittingAuthUserId( userSession.getAuthUserId() );
 		GenerateInviteCodeSaveInviteRecordService.getInstance().generateInviteCodeSaveInviteRecordService( authUserInviteTrackingDTO );
 		//  Generate email with invite code
 		// Generate and send the email to the user.
 		try {
-        	SendEmailDTO sendEmailDTO = createMailMessageToSend( authUserInviteTrackingDTO, userDatabaseRecord, request );
+        	SendEmailDTO sendEmailDTO = createMailMessageToSend( authUserInviteTrackingDTO, userSession, request );
         	SendEmail.getInstance().sendEmail( sendEmailDTO );
 			userInviteResult.setStatus(true);
 			userInviteResult.setEmailSent(true);
@@ -552,7 +536,7 @@ public class UserInviteService {
 	 * @return
 	 * @throws Exception 
 	 */
-	private SendEmailDTO createMailMessageToSend( AuthUserInviteTrackingDTO authUserInviteTrackingDTO, XLinkUserDTO userDatabaseRecord, HttpServletRequest request )
+	private SendEmailDTO createMailMessageToSend( AuthUserInviteTrackingDTO authUserInviteTrackingDTO, UserSession userSession, HttpServletRequest request )
 	throws Exception {
 		//  Does NOT include slash after web app context
 		String requestURLIncludingWebAppContext = (String) request.getAttribute( WebConstants.REQUEST_URL_ONLY_UP_TO_WEB_APP_CONTEXT );
@@ -561,11 +545,11 @@ public class UserInviteService {
 		// set the message body
 		String text = 
 				"You have been invited to the ProXL DB web application by "
-				+ userDatabaseRecord.getFirstName()
+				+ userSession.getFirstName()
 				+ " "
-				+ userDatabaseRecord.getLastName()
+				+ userSession.getLastName()
 				+ " at "
-				+ userDatabaseRecord.getOrganization()
+				+ userSession.getOrganization()
 				+ ".\n\n"
 				+ "To create an account follow this link: " + newURL + "\n\n"
 			+ "\n\n"
@@ -667,11 +651,9 @@ public class UserInviteService {
 			///////////
 			//  Auth Check for Project:
 
-			// Get the session first.  
-//			HttpSession session = request.getSession();
-			AccessAndSetupWebSessionResult accessAndSetupWebSessionResult =
-					GetAccessAndSetupWebSession.getInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request );
-			UserSessionObject userSessionObject = accessAndSetupWebSessionResult.getUserSessionObject();
+			GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result accessAndSetupWebSessionResult =
+					GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.getSinglesonInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request );
+			UserSession userSession = accessAndSetupWebSessionResult.getUserSession();
 			if ( accessAndSetupWebSessionResult.isNoSession() ) {
 				//  No User session 
 				throw new WebApplicationException(
@@ -681,7 +663,7 @@ public class UserInviteService {
 						);
 			}
 			//  Test access to the project id
-			AuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getAuthAccessLevel();
+			WebSessionAuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getWebSessionAuthAccessLevel();
 			if ( ! authAccessLevel.isAssistantProjectOwnerAllowed() ) {
 				//  No Access Allowed for this project id
 				throw new WebApplicationException(
@@ -728,12 +710,10 @@ public class UserInviteService {
 						);
 			}
 		
-			XLinkUserDTO userDatabaseRecord = userSessionObject.getUserDBObject();
-
 			//  Generate email with invite code
 			// Generate and send the email to the user.
 			try {
-	        	SendEmailDTO sendEmailDTO = createMailMessageToSend( authUserInviteTrackingDTO, userDatabaseRecord, request );
+	        	SendEmailDTO sendEmailDTO = createMailMessageToSend( authUserInviteTrackingDTO, userSession, request );
 	        	SendEmail.getInstance().sendEmail( sendEmailDTO );
 	        	resendInviteEmailResult.setStatus(true);
 			}
@@ -753,5 +733,105 @@ public class UserInviteService {
 					.build()
 					);
 		}
+	}
+	
+
+	/**
+	 * This is returned from the web service UserInviteService
+	 *
+	 */
+	public class UserInviteResult {
+
+		private boolean status;
+
+		private boolean addedExistingUser;
+		private boolean lastNameNotFoundError;
+		private boolean lastNameDuplicateError;
+
+		//  For invite from Manage Users page ( no project id sent )
+		private boolean emailAddressDuplicateError;
+
+		private boolean duplicateInsertError;
+
+		private boolean emailAddressInvalidSendError;
+
+		private boolean emailSent;
+
+		public boolean isEmailAddressInvalidSendError() {
+			return emailAddressInvalidSendError;
+		}
+
+		public void setEmailAddressInvalidSendError(boolean emailAddressInvalidSendError) {
+			this.emailAddressInvalidSendError = emailAddressInvalidSendError;
+		}
+
+		private boolean unableToSendEmailError;
+
+
+		public boolean isUnableToSendEmailError() {
+			return unableToSendEmailError;
+		}
+
+		public void setUnableToSendEmailError(boolean unableToSendEmailError) {
+			this.unableToSendEmailError = unableToSendEmailError;
+		}
+
+
+		public boolean isEmailAddressDuplicateError() {
+			return emailAddressDuplicateError;
+		}
+
+		public void setEmailAddressDuplicateError(boolean emailAddressDuplicateError) {
+			this.emailAddressDuplicateError = emailAddressDuplicateError;
+		}
+
+		public boolean isEmailSent() {
+			return emailSent;
+		}
+
+		public void setEmailSent(boolean emailSent) {
+			this.emailSent = emailSent;
+		}
+
+		public boolean isLastNameNotFoundError() {
+			return lastNameNotFoundError;
+		}
+
+		public void setLastNameNotFoundError(boolean lastNameNotFoundError) {
+			this.lastNameNotFoundError = lastNameNotFoundError;
+		}
+
+		public boolean isLastNameDuplicateError() {
+			return lastNameDuplicateError;
+		}
+
+		public void setLastNameDuplicateError(boolean lastNameDuplicateError) {
+			this.lastNameDuplicateError = lastNameDuplicateError;
+		}
+
+
+		public boolean isAddedExistingUser() {
+			return addedExistingUser;
+		}
+
+		public void setAddedExistingUser(boolean addedExistingUser) {
+			this.addedExistingUser = addedExistingUser;
+		}
+		public boolean isDuplicateInsertError() {
+			return duplicateInsertError;
+		}
+
+		public void setDuplicateInsertError(boolean duplicateInsertError) {
+			this.duplicateInsertError = duplicateInsertError;
+		}
+
+		public boolean isStatus() {
+			return status;
+		}
+
+		public void setStatus(boolean status) {
+			this.status = status;
+		}
+
 	}
 }

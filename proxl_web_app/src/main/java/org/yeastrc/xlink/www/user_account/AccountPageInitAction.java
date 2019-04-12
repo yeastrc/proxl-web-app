@@ -8,12 +8,11 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.yeastrc.auth.dto.AuthUserDTO;
 import org.yeastrc.xlink.www.constants.StrutsGlobalForwardNames;
-import org.yeastrc.xlink.www.dto.XLinkUserDTO;
-import org.yeastrc.xlink.www.internal_services.UpdateAuthUserUserAccessLevelEnabled;
-import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
-import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
+
+import org.yeastrc.xlink.www.user_session_management.UserSession;
+import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result;
+import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId;
 import org.yeastrc.xlink.www.web_utils.GetPageHeaderData;
 import org.yeastrc.xlink.www.web_utils.TestIsUserSignedIn;
 /**
@@ -27,36 +26,69 @@ public class AccountPageInitAction extends Action {
 	/* (non-Javadoc)
 	 * @see org.apache.struts.action.Action#execute(org.apache.struts.action.ActionMapping, org.apache.struts.action.ActionForm, javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
 	 */
+	@Override
 	public ActionForward execute( ActionMapping mapping,
 			  ActionForm form,
 			  HttpServletRequest request,
 			  HttpServletResponse response )
 					  throws Exception {
 		try {
-			// Get the session first.  
-//			HttpSession session = request.getSession();
-			AccessAndSetupWebSessionResult accessAndSetupWebSessionResult =
-					GetAccessAndSetupWebSession.getInstance().getAccessAndSetupWebSessionNoProjectId( request, response );
+			GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result accessAndSetupWebSessionResult =
+					GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.getSinglesonInstance().getAccessAndSetupWebSessionNoProjectId( request, response );
 			if ( accessAndSetupWebSessionResult.isNoSession() ) {
 				//  No User session 
 				return mapping.findForward( StrutsGlobalForwardNames.NO_USER_SESSION );
 			}
-			UserSessionObject userSessionObject = accessAndSetupWebSessionResult.getUserSessionObject();
-			if ( ! TestIsUserSignedIn.getInstance().testIsUserSignedIn( userSessionObject ) ) {
+			UserSession userSession = accessAndSetupWebSessionResult.getUserSession();
+			if ( ! TestIsUserSignedIn.getInstance().testIsUserSignedIn( userSession ) ) {
 				//  No User session 
 				return mapping.findForward( StrutsGlobalForwardNames.NO_USER_SESSION );
 			}
 			GetPageHeaderData.getInstance().getPageHeaderDataWithoutProjectId( request );
-			XLinkUserDTO userDBObject = userSessionObject.getUserDBObject();
-			AuthUserDTO authUser = userDBObject.getAuthUser();
-			///  Refresh with latest
-			UpdateAuthUserUserAccessLevelEnabled.getInstance().updateAuthUserUserAccessLevelEnabled( authUser );
-			request.setAttribute( "loggedInUser", userDBObject );
+			
+			UserDataForPage userDataForPage = new UserDataForPage();
+			userDataForPage.firstName = userSession.getFirstName();
+			userDataForPage.lastName = userSession.getLastName();
+			userDataForPage.email = userSession.getEmail();
+			userDataForPage.organization = userSession.getOrganization();
+			userDataForPage.username = userSession.getUsername();
+			
+			request.setAttribute( "loggedInUser", userDataForPage );
 			return mapping.findForward( "Success" );
 		} catch ( Exception e ) {
 			String msg = "Exception caught: " + e.toString();
 			log.error( msg, e );
 			throw e;
 		}
+	}
+	
+	/**
+	 * 
+	 *
+	 */
+	public static class UserDataForPage {
+		
+		private String firstName;
+		private String lastName;
+		private String email;
+		private String organization;
+		private String username;
+		
+		public String getFirstName() {
+			return firstName;
+		}
+		public String getLastName() {
+			return lastName;
+		}
+		public String getEmail() {
+			return email;
+		}
+		public String getOrganization() {
+			return organization;
+		}
+		public String getUsername() {
+			return username;
+		}
+		
 	}
 }

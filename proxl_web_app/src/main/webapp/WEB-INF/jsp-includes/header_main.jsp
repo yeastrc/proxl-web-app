@@ -281,7 +281,7 @@ response.addHeader("Cache-control", "max-age=0"); // stale right away
 	  		><span class="header-user-name">
 	  			<span id="header-user-first-name"><c:out value="${ headerUser.firstName }"></c:out></span> 
 	  			<span id="header-user-last-name"><c:out value="${ headerUser.lastName }"></c:out></span>
-	  			(<span id="header-user-user-name"><c:out value="${ headerUser.authUser.username }"></c:out></span>) 
+	  			(<span id="header-user-user-name"><c:out value="${ headerUser.username }"></c:out></span>) 
   			</span></a>
   	   </div>
   		

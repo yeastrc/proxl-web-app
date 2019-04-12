@@ -45,6 +45,7 @@ public class MergedSearchPeptideDimer implements IMergedSearchLink {
 
 	
 	
+	@Override
 	public int hashCode() {
 		return (this.peptide1.getSequence() + this.peptide2.getSequence() ).hashCode();
 	}
@@ -52,6 +53,7 @@ public class MergedSearchPeptideDimer implements IMergedSearchLink {
 	/**
 	 * Returns true if both MergedSearchPeptideDimer objects describe the same two peptides at the same two positions in each respective peptide
 	 */
+	@Override
 	public boolean equals( Object o ) {
 		if( !( o instanceof MergedSearchPeptideDimer ) ) return false;
 		

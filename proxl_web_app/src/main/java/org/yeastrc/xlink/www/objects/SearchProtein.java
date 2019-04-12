@@ -19,9 +19,11 @@ public class SearchProtein implements IProtein {
 		this.search = search;
 		this.proteinSequenceVersionObject = protein;
 	}
+	@Override
 	public int hashCode() {
 		return ("" + this.getProteinSequenceVersionObject().getProteinSequenceVersionId() + "-" + this.getSearch().getSearchId() ).hashCode();
 	}
+	@Override
 	public boolean equals( Object o ) {
 		if( !( o instanceof SearchProtein ) ) return false;
 		if( ((SearchProtein)o).getProteinSequenceVersionObject().getProteinSequenceVersionId() != this.getProteinSequenceVersionObject().getProteinSequenceVersionId() )
@@ -30,6 +32,7 @@ public class SearchProtein implements IProtein {
 			return false;
 		return true;
 	}
+	@Override
 	public String getName() throws Exception {
 		try {
 			if( this.name == null ) {
@@ -48,6 +51,7 @@ public class SearchProtein implements IProtein {
 			throw e;
 		}
 	}
+	@Override
 	public String getDescription() throws Exception {
 		try {
 			if( this.description == null ) {
@@ -66,6 +70,7 @@ public class SearchProtein implements IProtein {
 			throw e;
 		}
 	}
+	@Override
 	public ProteinSequenceVersionObject getProteinSequenceVersionObject() {
 		return proteinSequenceVersionObject;
 	}

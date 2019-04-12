@@ -25,20 +25,24 @@ public class SearchProteinMonolinkWrapper extends SortDisplayRecordsWrapperBase 
 	//   Getters and Setters for access to wrapped object
 	
 
+	@Override
 	public List<String> getPsmAnnotationValueList() {
 		return searchProteinMonolink.getPsmAnnotationValueList();
 	}
 
 
+	@Override
 	public void setPsmAnnotationValueList(List<String> psmAnnotationValueList) {
 		searchProteinMonolink.setPsmAnnotationValueList( psmAnnotationValueList );
 	}
 
+	@Override
 	public List<String> getPeptideAnnotationValueList() {
 		return searchProteinMonolink.getPeptideAnnotationValueList();
 	}
 
 
+	@Override
 	public void setPeptideAnnotationValueList(
 			List<String> peptideAnnotationValueList) {
 		searchProteinMonolink.setPeptideAnnotationValueList( peptideAnnotationValueList );

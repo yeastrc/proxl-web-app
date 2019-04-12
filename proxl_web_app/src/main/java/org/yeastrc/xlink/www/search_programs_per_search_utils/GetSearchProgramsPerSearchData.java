@@ -76,7 +76,8 @@ public class GetSearchProgramsPerSearchData implements CachedDataCommonIF {
 			    .maximumSize( CACHE_MAX_SIZE )
 			    .build(
 			    		new CacheLoader<LocalCacheKey, LocalCacheValue>() {
-			    			public LocalCacheValue load(LocalCacheKey localCacheKey) throws Exception {
+			    			@Override
+							public LocalCacheValue load(LocalCacheKey localCacheKey) throws Exception {
 			    				
 			    				//   WARNING  cannot return null.  
 			    				//   If would return null, throw ProxlWebappDataNotFoundException and catch at the .get(...)

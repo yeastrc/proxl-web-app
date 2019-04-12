@@ -13,14 +13,17 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
-import org.yeastrc.xlink.www.dto.XLinkUserDTO;
-import org.yeastrc.xlink.www.internal_services.GetXLinkUserDTOListForUsers;
-import org.yeastrc.xlink.www.objects.AuthAccessLevel;
-import org.yeastrc.xlink.www.objects.ListAllUsersResponse;
+
+import org.yeastrc.xlink.www.access_control.result_objects.WebSessionAuthAccessLevel;
+import org.yeastrc.xlink.www.searcher.UserSearcherAll;
+import org.yeastrc.xlink.www.user_mgmt_webapp_access.UserMgmtCentralWebappWebserviceAccess;
+import org.yeastrc.xlink.www.user_mgmt_webapp_access.UserMgmtGetUserDataRequest;
+import org.yeastrc.xlink.www.user_mgmt_webapp_access.UserMgmtGetUserDataResponse;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
-import org.yeastrc.xlink.www.user_account.UserSessionObject;
-import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
-import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
+import org.yeastrc.xlink.www.user_session_management.UserSession;
+import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result;
+import org.yeastrc.auth.dao.AuthUserDAO;
+import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId;
 
 @Path("/user")
 public class ListAllUsersService {
@@ -34,10 +37,8 @@ public class ListAllUsersService {
 	throws Exception {
 		//  Restricted to users with ACCESS_LEVEL_ADMIN or better
 		try {
-			// Get the session first.  
-//			HttpSession session = request.getSession();
-			AccessAndSetupWebSessionResult accessAndSetupWebSessionResult =
-					GetAccessAndSetupWebSession.getInstance().getAccessAndSetupWebSessionNoProjectId( request );
+			GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result accessAndSetupWebSessionResult =
+					GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.getSinglesonInstance().getAccessAndSetupWebSessionNoProjectId( request );
 			if ( accessAndSetupWebSessionResult.isNoSession() ) {
 				//  No User session 
 				throw new WebApplicationException(
@@ -46,9 +47,9 @@ public class ListAllUsersService {
 						.build()
 						);
 			}
-			UserSessionObject userSessionObject = accessAndSetupWebSessionResult.getUserSessionObject();
+			UserSession userSession = accessAndSetupWebSessionResult.getUserSession();
 			//  Test access at global level
-			AuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getAuthAccessLevel();
+			WebSessionAuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getWebSessionAuthAccessLevel();
 			if ( ! authAccessLevel.isAdminAllowed() ) {
 				//  No Access Allowed 
 				throw new WebApplicationException(
@@ -57,12 +58,12 @@ public class ListAllUsersService {
 						.build()
 						);
 			}
-			int currentlyLoggedInAccountId = userSessionObject.getUserDBObject().getAuthUser().getId();
-			List<XLinkUserDTO> userAccountDBList = GetXLinkUserDTOListForUsers.getInstance().getXLinkUserDTOListForAllUsers();
+			// int currentlyLoggedInAccountId = userSession.getAuthUserId();
+			List<UserItem> userAccountDBList = this.getUserItemListForAllUsers();
 			//  Sort on last name then first name
-			Collections.sort( userAccountDBList, new Comparator<XLinkUserDTO>() {
+			Collections.sort( userAccountDBList, new Comparator<UserItem>() {
 				@Override
-				public int compare(XLinkUserDTO o1, XLinkUserDTO o2) {
+				public int compare(UserItem o1, UserItem o2) {
 					int lastNameCompare = o1.getLastName().compareTo( o2.getLastName() );
 					if ( lastNameCompare != 0 ) {
 						return lastNameCompare;
@@ -70,13 +71,9 @@ public class ListAllUsersService {
 					return o1.getFirstName().compareTo( o2.getFirstName() );
 				}
 			});
-			List<XLinkUserDTO> users = new ArrayList<XLinkUserDTO>( userAccountDBList.size() );
 			ListAllUsersResponse listAllUsersResponse = new ListAllUsersResponse();
-			listAllUsersResponse.setUsers( users );
-			for ( XLinkUserDTO xLinkUserDTO : userAccountDBList ) {
-				users.add( xLinkUserDTO );
-			}
-			listAllUsersResponse.setStatus(true);
+			listAllUsersResponse.users = userAccountDBList;
+			listAllUsersResponse.status = true;
 			return listAllUsersResponse;
 		} catch ( WebApplicationException e ) {
 			throw e;
@@ -86,4 +83,108 @@ public class ListAllUsersService {
 			throw e;
 		}
 	}
+	
+
+	/**
+	 * @return
+	 * @throws Exception
+	 */
+	public List<UserItem> getUserItemListForAllUsers( ) throws Exception {
+		
+		List<Integer> userIds = UserSearcherAll.getInstance().getAllAuthUserIds();
+		List<UserItem> returnList = new ArrayList<UserItem>( userIds.size() );
+		for ( int authUserId : userIds ) {
+
+			//  Get User Mgmt User Id for authUserId
+			Integer userMgmtUserId = AuthUserDAO.getInstance().getUserMgmtUserIdForId( authUserId );
+			if ( userMgmtUserId == null ) {
+				String msg = "Failed to get userMgmtUserId for Proxl auth user id: " + authUserId;
+				log.warn( msg );
+		        return null;  //  Early Exit
+			}
+			
+			//  Get full user data
+			UserMgmtGetUserDataRequest userMgmtGetUserDataRequest = new UserMgmtGetUserDataRequest();
+//			userMgmtGetUserDataRequest.setSessionKey( userMgmtLoginResponse.getSessionKey() );
+			userMgmtGetUserDataRequest.setUserId( userMgmtUserId );
+			UserMgmtGetUserDataResponse userMgmtGetUserDataResponse = 
+					UserMgmtCentralWebappWebserviceAccess.getInstance().getUserData( userMgmtGetUserDataRequest );
+			if ( ! userMgmtGetUserDataResponse.isSuccess() ) {
+				String msg = "Failed to get Full user data from User Mgmt Webapp for authUserId: " + authUserId
+						+ ", userMgmtUserId: " + userMgmtUserId;
+				log.error( msg );
+				continue;  //  EARLY CONTINUE to next entry
+			}
+			
+			Boolean enabledAppSpecific =
+					AuthUserDAO.getInstance().getUserEnabledAppSpecific( authUserId );
+			if ( enabledAppSpecific == null ) {
+				String msg = "Failed to get enabledAppSpecific from proxl auth_user table for user id: " + authUserId;
+				log.error( msg );
+				continue;  //  EARLY CONTINUE to next entry
+			}
+			
+			//  Get user Access level at account level from proxl db
+			Integer userAccessLevel = AuthUserDAO.getInstance().getUserAccessLevel( authUserId );
+			if ( userAccessLevel == null ) {
+				String msg = "Failed to get userAccessLevel from proxl auth_user table for user id: " + authUserId;
+				log.error( msg );
+				continue;  //  EARLY CONTINUE to next entry
+			}
+			
+			UserItem userItem = new UserItem();
+			userItem.authUserId = authUserId;
+			userItem.firstName = userMgmtGetUserDataResponse.getFirstName();
+			userItem.lastName = userMgmtGetUserDataResponse.getLastName();
+			userItem.userAccessLevel = userAccessLevel;
+			userItem.enabledAppSpecific = enabledAppSpecific;
+			userItem.enabledUserMgmtGlobalLevel = userMgmtGetUserDataResponse.isEnabled();
+			
+			returnList.add( userItem );
+		}
+		return returnList;
+	}
+
+	public static  class ListAllUsersResponse {
+	
+		private boolean status;
+		private List<UserItem> users;
+		
+		public boolean isStatus() {
+			return status;
+		}
+		public List<UserItem> getUsers() {
+			return users;
+		}
+	}
+	
+	public static  class UserItem {
+		
+		private int authUserId;
+		private String firstName;
+		private String lastName;
+		private Integer userAccessLevel;
+		private Boolean enabledAppSpecific;
+		private Boolean enabledUserMgmtGlobalLevel;
+		
+		public int getAuthUserId() {
+			return authUserId;
+		}
+		public String getFirstName() {
+			return firstName;
+		}
+		public String getLastName() {
+			return lastName;
+		}
+		public Integer getUserAccessLevel() {
+			return userAccessLevel;
+		}
+		public Boolean getEnabledAppSpecific() {
+			return enabledAppSpecific;
+		}
+		public Boolean getEnabledUserMgmtGlobalLevel() {
+			return enabledUserMgmtGlobalLevel;
+		}
+	}
+	
 }

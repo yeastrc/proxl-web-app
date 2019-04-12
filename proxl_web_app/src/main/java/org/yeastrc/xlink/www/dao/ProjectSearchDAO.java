@@ -5,7 +5,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.db.DBConnectionFactory;
-import org.yeastrc.xlink.enum_classes.SearchRecordStatus;
 
 /**
  * Table project_search

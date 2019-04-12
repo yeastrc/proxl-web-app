@@ -1054,7 +1054,7 @@ var initInviteUserLastNameAutoComplete = function() {
 							return {
 								label : item.lastName + ", " + item.firstName,
 								value : item.lastName,
-								id : item.authUser.id
+								id : item.authUserId
 							};
 						}));
 					} catch( e ) {
@@ -1118,7 +1118,7 @@ var initInviteUserEmailAutoComplete = function() {
 							return {
 								label : item.authUser.email + ", " + item.lastName + ", " + item.firstName,
 								value : item.authUser.email,
-								id : item.authUser.id
+								id : item.authUserId
 							};
 						}));
 					} catch( e ) {
@@ -1299,16 +1299,9 @@ var inviteUserToProjectResponse = function(params) {
 	if (responseData.status) {
 		clearInviteUserFieldsAndAutocompleteDisplay();
 		var addedExistingUser = responseData.addedExistingUser;
-		var existingUserThatWasAdded = responseData.existingUserThatWasAdded;
 		var invite_user_email = requestData.invite_user_email;
 		if ( addedExistingUser ) {
-			if ( existingUserThatWasAdded ) {
-//				var firstName = existingUserThatWasAdded.firstName;
-//				var lastName = existingUserThatWasAdded.lastName;
-//				alert( "Access to project added for " + firstName + " " + lastName );
-			} else {
-//				alert( "Access to project added for provided user" );
-			}
+
 		} else {
 //			alert( "email sent to " + invite_user_email  + " inviting them to this project" );
 			$("#invite_user_email_that_was_sent").text( invite_user_email );
@@ -1317,16 +1310,6 @@ var inviteUserToProjectResponse = function(params) {
 		}	
 		updateInvitedPeopleCurrentUsersLists();
 	} else {
-//		status: false
-//		addedExistingUser: false
-//		duplicateInsertError: false
-//		emailAddressDuplicateError: false
-//		emailAddressInvalidSendError: false
-//		emailSent: false
-//		existingUserThatWasAdded: null
-//		lastNameDuplicateError: false
-//		lastNameNotFoundError: true
-//		unableToSendEmailError: false
 		if (responseData.duplicateInsertError) {
 //			alert("User already has access to this project");
 			var $element = $("#error_message_invite_already_has_access");

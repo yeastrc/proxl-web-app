@@ -3,7 +3,6 @@ package org.yeastrc.xlink.www.url_shortner_share_page.webservices;
 import java.sql.SQLException;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -14,19 +13,18 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
-import org.yeastrc.auth.dto.AuthUserDTO;
+import org.yeastrc.xlink.www.access_control.common.AccessControl_GetUserSession_RefreshAccessEnabled;
 import org.yeastrc.xlink.www.constants.URLShortenerWhiteListConstants;
-import org.yeastrc.xlink.www.constants.WebConstants;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.dao.URLShortenerAssociatedProjectSearchIdDAO;
 import org.yeastrc.xlink.www.dao.URLShortenerDAO;
 import org.yeastrc.xlink.www.dao.URLShortenerDAO.LogDuplicateSQLException;
 import org.yeastrc.xlink.www.dto.URLShortenerAssociatedProjectSearchIdDTO;
 import org.yeastrc.xlink.www.dto.URLShortenerDTO;
-import org.yeastrc.xlink.www.dto.XLinkUserDTO;
+
 import org.yeastrc.xlink.www.exceptions.ProxlWebappInternalErrorException;
 import org.yeastrc.xlink.www.servlet_context.CurrentContext;
-import org.yeastrc.xlink.www.user_account.UserSessionObject;
+import org.yeastrc.xlink.www.user_session_management.UserSession;
 import com.google.common.io.BaseEncoding;
 import com.google.common.primitives.Longs;
 
@@ -123,17 +121,13 @@ public class SharePageURLShortenerCreateAndSaveWebService {
 				urlShortenerDTO = new URLShortenerDTO();
 				//  Get Auth user Id if a user account is signed in
 				Integer authUserId = null;
-				HttpSession session = httpServletRequest.getSession();
-				UserSessionObject userSessionObject  =
-						(UserSessionObject) session.getAttribute( WebConstants.SESSION_CONTEXT_USER_LOGGED_IN );
-				if ( userSessionObject != null ) {
-					XLinkUserDTO  xlinkUserDTO = userSessionObject.getUserDBObject();
-					if ( xlinkUserDTO != null ) {
-						AuthUserDTO authUser = xlinkUserDTO.getAuthUser();
-						if ( authUser != null ) {
-							authUserId = authUser.getId();
-						}
-					}
+
+				UserSession userSession =
+						AccessControl_GetUserSession_RefreshAccessEnabled.getSinglesonInstance()
+						.getUserSession_RefreshAccessEnabled( httpServletRequest );
+				
+				if ( userSession != null ) {
+					authUserId = userSession.getAuthUserId();
 				}
 				urlShortenerDTO.setUrl( pageUrlAfterContext );
 				urlShortenerDTO.setAuthUserId( authUserId );
@@ -194,7 +188,12 @@ public class SharePageURLShortenerCreateAndSaveWebService {
 	 */
 	private String getShortenedKey() {
 		StringBuilder randomStringSB = new StringBuilder( 16 );
-		for ( int j = 0; j < 2; j++ ) {
+
+		final int RETURN_LENGTH = 10;
+		
+		int insertedCharacterCount = 0;
+		
+		for ( int j = 0; j < 200; j++ ) { // for loop just provides an upper bound
 			double tosKeyMultiplier = Math.random();
 			if ( tosKeyMultiplier < 0.5 ) {
 				tosKeyMultiplier += 0.5;
@@ -204,12 +203,32 @@ public class SharePageURLShortenerCreateAndSaveWebService {
 			String encodedLong = BaseEncoding.base64().encode( Longs.toByteArray(tosKeyLong) );
 			// Drop first 6 characters and last character
 			String encodedLongExtract = encodedLong.substring( 6, encodedLong.length() - 1 );
-			randomStringSB.append( encodedLongExtract );
+			
+			char[] encodedLongArray = encodedLongExtract.toCharArray();
+			
+			for ( char entry : encodedLongArray ) {
+				
+//				entry = '9';
+				
+				if ( ( entry >= 'a' && entry <= 'z' )
+						|| ( entry >= 'A' && entry <= 'Z' )
+						|| ( entry >= '0' && entry <= '9' ) ) {
+					randomStringSB.append( entry );
+					insertedCharacterCount++;
+					if ( insertedCharacterCount >= RETURN_LENGTH ) {
+						break;
+					}
+				}
+			}
+			if ( insertedCharacterCount >= RETURN_LENGTH ) {
+				break;
+			}
 		}
+		if ( insertedCharacterCount < RETURN_LENGTH ) {
+			throw new RuntimeException("Not find enough letters and numbers for randomString. insertedCharacterCount: " + insertedCharacterCount );
+		}
+
 		String randomString = randomStringSB.toString();
-		randomString = randomString.replace( '/', 'z' ); // Replace all '/' since is a URL path separator
-	    randomString = randomString.replace( '\\', 'x' ); // Replace all '\' Browser replaces it with '/' which is a URL path separator
-	    randomString = randomString.replace( '%', 'w' ); // Replace all '%' since is the start of '%' encoded characters
 		return randomString;
 	}
 	

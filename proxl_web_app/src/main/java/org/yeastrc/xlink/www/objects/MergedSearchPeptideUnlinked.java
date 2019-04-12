@@ -46,6 +46,7 @@ public class MergedSearchPeptideUnlinked implements IMergedSearchLink {
 
 	
 	
+	@Override
 	public int hashCode() {
 		return this.peptide.getSequence().hashCode();
 	}
@@ -53,6 +54,7 @@ public class MergedSearchPeptideUnlinked implements IMergedSearchLink {
 	/**
 	 * Returns true if both MergedSearchPeptideUnlinked objects describe the same two peptides at the same two positions in each respective peptide
 	 */
+	@Override
 	public boolean equals( Object o ) {
 		if( !( o instanceof MergedSearchPeptideUnlinked ) ) return false;
 		

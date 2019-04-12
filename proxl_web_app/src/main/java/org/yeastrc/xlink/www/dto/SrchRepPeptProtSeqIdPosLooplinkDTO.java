@@ -35,6 +35,7 @@ public class SrchRepPeptProtSeqIdPosLooplinkDTO implements SrchRepPeptProtSeqIdP
 		this.id = id;
 	}
 
+	@Override
 	public int getSearchId() {
 		return searchId;
 	}
@@ -43,6 +44,7 @@ public class SrchRepPeptProtSeqIdPosLooplinkDTO implements SrchRepPeptProtSeqIdP
 		this.searchId = searchId;
 	}
 
+	@Override
 	public int getReportedPeptideId() {
 		return reportedPeptideId;
 	}
@@ -51,6 +53,7 @@ public class SrchRepPeptProtSeqIdPosLooplinkDTO implements SrchRepPeptProtSeqIdP
 		this.reportedPeptideId = reportedPeptideId;
 	}
 
+	@Override
 	public int getSearchReportedPeptidepeptideId() {
 		return searchReportedPeptidepeptideId;
 	}
@@ -59,6 +62,7 @@ public class SrchRepPeptProtSeqIdPosLooplinkDTO implements SrchRepPeptProtSeqIdP
 		this.searchReportedPeptidepeptideId = searchReportedPeptidepeptideId;
 	}
 
+	@Override
 	public int getProteinSequenceVersionId() {
 		return proteinSequenceVersionId;
 	}

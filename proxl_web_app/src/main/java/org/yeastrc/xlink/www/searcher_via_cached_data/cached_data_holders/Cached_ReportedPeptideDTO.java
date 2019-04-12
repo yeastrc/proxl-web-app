@@ -197,11 +197,11 @@ public class Cached_ReportedPeptideDTO implements CachedDataCommonIF {
 				}
 				
 				int cacheTimeout = CACHE_TIMEOUT_FULL_SIZE;
-				cacheMaxSize = parentObject.CACHE_MAX_SIZE_FULL_SIZE;
+				cacheMaxSize = Cached_ReportedPeptideDTO.CACHE_MAX_SIZE_FULL_SIZE;
 				if ( cachedDataSizeOptions == CachedDataSizeOptions.HALF ) {
 					cacheMaxSize = cacheMaxSize / 2;
 				} else if ( cachedDataSizeOptions == CachedDataSizeOptions.SMALL ) {
-					cacheMaxSize = parentObject.CACHE_MAX_SIZE_SMALL;
+					cacheMaxSize = Cached_ReportedPeptideDTO.CACHE_MAX_SIZE_SMALL;
 					cacheTimeout = CACHE_TIMEOUT_SMALL;
 				}
 				
@@ -210,6 +210,7 @@ public class Cached_ReportedPeptideDTO implements CachedDataCommonIF {
 						.maximumSize( cacheMaxSize )
 						.build(
 								new CacheLoader<Integer, ReportedPeptideDTO>() {
+									@Override
 									public ReportedPeptideDTO load(Integer reportedPeptideId) throws Exception {
 										
 										//   WARNING  cannot return null.  

@@ -81,6 +81,50 @@ public class AuthSharedObjectUsersDAO {
 		returnItem.setAccessLevel( rs.getInt( "access_level" ) );
 		return returnItem;
 	}
+
+	/**
+	 * @param sharedObjectId
+	 * @param userId
+	 * @return null if not found
+	 * @throws Exception
+	 */
+	public Integer getAccessLevelForSharedObjectIdAndUserId( int sharedObjectId, int userId ) throws Exception {
+		Integer accessLevel = null;
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		final String sql = "SELECT access_level FROM auth_shared_object_users WHERE shared_object_id = ? AND user_id = ? ";
+		try {
+			conn = AuthLibraryDBConnectionFactory.getConnection(  );
+			pstmt = conn.prepareStatement( sql );
+			pstmt.setInt( 1, sharedObjectId );
+			pstmt.setInt( 2, userId );
+			rs = pstmt.executeQuery();
+			if( rs.next() ) {
+				accessLevel = rs.getInt( "access_level" );
+			}
+		} catch ( Exception e ) {
+			String msg = "Failed to select access_level, sharedObjectId: " + sharedObjectId
+					+ ", userId: " + userId + ", sql: " + sql;
+			log.error( msg, e );
+			throw e;
+		} finally {
+			// be sure database handles are closed
+			if( rs != null ) {
+				try { rs.close(); } catch( Throwable t ) { ; }
+				rs = null;
+			}
+			if( pstmt != null ) {
+				try { pstmt.close(); } catch( Throwable t ) { ; }
+				pstmt = null;
+			}
+			if( conn != null ) {
+				try { conn.close(); } catch( Throwable t ) { ; }
+				conn = null;
+			}
+		}
+		return accessLevel;
+	}
 	
 	/**
 	 * @param item

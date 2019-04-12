@@ -9,7 +9,7 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.yeastrc.xlink.www.objects.AuthAccessLevel;
+import org.yeastrc.xlink.www.access_control.result_objects.WebSessionAuthAccessLevel;
 import org.yeastrc.xlink.www.objects.ProjectPageFoldersSearches;
 import org.yeastrc.xlink.www.objects.ProjectPublicAccessData;
 import org.yeastrc.xlink.www.file_import_proxl_xml_scans.searchers.ProxlXMLFileImportTracking_PendingCount_Searcher;
@@ -18,9 +18,9 @@ import org.yeastrc.xlink.www.searcher.NoteSearcher;
 import org.yeastrc.xlink.www.searcher.ProjectToCopyToSearcher;
 import org.yeastrc.xlink.www.constants.StrutsGlobalForwardNames;
 import org.yeastrc.xlink.www.constants.WebConstants;
-import org.yeastrc.xlink.www.user_account.UserSessionObject;
-import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
-import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
+import org.yeastrc.xlink.www.user_session_management.UserSession;
+import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result;
+import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId;
 import org.yeastrc.xlink.www.web_utils.AnyPDBFilesForProjectId;
 import org.yeastrc.xlink.www.web_utils.GetPageHeaderData;
 import org.yeastrc.xlink.www.web_utils.GetProjectPublicAccessData;
@@ -41,18 +41,18 @@ public class ViewProjectAction extends Action {
 	private static final Logger log = LoggerFactory.getLogger( ViewProjectAction.class);
 	
 	//  For use in projectNotFound.jsp
-	
+	public final static String PROJECT_NOT_FOUND = "ProjectNotFound";
+		
 	private static final String REQUEST_PROJECT_ID_FROM_VIEW_PROJECT_ACTION = "projectId_FromViewProjectAction";
 	private static final String REQUEST_ADMIN_EMAIL_ADDRESS = "adminEmailAddress";
 	
+	@Override
 	public ActionForward execute( ActionMapping mapping,
 			  ActionForm form,
 			  HttpServletRequest request,
 			  HttpServletResponse response )
 					  throws Exception {
 		try {
-			// Get the session first.  
-//			HttpSession session = request.getSession();
 			//  First try to get project id from request as passed from another struts action
 			String projectIdString = null;
 			int projectId = 0;
@@ -74,8 +74,7 @@ public class ViewProjectAction extends Action {
 				} catch ( Exception ex ) {
 					log.warn( "Failed to parse project id: " + projectIdString );
 					this.getDataForProjectNotFoundPage(request); 
-					GetPageHeaderData.getInstance().getPageHeaderDataWithoutProjectId(request);
-					return mapping.findForward( StrutsGlobalForwardNames.PROJECT_NOT_FOUND );
+					return mapping.findForward( PROJECT_NOT_FOUND );
 				}
 			}
 			//  Confirm projectId is in database
@@ -85,18 +84,17 @@ public class ViewProjectAction extends Action {
 				String msg = "Project id is not in database: " + projectId;
 				log.warn( msg );
 				this.getDataForProjectNotFoundPage(request);
-				GetPageHeaderData.getInstance().getPageHeaderDataWithoutProjectId(request);
-				return mapping.findForward( StrutsGlobalForwardNames.PROJECT_NOT_FOUND );
+				return mapping.findForward( PROJECT_NOT_FOUND );
 			}
-			AccessAndSetupWebSessionResult accessAndSetupWebSessionResult =
-					GetAccessAndSetupWebSession.getInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request, response );
-			UserSessionObject userSessionObject = accessAndSetupWebSessionResult.getUserSessionObject();
+			GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result accessAndSetupWebSessionResult =
+					GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.getSinglesonInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request, response );
+			UserSession userSession = accessAndSetupWebSessionResult.getUserSession();
 			if ( accessAndSetupWebSessionResult.isNoSession() ) {
 				//  No User session 
 				return mapping.findForward( StrutsGlobalForwardNames.NO_USER_SESSION );
 			}
 			//  Test access to the project id
-			AuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getAuthAccessLevel();
+			WebSessionAuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getWebSessionAuthAccessLevel();
 			if ( ! authAccessLevel.isPublicAccessCodeReadAllowed() ) {
 				//  No Access Allowed for this project id
 				return mapping.findForward( StrutsGlobalForwardNames.INSUFFICIENT_ACCESS_PRIVILEGE );
@@ -113,15 +111,14 @@ public class ViewProjectAction extends Action {
 			
 			if ( projectDTO == null || ( ! projectDTO.isEnabled() ) || ( projectDTO.isMarkedForDeletion() )  ) {
 				this.getDataForProjectNotFoundPage(request);
-				GetPageHeaderData.getInstance().getPageHeaderDataWithoutProjectId(request);
-				return mapping.findForward( StrutsGlobalForwardNames.PROJECT_NOT_FOUND );
+				return mapping.findForward( PROJECT_NOT_FOUND );
 			}
 			
 			ProjectPublicAccessData projectPublicAccessData =
 					GetProjectPublicAccessData.getInstance().getProjectPublicAccessData( projectId );
 			if ( projectPublicAccessData == null ) {
-				GetPageHeaderData.getInstance().getPageHeaderDataWithoutProjectId(request);
-				return mapping.findForward( StrutsGlobalForwardNames.PROJECT_NOT_FOUND );
+				this.getDataForProjectNotFoundPage(request);
+				return mapping.findForward( PROJECT_NOT_FOUND );
 			}
 			
 			GetPageHeaderData.getInstance().getPageHeaderDataWithProjectId( projectId, request );
@@ -166,7 +163,7 @@ public class ViewProjectAction extends Action {
 							ProjectToCopyToSearcher.getInstance().anyProjectsExistExcludingProjectId( projectId );
 				} else {
 					//  Do other projects exist that this user is owner for
-					int authUserId = userSessionObject.getUserDBObject().getAuthUser().getId();
+					int authUserId = userSession.getAuthUserId();
 					int maxAuthLevel = AuthAccessLevelConstants.ACCESS_LEVEL_PROJECT_OWNER;
 					otherProjectsExistForUser = 
 							ProjectToCopyToSearcher.getInstance()

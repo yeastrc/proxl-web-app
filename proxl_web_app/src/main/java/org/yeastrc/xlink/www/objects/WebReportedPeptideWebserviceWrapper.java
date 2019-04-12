@@ -29,9 +29,11 @@ public class WebReportedPeptideWebserviceWrapper implements SearchPeptideCommonL
 	public void setWebReportedPeptide(WebReportedPeptide webReportedPeptide) {
 		this.webReportedPeptide = webReportedPeptide;
 	}
+	@Override
 	public List<String> getPsmAnnotationValueList() {
 		return this.webReportedPeptide.getPsmAnnotationValueList();
 	}
+	@Override
 	public List<String> getPeptideAnnotationValueList() {
 		return this.webReportedPeptide.getPeptideAnnotationValueList();
 	}

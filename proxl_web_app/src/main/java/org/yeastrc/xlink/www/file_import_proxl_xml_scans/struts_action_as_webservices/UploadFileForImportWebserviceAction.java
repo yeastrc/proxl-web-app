@@ -26,16 +26,16 @@ import org.yeastrc.xlink.www.dao.ProjectDAO;
 import org.yeastrc.xlink.www.dto.ProjectDTO;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappFileUploadFileSystemException;
-import org.yeastrc.xlink.www.objects.AuthAccessLevel;
+import org.yeastrc.xlink.www.access_control.result_objects.WebSessionAuthAccessLevel;
 import org.yeastrc.xlink.www.file_import_proxl_xml_scans.constants.ProxlXMLFileUploadMaxFileSizeConstants;
 import org.yeastrc.xlink.www.file_import_proxl_xml_scans.constants.ProxlXMLFileUploadWebConstants;
 import org.yeastrc.xlink.www.file_import_proxl_xml_scans.objects.ProxlUploadTempDataFileContents;
 import org.yeastrc.xlink.www.file_import_proxl_xml_scans.utils.IsScanFileImportAllowedViaWebSubmit;
 import org.yeastrc.xlink.www.file_import_proxl_xml_scans.utils.Minimal_Validate_ProxlXMLFile_AndGetSearchNameIfInFile;
 import org.yeastrc.xlink.www.file_import_proxl_xml_scans.utils.Proxl_XML_Importer_Work_Directory_And_SubDirs_Web;
-import org.yeastrc.xlink.www.user_account.UserSessionObject;
-import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
-import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
+import org.yeastrc.xlink.www.user_session_management.UserSession;
+import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result;
+import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
@@ -66,6 +66,7 @@ public class UploadFileForImportWebserviceAction extends Action {
 	public static final String UPLOAD_FILE_FORM_NAME_UPLOADED_FILENAME_W_PATH_ABSOLUTE = 
 			"absoluteFilename_W_Path_OnSubmitMachine";
 	
+	@Override
 	public ActionForward execute( ActionMapping mapping,
 			  ActionForm form,
 			  HttpServletRequest request,
@@ -215,9 +216,9 @@ public class UploadFileForImportWebserviceAction extends Action {
 				response.setStatus( HttpServletResponse.SC_BAD_REQUEST /* 400  */ );
 				throw new FailResponseSentException();
 			}
-			AccessAndSetupWebSessionResult accessAndSetupWebSessionResult =
-					GetAccessAndSetupWebSession.getInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request, response );
-			UserSessionObject userSessionObject = accessAndSetupWebSessionResult.getUserSessionObject();
+			GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result accessAndSetupWebSessionResult =
+					GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.getSinglesonInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request, response );
+			UserSession userSession = accessAndSetupWebSessionResult.getUserSession();
 			if ( accessAndSetupWebSessionResult.isNoSession() ) {
 				//  No User session 
 				response.setStatus( WebServiceErrorMessageConstants.NO_SESSION_STATUS_CODE.getStatusCode() );
@@ -226,7 +227,7 @@ public class UploadFileForImportWebserviceAction extends Action {
 				throw new FailResponseSentException();
 			}
 			//  Test access to the project id
-			AuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getAuthAccessLevel();
+			WebSessionAuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getWebSessionAuthAccessLevel();
 			if ( ! authAccessLevel.isProjectOwnerAllowed() ) {
 				//  No Access Allowed for this project id
 				response.setStatus( WebServiceErrorMessageConstants.NOT_AUTHORIZED_STATUS_CODE.getStatusCode() );
@@ -234,7 +235,7 @@ public class UploadFileForImportWebserviceAction extends Action {
 				response.getWriter().print( WebServiceErrorMessageConstants.NOT_AUTHORIZED_TEXT );
 				throw new FailResponseSentException();
 			}
-			int authUserId = userSessionObject.getUserDBObject().getAuthUser().getId();
+			int authUserId = userSession.getAuthUserId();
 			//  Confirm projectId is in database
 			ProjectDTO projectDTO =	ProjectDAO.getInstance().getProjectDTOForProjectId( projectId );
 			if ( projectDTO == null ) {

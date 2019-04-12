@@ -28,7 +28,7 @@ import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.www.objects.AnnDisplayNameDescPeptPsmListsPair;
 import org.yeastrc.xlink.www.objects.AnnValuePeptPsmListsPair;
 import org.yeastrc.xlink.www.objects.AnnotationDisplayNameDescription;
-import org.yeastrc.xlink.www.objects.AuthAccessLevel;
+import org.yeastrc.xlink.www.access_control.result_objects.WebSessionAuthAccessLevel;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
 import org.yeastrc.xlink.www.actions.ProteinsAllMergedCommonPageDownload.AllProteinsMergedCommonPageDownloadResult;
 import org.yeastrc.xlink.www.actions.ProteinsAllMergedCommonPageDownload.MergedProteinSingleEntry;
@@ -36,8 +36,8 @@ import org.yeastrc.xlink.www.constants.ServletOutputStreamCharacterSetConstant;
 import org.yeastrc.xlink.www.constants.StrutsGlobalForwardNames;
 import org.yeastrc.xlink.www.constants.WebConstants;
 import org.yeastrc.xlink.www.forms.MergedSearchViewProteinsForm;
-import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
-import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
+import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result;
+import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId;
 /**
  * 
  *
@@ -46,6 +46,7 @@ public class DownloadMergedSearchProteinsAllAction extends Action {
 	
 	private static final Logger log = LoggerFactory.getLogger( DownloadMergedSearchProteinsAllAction.class);
 	
+	@Override
 	public ActionForward execute( ActionMapping mapping,
 			  ActionForm actionForm,
 			  HttpServletRequest request,
@@ -54,8 +55,6 @@ public class DownloadMergedSearchProteinsAllAction extends Action {
 		try {
 			// our form
 			MergedSearchViewProteinsForm form = (MergedSearchViewProteinsForm)actionForm;
-			// Get the session first.  
-//			HttpSession session = request.getSession();
 			//   Get the project id for these searches
 			int[] projectSearchIds = form.getProjectSearchId();
 			if ( projectSearchIds.length == 0 ) {
@@ -85,14 +84,14 @@ public class DownloadMergedSearchProteinsAllAction extends Action {
 			int projectId = projectIdsFromSearchIds.get( 0 );
 			request.setAttribute( "projectId", projectId ); 
 			///////////////////////
-			AccessAndSetupWebSessionResult accessAndSetupWebSessionResult =
-					GetAccessAndSetupWebSession.getInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request, response );
+			GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result accessAndSetupWebSessionResult =
+					GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.getSinglesonInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request, response );
 			if ( accessAndSetupWebSessionResult.isNoSession() ) {
 				//  No User session 
 				return mapping.findForward( StrutsGlobalForwardNames.NO_USER_SESSION );
 			}
 			//  Test access to the project id
-			AuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getAuthAccessLevel();
+			WebSessionAuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getWebSessionAuthAccessLevel();
 			if ( ! authAccessLevel.isPublicAccessCodeReadAllowed() ) {
 				//  No Access Allowed for this project id
 				return mapping.findForward( StrutsGlobalForwardNames.INSUFFICIENT_ACCESS_PRIVILEGE );

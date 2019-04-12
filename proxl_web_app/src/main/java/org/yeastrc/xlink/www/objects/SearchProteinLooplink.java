@@ -20,6 +20,7 @@ public class SearchProteinLooplink implements IProteinLooplink {
 	
 	private static final Logger log = LoggerFactory.getLogger( SearchProteinLooplink.class);
 	
+	@Override
 	public SearchProtein getProtein() {
 		return protein;
 	}
@@ -51,12 +52,14 @@ public class SearchProteinLooplink implements IProteinLooplink {
 	}
 	
 	
+	@Override
 	public int getProteinPosition1() {
 		return proteinPosition1;
 	}
 	public void setProteinPosition1(int proteinPosition1) {
 		this.proteinPosition1 = proteinPosition1;
 	}
+	@Override
 	public int getProteinPosition2() {
 		return proteinPosition2;
 	}

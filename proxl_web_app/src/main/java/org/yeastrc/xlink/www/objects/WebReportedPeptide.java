@@ -513,22 +513,26 @@ public class WebReportedPeptide implements SearchPeptideCommonLinkWebserviceResu
 
 	
 	
+	@Override
 	public List<String> getPsmAnnotationValueList() {
 		return psmAnnotationValueList;
 	}
 
 
+	@Override
 	public void setPsmAnnotationValueList(List<String> psmAnnotationValueList) {
 		this.psmAnnotationValueList = psmAnnotationValueList;
 	}
 
 
+	@Override
 	public List<String> getPeptideAnnotationValueList() {
 		return peptideAnnotationValueList;
 	}
 
 
 
+	@Override
 	public void setPeptideAnnotationValueList(
 			List<String> peptideAnnotationValueList) {
 		this.peptideAnnotationValueList = peptideAnnotationValueList;

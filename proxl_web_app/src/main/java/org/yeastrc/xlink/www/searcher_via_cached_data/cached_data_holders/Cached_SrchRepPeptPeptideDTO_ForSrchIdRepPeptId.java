@@ -175,11 +175,11 @@ public class Cached_SrchRepPeptPeptideDTO_ForSrchIdRepPeptId implements CachedDa
 				}
 				
 				int cacheTimeout = CACHE_TIMEOUT_FULL_SIZE;
-				cacheMaxSize = parentObject.CACHE_MAX_SIZE_FULL_SIZE;
+				cacheMaxSize = Cached_SrchRepPeptPeptideDTO_ForSrchIdRepPeptId.CACHE_MAX_SIZE_FULL_SIZE;
 				if ( cachedDataSizeOptions == CachedDataSizeOptions.HALF ) {
 					cacheMaxSize = cacheMaxSize / 2;
 				} else if ( cachedDataSizeOptions == CachedDataSizeOptions.SMALL ) {
-					cacheMaxSize = parentObject.CACHE_MAX_SIZE_SMALL;
+					cacheMaxSize = Cached_SrchRepPeptPeptideDTO_ForSrchIdRepPeptId.CACHE_MAX_SIZE_SMALL;
 					cacheTimeout = CACHE_TIMEOUT_SMALL;
 				}
 				
@@ -188,6 +188,7 @@ public class Cached_SrchRepPeptPeptideDTO_ForSrchIdRepPeptId implements CachedDa
 						.maximumSize( cacheMaxSize )
 						.build(
 								new CacheLoader<SrchRepPeptPeptideDTO_ForSrchIdRepPeptId_ReqParams, SrchRepPeptPeptideDTO_ForSrchIdRepPeptId_Result>() {
+									@Override
 									public SrchRepPeptPeptideDTO_ForSrchIdRepPeptId_Result load(SrchRepPeptPeptideDTO_ForSrchIdRepPeptId_ReqParams srchRepPeptPeptideDTO_ForSrchIdRepPeptId_ReqParams) throws Exception {
 										
 										//   WARNING  cannot return null.  

@@ -59,18 +59,21 @@ public class MergedSearchProteinLooplink implements IProteinLooplink, IMergedSea
 
 
 	
+	@Override
 	public MergedSearchProtein getProtein() {
 		return protein;
 	}
 	public void setProtein(MergedSearchProtein protein) {
 		this.protein = protein;
 	}
+	@Override
 	public int getProteinPosition1() {
 		return proteinPosition1;
 	}
 	public void setProteinPosition1(int proteinPosition1) {
 		this.proteinPosition1 = proteinPosition1;
 	}
+	@Override
 	public int getProteinPosition2() {
 		return proteinPosition2;
 	}

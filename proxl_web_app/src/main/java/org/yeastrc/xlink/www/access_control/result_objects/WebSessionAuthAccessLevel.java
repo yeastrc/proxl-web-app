@@ -1,40 +1,64 @@
-package org.yeastrc.xlink.www.objects;
+/*
+* Original author: Daniel Jaschob <djaschob .at. uw.edu>
+*                  
+* Copyright 2018 University of Washington - Seattle, WA
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*      http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
+package org.yeastrc.xlink.www.access_control.result_objects;
 
 import org.yeastrc.xlink.www.constants.AuthAccessLevelConstants;
 
 /**
  * 
- * This holds the auth level a given request, it is created in the action
+ *
  */
-public class AuthAccessLevel {
-
-	private int authAccessLevel = AuthAccessLevelConstants.ACCESS_LEVEL_NONE;
-	
-	/**
-	 * Preserve access level if the project was not locked
-	 */
-	private int authAccessLevelIfNotLocked = AuthAccessLevelConstants.ACCESS_LEVEL_NONE;
+public class WebSessionAuthAccessLevel {
 
 	/**
-	 * Constuctor
+	 * Worst access level across the projects, if there are project ids
 	 */
-	public AuthAccessLevel(  ) {
-		
-	}
-	
+	int authAccessLevel;
 	
 	/**
-	 * Constuctor
-	 * @param authAccessLevel
+	 * If the project(s) were not locked, what the access level would be.
 	 */
-	public AuthAccessLevel( int authAccessLevel ) {
-		
-		this.authAccessLevel = authAccessLevel;
-		this.authAccessLevelIfNotLocked = authAccessLevel;
+	int authAccessLevelForProjectIdsIfNotLocked;
+
+	@Override
+	public String toString() {
+		return "WebSessionAuthAccessLevel [authAccessLevel=" + authAccessLevel
+				+ ", authAccessLevelForProjectIdsIfNotLocked=" + authAccessLevelForProjectIdsIfNotLocked + "]";
 	}
 	
+	/**
+	 * Worst access level across the projects
+	 * @return
+	 */
+	public int getAccessLevel() {
+		return authAccessLevel;
+	}
+
+	/**
+	 * If the project(s) were not locked, what the access level would be.
+	 * Worst access level across the projects.
+	 * @return
+	 */
+	public int getAuthAccessLevelForProjectIdsIfNotLocked() {
+		return authAccessLevelForProjectIdsIfNotLocked;
+	}
 	
-	
+
 
 	public boolean isAdminAllowed() {
 		
@@ -50,7 +74,7 @@ public class AuthAccessLevel {
 	 */
 	public boolean isAdminIfProjectNotLockedAllowed() {
 		
-		if ( authAccessLevelIfNotLocked <= AuthAccessLevelConstants.ACCESS_LEVEL_ADMIN ) {
+		if ( authAccessLevelForProjectIdsIfNotLocked <= AuthAccessLevelConstants.ACCESS_LEVEL_ADMIN ) {
 			return true;
 		}
 		return false;
@@ -86,7 +110,7 @@ public class AuthAccessLevel {
 	 */
 	public boolean isProjectOwnerIfProjectNotLockedAllowed() {
 		
-		if ( authAccessLevelIfNotLocked <= AuthAccessLevelConstants.ACCESS_LEVEL_PROJECT_OWNER ) {
+		if ( authAccessLevelForProjectIdsIfNotLocked <= AuthAccessLevelConstants.ACCESS_LEVEL_PROJECT_OWNER ) {
 			return true;
 		}
 		return false;
@@ -110,7 +134,7 @@ public class AuthAccessLevel {
 	 */
 	public boolean isAssistantProjectOwnerIfProjectNotLockedAllowed() {
 		
-		if ( authAccessLevelIfNotLocked <= AuthAccessLevelConstants.ACCESS_LEVEL_ASSISTANT_PROJECT_OWNER_AKA_RESEARCHER ) {
+		if ( authAccessLevelForProjectIdsIfNotLocked <= AuthAccessLevelConstants.ACCESS_LEVEL_ASSISTANT_PROJECT_OWNER_AKA_RESEARCHER ) {
 			return true;
 		}
 		return false;
@@ -199,30 +223,6 @@ public class AuthAccessLevel {
 		
 		return false;
 	}
-	
-	
-	
-	//////////////////////////////////////////////////////////////
-	
-	
-	public int getAuthAccessLevel() {
-		return authAccessLevel;
-	}
 
-	public void setAuthAccessLevel(int authAccessLevel) {
-		this.authAccessLevel = authAccessLevel;
-		this.authAccessLevelIfNotLocked = authAccessLevel;
-	}
 	
-
-	public int getAuthAccessLevelIfNotLocked() {
-		return authAccessLevelIfNotLocked;
-	}
-
-
-	public void setAuthAccessLevelIfNotLocked(int authAccessLevelIfNotLocked) {
-		this.authAccessLevelIfNotLocked = authAccessLevelIfNotLocked;
-	}
-
-
 }

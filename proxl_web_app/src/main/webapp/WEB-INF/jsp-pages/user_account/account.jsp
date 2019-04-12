@@ -97,7 +97,7 @@
 				Email Address: 
 			</div>
 			<div  class="current-value-container current_value_container_jq">
-				<span class="current_value_span_jq"><c:out value="${ loggedInUser.authUser.email }"></c:out></span> 
+				<span class="current_value_span_jq"><c:out value="${ loggedInUser.email }"></c:out></span> 
 				<a href="javascript:" class="edit_value_jq" ><img src="images/icon-edit-small.png" title="Change Email"></a>
 			</div>
 			<div  class="edit-value-container edit_value_container_jq">
@@ -135,7 +135,7 @@
 			</div>
 			
 			<div  class="current-value-container current_value_container_jq">
-				<span class="current_value_span_jq"><c:out value="${ loggedInUser.authUser.username }"></c:out></span> 
+				<span class="current_value_span_jq"><c:out value="${ loggedInUser.username }"></c:out></span> 
 				<a href="javascript:" class="edit_value_jq" ><img src="images/icon-edit-small.png" title="Change Username"></a>
 			</div>
 			<div  class="edit-value-container edit_value_container_jq">

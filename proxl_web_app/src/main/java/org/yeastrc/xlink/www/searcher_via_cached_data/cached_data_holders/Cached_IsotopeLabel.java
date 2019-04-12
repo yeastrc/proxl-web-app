@@ -188,7 +188,7 @@ public class Cached_IsotopeLabel implements CachedDataCommonIF {
 				}
 				
 //				int cacheTimeout = CACHE_TIMEOUT_FULL_SIZE;
-				cacheMaxSize = parentObject.CACHE_MAX_SIZE_FULL_SIZE;
+				cacheMaxSize = Cached_IsotopeLabel.CACHE_MAX_SIZE_FULL_SIZE;
 				if ( cachedDataSizeOptions == CachedDataSizeOptions.HALF ) {
 //					cacheMaxSize = cacheMaxSize / 2;
 				} else if ( cachedDataSizeOptions == CachedDataSizeOptions.SMALL ) {
@@ -201,6 +201,7 @@ public class Cached_IsotopeLabel implements CachedDataCommonIF {
 						.maximumSize( cacheMaxSize )
 						.build(
 								new CacheLoader<Integer, IsotopeLabelDTO>() {
+									@Override
 									public IsotopeLabelDTO load(Integer isotopeLabelId) throws Exception {
 										
 										//   WARNING  cannot return null.  

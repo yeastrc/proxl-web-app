@@ -13,8 +13,10 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.batik.transcoder.SVGAbstractTranscoder;
 import org.apache.batik.transcoder.TranscoderInput;
 import org.apache.batik.transcoder.TranscoderOutput;
+import org.apache.batik.transcoder.image.ImageTranscoder;
 import org.apache.batik.transcoder.image.JPEGTranscoder;
 import org.apache.batik.transcoder.image.PNGTranscoder;
 import org.apache.commons.lang.StringUtils;
@@ -59,6 +61,7 @@ public class ConvertAndDownloadSVGAction extends Action {
 		
 	}
 	
+	@Override
 	public ActionForward execute( ActionMapping mapping,
 			  ActionForm actionForm,
 			  HttpServletRequest request,
@@ -231,9 +234,9 @@ public class ConvertAndDownloadSVGAction extends Action {
 		} else if( type.equals( "png" ) ) {
 	        // Create a PNG transcoder
     		PNGTranscoder t = new PNGTranscoder();
-    		t.addTranscodingHint( PNGTranscoder.KEY_BACKGROUND_COLOR, Color.white );
+    		t.addTranscodingHint( ImageTranscoder.KEY_BACKGROUND_COLOR, Color.white );
     		
-    		t.addTranscodingHint( PNGTranscoder.KEY_WIDTH, new Float(2000.0));
+    		t.addTranscodingHint( SVGAbstractTranscoder.KEY_WIDTH, new Float(2000.0));
     		
 	        // Save the image.
 	        t.transcode(input, output);			
@@ -243,9 +246,9 @@ public class ConvertAndDownloadSVGAction extends Action {
 	        JPEGTranscoder t = new JPEGTranscoder();
 	        // Set the transcoding hints.
 	        t.addTranscodingHint(JPEGTranscoder.KEY_QUALITY, new Float(.8));
-    		t.addTranscodingHint( JPEGTranscoder.KEY_BACKGROUND_COLOR, Color.white );
+    		t.addTranscodingHint( ImageTranscoder.KEY_BACKGROUND_COLOR, Color.white );
     		
-    		t.addTranscodingHint( JPEGTranscoder.KEY_WIDTH, new Float(2000.0));
+    		t.addTranscodingHint( SVGAbstractTranscoder.KEY_WIDTH, new Float(2000.0));
     		
 	        // Save the image.
 	        t.transcode(input, output);			

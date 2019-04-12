@@ -16,6 +16,7 @@ public class ShortcutNotFoundPageInitAction extends Action{
 	
 	private static final Logger log = LoggerFactory.getLogger( ShortcutNotFoundPageInitAction.class);
 	
+	@Override
 	public ActionForward execute( ActionMapping mapping,
 			  ActionForm form,
 			  HttpServletRequest request,

@@ -1237,7 +1237,8 @@ public class ProteinsMergedCommonPageDownload {
      *
      */
     public class SortSearchProtein implements Comparator<SearchProtein> {
-        public int compare(SearchProtein o1, SearchProtein o2) {
+        @Override
+		public int compare(SearchProtein o1, SearchProtein o2) {
             try { return o1.getName().toLowerCase().compareTo(o2.getName().toLowerCase()); }
             catch( Exception e ) { return 0; }
         }

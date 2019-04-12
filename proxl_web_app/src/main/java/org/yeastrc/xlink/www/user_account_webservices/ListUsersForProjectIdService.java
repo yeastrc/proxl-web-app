@@ -4,7 +4,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -16,11 +15,11 @@ import javax.ws.rs.core.Response;
 import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.www.dao.ProjectDAO;
 import org.yeastrc.xlink.www.internal_services.GetUserDisplayListForSharedObjectId;
-import org.yeastrc.xlink.www.objects.AuthAccessLevel;
+import org.yeastrc.xlink.www.access_control.result_objects.WebSessionAuthAccessLevel;
 import org.yeastrc.xlink.www.objects.UserDisplay;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
-import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
-import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
+import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result;
+import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId;
 
 @Path("/user")
 public class ListUsersForProjectIdService {
@@ -35,8 +34,6 @@ public class ListUsersForProjectIdService {
 	throws Exception {
 		//  Restricted to users with ACCESS_LEVEL_ASSISTANT_PROJECT_OWNER or better
 		try {
-			// Get the session first.  
-			HttpSession session = request.getSession();
 			if ( projectId == null ) {
 				//  No Project Id 
 				throw new WebApplicationException(
@@ -45,8 +42,8 @@ public class ListUsersForProjectIdService {
 						.build()
 						);
 			} 
-			AccessAndSetupWebSessionResult accessAndSetupWebSessionResult =
-					GetAccessAndSetupWebSession.getInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request );
+			GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result accessAndSetupWebSessionResult =
+					GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.getSinglesonInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request );
 			if ( accessAndSetupWebSessionResult.isNoSession() ) {
 				//  No User session 
 				throw new WebApplicationException(
@@ -55,7 +52,7 @@ public class ListUsersForProjectIdService {
 						.build()
 						);
 			}
-			AuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getAuthAccessLevel();
+			WebSessionAuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getWebSessionAuthAccessLevel();
 			//  Test access to the project id
 			if ( ! authAccessLevel.isAssistantProjectOwnerAllowed()
 					&& ! authAccessLevel.isAssistantProjectOwnerIfProjectNotLockedAllowed() ) {
@@ -77,19 +74,23 @@ public class ListUsersForProjectIdService {
 						.build()
 						);
 			}
+			
 			List<UserDisplay> userListForProject = GetUserDisplayListForSharedObjectId.getInstance().getUserDisplayListExcludeAdminGlobalNoAccessAccountsForSharedObjectId( projectSharedObjectId );
+			
 			//  Sort on last name then first name
 			Collections.sort( userListForProject, new Comparator<UserDisplay>() {
 				@Override
 				public int compare(UserDisplay o1, UserDisplay o2) {
-					int lastNameCompare = o1.getxLinkUserDTO().getLastName().compareTo( o2.getxLinkUserDTO().getLastName() );
+					int lastNameCompare = o1.getLastName().compareTo( o2.getLastName() );
 					if ( lastNameCompare != 0 ) {
 						return lastNameCompare;
 					}
-					return o1.getxLinkUserDTO().getFirstName().compareTo( o2.getxLinkUserDTO().getFirstName() );
+					return o1.getFirstName().compareTo( o2.getFirstName() );
 				}
 			});
+			
 			return userListForProject;
+			
 		} catch ( WebApplicationException e ) {
 			throw e;
 		} catch ( Exception e ) {

@@ -47,18 +47,6 @@
 	
 	<div class="top-level-label-bottom-border" ></div>
 
-<%-- 
-	<h3>Current Account</h3>
-
-	<div id="current_account"></div>
-	
-	<div id="current_account_template" style="display: none;">
-		<div >{{ lastName }},
-			{{ firstName }}</div>
-	</div>
---%>			
-
-
 	<div id="invite_user_block" >
 
 		<div  id="invite_user_collapsed" >
@@ -433,18 +421,18 @@
 	<%-- This div is just a container and will not be placed into the final output --%>
 	<table id="user_entry_template" style="display: none;" >
 
-		<tr class="current_user_entry_root_div_jq" userId="{{authUser.id}}" >
+		<tr class="current_user_entry_root_div_jq" userId="{{ authUserId }}" >
 		
 		 <td nowrap  style="padding-right: 5px;">
 		 		 	<!-- One of these inputs will be shown  -->
 		 	<input type="image" src="images/icon-circle-x.png" class="user_disable_button_jq"  
-		 		title="Disable User" userId="{{authUser.id}}"  style="display: none;" />
+		 		title="Disable User" userId="{{ authUserId }}"  style="display: none;" />
 		 	<input type="image" src="images/icon-circle-plus.png" class="user_enable_button_jq"  
-		 		title="Enable User" userId="{{authUser.id}}"  style="display: none;"/>
+		 		title="Enable User" userId="{{ authUserId }}"  style="display: none;"/>
 		 </td>
 		 <td nowrap>
 		 	<%--  Add class 'name-of-user-disabled-user' if user is disabled in Javascript --%>
-		 	<span class="name-of-user  name_of_user_jq" >{{firstName}} {{lastName}}</span>
+		 	<span class="name-of-user  name_of_user_jq" >{{ firstName }} {{ lastName }}</span>
 		 </td>
 		 
 		 <td nowrap style="padding-left: 5px; padding-right: 5px;">
@@ -452,16 +440,16 @@
 			<span class="access_level_administrator_jq" style="display: none;">
 				<input type="image" src="images/icon-arrow-down.png" 
 					title="Decrease User Access Level"
-					class="user_entry_access_level_update_button_jq" userId="{{authUser.id}}"  />
+					class="user_entry_access_level_update_button_jq" userId="{{ authUserId }}"  />
 			</span>		
 			<span class="access_level_user_jq" style="display: none;">
 				<input type="image" src="images/icon-arrow-up.png" 
 					title="Increase User Access Level"
-					class="user_entry_access_level_update_button_jq" userId="{{authUser.id}}"  />
+					class="user_entry_access_level_update_button_jq" userId="{{ authUserId }}"  />
 			</span>
 			<span class="user_disabled_jq" style="display: none; visibility: hidden;">
 				<input type="image" src="images/icon-arrow-up.png" 
-					class="" userId="{{authUser.id}}"  />
+					class="" userId="{{ authUserId }}"  />
 			</span>			
 		 </td>
 
@@ -483,36 +471,9 @@
 				<div class="top-level-label-bottom-border" ></div>
 			</td>
 		</tr>
-			<%--  END Current User Template --%>			
+			<%--  END User Template --%>			
 	</table>
-				  
-<%-- 
-	<div id="OLD__current_user_template" style="display: none;" >
-	
-		<div class="current_user_entry_root_div_jq" userId="{{ authUser.id }}" >
-
-			{{ lastName }},
-			{{ firstName }}
-			
-			&nbsp;
-			&nbsp;
-			<select class="current_user_entry_access_level_entry_field_jq"  
-				current_access_level="{{ authUser.userAccessLevel }}">
-				<option value="" >Project Specific</option>
-				<option value="<%=AuthAccessLevelConstants.ACCESS_LEVEL_ADMIN%>" >Admin</option>
-				<option value="<%=AuthAccessLevelConstants.ACCESS_LEVEL_CREATE_NEW_PROJECT_AKA_USER%>" >Create New Project</option>
-				<option value="<%=AuthAccessLevelConstants.ACCESS_LEVEL_NONE%>" >Global No Access</option>
-			</select>
-			<input type="button" value="Update User Access" class="current_user_entry_access_level_update_button_jq" />
-			&nbsp;&nbsp;
-			<input type="button" value="Disable User" class="current_user_entry_disable_button_jq" />
-
-			<input type="button" value="Enable User" class="current_user_entry_enable_button_jq" />
-
-		</div>
-	</div>
---%>
-
+				
 </div>
 
   

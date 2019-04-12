@@ -2,6 +2,7 @@ package org.yeastrc.xlink.www.objects;
 
 public class SearchProteinDoublePosition {
 	
+	@Override
 	public String toString() {
 		try {
 			return protein.getName() + "(" + position1 + "," + position2 + ")";

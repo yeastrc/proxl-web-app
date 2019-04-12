@@ -26,7 +26,7 @@ import org.yeastrc.xlink.www.linked_positions.LooplinkLinkedPositions;
 import org.yeastrc.xlink.www.linked_positions.UnlinkedDimerPeptideProteinMapping;
 import org.yeastrc.xlink.www.linked_positions.UnlinkedDimerPeptideProteinMapping.UnlinkedDimerPeptideProteinMappingResult;
 import org.yeastrc.xlink.www.nav_links_image_structure.PopulateRequestDataForImageAndStructureAndQC_NavLinks;
-import org.yeastrc.xlink.www.objects.AuthAccessLevel;
+import org.yeastrc.xlink.www.access_control.result_objects.WebSessionAuthAccessLevel;
 import org.yeastrc.xlink.www.objects.MergedSearchProtein;
 import org.yeastrc.xlink.www.objects.SearchProtein;
 import org.yeastrc.xlink.www.objects.SearchProteinCrosslink;
@@ -52,8 +52,8 @@ import org.yeastrc.xlink.www.form_utils.GetProteinQueryJSONRootFromFormData;
 import org.yeastrc.xlink.www.forms.MergedSearchViewProteinsForm;
 import org.yeastrc.xlink.www.objects.ProteinCoverageData;
 import org.yeastrc.xlink.www.protein_coverage.ProteinCoverageCompute;
-import org.yeastrc.xlink.www.user_web_utils.AccessAndSetupWebSessionResult;
-import org.yeastrc.xlink.www.user_web_utils.GetAccessAndSetupWebSession;
+import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result;
+import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId;
 import org.yeastrc.xlink.www.web_utils.AnyPDBFilesForProjectId;
 import org.yeastrc.xlink.www.web_utils.ExcludeLinksWith_Remove_NonUniquePSMs_Checkbox_PopRequestItems;
 import org.yeastrc.xlink.www.web_utils.ExcludeOnTaxonomyForProteinSequenceVersionIdSearchId;
@@ -74,6 +74,7 @@ public class ViewMergedSearchCoverageReportAction extends Action {
 	
 	private static final Logger log = LoggerFactory.getLogger( ViewMergedSearchCoverageReportAction.class);
 	
+	@Override
 	public ActionForward execute( ActionMapping mapping,
 			  ActionForm actionForm,
 			  HttpServletRequest request,
@@ -91,8 +92,6 @@ public class ViewMergedSearchCoverageReportAction extends Action {
 			if ( Struts_Config_Parameter_Values_Constants.STRUTS__PARAMETER__MERGED_PROTEIN_COVERAGE_PAGE.equals( strutsActionMappingParameter ) ) {
 				request.setAttribute( "mergedPage", true );
 			}
-			// Get the session first.  
-//			HttpSession session = request.getSession();
 			int[] projectSearchIds = form.getProjectSearchId();
 			if ( projectSearchIds == null || projectSearchIds.length == 0 ) {
 				return mapping.findForward( StrutsGlobalForwardNames.INVALID_REQUEST_DATA );
@@ -122,14 +121,14 @@ public class ViewMergedSearchCoverageReportAction extends Action {
 			request.setAttribute( "projectId", projectId ); 
 			request.setAttribute( "project_id", projectId );
 			///////////////////////
-			AccessAndSetupWebSessionResult accessAndSetupWebSessionResult =
-					GetAccessAndSetupWebSession.getInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request, response );
+			GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result accessAndSetupWebSessionResult =
+					GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.getSinglesonInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request, response );
 			if ( accessAndSetupWebSessionResult.isNoSession() ) {
 				//  No User session 
 				return mapping.findForward( StrutsGlobalForwardNames.NO_USER_SESSION );
 			}
 			//  Test access to the project id
-			AuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getAuthAccessLevel();
+			WebSessionAuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getWebSessionAuthAccessLevel();
 			if ( ! authAccessLevel.isPublicAccessCodeReadAllowed() ) {
 				//  No Access Allowed for this project id
 				return mapping.findForward( StrutsGlobalForwardNames.INSUFFICIENT_ACCESS_PRIVILEGE );
@@ -458,7 +457,8 @@ public class ViewMergedSearchCoverageReportAction extends Action {
 	}
 	
     public class SortMergedSearchProtein implements Comparator<MergedSearchProtein> {
-        public int compare(MergedSearchProtein o1, MergedSearchProtein o2) {
+        @Override
+		public int compare(MergedSearchProtein o1, MergedSearchProtein o2) {
             try { return o1.getName().toLowerCase().compareTo(o2.getName().toLowerCase()); }
             catch( Exception e ) { return 0; }
         }

@@ -909,7 +909,7 @@ public class MS1_All_IntensityHeatmapImage {
 		int x_Count = end_X - start_X + 1;
 		int y_Count = end_Y - start_Y + 1;
 		
-		MultiColorMapper mapper = new MultiColorMapper( 1.0, (double) y_Count, colors );
+		MultiColorMapper mapper = new MultiColorMapper( 1.0, y_Count, colors );
 
         WritableRaster raster = bufferedImage.getRaster();
 

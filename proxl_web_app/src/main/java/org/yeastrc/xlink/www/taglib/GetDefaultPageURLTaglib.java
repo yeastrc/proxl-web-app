@@ -42,6 +42,7 @@ public class GetDefaultPageURLTaglib extends TagSupport {
 	/* (non-Javadoc)
 	 * @see javax.servlet.jsp.tagext.BodyTagSupport#doStartTag()
 	 */
+	@Override
 	public int doStartTag() throws JspException { 
 		int returnValue = EVAL_BODY_INCLUDE; // default to print the contents of the body of the tag
     	if ( StringUtils.isEmpty(pageName)) {

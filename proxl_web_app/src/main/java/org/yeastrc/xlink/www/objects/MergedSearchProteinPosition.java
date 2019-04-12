@@ -5,6 +5,7 @@ public class MergedSearchProteinPosition {
 	/**
 	 * Returns true if the protein and position are the same
 	 */
+	@Override
 	public boolean equals( Object o ) {
 		if( !( o instanceof MergedSearchProteinPosition ) ) return false;
 		MergedSearchProteinPosition mrpp = (MergedSearchProteinPosition) o;
@@ -15,10 +16,12 @@ public class MergedSearchProteinPosition {
 		return true;
 	}
 	
+	@Override
 	public int hashCode() {
 		return ( "" + position + this.getProtein().getProteinSequenceVersionObject().getProteinSequenceVersionId() ).hashCode();
 	}
 	
+	@Override
 	public String toString() {
 		try {
 			return protein.getName() + "(" + position + ")";
