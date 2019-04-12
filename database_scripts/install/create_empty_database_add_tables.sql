@@ -34,12 +34,14 @@ CREATE UNIQUE INDEX username_UNIQUE ON user_mgmt_user (username ASC);
 DROP TABLE IF EXISTS password_mgmt_user_password ;
 
 CREATE TABLE  password_mgmt_user_password (
-  user_id INT UNSIGNED NOT NULL,
-  password_hashed VARCHAR(255) NOT NULL,
-  last_password_change TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  last_password_change_user_ip VARCHAR(45) NULL,
-  last_password_reset TIMESTAMP NULL,
-  last_password_reset_user_ip VARCHAR(45) NULL,
+  `user_id` INT UNSIGNED NOT NULL,
+  `password_hashed` VARCHAR(255) NULL,
+  `password_hashed_new` VARCHAR(255) NULL,
+  `last_record_change` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `last_password_change` TIMESTAMP NULL,
+  `last_password_change_user_ip` VARCHAR(45) NULL,
+  `last_password_reset` TIMESTAMP NULL,
+  `last_password_reset_user_ip` VARCHAR(45) NULL,
   PRIMARY KEY (user_id),
   CONSTRAINT yrc_password_mgmt_user_password_user_id
     FOREIGN KEY (user_id)
@@ -48,7 +50,6 @@ CREATE TABLE  password_mgmt_user_password (
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
 COMMENT = 'Password table for code in yrc_password_mgmt_public.jar';
-
 
 
 -- SET SQL_MODE=@OLD_SQL_MODE;

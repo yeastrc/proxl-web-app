@@ -78,7 +78,10 @@ dependencies {
 	// https://mvnrepository.com/artifact/org.slf4j/log4j-over-slf4j
 //	compile group: 'org.slf4j', name: 'log4j-over-slf4j', version: '1.7.25'
 	
-		
+	// Used by included yeastrc jar password management
+	// https://mvnrepository.com/artifact/org.springframework.security/spring-security-crypto
+	compile group: 'org.springframework.security', name: 'spring-security-crypto', version: '5.1.5.RELEASE'
+	
 	// Used by included yeastrc jars
 	// https://mvnrepository.com/artifact/com.google.guava/guava
 //	compile group: 'com.google.guava', name: 'guava', version: '24.0-jre'
