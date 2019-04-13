@@ -30,7 +30,7 @@
       		<!-- Roll over the log file based on time  -->
         <TimeBasedTriggeringPolicy/>
       </Policies>
-      <DefaultRolloverStrategy max="20" />
+      <DefaultRolloverStrategy max="30" />
     </RollingFile>
         
   </Appenders>
@@ -47,7 +47,7 @@
 	<!-- 
     <Logger name="org.springframework.transaction.interceptor" level="TRACE"/>
     -->
-    <Root level="info">
+    <Root level="warn">
       <AppenderRef ref="RollingFile"/>
     </Root>
   </Loggers>
