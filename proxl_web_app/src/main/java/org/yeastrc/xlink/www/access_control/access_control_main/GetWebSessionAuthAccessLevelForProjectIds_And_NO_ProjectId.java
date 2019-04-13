@@ -31,6 +31,7 @@ import org.yeastrc.xlink.www.constants.AuthAccessLevelConstants;
 import org.yeastrc.xlink.www.dao.ProjectDAO;
 import org.yeastrc.xlink.www.dto.ProjectDTO;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
+import org.yeastrc.xlink.www.searcher_via_cached_data.cached_data_holders.Cached_AuthShareableObjectId_For_ProjectId;
 import org.yeastrc.xlink.www.user_session_management.UserSession;
 
 /**
@@ -308,7 +309,9 @@ public class GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId {
 		} else {
 			int authUserId = userSession.getAuthUserId();
 			
-			Integer authShareableObjectId = ProjectDAO.getInstance().getAuthShareableObjectIdForProjectId( projectId );
+			Integer authShareableObjectId = 
+					Cached_AuthShareableObjectId_For_ProjectId.getInstance()
+					.getAuthShareableObjectIdForProjectId( projectId );
 			if ( authShareableObjectId == null ) {
 				if ( log.isInfoEnabled() ) {
 					String msg = "missing data, no authShareableObjectId found for projectId: " + projectId;

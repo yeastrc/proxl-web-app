@@ -6,11 +6,10 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
-import org.yeastrc.xlink.dto.PeptideDTO;
 import org.yeastrc.xlink.www.cached_data_mgmt.CacheCurrentSizeMaxSizeResult;
 import org.yeastrc.xlink.www.cached_data_mgmt.CachedDataCentralRegistry;
 import org.yeastrc.xlink.www.cached_data_mgmt.CachedDataCommonIF;
-import org.yeastrc.xlink.www.dao.PeptideDAO;
+import org.yeastrc.xlink.www.dao.ProjectDAO;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataNotFoundException;
 import org.yeastrc.xlink.www.searcher_via_cached_data.config_size_etc_central_code.CachedDataCentralConfigStorageAndProcessing;
 import org.yeastrc.xlink.www.searcher_via_cached_data.config_size_etc_central_code.CachedDataSizeOptions;
@@ -20,20 +19,22 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 
 /**
- * Cache Key:   Integer peptideId;
- * Cache Value: PeptideDTO peptideDTO;
+ * Cache Key:   Integer projectId;
+ * Cache Value: Integer AuthShareableObjectId;
  * 
  * uses ProxlWebappDataNotFoundException internally since loadFromDB call to searcher may return null
  */
-public class Cached_PeptideDTO implements CachedDataCommonIF {
+public class Cached_AuthShareableObjectId_For_ProjectId implements CachedDataCommonIF {
 
-	private static final Logger log = LoggerFactory.getLogger(  Cached_PeptideDTO.class );
+	private static final Logger log = LoggerFactory.getLogger(  Cached_AuthShareableObjectId_For_ProjectId.class );
 
+	//  SMALL applied for SMALL and FEW
+	
 	private static final int CACHE_MAX_SIZE_FULL_SIZE = 4000;
-	private static final int CACHE_MAX_SIZE_SMALL = 10;
+	private static final int CACHE_MAX_SIZE_SMALL = 60;
 
-	private static final int CACHE_TIMEOUT_FULL_SIZE = 20; // in days
-	private static final int CACHE_TIMEOUT_SMALL = 1; // in days
+	private static final int CACHE_TIMEOUT_FULL_SIZE = 60; // in days
+	private static final int CACHE_TIMEOUT_SMALL = 20; // in days
 
 
 	private static final AtomicLong cacheGetCount = new AtomicLong();
@@ -46,17 +47,17 @@ public class Cached_PeptideDTO implements CachedDataCommonIF {
 	/**
 	 * Static singleton instance
 	 */
-	private static Cached_PeptideDTO _instance = null; //  Delay creating until first getInstance() call
+	private static Cached_AuthShareableObjectId_For_ProjectId _instance = null; //  Delay creating until first getInstance() call
 
 	/**
 	 * Static get singleton instance
 	 * @return
 	 * @throws Exception 
 	 */
-	public static synchronized Cached_PeptideDTO getInstance() throws Exception {
+	public static synchronized Cached_AuthShareableObjectId_For_ProjectId getInstance() throws Exception {
 
 		if ( _instance == null ) {
-			_instance = new Cached_PeptideDTO();
+			_instance = new Cached_AuthShareableObjectId_For_ProjectId();
 		}
 		return _instance; 
 	}
@@ -64,7 +65,7 @@ public class Cached_PeptideDTO implements CachedDataCommonIF {
 	/**
 	 * constructor
 	 */
-	private Cached_PeptideDTO() {
+	private Cached_AuthShareableObjectId_For_ProjectId() {
 		if ( log.isDebugEnabled() ) {
 			debugLogLevelEnabled = true;
 			log.debug( "debug log level enabled" );
@@ -100,20 +101,20 @@ public class Cached_PeptideDTO implements CachedDataCommonIF {
 	}
 	
 //	/**
-//	 * Remove specific peptideId from cache since data changed
-//	 * @param peptideId
+//	 * Remove specific projectId from cache since data changed
+//	 * @param projectId
 //	 */
-//	public void invalidateProjectSearchId( int peptideId ) {
-//		cacheHolderInternal.invalidateKey( peptideId );
+//	public void invalidateProjectSearchId( int projectId ) {
+//		cacheHolderInternal.invalidateKey( projectId );
 //	}
 
 	/**
-	 * @param peptideId
+	 * @param projectId
 	 * @return - retrieved from DB or null if not found
 	 * @throws Exception
 	 */
-	public PeptideDTO getPeptideDTO( 
-			Integer peptideId ) throws Exception {
+	public Integer getAuthShareableObjectIdForProjectId( 
+			Integer projectId ) throws Exception {
 
 		printPrevCacheHitCounts( false /* forcePrintNow */ );
 		
@@ -122,15 +123,15 @@ public class Cached_PeptideDTO implements CachedDataCommonIF {
 		}
 
 		try {
-			LoadingCache<Integer, PeptideDTO> cache = cacheHolderInternal.getCache();
+			LoadingCache<Integer, Integer> cache = cacheHolderInternal.getCache();
 
 			if ( cache != null ) {
-				PeptideDTO peptideDTO = cache.get( peptideId );
-				return peptideDTO; // EARLY return
+				Integer authShareableObjectId = cache.get( projectId );
+				return authShareableObjectId; // EARLY return
 			}
 
-			PeptideDTO peptideDTO = cacheHolderInternal.loadFromDB( peptideId );
-			return peptideDTO;
+			Integer authShareableObjectId = cacheHolderInternal.loadFromDB( projectId );
+			return authShareableObjectId;
 			
 		} catch ( ExecutionException e ) {
 			//  caught from LoadingCache when loadFromDB throws ProxlWebappDataNotFoundException
@@ -153,9 +154,9 @@ public class Cached_PeptideDTO implements CachedDataCommonIF {
 	 */
 	private static class CacheHolderInternal {
 
-		private Cached_PeptideDTO parentObject;
+		private Cached_AuthShareableObjectId_For_ProjectId parentObject;
 		
-		private CacheHolderInternal( Cached_PeptideDTO parentObject ) {
+		private CacheHolderInternal( Cached_AuthShareableObjectId_For_ProjectId parentObject ) {
 			this.parentObject = parentObject;
 		}
 		
@@ -164,7 +165,7 @@ public class Cached_PeptideDTO implements CachedDataCommonIF {
 		/**
 		 * cached data, left null if no caching
 		 */
-		private LoadingCache<Integer, PeptideDTO> dbRecordsDataCache = null;
+		private LoadingCache<Integer, Integer> dbRecordsDataCache = null;
 		
 		private int cacheMaxSize;
 
@@ -185,23 +186,24 @@ public class Cached_PeptideDTO implements CachedDataCommonIF {
 		 * @throws Exception
 		 */
 		@SuppressWarnings("static-access")
-		private synchronized LoadingCache<Integer, PeptideDTO> getCache(  ) throws Exception {
+		private synchronized LoadingCache<Integer, Integer> getCache(  ) throws Exception {
 			if ( ! cacheDataInitialized ) { 
 				CachedDataSizeOptions cachedDataSizeOptions = 
 						CachedDataCentralConfigStorageAndProcessing.getInstance().getCurrentSizeConfigValue();
 				
-				if ( cachedDataSizeOptions == CachedDataSizeOptions.FEW ) {
-					//  No Cache, just mark initialized, dbRecordsDataCache already set to null;
-					cacheDataInitialized = true;
-					return dbRecordsDataCache;  //  EARLY RETURN
-				}
+//				if ( cachedDataSizeOptions == CachedDataSizeOptions.FEW ) {
+//					//  No Cache, just mark initialized, dbRecordsDataCache already set to null;
+//					cacheDataInitialized = true;
+//					return dbRecordsDataCache;  //  EARLY RETURN
+//				}
 				
 				int cacheTimeout = CACHE_TIMEOUT_FULL_SIZE;
-				cacheMaxSize = Cached_PeptideDTO.CACHE_MAX_SIZE_FULL_SIZE;
+				cacheMaxSize = Cached_AuthShareableObjectId_For_ProjectId.CACHE_MAX_SIZE_FULL_SIZE;
 				if ( cachedDataSizeOptions == CachedDataSizeOptions.HALF ) {
 					cacheMaxSize = cacheMaxSize / 2;
-				} else if ( cachedDataSizeOptions == CachedDataSizeOptions.SMALL ) {
-					cacheMaxSize = Cached_PeptideDTO.CACHE_MAX_SIZE_SMALL;
+				} else if ( cachedDataSizeOptions == CachedDataSizeOptions.SMALL
+						|| cachedDataSizeOptions == CachedDataSizeOptions.FEW ) {
+					cacheMaxSize = Cached_AuthShareableObjectId_For_ProjectId.CACHE_MAX_SIZE_SMALL;
 					cacheTimeout = CACHE_TIMEOUT_SMALL;
 				}
 				
@@ -209,15 +211,15 @@ public class Cached_PeptideDTO implements CachedDataCommonIF {
 						.expireAfterAccess( cacheTimeout, TimeUnit.DAYS ) // always in cache
 						.maximumSize( cacheMaxSize )
 						.build(
-								new CacheLoader<Integer, PeptideDTO>() {
+								new CacheLoader<Integer, Integer>() {
 									@Override
-									public PeptideDTO load(Integer peptideId) throws Exception {
+									public Integer load(Integer projectId) throws Exception {
 										
 										//   WARNING  cannot return null.  
 										//   If would return null, throw ProxlWebappDataNotFoundException and catch at the .get(...)
 										
 										//  value is NOT in cache so get it and return it
-										return loadFromDB(peptideId);
+										return loadFromDB(projectId);
 									}
 								});
 			//			    .build(); // no CacheLoader
@@ -238,11 +240,11 @@ public class Cached_PeptideDTO implements CachedDataCommonIF {
 		}
 
 		/**
-		 * @param peptideId
+		 * @param projectId
 		 * @return
 		 * @throws Exception
 		 */
-		private PeptideDTO loadFromDB( Integer peptideId ) throws Exception {
+		private Integer loadFromDB( Integer projectId ) throws Exception {
 			
 			//   WARNING  cannot return null.  
 			//   If would return null, throw ProxlWebappDataNotFoundException and catch at the .get(...)
@@ -251,13 +253,13 @@ public class Cached_PeptideDTO implements CachedDataCommonIF {
 			if ( debugLogLevelEnabled ) {
 				cacheDBRetrievalCount.incrementAndGet();
 			}
-			PeptideDTO peptideDTO =
-					PeptideDAO.getInstance().getPeptideDTOFromDatabaseActual( peptideId );
-			if ( peptideDTO == null ) {
+			Integer authShareableObjectId =
+					ProjectDAO.getInstance().getAuthShareableObjectIdForProjectId( projectId );
+			if ( authShareableObjectId == null ) {
 				// Throw this exception since cannot return null to Cache
 				throw new ProxlWebappDataNotFoundException();
 			}
-			return peptideDTO;
+			return authShareableObjectId;
 		}
  	}
 

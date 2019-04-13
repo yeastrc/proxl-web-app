@@ -34,10 +34,8 @@ public class ProjectListForCurrentUserService {
 			GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result accessAndSetupWebSessionResult =
 					GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.getSinglesonInstance().getAccessAndSetupWebSessionNoProjectId( request );
 			
-			log.warn( "accessAndSetupWebSessionResult: " + accessAndSetupWebSessionResult );
 			UserSession userSession = accessAndSetupWebSessionResult.getUserSession();
 			if ( accessAndSetupWebSessionResult.isNoSession() ) {
-				
 				//  No User session 
 				throw new WebApplicationException(
 						Response.status( WebServiceErrorMessageConstants.NO_SESSION_STATUS_CODE )  //  Send HTTP code
@@ -46,7 +44,6 @@ public class ProjectListForCurrentUserService {
 						);
 			}
 			if ( userSession == null || ( ! userSession.isActualUser() ) ) {
-
 				//  No Access Allowed since not a logged in user
 				throw new WebApplicationException(
 						Response.status( WebServiceErrorMessageConstants.NOT_AUTHORIZED_STATUS_CODE )  //  Send HTTP code
