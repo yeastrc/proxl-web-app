@@ -2432,7 +2432,7 @@
         myTable+= '<input type="checkbox" value="true" ';
         if(options.labelImmoniumIons == true)
         {
-            myTable+=checked="checked"
+        	myTable += ' checked="checked"';
         }
         myTable+= ' id="'+getElementId(container, elementIds.immoniumIons)+'"/><span style="font-weight:bold;">Immonium ions</span>';
 
@@ -2441,7 +2441,7 @@
         myTable+= '<input type="checkbox" value="true" ';
         if(options.labelReporters == true)
         {
-            myTable+=checked="checked";
+        	myTable += ' checked="checked"';
         }
         myTable+= ' id="'+getElementId(container, elementIds.reporterIons)+'"/><span style="font-weight:bold;">Reporter ions</span>';
 
@@ -2477,7 +2477,7 @@
         myTable+= '<input type="checkbox" value="true" ';
         if(options.peakDetect == true)
         {
-            myTable+=checked="checked"
+        	myTable += ' checked="checked"';
         }
         myTable+= ' id="'+getElementId(container, elementIds.peakDetect)+'"/><span style="font-weight:bold;">Peak Detect</span>';
 		myTable+= '</div> ';
