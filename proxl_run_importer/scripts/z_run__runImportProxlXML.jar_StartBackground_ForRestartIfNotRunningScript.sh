@@ -11,7 +11,7 @@
 #	script: z_run__runImportProxlXML.jar_StartBackground_ForRestartIfNotRunningScript.sh
 #	Run Importer Program config file (property name 'importer.pid.file.with.path') 
 #		(the program removes the pid file when shuts down using run control file)
-pid_file=x_run_ProxlImporter_pid
+pid_file=x_runProxlImporter_pid
 
 java -jar runImportProxlXML.jar \
 --config=run_importer_config_file.properties  \
