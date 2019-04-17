@@ -6,8 +6,10 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import org.slf4j.LoggerFactory;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
-
+import org.yeastrc.proxl.import_xml_to_db_runner_pgm.config.ImporterRunnerConfigData;
+import org.yeastrc.proxl.import_xml_to_db_runner_pgm.config.ProcessImporterRunnerConfigFile;
 import org.yeastrc.proxl.import_xml_to_db_runner_pgm.constants.RunControlFileConstants;
 import org.yeastrc.proxl.import_xml_to_db_runner_pgm.get_import_and_process_thread.GetImportAndProcessThread;
 import org.yeastrc.proxl.import_xml_to_db_runner_pgm.main.ImporterRunnerMain;
@@ -23,9 +25,14 @@ public class ManagerThread extends Thread {
 	private static final Logger log = LoggerFactory.getLogger( ManagerThread.class);
 	
 	private static final int WAIT_TIME_FOR_MANAGER_THREAD_TO_EXIT_IN_SECONDS = 10;
+	
 //	private static final int WAIT_TIME_FOR_CLIENT_STATUS_UPDATE_THREAD_TO_EXIT_IN_SECONDS = 10;
-	private static final int WAIT_TIME_FOR_GET_IMPORT_THREAD_TO_EXIT_IN_SECONDS = 10;
+	
+	//  For shutdown wait for current import to finish
+	private static final int WAIT_TIME_FOR_GET_IMPORT_THREAD_TO_EXIT_IN_SECONDS = 30 * 60; // X minutes
+	
 	private static final int WAIT_TIME_FOR_CHECK_RUN_CONTROL_FILE_IN_SECONDS = 10;
+	
 	private static final String GET_IMPORT_AND_PROCESS_THREAD = "GetImportAndProcessThread";
 	
 	private volatile boolean keepRunning = true;
@@ -115,6 +122,10 @@ public class ManagerThread extends Thread {
 					}
 				}
 				if ( stopProxlRunImporterProgram ) {
+					//  Remove PID file since requested via run control file to shut down program
+					removePIDFileOnShutdownViaRunControlFile();
+				}
+				if ( stopProxlRunImporterProgram ) {
 					importerRunnerMain.stopMainThread();
 				}
 			}
@@ -149,7 +160,7 @@ public class ManagerThread extends Thread {
 						}
 					}
 				}
-				this.getId();
+				// this.getId();
 			} catch (Throwable e) {
 				log.error( "Exception in runProcessLoop(): ", e );
 			}
@@ -253,7 +264,6 @@ public class ManagerThread extends Thread {
 				}
 				if ( stopRequestedLocal ) {
 					stopProcessingNextImport = true;
-					processStopProcessingNewImportsRequest( stopRequestType );
 					log.info( "ClientControlFile: Adding to file contents : \n" + RunControlFileConstants.CLIENT_RUN_CONTROL_STOP_REQUEST_ACCEPTED );
 					log.info( "ClientControlFile: filename = '" + RunControlFileConstants.CLIENT_RUN_CONTROL_FILENAME + "' filepath is = '" + clientControlFile.getAbsolutePath() + "'." );
 					clientControlFileWriter = new BufferedWriter( new FileWriter( clientControlFile, true /* append */ ) );
@@ -261,6 +271,13 @@ public class ManagerThread extends Thread {
 						clientControlFileWriter.append( line  );
 						clientControlFileWriter.newLine();
 					}
+					try {
+						clientControlFileReader.close();
+						clientControlFileReader = null;
+					} catch (Throwable e) {
+						log.error( "Exception in checkForStopProcessingJobsRequest(): calling clientControlFileReader.close(); ", e );
+					}
+					processStopProcessingNewImportsRequest( stopRequestType );
 				}
 			}
 		} catch (Throwable e) {
@@ -289,12 +306,12 @@ public class ManagerThread extends Thread {
 	private void processStopProcessingNewImportsRequest( String stopRequestType ) {
 		
 		keepRunning = false;  // Set thread of the current object to exit main processing loop.
-		//  call getImportAndProcessThread.shutdown();
+		//  call getImportAndProcessThread.stopRunningAfterProcessingImport();
 		if ( getImportAndProcessThread != null ) {
 			try {
-				getImportAndProcessThread.shutdown();
+				getImportAndProcessThread.stopRunningAfterProcessingImport();
 			} catch (Throwable e) {
-				log.error( "In processStopProcessingNewImportsRequest(): call to getImportAndProcessThread.shutdown() threw Throwable " + e.toString(), e );
+				log.error( "In processStopProcessingNewImportsRequest(): call to getImportAndProcessThread.stopRunningAfterProcessingImport() threw Throwable " + e.toString(), e );
 			}
 		} else {
 			log.info( "In processStopProcessingNewImportsRequest(): getImportAndProcessThread == null" );
@@ -350,7 +367,7 @@ public class ManagerThread extends Thread {
 	 */
 	private void waitForGetImportAndProcessThread () {
 		
-		log.info( "waitForGetImportAndProcessThread(): wait for getImportAndProcessThread to complete, call getImportAndProcessThread.join() " );
+		log.warn( "INFO: waitForGetImportAndProcessThread(): wait for getImportAndProcessThread to complete, call getImportAndProcessThread.join() " );
 		// wait for getImportAndProcessThread to complete
 		if ( getImportAndProcessThread != null ) {
 //			boolean getJobThreadExited = false;
@@ -372,9 +389,53 @@ public class ManagerThread extends Thread {
 				}
 //			}
 		} else {
-			log.info( "In waitForGetImportAndProcessThread(): getImportAndProcessThread == null" );
+			log.warn( "INFO: In waitForGetImportAndProcessThread(): getImportAndProcessThread == null" );
 		}
-		log.info( "waitForGetImportAndProcessThread():  getImportAndProcessThread IS complete, called getImportAndProcessThread.join() " );
+		log.warn( "INFO: waitForGetImportAndProcessThread():  getImportAndProcessThread IS complete, called getImportAndProcessThread.join() " );
+	}
+	
+	/**
+	 * 
+	 */
+	private void removePIDFileOnShutdownViaRunControlFile() {
+		
+		String importerPidFileWithPath = ImporterRunnerConfigData.getImporterPidFileWithPath();
+		
+		if ( StringUtils.isNotEmpty( importerPidFileWithPath ) ) {
+			try {
+				File importerPidFileWithPath_File = new File( importerPidFileWithPath );
+				if ( ! importerPidFileWithPath_File.exists() ) {
+					log.warn( "INFO: PID file configured, but not found so do not delete it."
+							+ " Config file property name: '"
+							+ ProcessImporterRunnerConfigFile.PROPERTY_NAME__IMPORTER_PID_FILE_WITH_PATH 
+							+ "'"
+							+ ", PID File: " + importerPidFileWithPath);
+					return; // EARLY EXIT
+				}
+				if ( ! importerPidFileWithPath_File.delete() ) {
+					log.error( "PID file configured, but failed to delete it.  NO Exception. "
+							+ " Config file property name: '"
+							+ ProcessImporterRunnerConfigFile.PROPERTY_NAME__IMPORTER_PID_FILE_WITH_PATH 
+							+ "'"
+							+ ", PID File: " + importerPidFileWithPath );
+					return; // EARLY EXIT
+				}
+				log.warn( "INFO: PID file configured so deleted it."
+						+ " Config file property name: '"
+						+ ProcessImporterRunnerConfigFile.PROPERTY_NAME__IMPORTER_PID_FILE_WITH_PATH 
+						+ "'"
+						+ ", PID File: " + importerPidFileWithPath);
+			} catch ( Throwable t ) {
+				log.error( "PID file configured, but failed to delete it.  Exception. "
+						+ " Config file property name: '"
+						+ ProcessImporterRunnerConfigFile.PROPERTY_NAME__IMPORTER_PID_FILE_WITH_PATH 
+						+ "'"
+						+ ", PID File: " + importerPidFileWithPath
+						,
+						t );
+				//  EAT Exception
+			}
+		}
 	}
 	
 	public ImporterRunnerMain getImporterRunnerMain() {

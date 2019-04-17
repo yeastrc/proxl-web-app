@@ -1,10 +1,17 @@
 package org.yeastrc.proxl.import_xml_to_db_runner_pgm.get_import_and_process_thread;
 
 import org.slf4j.LoggerFactory;
+
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+
 import org.slf4j.Logger;
 
 import org.yeastrc.proxl.import_xml_to_db.database_update_with_transaction_services.GetNextTrackingToProcessDBTransaction;
 import org.yeastrc.proxl.import_xml_to_db_runner_pgm.config.ImporterRunnerConfigData;
+import org.yeastrc.proxl.import_xml_to_db_runner_pgm.constants.GetImportStatus_FileConstants;
 import org.yeastrc.proxl.import_xml_to_db_runner_pgm.process_import.ProcessProxlXMLImport;
 import org.yeastrc.xlink.base.file_import_proxl_xml_scans.objects.TrackingDTOTrackingRunDTOPair;
 import org.yeastrc.xlink.db.DBConnectionFactory;
@@ -69,6 +76,38 @@ public class GetImportAndProcessThread extends Thread {
 			notify();
 		}
 	}
+
+	/**
+	 * Called on a different thread.
+	 * The ManagerThread instance has detected that the user has requested that the Run Importer client stop after current import.
+	 */
+	public void stopRunningAfterProcessingImport() {
+
+		log.warn("INFO: stopRunningAfterProcessingJob() called:  GetImportAndProcessThread.getId() = " + this.getId() + ", GetImportAndProcessThread.getName() = " + this.getName() );
+		synchronized (this) {
+			this.keepRunning = false;
+		}
+		this.awaken();
+	}
+	
+	/**
+	 * Called on a separate thread when a shutdown request comes from the operating system.
+	 * If this is not heeded, the process may be killed by the operating system after some time has passed ( controlled by the operating system )
+	 */
+	public void shutdown() {
+		log.warn( "INFO: shutdown() called, setting keepRunning = false, calling awaken() " );
+		keepRunning = false;
+		try {
+			if ( processProxlXMLImport != null ) {
+				processProxlXMLImport.shutdown();
+			}
+		} catch ( NullPointerException e ) {
+			//  Eat the NullPointerException since that meant that nothing had to be done.
+		}
+		awaken();
+		log.warn( "INFO: Exiting shutdown()" );
+	}
+	
 	
 	/* (non-Javadoc)
 	 * @see java.lang.Runnable#run()
@@ -77,15 +116,24 @@ public class GetImportAndProcessThread extends Thread {
 	public void run() {
 		log.info( "run() entered" );
 		while ( keepRunning ) {
+			TrackingDTOTrackingRunDTOPair trackingDTOTrackingRunDTOPair = null;
 			try {
-				TrackingDTOTrackingRunDTOPair trackingDTOTrackingRunDTOPair =
-						GetNextTrackingToProcessDBTransaction.getInstance().getNextTrackingToProcess( maxTrackingRecordPriorityToRetrieve );
+				try {
+					trackingDTOTrackingRunDTOPair =
+							GetNextTrackingToProcessDBTransaction.getInstance()
+							.getNextTrackingToProcess( maxTrackingRecordPriorityToRetrieve );
+				} catch ( Throwable t ) {
+					updateGetImportStatus_File_ERROR_GettingImportToProcess( t );
+					throw t;
+				}
 				if ( trackingDTOTrackingRunDTOPair != null ) {
+					updateGetImportStatus_File_YES_ImportToProcess( trackingDTOTrackingRunDTOPair );
 					synchronized (this) {
 						processProxlXMLImport = ProcessProxlXMLImport.getInstance();
 					}
 					processProxlXMLImport.processProxlXMLImport( trackingDTOTrackingRunDTOPair );
 				} else {
+					updateGetImportStatus_File_NO_ImportToProcess();
 					int waitTimeInSeconds = waitTimeForNextCheckForImportToProcess_InSeconds;
 					synchronized (this) {
 						try {
@@ -96,6 +144,10 @@ public class GetImportAndProcessThread extends Thread {
 					}
 				}
 			} catch ( Throwable t ) {
+				
+				if ( trackingDTOTrackingRunDTOPair != null ) {
+					updateGetImportStatus_File_ERROR_ProcessingImportToProcess( t, trackingDTOTrackingRunDTOPair );
+				}
 				
 				if ( keepRunning ) {
 					log.error( "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
@@ -154,23 +206,98 @@ public class GetImportAndProcessThread extends Thread {
 	}
 	
 	/**
-	 * Called on a separate thread when a shutdown request comes from the operating system.
-	 * If this is not heeded, the process may be killed by the operating system after some time has passed ( controlled by the operating system )
+	 * @param trackingDTOTrackingRunDTOPair
+	 * @throws IOException
 	 */
-	public void shutdown() {
-		log.warn( "shutdown() called, setting keepRunning = false, calling awaken() " );
-		keepRunning = false;
-		try {
-			if ( processProxlXMLImport != null ) {
-				processProxlXMLImport.shutdown();
-			}
-		} catch ( NullPointerException e ) {
-			//  Eat the NullPointerException since that meant that nothing had to be done.
-		}
-		awaken();
-		log.warn( "Exiting shutdown()" );
-	}
+	private void updateGetImportStatus_File_YES_ImportToProcess( TrackingDTOTrackingRunDTOPair trackingDTOTrackingRunDTOPair ) {
 	
+		try {
+			int id = trackingDTOTrackingRunDTOPair.getProxlXMLFileImportTrackingDTO().getId();
+	
+			try ( BufferedWriter writer = new BufferedWriter( new FileWriter( GetImportStatus_FileConstants.GET_IMPORT_STATUS_FILENAME ) ) ) {
+				
+				writer.write( GetImportStatus_FileConstants.GET_IMPORT_STATUS_YES_FOUND_REQUEST_TO_PROCESS_TEXT );
+				writer.write( String.valueOf( id ) );
+				writer.newLine();
+			}
+		} catch ( Throwable t ) {
+			
+			log.error( "Failed to update file " + GetImportStatus_FileConstants.GET_IMPORT_STATUS_FILENAME );
+			//  Eat Exception
+		}
+	}
+
+	/**
+	 * @throws IOException
+	 */
+	private void updateGetImportStatus_File_NO_ImportToProcess( ) {
+
+		try {
+			try ( BufferedWriter writer = new BufferedWriter( new FileWriter( GetImportStatus_FileConstants.GET_IMPORT_STATUS_FILENAME ) ) ) {
+				
+				writer.write( GetImportStatus_FileConstants.GET_IMPORT_STATUS_NONE_FOUND_REQUEST_TO_PROCESS_TEXT );
+				writer.newLine();
+			}
+	} catch ( Throwable t ) {
+			
+			log.error( "Failed to update file " + GetImportStatus_FileConstants.GET_IMPORT_STATUS_FILENAME );
+			//  Eat Exception
+		}
+	}
+
+	/**
+	 * @param throwable
+	 */
+	private void updateGetImportStatus_File_ERROR_GettingImportToProcess( Throwable throwable ) {
+		try {
+			try ( PrintWriter writer = new PrintWriter( new FileWriter( GetImportStatus_FileConstants.GET_IMPORT_STATUS_FILENAME ) ) ) {
+				
+				writer.write( GetImportStatus_FileConstants.GET_IMPORT_STATUS_YES_ERROR_CHECKING_FOR_REQUEST_TEXT );
+				writer.write( "\n" );
+				throwable.printStackTrace( writer );
+				writer.write( "\n" );
+			}
+		} catch ( Throwable t ) {
+			
+			log.error( "Failed to update file " + GetImportStatus_FileConstants.GET_IMPORT_STATUS_FILENAME );
+			//  Eat Exception
+		}
+	}
+
+	/**
+	 * @param throwable
+	 * @param trackingDTOTrackingRunDTOPair
+	 */
+	private void updateGetImportStatus_File_ERROR_ProcessingImportToProcess( Throwable throwable, TrackingDTOTrackingRunDTOPair trackingDTOTrackingRunDTOPair ) {
+
+		String trackingId = null;
+		try {
+			if ( trackingDTOTrackingRunDTOPair != null ) {
+				trackingId = ": Import Tracking Id: " + trackingDTOTrackingRunDTOPair.getProxlXMLFileImportTrackingDTO().getId();
+			}
+		} catch ( Throwable t ) {
+			
+		}
+		
+		try {
+			try ( PrintWriter writer = new PrintWriter( new FileWriter( GetImportStatus_FileConstants.GET_IMPORT_STATUS_FILENAME ) ) ) {
+				
+				writer.write( GetImportStatus_FileConstants.GET_IMPORT_STATUS_YES_ERROR_PROCESSING_REQUEST_TEXT );
+				if ( trackingId != null ) {
+					writer.write( trackingId );					
+				}
+				writer.write( "\n" );
+				throwable.printStackTrace( writer );
+				writer.write( "\n" );
+			}
+		} catch ( Throwable t ) {
+			
+			log.error( "Failed to update file " + GetImportStatus_FileConstants.GET_IMPORT_STATUS_FILENAME );
+			//  Eat Exception
+		}
+	}
+
+
 	public int getMaxTrackingRecordPriorityToRetrieve() {
 		return maxTrackingRecordPriorityToRetrieve;
 	}
