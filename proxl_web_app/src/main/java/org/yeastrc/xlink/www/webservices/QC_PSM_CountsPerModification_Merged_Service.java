@@ -127,18 +127,17 @@ public class QC_PSM_CountsPerModification_Merged_Service {
 			GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result accessAndSetupWebSessionResult =
 					GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.getSinglesonInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request );
 //			UserSession userSession = accessAndSetupWebSessionResult.getUserSession();
-			if ( accessAndSetupWebSessionResult.isNoSession() ) {
-				//  No User session 
-				throw new WebApplicationException(
-						Response.status( WebServiceErrorMessageConstants.NO_SESSION_STATUS_CODE )  //  Send HTTP code
-						.entity( WebServiceErrorMessageConstants.NO_SESSION_TEXT ) // This string will be passed to the client
-						.build()
-						);
-			}
 			//  Test access to the project id
 			WebSessionAuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getWebSessionAuthAccessLevel();
-			//  Test access to the project id
 			if ( ! authAccessLevel.isPublicAccessCodeReadAllowed() ) {
+				if ( accessAndSetupWebSessionResult.isNoSession() ) {
+					//  No User session 
+					throw new WebApplicationException(
+							Response.status( WebServiceErrorMessageConstants.NO_SESSION_STATUS_CODE )  //  Send HTTP code
+							.entity( WebServiceErrorMessageConstants.NO_SESSION_TEXT ) // This string will be passed to the client
+							.build()
+							);
+				}
 				//  No Access Allowed for this project id
 				throw new WebApplicationException(
 						Response.status( WebServiceErrorMessageConstants.NOT_AUTHORIZED_STATUS_CODE )  //  Send HTTP code

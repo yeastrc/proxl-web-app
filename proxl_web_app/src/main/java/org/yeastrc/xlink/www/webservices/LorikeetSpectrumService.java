@@ -153,13 +153,13 @@ public class LorikeetSpectrumService {
         		GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result accessAndSetupWebSessionResult =
         				GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.getSinglesonInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request );
         		//			UserSession userSession = accessAndSetupWebSessionResult.getUserSession();
-        		if ( accessAndSetupWebSessionResult.isNoSession() ) {
+//        		//  Test access to the project id
+        		WebSessionAuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getWebSessionAuthAccessLevel();
+        		if ( ( ! authAccessLevel.isPublicAccessCodeReadAllowed() ) && accessAndSetupWebSessionResult.isNoSession() ) {
         			//  No user session so not allowed
         			continue;
         		}
         		allAuthHaveNoSession = false;
-//        		//  Test access to the project id
-        		WebSessionAuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getWebSessionAuthAccessLevel();
         		if ( authAccessLevel.isPublicAccessCodeReadAllowed() ) {
         			accessAllowed = true;
         			break;

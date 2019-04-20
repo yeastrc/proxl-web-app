@@ -149,22 +149,22 @@ public class QC_Scan_MS1_All_IntensityHeatmapImageAction extends Action {
 			GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result accessAndSetupWebSessionResult =
 					GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.getSinglesonInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request );
 			//			UserSession userSession = accessAndSetupWebSessionResult.getUserSession();
-			if ( accessAndSetupWebSessionResult.isNoSession() ) {
-				//  No User session 
-				if ( requestedImageWidthProvided ) {
-					response.sendError( 
-							WebServiceErrorMessageConstants.NO_SESSION_STATUS_CODE.getStatusCode(), 
-							WebServiceErrorMessageConstants.NO_SESSION_TEXT );
-					return null;
-				} else {
-					return mapping.findForward( StrutsGlobalForwardNames.NO_USER_SESSION );
-				}
-			}
 			//  Test access to the project id
 			WebSessionAuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getWebSessionAuthAccessLevel();
 			//  Test access to the project id
 			if ( ! authAccessLevel.isPublicAccessCodeReadAllowed() ) {
 				//  No Access Allowed for this project id
+				if ( accessAndSetupWebSessionResult.isNoSession() ) {
+					//  No User session 
+					if ( requestedImageWidthProvided ) {
+						response.sendError( 
+								WebServiceErrorMessageConstants.NO_SESSION_STATUS_CODE.getStatusCode(), 
+								WebServiceErrorMessageConstants.NO_SESSION_TEXT );
+						return null;
+					} else {
+						return mapping.findForward( StrutsGlobalForwardNames.NO_USER_SESSION );
+					}
+				}				
 				if ( requestedImageWidthProvided ) {
 					response.sendError( 
 							WebServiceErrorMessageConstants.NOT_AUTHORIZED_STATUS_CODE.getStatusCode(), 

@@ -112,14 +112,14 @@ public class DownloadQC_PeptideLengthVsPSMCountBoxplotChartDataAction extends Ac
 			///////////////////////
 			GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result accessAndSetupWebSessionResult =
 					GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.getSinglesonInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request );
-			if ( accessAndSetupWebSessionResult.isNoSession() ) {
-				//  No User session 
-				return mapping.findForward( StrutsGlobalForwardNames.NO_USER_SESSION );
-			}
 			//  Test access to the project id
 			WebSessionAuthAccessLevel authAccessLevel = accessAndSetupWebSessionResult.getWebSessionAuthAccessLevel();
 			if ( ! authAccessLevel.isPublicAccessCodeReadAllowed() ) {
 				//  No Access Allowed for this project id
+				if ( accessAndSetupWebSessionResult.isNoSession() ) {
+					//  No User session 
+					return mapping.findForward( StrutsGlobalForwardNames.NO_USER_SESSION );
+				}
 				return mapping.findForward( StrutsGlobalForwardNames.INSUFFICIENT_ACCESS_PRIVILEGE );
 			}
 			request.setAttribute( WebConstants.REQUEST_AUTH_ACCESS_LEVEL, authAccessLevel );
