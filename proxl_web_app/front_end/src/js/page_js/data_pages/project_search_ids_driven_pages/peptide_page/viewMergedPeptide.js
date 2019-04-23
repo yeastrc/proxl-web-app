@@ -19,6 +19,9 @@ import { searchesForPageChooser } from 'page_js/data_pages/project_search_ids_dr
 import { sharePageURLShortener  } from 'page_js/data_pages/project_search_ids_driven_pages/common/sharePageURLShortener.js';
 import { addSingleTooltipForProteinName } from 'page_js/data_pages/project_search_ids_driven_pages/common/createTooltipForProteinNames.js';
 
+import { DataPages_LoggedInUser_CommonObjectsFactory } from 'page_js/data_pages/data_pages_common/dataPages_LoggedInUser_CommonObjectsFactory.js';
+
+
 
 import { minimumPSM_Count_Filter } from 'page_js/data_pages/project_search_ids_driven_pages/common/minimumPSM_Count_Filter.js';
 import { annotationDataDisplayProcessingCommonCode } from 'page_js/data_pages/project_search_ids_driven_pages/common/psmPeptideAnnDisplayDataCommon.js';
@@ -41,7 +44,12 @@ $(document).ready(function() {
 
 var ViewMergedPeptidePageCode = function() {
 	
+	const dataPages_LoggedInUser_CommonObjectsFactory = new DataPages_LoggedInUser_CommonObjectsFactory();
+
+	const saveView_dataPages = dataPages_LoggedInUser_CommonObjectsFactory.instantiate_SaveView_dataPages();
+
 	var _query_json_field_Contents = null;
+	var _query_json_field_String = null;
 	
 	///////
 	//  function called after all HTML above main table is generated, called from inline script on page
@@ -64,20 +72,39 @@ var ViewMergedPeptidePageCode = function() {
 				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
 				throw e;
 			}
-		},10);		
+		},10);	
+		setTimeout( () => { // put in setTimeout so if it fails it doesn't kill anything else
+			try {
+				this.initialize_saveView_dataPages();
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
+		},11);	
 	};
 	
+	//////////////
+	this.initialize_saveView_dataPages = function() {
+
+		saveView_dataPages.initialize({ /* projectSearchIds, container_DOM_Element, enableSetDefault */ });
+	}
+
+	//////////////
+	this.getQueryJSONString = function() {
+		return _query_json_field_String;
+	};
+
 	///////
 	this.get_query_json_field_ContentsFromHiddenField = function() {
 		var $query_json_field =  $("#query_json_field_outside_form");
 		if ( $query_json_field.length === 0 ) {
 			throw Error( "No HTML field with id 'query_json_field'" );
 		}
-		var query_json_field_String = $query_json_field.val();
+		_query_json_field_String = $query_json_field.val();
 		try {
-			_query_json_field_Contents = JSON.parse( query_json_field_String );
+			_query_json_field_Contents = JSON.parse( _query_json_field_String );
 		} catch( e ) {
-			throw Error( "Failed to parse JSON from HTML field with id 'query_json_field'.  JSON String: " + query_json_field_String );
+			throw Error( "Failed to parse JSON from HTML field with id 'query_json_field'.  JSON String: " + _query_json_field_String );
 		}
 //		_query_json_field_Contents: Object
 //		cutoffs: Object

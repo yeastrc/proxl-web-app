@@ -551,6 +551,9 @@ task frontEndBuild(type: GradleBuild) {
      'delete_outputDirs', 
      'createHandlebarsOutputDirs', 
      'handlebarsPrecompile_project_page__share_data_section_loggedin_users',
+     'handlebarsPrecompile_project_page__saved_views_section',
+     'handlebarsPrecompile_project_page__saved_views_section_loggedin_users',
+     'handlebarsPrecompile_save_view',
 
      'webpack',
      'copyFrontEndJS',

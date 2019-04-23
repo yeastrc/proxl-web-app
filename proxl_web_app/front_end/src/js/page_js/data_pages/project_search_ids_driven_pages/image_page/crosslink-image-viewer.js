@@ -46,6 +46,9 @@ import { sharePageURLShortener  } from 'page_js/data_pages/project_search_ids_dr
 
 import { defaultPageView } from 'page_js/data_pages/project_search_ids_driven_pages/common/defaultPageView.js';
 
+import { DataPages_LoggedInUser_CommonObjectsFactory } from 'page_js/data_pages/data_pages_common/dataPages_LoggedInUser_CommonObjectsFactory.js';
+
+
 import { addSingleTooltipForProteinName } from 'page_js/data_pages/project_search_ids_driven_pages/common/createTooltipForProteinNames.js';
 
 import { minimumPSM_Count_Filter } from 'page_js/data_pages/project_search_ids_driven_pages/common/minimumPSM_Count_Filter.js';
@@ -663,6 +666,10 @@ var ImagePagePrimaryRootCodeClass = function() {
 	var _downloadProteins = new DownloadProteins();
 	
 
+	const dataPages_LoggedInUser_CommonObjectsFactory = new DataPages_LoggedInUser_CommonObjectsFactory();
+
+	const saveView_dataPages = dataPages_LoggedInUser_CommonObjectsFactory.instantiate_SaveView_dataPages();
+
 
 	//   General
 
@@ -1218,6 +1225,9 @@ var ImagePagePrimaryRootCodeClass = function() {
 	function refreshData() {
 		updateURLHash( true /* useSearchForm */ );
 		defaultPageView.searchFormUpdateButtonPressed_ForDefaultPageView();
+		if ( window.saveView_dataPages ) {
+			window.saveView_dataPages.searchFormChanged_ForDefaultPageView(); 
+		}
 		_coverages = undefined;
 		_ranges = undefined;
 	//	proteinAnnotationStore.reset(); // don't call since not affected by search criteria on page
@@ -2081,6 +2091,14 @@ var ImagePagePrimaryRootCodeClass = function() {
 		$taxonomy_checkboxes.find("input").change(function() {
 			try {
 				defaultPageView.searchFormChanged_ForDefaultPageView();;
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
+			try {
+				if ( window.saveView_dataPages ) {
+					window.saveView_dataPages.searchFormChanged_ForDefaultPageView(); 
+				}
 			} catch( e ) {
 				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
 				throw e;
@@ -6191,10 +6209,26 @@ var ImagePagePrimaryRootCodeClass = function() {
 				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
 				throw e;
 			}
+			try {
+				if ( window.saveView_dataPages ) {
+					window.saveView_dataPages.searchFormChanged_ForDefaultPageView(); 
+				}
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
 		});
 		$( "input#filterOnlyOnePeptide" ).change(function() {
 			try {
 				defaultPageView.searchFormChanged_ForDefaultPageView();
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
+			try {
+				if ( window.saveView_dataPages ) {
+					window.saveView_dataPages.searchFormChanged_ForDefaultPageView(); 
+				}
 			} catch( e ) {
 				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
 				throw e;
@@ -6207,10 +6241,26 @@ var ImagePagePrimaryRootCodeClass = function() {
 				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
 				throw e;
 			}
+			try {
+				if ( window.saveView_dataPages ) {
+					window.saveView_dataPages.searchFormChanged_ForDefaultPageView(); 
+				}
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
 		});	
 		$("#exclude_protein_types_block").find("input").change(function() {
 			try {
 				defaultPageView.searchFormChanged_ForDefaultPageView();
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
+			try {
+				if ( window.saveView_dataPages ) {
+					window.saveView_dataPages.searchFormChanged_ForDefaultPageView(); 
+				}
 			} catch( e ) {
 				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
 				throw e;
@@ -6256,6 +6306,8 @@ var ImagePagePrimaryRootCodeClass = function() {
 		_linkExclusionSelectionsOverlayCode.init();
 
 		_downloadProteins.init({ _NOT_HIGHLIGHTED_LINE_COLOR });
+
+		saveView_dataPages.initialize({ /* projectSearchIds, container_DOM_Element, enableSetDefault */ });
 
 		loadDataFromService();
 	};
@@ -6310,7 +6362,7 @@ downloadProteins_pass_imagePagePrimaryRootCodeObject( imagePagePrimaryRootCodeOb
 window.imageViewerPageObject = {
 	getQueryJSONString : function() {
 //			var queryJSON = getNavigationJSON_Not_for_Image_Or_Structure();
-		var queryJSON = window.imagePagePrimaryRootCodeObject.call__getJsonFromHash();
+		var queryJSON = imagePagePrimaryRootCodeObject.call__getJsonFromHash();
 		var queryJSONString = JSON.stringify( queryJSON );
 		return queryJSONString;
 	},

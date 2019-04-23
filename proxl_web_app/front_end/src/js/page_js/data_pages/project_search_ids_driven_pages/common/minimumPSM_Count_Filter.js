@@ -129,6 +129,9 @@ var MinimumPSM_Count_Filter = function() {
 		if ( window.defaultPageView ) {
 			window.defaultPageView.searchFormChanged_ForDefaultPageView(); 
 		}
+		if ( window.saveView_dataPages ) {
+			window.saveView_dataPages.searchFormChanged_ForDefaultPageView(); 
+		}
 		
 		minPSMs = parseInt( minimum_psm_count_user_input, 10 );
 		if ( window.isNaN( minPSMs ) ) {

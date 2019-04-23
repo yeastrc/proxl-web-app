@@ -34,7 +34,8 @@ import { viewProject_SearchMaint } from './viewProject_SearchMaint.js';
 
 
 import { ProjectPage_UserCustomProjectLabel_ProjectOwnerInteraction } from './projectPage_UserCustomProjectLabel.js';
-
+import { ProjectPage_SavedViews_Section_AllUsersInteraction } from './projectPage_SavedViews_Section_AllUsersInteraction.js';
+import { ProjectPage_SavedViews_Section_LoggedInUsersInteraction } from './projectPage_SavedViews_Section_LoggedInUsersInteraction.js';
 
 ///////////////
 $(document).ready(function() {
@@ -59,6 +60,19 @@ $(document).ready(function() {
 
         set_projectPage_UserCustomProjectLabel_ProjectOwnerInteraction( projectPage_UserCustomProjectLabel_ProjectOwnerInteraction );
 
+
+        const projectPage_SavedViews_Section_LoggedInUsersInteraction = new ProjectPage_SavedViews_Section_LoggedInUsersInteraction({ projectIdString });
+
+		const projectPage_SavedViews_Section_AllUsersInteraction =
+			new ProjectPage_SavedViews_Section_AllUsersInteraction({ 
+				projectIdString,
+				projectPage_SavedViews_Section_LoggedInUsersInteraction });
+        
+        projectPage_SavedViews_Section_LoggedInUsersInteraction.initialize({ projectPage_SavedViews_Section_AllUsersInteraction });
+
+        projectPage_SavedViews_Section_AllUsersInteraction.initialize();
+
+        projectPage_SavedViews_Section_AllUsersInteraction.getSavedViewsData();
 
 	} catch( e ) {
 		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );

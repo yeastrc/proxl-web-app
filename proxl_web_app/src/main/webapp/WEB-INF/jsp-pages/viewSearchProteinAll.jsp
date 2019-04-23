@@ -293,6 +293,7 @@
 						<c:set var="page_JS_Object" value="viewSearchProteinPageCommonCrosslinkLooplinkCoverage"/>
 						
 						<%@ include file="/WEB-INF/jsp-includes/defaultPageViewButtonFragment.jsp" %>
+						<%@ include file="/WEB-INF/jsp-includes/savePageViewButtonFragment.jsp" %>
 						<%@ include file="/WEB-INF/jsp-includes/sharePageURLShortenerButtonFragment.jsp" %>
 
 					</td>

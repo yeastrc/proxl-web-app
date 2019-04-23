@@ -311,8 +311,13 @@
 					<td>
 						<%@ include file="/WEB-INF/jsp-includes/sharePageURLShortenerOverlayFragment.jsp" %>
 					
-						<input type="button" value="Update"  onclick="viewMergedPeptidePageCode.updatePageForFormParams()" >
-											
+						<c:set var="UpdateButtonText" value="Update"/>
+						
+						<input type="button" value="${ UpdateButtonText }"  onclick="viewMergedPeptidePageCode.updatePageForFormParams()" >
+
+						<c:set var="page_JS_Object" value="viewMergedPeptidePageCode"/>
+						
+						<%@ include file="/WEB-INF/jsp-includes/savePageViewButtonFragment.jsp" %>
 						<%@ include file="/WEB-INF/jsp-includes/sharePageURLShortenerButtonFragment.jsp" %>
 					</td>
 				</tr>

@@ -600,6 +600,9 @@ var CutoffProcessingCommonCode = function() {
 			if ( window.defaultPageView ) {
 				defaultPageView.searchFormChanged_ForDefaultPageView();
 			}
+			if ( window.saveView_dataPages ) {
+				window.saveView_dataPages.searchFormChanged_ForDefaultPageView(); 
+			}
 		}
 	};	
 	

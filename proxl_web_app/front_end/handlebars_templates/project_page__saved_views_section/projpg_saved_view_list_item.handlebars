@@ -1,0 +1,22 @@
+{{!--  projpg_saved_view_list_item.handlebars
+
+    Project Page: Saved View List Item
+--}}
+<div style="margin-bottom: 5px;" class=" selector_saved_view_item_root_container">
+
+    <div  class=" selector_saved_view_item_display_container">
+        <a href="{{ savedViewItem.url }}"
+            ><span class=" selector_saved_view_item_label">{{ savedViewItem.label }}</span></a>
+        {{#if canEdit }}
+            <img class="icon-small clickable  selector_edit_saved_view_label " src="images/icon-edit-small.png">
+        {{/if}}
+        {{#if canDelete }}
+            <img class="icon-small clickable  selector_delete_saved_view " src="images/icon-delete-small.png">
+        {{/if}}
+        {{!--
+        {{#if savedViewItem.defaultView }}
+            (default)
+        {{/if}}
+        --}}
+    </div>
+</div>

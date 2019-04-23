@@ -1,0 +1,42 @@
+{{!--  save_view_overlay_main.handlebars
+
+    Main overlay for save a view
+--}}
+
+<div class=" save-view-modal-dialog-overlay-div overlay-outer-div  selector_save_view_modal_dialog "  >
+
+    <div class="save-view-modal-dialog-overlay-header" style="width:100%; " >
+        
+        <h1 class="save-view-modal-dialog-overlay-X-for-exit-overlay selector_save_view_modal_dialog_x_exit " 
+            >X</h1>
+        
+        <h1 class="save-view-modal-dialog-overlay-header-text" >Save View</h1>
+    </div>
+    <div class="save-view-modal-dialog-overlay-body selector_save_view_modal_dialog_body " >
+                    
+        <div >
+            Label for view:
+            <input type="text" style="width: 300px; margin-left: 4px;" class=" selector_save_view_label ">
+        </div>
+
+       {{!--   Set default is no longer an option
+        <div >
+            {{#if canSetDefault }} 
+                
+                Set as default:
+                <input type="checkbox" class=" selector_save_view_as_default_checkbox ">
+                
+            {{/if}}
+        </div>
+        --}}
+
+        <div style="margin-top: 10px;">
+            <input type="button" value="Save This View" 
+                class=" selector_save_view_button ">&nbsp;
+            
+            <input type="button" value="Cancel" 
+                class=" selector_save_view_cancel_button ">
+        </div>
+    </div>
+
+</div>

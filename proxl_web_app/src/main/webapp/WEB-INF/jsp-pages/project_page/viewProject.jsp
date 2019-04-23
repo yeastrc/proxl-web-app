@@ -1476,7 +1476,8 @@
 
 		</c:if>
 							
-	
+		<%--  Saved Views Section --%>
+		<%@ include file="/WEB-INF/jsp-pages/project_page/projectView_SavedViews.jsp" %>
 
 		<%-- Place outside of submitted form --%>
 		<input type="hidden" id="project_id" value="<c:out value="${project_id}" />" />

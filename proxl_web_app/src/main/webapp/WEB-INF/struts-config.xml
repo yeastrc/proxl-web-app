@@ -191,8 +191,8 @@
 				type="org.yeastrc.xlink.www.actions.ViewProjectAction"
 				scope="request"
 				validate="false">
-			<forward name="Success" path="/WEB-INF/jsp-pages/viewProject.jsp" redirect="false" />
-			<forward name="Failure" path="/WEB-INF/jsp-pages/viewProject.jsp" redirect="false" />
+			<forward name="Success" path="/WEB-INF/jsp-pages/project_page/viewProject.jsp" redirect="false" />
+			<forward name="Failure" path="/WEB-INF/jsp-pages/project_page/viewProject.jsp" redirect="false" />
    			<forward name="ProjectNotFound" path="/WEB-INF/jsp-pages/projectNotFound.jsp" redirect="false" />
 		</action>
 		

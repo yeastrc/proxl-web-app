@@ -33,6 +33,7 @@ import { viewProject_ProjectAdminSection, set_projectPage_UserCustomProjectLabel
 import { viewProject_ProjectLockAdmin } from './viewProject_ProjectLockAdmin.js';
 
 import { ProjectPage_UserCustomProjectLabel_ProjectOwnerInteraction } from './projectPage_UserCustomProjectLabel.js';
+import { ProjectPage_SavedViews_Section_AllUsersInteraction } from './projectPage_SavedViews_Section_AllUsersInteraction.js';
 
 
 ///////////////
@@ -42,11 +43,11 @@ $(document).ready(function() {
 
 		var $project_id = $("#project_id");
 		if ($project_id.length === 0) {
-			throw Error("projectPage_Root_ProjectOwnerUser.js: No DOM element with id 'project_id'");
+			throw Error("projectPage_Root_ProjectLocked_ProjectOwnerUser.js: No DOM element with id 'project_id'");
         }
         const projectIdString = $project_id.val();
 		if ( projectIdString === undefined || projectIdString === "" ) {
-			throw Error("projectPage_Root_ProjectOwnerUser.js: Value in DOM element with id 'project_id' is undefined or empty string");
+			throw Error("projectPage_Root_ProjectLocked_ProjectOwnerUser.js: Value in DOM element with id 'project_id' is undefined or empty string");
         }
 
         const userIsProjectOwner = true;
@@ -57,6 +58,14 @@ $(document).ready(function() {
                 projectIdString, userIsProjectOwner, projectLocked } );
 
         set_projectPage_UserCustomProjectLabel_ProjectOwnerInteraction( projectPage_UserCustomProjectLabel_ProjectOwnerInteraction );
+       
+		const projectPage_SavedViews_Section_AllUsersInteraction =
+			new ProjectPage_SavedViews_Section_AllUsersInteraction({ 
+				projectIdString });
+        
+        projectPage_SavedViews_Section_AllUsersInteraction.initialize();
+
+        projectPage_SavedViews_Section_AllUsersInteraction.getSavedViewsData();
 
 
 	} catch( e ) {

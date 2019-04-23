@@ -303,8 +303,13 @@
 					<td>
 						<%@ include file="/WEB-INF/jsp-includes/sharePageURLShortenerOverlayFragment.jsp" %>
 					
-						<input type="button" value="Update"  onclick="viewMergedLooplinkProteinPageCode.updatePageForFormParams()" >
-											
+						<c:set var="UpdateButtonText" value="Update"/>
+						
+						<input type="button" value="${ UpdateButtonText }"  onclick="viewMergedLooplinkProteinPageCode.updatePageForFormParams()" >
+
+						<c:set var="page_JS_Object" value="viewSearchProteinPageCommonCrosslinkLooplinkCoverage"/>
+						
+						<%@ include file="/WEB-INF/jsp-includes/savePageViewButtonFragment.jsp" %>
 						<%@ include file="/WEB-INF/jsp-includes/sharePageURLShortenerButtonFragment.jsp" %>
 					</td>
 				</tr>

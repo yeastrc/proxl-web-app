@@ -282,7 +282,7 @@
 						<c:set var="UpdateButtonText" value="Update From Database"/>
 						
 						<input type="button" value="${ UpdateButtonText }"  onclick="refreshData()" >
-
+						
 						<c:if test="${ not empty onlySingleProjectSearchId }">
 
 							<c:set var="projectSearchId" value="${ onlySingleProjectSearchId }"/>	
@@ -292,6 +292,10 @@
 							<%@ include file="/WEB-INF/jsp-includes/defaultPageViewButtonFragment.jsp" %>
 						</c:if>
 
+						<c:set var="page_JS_Object" value="structureViewerPageObject"/>
+						
+						<%@ include file="/WEB-INF/jsp-includes/savePageViewButtonFragment.jsp" %>
+	
 						<%@ include file="/WEB-INF/jsp-includes/sharePageURLShortenerButtonFragment.jsp" %>
 					</td>
 				</tr>

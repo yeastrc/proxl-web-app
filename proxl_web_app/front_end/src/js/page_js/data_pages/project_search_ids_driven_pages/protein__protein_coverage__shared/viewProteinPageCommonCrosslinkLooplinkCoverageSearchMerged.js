@@ -21,6 +21,9 @@ import { searchesForPageChooser } from 'page_js/data_pages/project_search_ids_dr
 import { sharePageURLShortener  } from 'page_js/data_pages/project_search_ids_driven_pages/common/sharePageURLShortener.js';
 import { addSingleTooltipForProteinName } from 'page_js/data_pages/project_search_ids_driven_pages/common/createTooltipForProteinNames.js';
 
+import { DataPages_LoggedInUser_CommonObjectsFactory } from 'page_js/data_pages/data_pages_common/dataPages_LoggedInUser_CommonObjectsFactory.js';
+
+
 
 
 import { minimumPSM_Count_Filter } from 'page_js/data_pages/project_search_ids_driven_pages/common/minimumPSM_Count_Filter.js';
@@ -48,6 +51,13 @@ var onDocumentReady = function() {
 //  Constructor
 
 var ViewSearchProteinPageCommonCrosslinkLooplinkCoverage = function() {
+
+
+	const dataPages_LoggedInUser_CommonObjectsFactory = new DataPages_LoggedInUser_CommonObjectsFactory();
+
+	const saveView_dataPages = dataPages_LoggedInUser_CommonObjectsFactory.instantiate_SaveView_dataPages();
+
+
 	var _query_json_field_Contents = null;
 	var _query_json_field_String = null;
 	
@@ -63,8 +73,23 @@ var ViewSearchProteinPageCommonCrosslinkLooplinkCoverage = function() {
 				throw e;
 			}
 		},10);
+		setTimeout( () => { // put in setTimeout so if it fails it doesn't kill anything else
+			try {
+				this.initialize_saveView_dataPages();
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
+		},11);
 	};
 	
+	//////////////
+	this.initialize_saveView_dataPages = function() {
+
+		saveView_dataPages.initialize({ /* projectSearchIds, container_DOM_Element, enableSetDefault */ });
+	}
+
+
 	this.getQueryJSONString = function() {
 		return _query_json_field_String;
 	};

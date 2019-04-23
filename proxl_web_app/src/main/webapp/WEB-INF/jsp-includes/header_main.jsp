@@ -63,7 +63,12 @@ response.addHeader("Cache-control", "max-age=0"); // stale right away
 	<%--  Loaded in head_section_include_every_page.jsp   --%>
 	<%-- <script type="text/javascript" src="js/jquery-1.11.0.min.js"></script>  --%>
 	 
-	
+		
+		<%--  Only test for presence of this tag for is project owner allowed  --%>
+	<c:if test="${ authAccessLevel.projectOwnerAllowed }">
+	  <script type="text/text" id="page_auth_access_level_project_owner_allowed">x</script>
+	 </c:if>
+		
 	
 	
 	
