@@ -12,7 +12,7 @@ var downloadStringAsFile = function( filename, mimetype, content ) {
 
 		console.log( "downloadStringAsFile_OnlyJS called." );
 
-		var blob = new Blob([content], {type: "text/plain;charset=utf-8"});
+		var blob = new Blob([content], {type: "text/plain;charset=ISO-8859-1"});
 
 		saveAs(blob, filename);
 
