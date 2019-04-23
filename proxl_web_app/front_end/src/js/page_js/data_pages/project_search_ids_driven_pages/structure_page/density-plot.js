@@ -47,8 +47,8 @@ export class DensityPlot {
         const maxDistance = DensityPlot.getMaximumDistance( pdbDistanceArray, renderedDistanceArray );
         console.log( "max distance: " + maxDistance );
 
-        const margin = {top: 15, right: 30, bottom: 30, left: 50},
-            width = 460 - margin.left - margin.right,
+        const margin = {top: 15, right: 10, bottom: 30, left: 50},
+            width = 500 - margin.left - margin.right,
             height = 400 - margin.top - margin.bottom;
 
 
