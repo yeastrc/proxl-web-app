@@ -49,33 +49,32 @@ public class GetPageHeaderData {
 
 		UserSession userSession = UserSessionManager.getSinglesonInstance().getUserSession(request);
 		
-		if ( userSession == null ) {
-			//  No User session 
-			return;
-		}
-		Integer authUserId = userSession.getAuthUserId();
-		if ( userSession.isActualUser() && authUserId != null ) {
-			//  have a logged in user
-			if ( authUserId != null ) {
-				Integer userAccessLevel = AuthUserDAO.getInstance().getUserAccessLevel( authUserId );
-				boolean headerUserIsAdmin = false;
-				if ( userAccessLevel != null 
-						&& userAccessLevel == AuthAccessLevelConstants.ACCESS_LEVEL_ADMIN ) {
-					headerUserIsAdmin = true;
+		if ( userSession != null ) {
+
+				Integer authUserId = userSession.getAuthUserId();
+			if ( userSession.isActualUser() && authUserId != null ) {
+				//  have a logged in user
+				if ( authUserId != null ) {
+					Integer userAccessLevel = AuthUserDAO.getInstance().getUserAccessLevel( authUserId );
+					boolean headerUserIsAdmin = false;
+					if ( userAccessLevel != null 
+							&& userAccessLevel == AuthAccessLevelConstants.ACCESS_LEVEL_ADMIN ) {
+						headerUserIsAdmin = true;
+					}
+					request.setAttribute( "headerUserIsAdmin", headerUserIsAdmin );
 				}
-				request.setAttribute( "headerUserIsAdmin", headerUserIsAdmin );
+				request.setAttribute( "headerUser", userSession );
+				List<ProjectTblSubPartsForProjectLists> projectsFromDB = GetProjectListForCurrentLoggedInUser.getInstance().getProjectListForCurrentLoggedInUser( request );
+				List<ProjectTitleHeaderDisplay> projects = new ArrayList<ProjectTitleHeaderDisplay>( projectsFromDB.size() );
+				for ( ProjectTblSubPartsForProjectLists projectFromDB : projectsFromDB ) {
+					ProjectTitleHeaderDisplay project = new ProjectTitleHeaderDisplay();
+					project.setProjectTblData( projectFromDB );
+					String titleHeaderDisplay = TruncateProjectTitleForDisplay.truncateProjectTitleForHeader( projectFromDB.getTitle() );
+					project.setTitleHeaderDisplay( titleHeaderDisplay );
+					projects.add( project );
+				}
+				request.setAttribute( "headerProjectList", projects ); 
 			}
-			request.setAttribute( "headerUser", userSession );
-			List<ProjectTblSubPartsForProjectLists> projectsFromDB = GetProjectListForCurrentLoggedInUser.getInstance().getProjectListForCurrentLoggedInUser( request );
-			List<ProjectTitleHeaderDisplay> projects = new ArrayList<ProjectTitleHeaderDisplay>( projectsFromDB.size() );
-			for ( ProjectTblSubPartsForProjectLists projectFromDB : projectsFromDB ) {
-				ProjectTitleHeaderDisplay project = new ProjectTitleHeaderDisplay();
-				project.setProjectTblData( projectFromDB );
-				String titleHeaderDisplay = TruncateProjectTitleForDisplay.truncateProjectTitleForHeader( projectFromDB.getTitle() );
-				project.setTitleHeaderDisplay( titleHeaderDisplay );
-				projects.add( project );
-			}
-			request.setAttribute( "headerProjectList", projects ); 
 		}
 		if ( projectId != null ) {
 			ProjectTblSubPartsForProjectLists projectTblData = Cached_ProjectTblSubPartsForProjectLists.getInstance().getProjectTblSubPartsForProjectLists( projectId );
