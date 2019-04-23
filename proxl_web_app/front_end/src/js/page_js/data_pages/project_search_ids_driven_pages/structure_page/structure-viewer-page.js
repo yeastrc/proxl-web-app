@@ -4402,18 +4402,22 @@ var StructurePagePrimaryRootCodeClass = function() {
 						html += "<span style=\"white-space:nowrap;margin-right:10px;\"><input ";
 						
 						if( HASH_PROPERTY_VISIBLE_CHAINS_WITH_PROTEIN_SEQUENCE_IDS in json ) {
-							
-							var chainsElemName = chains[ i ].name();
-							
-							if ( chainsElemName in json[ HASH_PROPERTY_VISIBLE_CHAINS_WITH_PROTEIN_SEQUENCE_IDS ] ) {
-								
-								var prots = json[ HASH_PROPERTY_VISIBLE_CHAINS_WITH_PROTEIN_SEQUENCE_IDS ][ chains[ i ].name() ];
-								console.log( "prots:" );
-								console.log( prots );
-								if( prots.length > 0 ) {
-									for( var protsIndex = 0; protsIndex < prots.length; protsIndex++ ) {
-										if( prots[ protsIndex ] == proteinId ) {
-											html+= "checked ";
+
+							if ( k === 0 && Object.keys(json[HASH_PROPERTY_VISIBLE_CHAINS_WITH_PROTEIN_SEQUENCE_IDS]).length < 1) {
+								html += "checked ";
+							} else {
+
+								var chainsElemName = chains[i].name();
+
+								if (chainsElemName in json[HASH_PROPERTY_VISIBLE_CHAINS_WITH_PROTEIN_SEQUENCE_IDS]) {
+
+									var prots = json[HASH_PROPERTY_VISIBLE_CHAINS_WITH_PROTEIN_SEQUENCE_IDS][chains[i].name()];
+
+									if (prots.length > 0) {
+										for (var protsIndex = 0; protsIndex < prots.length; protsIndex++) {
+											if (prots[protsIndex] == proteinId) {
+												html += "checked ";
+											}
 										}
 									}
 								}
