@@ -46,7 +46,12 @@ import { getLooplinkDataCommon, getCrosslinkDataCommon, getMonolinkDataCommon, a
 import { downloadStringAsFile } from 'page_js/data_pages/project_search_ids_driven_pages/common/download-string-as-file.js';
 
 import { LinkExclusionHandler } from './link-exclusion-handler.js';
-import {BackboneColorManager} from "./backbone-color-manager";
+import {BackboneColorManager} from "./backbone-color-manager.js";
+import {StructureWebserviceMethods} from "./structure-webservice-methods.js";
+import {StructureUtils} from "./stucture-utils.js";
+import {StructureAlignmentUtils} from "./structure-alignment-utils.js";
+import {DensityPlot} from "./density-plot.js";
+import {SVGDownloadUtils} from "../common/svgDownloadUtils.js";
 
 /////////////////////////////
 
@@ -1382,7 +1387,7 @@ var StructurePagePrimaryRootCodeClass = function() {
 				
 				var chain = chains[ k ];
 
-				var alignment = getAlignmentByChainAndProtein( chain, proteinId );
+				var alignment = StructureAlignmentUtils.getAlignmentByChainAndProtein( chain, proteinId, _ALIGNMENTS );
 				
 				var expPosition = 0;
 				var pdbPosition = 0;
@@ -1398,7 +1403,7 @@ var StructurePagePrimaryRootCodeClass = function() {
 						reportText += expPosition + "\t";
 						reportText += alignment.alignedExperimentalSequence[ h ] + "\t";
 						
-						var atoms = findCAAtoms( proteinId, expPosition, [ chain ] );
+						var atoms = StructureAlignmentUtils.findCAAtoms( proteinId, expPosition, [ chain ], _ALIGNMENTS, _STRUCTURE );
 						
 						if( !atoms || atoms.length < 1 ) {
 							reportText += "\t\t\n";
@@ -2782,45 +2787,6 @@ var StructurePagePrimaryRootCodeClass = function() {
 		});
 	}
 
-
-	var getAlignmentById = function ( alignmentId ) {
-		
-		var chains = Object.keys( _ALIGNMENTS );
-		for( var i = 0; i < chains.length; i++ ) {
-			var chain = chains[ i ];
-			
-			if( !_ALIGNMENTS[ chain ] ) { return undefined; }
-			
-			for( var j = 0; j < _ALIGNMENTS[ chain ].length; j++ ) {
-				
-				if( alignmentId == _ALIGNMENTS[ chain ][ j ][ 'id' ] ) {
-					return _ALIGNMENTS[ chain ][ j ];
-				}
-				
-			}
-		}
-		
-		return undefined;
-	};
-
-
-	var getAlignmentByChainAndProtein = function ( chainId, proteinId ) {
-		
-		if( !_ALIGNMENTS[ chainId ] ) { return undefined; }
-		
-		for( var j = 0; j < _ALIGNMENTS[ chainId ].length; j++ ) {
-			
-			var alignment = _ALIGNMENTS[ chainId ][ j ];
-			
-			if( proteinId == alignment.proteinSequenceVersionId ) {
-				return _ALIGNMENTS[ chainId ][ j ];
-			}
-			
-		}
-		
-		return undefined;
-	};
-
 	/*
 	* Create and download a text script for drawing the currently-shown links in the Chimera viewer for the
 	* currently shown PDB file.
@@ -2885,7 +2851,7 @@ var StructurePagePrimaryRootCodeClass = function() {
 				var atom1 = links[ i ].atom1;
 				var atom2 = links[ i ].atom2;
 				
-				var distance = calculateDistance( atom1.pos(), atom2.pos() );
+				const distance = StructureUtils.calculateDistance( atom1.pos(), atom2.pos() );
 
 				var hexColor = _linkColorHandler.getLinkColor( links[ i ].link, 'hex' );
 				var colorName;
@@ -2939,7 +2905,7 @@ var StructurePagePrimaryRootCodeClass = function() {
 				var atom1 = links[ i ].atom1;
 				var atom2 = links[ i ].atom2;
 				
-				var distance = calculateDistance( atom1.pos(), atom2.pos() );
+				var distance = StructureUtils.calculateDistance( atom1.pos(), atom2.pos() );
 
 				var hexColor = _linkColorHandler.getLinkColor( links[ i ].link, 'hex' );
 				var colorName;
@@ -3079,8 +3045,8 @@ var StructurePagePrimaryRootCodeClass = function() {
 				
 				//  Get Experiment Protein Sequence Id and Position data for the atoms and process them
 				
-				var atom1_ExpproteinSequenceVersionIdPositionPairs = getExpproteinSequenceVersionIdPositionPairs( getVisibleAlignmentsForChain( atom1.residue().chain().name() ), atom1.residue().index() + 1 );
-				var atom2_ExpproteinSequenceVersionIdPositionPairs = getExpproteinSequenceVersionIdPositionPairs( getVisibleAlignmentsForChain( atom2.residue().chain().name() ), atom2.residue().index() + 1 );
+				var atom1_ExpproteinSequenceVersionIdPositionPairs = StructureAlignmentUtils.getExpproteinSequenceVersionIdPositionPairs( getVisibleAlignmentsForChain( atom1.residue().chain().name() ), atom1.residue().index() + 1 );
+				var atom2_ExpproteinSequenceVersionIdPositionPairs = StructureAlignmentUtils.getExpproteinSequenceVersionIdPositionPairs( getVisibleAlignmentsForChain( atom2.residue().chain().name() ), atom2.residue().index() + 1 );
 				
 				if( !atom1_ExpproteinSequenceVersionIdPositionPairs || atom1_ExpproteinSequenceVersionIdPositionPairs.length != 1 ) {
 					console.log( "WARNING: Got anomolous readings for first protein in link." );
@@ -3156,8 +3122,8 @@ var StructurePagePrimaryRootCodeClass = function() {
 
 				//  Get Experiment Protein Sequence Id and Position data for the atoms and process them
 				
-				var atom1_ExpproteinSequenceVersionIdPositionPairs = getExpproteinSequenceVersionIdPositionPairs( getVisibleAlignmentsForChain( atom1.residue().chain().name() ), atom1.residue().index() + 1 );
-				var atom2_ExpproteinSequenceVersionIdPositionPairs = getExpproteinSequenceVersionIdPositionPairs( getVisibleAlignmentsForChain( atom2.residue().chain().name() ), atom2.residue().index() + 1 );
+				var atom1_ExpproteinSequenceVersionIdPositionPairs = StructureAlignmentUtils.getExpproteinSequenceVersionIdPositionPairs( getVisibleAlignmentsForChain( atom1.residue().chain().name() ), atom1.residue().index() + 1 );
+				var atom2_ExpproteinSequenceVersionIdPositionPairs = StructureAlignmentUtils.getExpproteinSequenceVersionIdPositionPairs( getVisibleAlignmentsForChain( atom2.residue().chain().name() ), atom2.residue().index() + 1 );
 				
 				
 				if( !atom1_ExpproteinSequenceVersionIdPositionPairs || atom1_ExpproteinSequenceVersionIdPositionPairs.length != 1 ) {
@@ -3223,48 +3189,6 @@ var StructurePagePrimaryRootCodeClass = function() {
 		return linkers;
 	};
 
-	/**
-	 * Sends the request out for a lookup
-	 */
-	var doLinkablePositionsLookup = function( proteins ) {
-
-		return new Promise( (resolve, reject ) => {
-
-			incrementSpinner();				// create spinner
-
-			const url = "services/linkablePositions/getLinkablePositionsBetweenProteins";
-
-			const requestData = {
-				projectSearchIds: _projectSearchIds,
-				proteins: proteins
-			};
-
-			$.ajax({
-				type: "GET",
-				url: url,
-				traditional: true,  //  Force traditional serialization of the data sent
-				//   One thing this means is that arrays are sent as the object property instead of object property followed by "[]".
-				//   So proteinIdsToGetSequence array is passed as "proteinIdsToGetSequence=<value>" which is what Jersey expects
-				data: requestData,
-				dataType: "json",
-				success: function (data) {
-					decrementSpinner();
-					resolve( data );
-				},
-				failure: function (errMsg) {
-					decrementSpinner();
-					handleAJAXFailure(errMsg);
-					reject();
-				},
-				error: function (jqXHR, textStatus, errorThrown) {
-					decrementSpinner();
-					handleAJAXError(jqXHR, textStatus, errorThrown);
-					reject();
-				}
-			});
-		});
-	};
-
 	this_OfOutermostObjectOfClass.beginSkylinePeptideReport = function() {
 
 		const queryPromise = getAllLinkersSupportedForSkylineReport();
@@ -3293,7 +3217,7 @@ var StructurePagePrimaryRootCodeClass = function() {
 		let i = 0;
 		for( const result of results ) {
 
-			const distance = getShortestDistanceForProteinPair( result[ 'proteinPositionPair' ] );
+			const distance = StructureAlignmentUtils.getShortestDistanceForProteinPair( result[ 'proteinPositionPair' ], _ALIGNMENTS, _STRUCTURE );
 
 			if( distance !== -1 ) {
 				lines[ i ] = [result[ 'reportLine' ], "\t", distance ].join("");
@@ -3302,70 +3226,6 @@ var StructurePagePrimaryRootCodeClass = function() {
 		}
 
 		downloadStringAsFile( "peptides-for-all-mappable-udrs-skyline.txt", "text/plain", lines.join( "\n" ) );
-	};
-
-	var getShortestDistanceForProteinPair = function( proteinPairObject ) {
-
-		const protein1 =  parseInt( proteinPairObject[ 'protein1' ] );
-		const protein2 =  parseInt( proteinPairObject[ 'protein2' ] );
-
-		const position1 = parseInt( proteinPairObject[ 'position1' ] );
-		const position2 = parseInt( proteinPairObject[ 'position2' ] );
-
-		const visibleProteinsMap = getVisibleProteins();
-		const chains1 = visibleProteinsMap[ protein1 ];
-		const chains2 = visibleProteinsMap[ protein2 ];
-
-		let shortestLink = 0;
-
-		if( !chains1 || chains1 == undefined || chains1.length < 1 ) {
-			console.log( "ERROR: Got no chains for protein: " + protein1 );
-			return -1;
-		}
-
-		if( !chains2 || chains2 == undefined || chains2.length < 1 ) {
-			console.log( "ERROR: Got no chains for protein: " + protein2 );
-			return -1;
-		}
-
-		for( var j = 0; j < chains1.length; j++ ) {
-			var chain1 = chains1[ j ];
-
-			var coordsArray1 = findCACoords( protein1, position1, [ chain1 ] );
-			if( coordsArray1 == undefined || coordsArray1.length < 1 ) { continue; }
-
-			for( var k = 0; k < chains2.length; k++ ) {
-				var chain2 = chains2[ k ];
-
-				if( chain1 == chain2 && protein1 == protein2 && position1 == position2 ) { continue; }
-
-				var coordsArray2 = findCACoords( protein2, position2, [ chain2 ] );
-				if( coordsArray1 == undefined || coordsArray2.length < 1 ) { continue; }
-
-				var distance = calculateDistance( coordsArray1[ 0 ], coordsArray2[ 0 ] );
-
-				if( !shortestLink || shortestLink[ 'distance' ] > distance ) {
-
-					shortestLink = {
-						'chain1' : chain1,
-						'chain2' : chain2,
-						'protein1' : protein1,
-						'protein2' : protein2,
-						'position1' : position1,
-						'position2' : position2,
-						'distance' : distance
-					};
-				}
-
-			}
-		}
-
-		if( shortestLink ) {
-
-			return shortestLink.distance;
-		}
-
-		return -1;
 	};
 
 	/**
@@ -3500,10 +3360,10 @@ var StructurePagePrimaryRootCodeClass = function() {
 			for( let j = 0; j < chains1.length; j++ ) {
 				const chain1 = chains1[ j ];
 
-				const coordsArray1 = findCACoords( protein1, position1, [ chain1 ] );
+				const coordsArray1 = StructureAlignmentUtils.findCACoords( protein1, position1, [ chain1 ], _ALIGNMENTS, _STRUCTURE );
 				if( coordsArray1 == undefined || coordsArray1.length < 1 ) { continue; }
 
-				const atoms1 = findCAAtoms( protein1, position1, [ chain1 ] );
+				const atoms1 = StructureAlignmentUtils.findCAAtoms( protein1, position1, [ chain1 ], _ALIGNMENTS, _STRUCTURE );
 				if( atoms1 === undefined || atoms1.length < 1 ) {
 					const message = "Error getting atom for alpha carbon for protein " + protein1 + ", position " + position1 + ", chain " + chain1;
 					console.log( message );
@@ -3522,11 +3382,11 @@ var StructurePagePrimaryRootCodeClass = function() {
 					
 					if( chain1 == chain2 && protein1 == protein2 && position1 == position2 ) { continue; }
 
-					const coordsArray2 = findCACoords( protein2, position2, [ chain2 ] );
+					const coordsArray2 = StructureAlignmentUtils.findCACoords( protein2, position2, [ chain2 ], _ALIGNMENTS, _STRUCTURE );
 					if( coordsArray1 == undefined || coordsArray2.length < 1 ) { continue; }
 
 
-					const atoms2 = findCAAtoms( protein2, position2, [ chain2 ] );
+					const atoms2 = StructureAlignmentUtils.findCAAtoms( protein2, position2, [ chain2 ], _ALIGNMENTS, _STRUCTURE );
 					if( atoms2 === undefined || atoms2.length < 1 ) {
 						const message = "Error getting atom for alpha carbon for protein " + protein2 + ", position " + position2 + ", chain " + chain2;
 						console.log( message );
@@ -3540,7 +3400,7 @@ var StructurePagePrimaryRootCodeClass = function() {
 					const atom2 = atoms2[ 0 ];
 					const pdbChainPosition2 = atom2.residue().num();
 
-					const distance = calculateDistance( coordsArray1[ 0 ], coordsArray2[ 0 ] );
+					const distance = StructureUtils.calculateDistance( coordsArray1[ 0 ], coordsArray2[ 0 ] );
 
 					if( !onlyShortest ) {
 					
@@ -3583,13 +3443,18 @@ var StructurePagePrimaryRootCodeClass = function() {
 
 	this_OfOutermostObjectOfClass.downloadUDRsAsProteinPairs = function(onlyShortest) {
 
-		var visibleProteinsMap = getVisibleProteins();
+		const visibleProteinsMap = getVisibleProteins();
 
 		if( !visibleProteinsMap || visibleProteinsMap == undefined || visibleProteinsMap.length < 1 ) { return; }
 
-		var visibleProteins = Object.keys( visibleProteinsMap );
+		const visibleProteins = Object.keys( visibleProteinsMap );
 
-		const lookupPromise = doLinkablePositionsLookup( visibleProteins );
+		const lookupPromise = StructureWebserviceMethods.doLinkablePositionsLookup({
+			proteins : visibleProteins,
+			projectSearchIds : _projectSearchIds,
+			startCallout : incrementSpinner,
+			endCallout : decrementSpinner
+		});
 
 		lookupPromise.then( (data) => {
 			generateAllUDRsReport( data, onlyShortest);
@@ -3823,10 +3688,18 @@ var StructurePagePrimaryRootCodeClass = function() {
 		html += "value=\"" + distance + "\">&Aring;: ";
 		html += "<span id=\"total-links-meeting-cutoff-val\">0</span> / <span id=\"total-links-val\">0</span></div>\n";
 		html += "<div id=\"distance-cutoff-report-text\"></div>\n";
+
+		html += "<div style=\"font-size:14pt;margin-top:15px;\">Distance Density Plot:</div>";
+		html += "<div id=\"svg-download\"></div>";
+
+		html += "<div id=\"distance-density-plot\" style=\"margin-top:-5px;\">\n";
+		html += "</div>";
+
 		html += "<div id=\"shown-crosslinks-text\"></div>\n";
 		html += "<div id=\"shown-looplinks-text\"></div>\n";
 		html += "</div>";
-		
+
+
 		html += "<div style=\"font-size:14pt;margin-top:15px;\">Download reports:</div>";
 		
 		html += "<div style=\"font-size:12pt;margin-left:20px;\"><a href=\"javascript:\" onclick=\"window.structurePagePrimaryRootCodeObject.downloadProteinToPDBMap()\">Protein Position to PDB Mapping</a></div>";
@@ -3848,9 +3721,20 @@ var StructurePagePrimaryRootCodeClass = function() {
 		$distanceReportDiv.html( html );
 		
 		$( '#distance-cutoff-report-field' ).on('input',function(e){ updateURLHash( false ); updateDistanceCutoffReport(); });
-		
+
 		updateDistanceCutoffReport();
 		updateShownLinks();
+
+		DensityPlot.loadAndShowDensityPlot({
+			divToUpdateSelector : "#distance-density-plot",
+			projectSearchIds : _projectSearchIds,
+			visibleProteinsMap : getVisibleProteins(),
+			onlyShortest : true,
+			alignments : _ALIGNMENTS,
+			structure : _STRUCTURE,
+			renderedLinks : _renderedLinks
+		});
+
 	};
 
 	var updateShownLinks = function () {
@@ -3859,6 +3743,7 @@ var StructurePagePrimaryRootCodeClass = function() {
 		updateShownLooplinks();
 
 	};
+
 
 	var updateShownCrosslinksHeader = function() {
 
@@ -4095,11 +3980,11 @@ var StructurePagePrimaryRootCodeClass = function() {
 				var atom2 = _renderedLinks[ 'crosslinks' ][ i ][ 'atom2' ];
 				
 				var distanceId = atom1.residue().chain().name() + "-" + atom1.residue().num() + "-" + atom2.residue().chain().name() + "-" + atom2.residue().num();
-				uniquePairs[ distanceId ] = calculateDistance( atom1.pos(), atom2.pos() );
+				uniquePairs[ distanceId ] = StructureUtils.calculateDistance( atom1.pos(), atom2.pos() );
 
 				totalRenderedCrosslinks++;
 
-				if( calculateDistance( atom1.pos(), atom2.pos() ) <= cutoff ) {
+				if( StructureUtils.calculateDistance( atom1.pos(), atom2.pos() ) <= cutoff ) {
 					totalRenderedCrosslinksMeetingCutoff++;
 				}
 			}
@@ -4121,11 +4006,11 @@ var StructurePagePrimaryRootCodeClass = function() {
 				var atom2 = _renderedLinks[ 'looplinks' ][ i ][ 'atom2' ];
 				
 				var distanceId = atom1.residue().chain().name() + "-" + atom1.residue().num() + "-" + atom2.residue().chain().name() + "-" + atom2.residue().num();
-				uniquePairs[ distanceId ] = calculateDistance( atom1.pos(), atom2.pos() );
+				uniquePairs[ distanceId ] = StructureUtils.calculateDistance( atom1.pos(), atom2.pos() );
 
 				totalRenderedLooplinks++;
 
-				if( calculateDistance( atom1.pos(), atom2.pos() ) <= cutoff ) {
+				if( StructureUtils.calculateDistance( atom1.pos(), atom2.pos() ) <= cutoff ) {
 					totalRenderedLooplinksMeetingCutoff++;
 				}
 			}
@@ -4306,12 +4191,12 @@ var StructurePagePrimaryRootCodeClass = function() {
 	 */
 	var proteinPositionIsMappable = function( protein, position ) {
 		var visibleChains = getVisibleChainsForProtein( protein );
-		
+
 		for( var i = 0; i < visibleChains.length; i++ ) {
-			if( findPDBResidueFromAlignment( protein, position, visibleChains[ i ] ) ) { return true; }
+			if( StructureAlignmentUtils.findPDBResidueFromAlignment( protein, position, visibleChains[ i ], _ALIGNMENTS ) ) { return true; }
 		}
-		
-		
+
+
 		return false;
 	};
 
@@ -4846,7 +4731,7 @@ var StructurePagePrimaryRootCodeClass = function() {
 					var fromPosition = fromKeys[ ii ];
 					
 					// find and return the coords of the CA atoms present for this position in this protein in the visible chains
-					var fromAtoms = findCAAtoms( protein1, fromPosition, proteins[ protein1 ] );
+					var fromAtoms = StructureAlignmentUtils.findCAAtoms( protein1, fromPosition, proteins[ protein1 ], _ALIGNMENTS, _STRUCTURE );
 					
 					if( !fromAtoms || fromAtoms.length < 1 ) { continue; }
 					
@@ -4881,7 +4766,7 @@ var StructurePagePrimaryRootCodeClass = function() {
 						//console.log( "\tfrom " + fromPosition + " to " + toPosition );
 
 						// find and return the coords of the CA atoms present for this position in this protein in the visible chains
-						var toAtoms = findCAAtoms( protein2, toPosition, proteins[ protein2 ] );
+						var toAtoms = StructureAlignmentUtils.findCAAtoms( protein2, toPosition, proteins[ protein2 ], _ALIGNMENTS, _STRUCTURE );
 						
 						if( !toAtoms || toAtoms.length < 1 ) { continue; }	
 
@@ -4899,7 +4784,7 @@ var StructurePagePrimaryRootCodeClass = function() {
 								var toAtom = toAtoms[ cj ];
 								var toCoord = toAtom.pos();
 															
-								var distance = calculateDistance( fromCoord, toCoord );
+								var distance = StructureUtils.calculateDistance( fromCoord, toCoord );
 								if( distance == 0 ) { continue; }
 								
 								if( shortestDistance == -1 || distance < shortestDistance ) {
@@ -5073,7 +4958,7 @@ var StructurePagePrimaryRootCodeClass = function() {
 			for( var j = 0; j < monoLinkPositions.length; j++ ) {
 				
 				// find and return the CA atoms present for this position in this protein in the visible chains
-				var atoms = findCAAtoms( proteinId, monoLinkPositions[ j ], proteins[ proteinId ] );
+				var atoms = StructureAlignmentUtils.findCAAtoms( proteinId, monoLinkPositions[ j ], proteins[ proteinId ], _ALIGNMENTS, _STRUCTURE );
 				
 				for( var k = 0; k < atoms.length; k++ ) {
 					
@@ -5126,7 +5011,7 @@ var StructurePagePrimaryRootCodeClass = function() {
 			
 			for( var j = 0; j < _linkablePositions[ proteinId ].length; j++ ) {
 				
-				var coords = findCACoords( proteinId, _linkablePositions[ proteinId ][ j ], proteins[ proteinId ] );
+				var coords = StructureAlignmentUtils.findCACoords( proteinId, _linkablePositions[ proteinId ][ j ], proteins[ proteinId ], _ALIGNMENTS, _STRUCTURE );
 				for( var k = 0; k < coords.length; k++ ) {
 					
 					//console.log( "Drawing linkable position: " );
@@ -5219,7 +5104,7 @@ var StructurePagePrimaryRootCodeClass = function() {
 				var fromKeys = Object.keys( _proteinLooplinkPositions[ proteinId ][ proteinId ] );
 				for( var fromIndex = 0; fromIndex < fromKeys.length; fromIndex++ ) {
 					var fromPosition = fromKeys[ fromIndex ];
-					var fromAtomsArray = findCAAtoms( proteinId, fromPosition, [ chainId ] );
+					var fromAtomsArray = StructureAlignmentUtils.findCAAtoms( proteinId, fromPosition, [ chainId ], _ALIGNMENTS, _STRUCTURE );
 
 					if( !fromAtomsArray || fromAtomsArray.length < 1 ) { continue; }
 					
@@ -5236,7 +5121,7 @@ var StructurePagePrimaryRootCodeClass = function() {
 						
 						if( toPosition <= fromPosition ) { continue; }		// ensure we're only looking at a given looplink once
 						
-						var toAtomsArray = findCAAtoms( proteinId, toPosition, [ chainId ] );
+						var toAtomsArray = StructureAlignmentUtils.findCAAtoms( proteinId, toPosition, [ chainId ], _ALIGNMENTS, _STRUCTURE );
 						
 						if( !toAtomsArray || toAtomsArray.length < 1 ) { continue; }
 						
@@ -5255,7 +5140,7 @@ var StructurePagePrimaryRootCodeClass = function() {
 							
 							var link = { };
 							link.type = 'looplink';
-							link.length = calculateDistance( fromCoords, toCoords );
+							link.length = StructureUtils.calculateDistance( fromCoords, toCoords );
 							link.protein1 = proteinId;
 							link.position1 = fromPosition;
 							link.position2 = toPosition;
@@ -5290,9 +5175,9 @@ var StructurePagePrimaryRootCodeClass = function() {
 							
 							var UDR = distinctUDRs[ proteinId ][ fromPosition ][ toPosition ];
 							
-							if( !( 'distance' in UDR ) || UDR[ 'distance' ] > calculateDistance( fromCoords, toCoords ) ) {
+							if( !( 'distance' in UDR ) || UDR[ 'distance' ] > StructureUtils.calculateDistance( fromCoords, toCoords ) ) {
 								UDR[ 'shortestPair' ] = [ fromCoords, toCoords ];
-								UDR[ 'distance' ] = calculateDistance( fromCoords, toCoords );
+								UDR[ 'distance' ] = StructureUtils.calculateDistance( fromCoords, toCoords );
 								UDR[ 'renderedLink' ] = renderedLink;
 								
 								distinctUDRs[ proteinId ][ fromPosition ][ toPosition ] = UDR;
@@ -6084,7 +5969,7 @@ var StructurePagePrimaryRootCodeClass = function() {
 			//console.log( "Got " + alignments.length + " visible alignments for chain: " + chain.name() );
 
 			// get a map of proteinSequenceVersionId:position pairs that correspond to the supplied pdbPosition in the supplied alignments
-			var expproteinSequenceVersionIdPositionPairs = getExpproteinSequenceVersionIdPositionPairs( alignments, pdbPosition );
+			var expproteinSequenceVersionIdPositionPairs = StructureAlignmentUtils.getExpproteinSequenceVersionIdPositionPairs( alignments, pdbPosition );
 
 			if( !expproteinSequenceVersionIdPositionPairs || expproteinSequenceVersionIdPositionPairs.length < 1 ) {
 
@@ -6141,7 +6026,7 @@ var StructurePagePrimaryRootCodeClass = function() {
 				
 				if( chainId != chain ) { return true; }
 				
-				var alignment = getAlignmentByChainAndProtein( chain, pid );
+				const alignment = StructureAlignmentUtils.getAlignmentByChainAndProtein( chain, pid, _ALIGNMENTS );
 				if( alignment ) {
 					alignments.push( alignment );
 				} else {
@@ -6165,7 +6050,7 @@ var StructurePagePrimaryRootCodeClass = function() {
 				
 			if( chainId != chain ) { return true; }
 				
-			var alignment = getAlignmentByChainAndProtein( chain, pid );
+			var alignment = StructureAlignmentUtils.getAlignmentByChainAndProtein( chain, pid, _ALIGNMENTS );
 			if( alignment ) {
 				alignments.push( alignment );
 			}	
@@ -6174,31 +6059,6 @@ var StructurePagePrimaryRootCodeClass = function() {
 		
 		return alignments;
 	}
-
-	/**
-	 * Get all proteinSequenceVersionId:position pairs that correspond to the supplied pdbPosition in the supplied alignments
-	 * 
-	 * This is for the "experimental" protein sequence from the experiment
-	 */
-	var getExpproteinSequenceVersionIdPositionPairs = function( alignments, pdbPosition ) {
-		
-		var expproteinSequenceVersionIdPositionPairs = new Array();
-		
-		for( var i = 0; i < alignments.length; i++ ) {
-			var expProteinPosition = findExpPositionForPDBPosition( alignments[ i ], pdbPosition );
-			
-			if( expProteinPosition ) {
-				var expproteinSequenceVersionIdPositionPair = { 
-						proteinSequenceVersionId : alignments[ i ].proteinSequenceVersionId,
-						position : expProteinPosition
-				};
-				
-				expproteinSequenceVersionIdPositionPairs.push( expproteinSequenceVersionIdPositionPair );
-			}
-		}
-		
-		return expproteinSequenceVersionIdPositionPairs;	
-	};
 
 	/**
 	 * Returns true if the supplied chain is a protein sequence (at least one
@@ -6220,154 +6080,6 @@ var StructurePagePrimaryRootCodeClass = function() {
 		
 		return false;
 	};
-
-
-	/**
-	 * Calculate distance between 2 3D coordinates
-	 */
-	var calculateDistance = function( coords1, coords2 ) {
-		
-		var xpart = Math.pow( coords1[ 0 ] - coords2[ 0 ], 2 );
-		var ypart = Math.pow( coords1[ 1 ] - coords2[ 1 ], 2 );
-		var zpart = Math.pow( coords1[ 2 ] - coords2[ 2 ], 2 );
-
-		return Math.sqrt( xpart + ypart + zpart );
-		
-	};
-
-	var findCACoords = function( proteinId, position, chains ) {
-		
-		//console.log( "findCACoords( " + proteinId + ", " + position + ", " + chains + " )" );
-		
-		var coords = new Array();
-		
-		for( var i = 0; i < chains.length; i++ ) {
-			
-			var pdbResidue = findPDBResidueFromAlignment( proteinId, position, chains[ i ] );
-			if( !pdbResidue ) { continue; }
-			
-			var chain = _STRUCTURE.chainByName( chains[ i ] );
-			
-			var residues = chain.residues();
-			var residue = residues[ pdbResidue - 1];
-			
-			//console.log( "Residue found in PDB: " );
-			//console.log( residue );
-			
-			if( residue ) {
-				var atom = residue.atom( 'CA' );
-				if( atom ) {
-					coords.push( atom.pos() );
-				}
-			} else {
-				console.log( "WARNING: Did not find residue at position " + pdbResidue + " in chain " + chains[ i ] + " in PDB." );
-				console.log( residue );
-				console.log( pdbResidue );
-				console.log( residues[ pdbResidue - 1 ] );
-				console.log( residues );
-			}
-			
-		}
-		
-		return coords;
-	};
-
-	var findCAAtoms = function( proteinId, position, chains ) {
-			
-		var atoms = new Array();
-		
-		for( var i = 0; i < chains.length; i++ ) {
-			
-			var pdbResidue = findPDBResidueFromAlignment( proteinId, position, chains[ i ] );
-			if( !pdbResidue ) { continue; }
-			
-			var chain = _STRUCTURE.chainByName( chains[ i ] );
-			
-			var residues = chain.residues();
-			var residue = residues[ pdbResidue - 1];
-			
-			//console.log( "Residue found in PDB: " );
-			//console.log( residue );
-			
-			if( residue ) {
-				var atom = residue.atom( 'CA' );
-				if( atom ) {
-					atoms.push( atom );
-				}
-			} else {
-				console.log( "WARNING: Did not find residue at position " + pdbResidue + " in chain " + chains[ i ] + " in PDB." );
-				console.log( residue );
-				console.log( pdbResidue );
-				console.log( residues[ pdbResidue - 1 ] );
-				console.log( residues );
-			}
-			
-		}
-		
-		return atoms;
-	};
-
-	/**
-	 * For the given alignment and PDB position, find the position in the experimental protein that corresponds to it
-	 */
-	var findExpPositionForPDBPosition = function( alignment, position ) {
-		
-		var expPosition = 0;
-		var pdbPosition = 0;
-		
-		//console.log( "position: " + position );
-		//console.log( alignment.alignedExperimentalSequence );
-		//console.log( alignment.alignedPDBSequence );
-		
-		for( var i = 0; i < alignment.alignedPDBSequence.length; i++ ) {
-
-			if( alignment.alignedExperimentalSequence[ i ] != '-' ) { expPosition++; }
-			if( alignment.alignedPDBSequence[ i ] != '-' ) { pdbPosition++; }
-			
-			if( pdbPosition == position ) {
-				if( alignment.alignedExperimentalSequence[ i ] == '-' ) {
-					//console.log( "Found no Nrseq position for position " + position + " in chain " + alignment.chainId );
-					return undefined;
-				}
-				else {
-					//console.log( "Found Experimental position " + expPosition + " for position " + position + " in chain " + alignment.chainId );
-					return expPosition;
-				}
-			}
-		}
-		
-		console.log( "MAJOR WARNING: DID NOT FIND POSITION " + position + " FOR PROTEIN " + alignment.proteinSequenceVersionId + " IN CHAIN " + alignment.chainId );
-		console.log( alignment );
-		return null;
-	};
-
-	var findPDBResidueFromAlignment = function(proteinId, position, chain) {
-			
-		var alignment = getAlignmentByChainAndProtein( chain, proteinId );
-		
-		var expPosition = 0;
-		var pdbPosition = 0;
-		for( var i = 0; i < alignment.alignedExperimentalSequence.length; i++ ) {
-
-			if( alignment.alignedExperimentalSequence[ i ] != '-' ) { expPosition++; }
-			if( alignment.alignedPDBSequence[ i ] != '-' ) { pdbPosition++; }
-			
-			if( expPosition == position ) {
-				if( alignment.alignedPDBSequence[ position - 1 ] == '-' ) {
-					//console.log( "Found no PDB position for position " + position + " in protein " + proteinId );
-					return undefined;
-				}
-				else {
-					//console.log( "Found PDB position " + pdbPosition + " for position " + position + " in protein " + proteinId );
-					return pdbPosition;
-				}
-			}
-		}
-		
-		console.log( "MAJOR WARNING: DID NOT FIND POSITION " + position + " FOR PROTEIN " + proteinId + " IN CHAIN " + chain );
-		return undefined;
-	};
-
 
 
 	this_OfOutermostObjectOfClass.editAlignment = function ( chainId, index ) {
