@@ -34,3 +34,4 @@ CREATE TABLE IF NOT EXISTS data_page_saved_view_assoc_project_search_id_tbl (
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
+
