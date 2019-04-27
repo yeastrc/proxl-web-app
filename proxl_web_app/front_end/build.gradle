@@ -1,6 +1,14 @@
 /*
- * This build file was Copied from https://spring.io/guides/gs/serving-web-content/.
+ * Build Front End of proxl web app
  *
+ 	Builds Front End and then copies results for inclusion in main webapp build under:
+ 	    ../src/main/webapp/static/js_generated_bundles
+	    ../src/main/webapp/static/css_generated
+ 	
+ 	Default task:
+
+		defaultTasks 'frontEndBuild'
+ 
  */
  
  //  New way to import gradle plugin for node:  per https://plugins.gradle.org/plugin/com.moowork.node

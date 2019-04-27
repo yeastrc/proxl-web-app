@@ -13,6 +13,13 @@
 
 	  -->
 
+	<!--  Runs Gradle (gradlew or gradlew.bat) -->
+
+	 <!-- Set program to run for Windows, else Non-Windows (Linux/Mac) -->
+	    <condition property="gradleExecutableToRun_Root" value="./gradlew.bat" else="./gradlew">
+	        <os family="windows"/>
+	    </condition>
+	
 
 	<property name="config_file" value="aa_ant__build_all_proxl_config.properties" />
 	
@@ -55,11 +62,18 @@
 	 -->
 	<target name="npm_install" depends="prepare">
 
-		<!--  web app - npm install  -->		
+		<!--  web app - npm install  -->
 		<exec executable="${npm.executable}" dir="proxl_web_app/front_end" failonerror="true" >
 			<arg value="install" />
-			<!--   <arg value="XXXX" /> -->
 		</exec>
+			
+		<!--  The Gradle task 'npm_install' in "proxl_web_app/front_end/build.gradle" does not work in Windows so execute npm directly here -->
+		<!--
+		<exec executable="${gradleExecutableToRun_Root}" dir="proxl_web_app/front_end" failonerror="true" 
+		    resolveexecutable="true" >
+			<arg value="npm_install" />
+		</exec>
+		-->
 	</target>
 	
 	<!--
@@ -71,35 +85,16 @@
 		<!--  Build submodules and create runnable jars -->
 
 		<!--  web app  -->		
-		<exec executable="${gradle.wrapper.executable}" dir="proxl_web_app" failonerror="true" >
-			<arg value="build" />
-			<!--   <arg value="XXXX" /> -->
-		</exec>
-
+		<ant antfile="ant_create_war.xml"  dir="proxl_web_app" />
+				
 		<!--  importer  -->		
-		<exec executable="${gradle.wrapper.executable}" dir="proxl_importer" failonerror="true" >
-			<arg value="build" />
-			<!--   <arg value="XXXX" /> -->
-		</exec>
-		<!--  importer executable jar -->		
-		<ant dir="proxl_importer/build_runnable_jar" antfile="ant__create_runnable_jar_importer.xml" />
+		<ant antfile="ant__create_runnable_jar_importer.xml"  dir="proxl_importer" />
 
 		<!-- run importer  -->		
-		<exec executable="${gradle.wrapper.executable}" dir="proxl_run_importer" failonerror="true" >
-			<arg value="build" />
-			<!--   <arg value="XXXX" /> -->
-		</exec>
-		<!-- run importer executable jar -->		
-		<ant dir="proxl_run_importer/build_runnable_jar" antfile="ant__create_runnable_jar_run_importer.xml" />
+		<ant antfile="ant__create_runnable_jar_run_importer.xml"  dir="proxl_run_importer" />
 		
 		<!-- submit import  -->		
-		<exec executable="${gradle.wrapper.executable}" dir="proxl_submit_import" failonerror="true" >
-			<arg value="build" />
-			<!--   <arg value="XXXX" /> -->
-		</exec>
-		<!-- submit import executable jar -->		
-		<ant dir="proxl_submit_import/build_runnable_jar" antfile="ant__create_runnable_jar_submit_import.xml" />
-		
+		<ant antfile="ant__create_runnable_jar_submit_import.xml"  dir="proxl_submit_import" />
 		
 	</target>
 	
@@ -111,9 +106,9 @@
 
 		<!-- copy files from subdir 'deploy' to deploy -->
 		<copy file="proxl_web_app/build/libs/proxl.war" todir="deploy" />
-		<copy file="proxl_importer/build_runnable_jar/deploy/importProxlXML.jar" todir="deploy" />
-		<copy file="proxl_run_importer/build_runnable_jar/deploy/runImportProxlXML.jar" todir="deploy" />
-		<copy file="proxl_submit_import/build_runnable_jar/deploy/submitProxlXMLImport.jar" todir="deploy" />
+		<copy file="proxl_importer/build/libs/importProxlXML.jar" todir="deploy" />
+		<copy file="proxl_run_importer/build/libs/runImportProxlXML.jar" todir="deploy" />
+		<copy file="proxl_submit_import/build/libs/submitProxlXMLImport.jar" todir="deploy" />
 		
 	</target>
 	

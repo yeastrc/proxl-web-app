@@ -3,10 +3,7 @@
 
 #   and update the properties below
 
-#  Input to Ant script: ant_buildWar_CopyToTomcat.xml
-
-gradle.wrapper.executable=/opt/gradle/gradle-4.5/bin/gradle
-
+#  Input to Ant script: as_ant_build_War_CopyToTomcat.xml
 
 tomcat.webapps.root=/data/web_tools/Tomcat_8.0_Port_8080/webapps
 

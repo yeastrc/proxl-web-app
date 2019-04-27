@@ -2,15 +2,7 @@
 <project basedir="." name="Proxl build_War_CopyToTomcat" default="built-copy-war">
 
 	<!--  Build the 'War' and copy to a Tomcat Deploy  -->
-	
-	<!--
-	<property environment="env" />
-	<property name="gradle.wrapper.executable" location="${env.GRADLE_HOME}/bin/gradle" />
-	
-	<echo>env:${env}</echo>
-	<echo>env.GRADLE_HOME:${env.GRADLE_HOME}</echo>
-	-->
-	
+		
 	<property name="war_filename" value="proxl.war" />
 	
 	<property name="config_file" value="aa_ant_buildWar_CopyToTomcat.settings.properties" />
@@ -33,17 +25,12 @@
 	<!-- This does not fail if the file is not found -->
 	<property file="${config_file_with_path}" />
 	
-	<echo>gradle.wrapper.executable: ${gradle.wrapper.executable}</echo>
-	
 	<echo>tomcat.webapps.root: ${tomcat.webapps.root}</echo>
 	<echo>proxl.context: ${proxl.context}</echo>
-
+	
 	<target name="built-copy-war" description="">
-		
-		<exec executable="${gradle.wrapper.executable}" dir="." failonerror="true" >
-			<arg value="build" />
-			<!--   <arg value="XXXX" /> -->
-		</exec>
+
+		<ant dir="." antfile="ant_create_war.xml" />
 		
 		<copy file="build${file.separator}libs${file.separator}${war_filename}"
 				todir="${tomcat.webapps.root}" >

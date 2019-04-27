@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project default="create_run_jar" name="Proxl Submit Import pgm: Create Runnable Jar using Gradle task shadowJar">
+
+	<!--  Runs Gradle (gradlew or gradlew.bat 
+		 with correct task 'shadowJar' to create runnable jar -->
+
+	 <!-- Set program to run for Windows, else Non-Windows (Linux/Mac) -->
+	    <condition property="executableToRun_SubmitImport" value="./gradlew.bat" else="./gradlew">
+	        <os family="windows"/>
+	    </condition>
+	
+	<!-- ================================================================================== -->
+	<!-- Clean the build directory -->
+	<!-- ================================================================================== -->
+    <target name="create_run_jar" description="Do build">
+    	
+		<exec executable="${executableToRun_SubmitImport}" dir="." failonerror="true" 
+		    resolveexecutable="true" >
+		    <!--
+		    resolveexecutable:
+		    When this attribute is true, the name of the executable is resolved firstly against the project basedir 
+		    and if that does not exist, against the execution directory if specified. 
+		    On Unix systems, if you only want to allow execution of 
+		    commands in the user's path, set this to false. since Ant 1.6
+		    -->			
+			<arg value="shadowJar" />
+			<!--   <arg value="XXXX" /> -->
+		</exec>
+    </target>
+	
+			
+</project>
+

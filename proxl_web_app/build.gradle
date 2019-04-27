@@ -3,6 +3,7 @@
  *
  * This build file was Copied from https://spring.io/guides/gs/serving-web-content/.
  *
+ 	Task for building the war: 'build'
  */
 
 plugins {
@@ -17,6 +18,10 @@ repositories {
 	jcenter()
     mavenCentral()
 }
+
+//  Default Task
+//    Comment out since creates infinite loop of building
+//  defaultTasks 'build'
 
 sourceCompatibility = 1.8     //  defaults to currently installed JVM
 // targetCompatibility = 1.8  //  defaults to sourceCompatibility
