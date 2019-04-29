@@ -1,0 +1,5 @@
+
+This is a placeholder to indicate that all the upgrade files before this point were for before release 2.0.0.
+
+The previous files are here for historical purposes.
+Using the files here for upgrading to release 2.0.0 will likely result in a database that is not set up properly.
