@@ -68,13 +68,41 @@ export class ProjectPage_SavedViews_Section_AllUsersInteraction {
 	/**
 	 * 
 	 */
-	getSavedViewsData() {
+	getSavedViewsData( params ) {
 
 		if (!this._initializeCalled) {
 			throw Error("initialize method not called");
 		}
 
+		let retryCount = undefined;
+		if ( params ) {
+			retryCount = params.retryCount;
+		}
+
 		let objectThis = this;
+
+		let $saved_views_list = $("#saved_views_list");
+		if ( $saved_views_list.length === 0 ) {
+
+			if ( ! retryCount ) {
+				retryCount = 0
+			}
+			retryCount++;
+			if ( retryCount > 10 ) {
+				throw Error("No DOM element with id 'saved_views_list'");
+			}
+			//  Retry
+			setTimeout(() => {
+				objectThis.getSavedViewsData({ retryCount });
+			}, 3000 );
+
+			//  Return since call this same function on a timeout
+
+			return; //  EARLY RETURN
+		}
+
+		$saved_views_list.empty();
+
 
 		let projectId = Number.parseInt( this._projectIdString );
 		if ( Number.isNaN( projectId ) ) {
@@ -95,7 +123,7 @@ export class ProjectPage_SavedViews_Section_AllUsersInteraction {
 
 		promise_webserviceCallStandardPost.then( ({ responseData }) => {
 			try {
-				objectThis._getSavedViewsDataResponse(responseData);
+				objectThis._getSavedViewsDataResponse({ responseData });
 			} catch (e) {
 				reportWebErrorToServer.reportErrorObjectToServer({
 					errorException : e
@@ -108,7 +136,7 @@ export class ProjectPage_SavedViews_Section_AllUsersInteraction {
 	/**
 	 * 
 	 */
-	_getSavedViewsDataResponse(responseData) {
+	_getSavedViewsDataResponse({ responseData }) {
 
 		if (!this._initializeCalled) {
 			throw Error("initialize method not called");
@@ -120,10 +148,11 @@ export class ProjectPage_SavedViews_Section_AllUsersInteraction {
 		if ( $saved_views_list.length === 0 ) {
 			throw Error("No DOM element with id 'saved_views_list'");
 		}
+
 		$saved_views_list.empty();
 
-		if ( (!savedViewList) || savedViewList.length === 0 ) {
-			//  No savedViewList for identifier
+		if ( ( ! savedViewList ) || savedViewList.length === 0 ) {
+			//  No savedViewList for project identifier
 
 			const $saved_views_no_entries = $("#saved_views_no_entries");
 			if ( $saved_views_no_entries.length === 0 ) {
