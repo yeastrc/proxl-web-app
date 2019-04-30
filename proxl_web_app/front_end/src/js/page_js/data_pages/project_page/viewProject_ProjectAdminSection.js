@@ -1116,8 +1116,8 @@ var initInviteUserEmailAutoComplete = function() {
 						// "source"
 						response($.map(data.queryResultList, function(item) {
 							return {
-								label : item.authUser.email + ", " + item.lastName + ", " + item.firstName,
-								value : item.authUser.email,
+								label : item.email + ", " + item.lastName + ", " + item.firstName,
+								value : item.email,
 								id : item.authUserId
 							};
 						}));
