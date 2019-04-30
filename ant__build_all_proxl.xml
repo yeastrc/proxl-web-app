@@ -49,6 +49,21 @@
 	<!--  -->
 	<target name="clean" >
 		<delete dir="deploy" />
+
+		<!-- Clean Front End -->
+		<exec executable="${gradleExecutableToRun_Root}" dir="proxl_web_app/front_end" failonerror="true" 
+		    resolveexecutable="true" >
+		    <!--
+		    resolveexecutable:
+		    When this attribute is true, the name of the executable is resolved firstly against the project basedir 
+		    and if that does not exist, against the execution directory if specified. 
+		    On Unix systems, if you only want to allow execution of 
+		    commands in the user's path, set this to false. since Ant 1.6
+		    -->
+			<!--  task 'clean' in front_end/build.gradle file -->
+			<arg value="clean" /> 
+		</exec>
+		
 	</target>
 
 	<!-- Prepare depends on clean -->

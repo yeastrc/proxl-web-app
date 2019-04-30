@@ -56,14 +56,29 @@ defaultTasks 'frontEndBuild'
 
 
 /*
+ * Clean up, remove output directories.  Removes some that are not deleted in task 'delete_outputDirs'
+ * working directory: The directory this build.gradle file is in
+ * 
+ * !!!!  This task is only executed from build all ant script at project/repo root.
+ */
+task clean(type: Delete) {
+  doFirst {	
+  	println("clean::doFirst called.  Deleting build output directories, including 'handlebars_templates_precompiled'")
+  	  
+	   delete 'handlebars_templates_precompiled'
+	   delete 'webpack_build_output'
+	   delete '../src/main/webapp/static/js_generated_bundles'
+	   delete '../src/main/webapp/static/css_generated'
+   }
+}
+
+/*
  * working directory: emozi-webapp/front_end
  */
 task delete_outputDirs(type: Delete) {
   doFirst {	
-  	  println("delete_outputDirs::doFirst called")
+  	println("delete_outputDirs::doFirst called.  Deleting most build output directories, except 'handlebars_templates_precompiled'")
   	  
-	   println("delete_outputDirs called")
-
      //  No longer delete since added build avoidance input dir and output file
 	   // delete 'handlebars_templates_precompiled'
 
