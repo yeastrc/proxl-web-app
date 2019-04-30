@@ -10,6 +10,14 @@
 	<echo>env:${env}</echo>
 	<echo>env.GRADLE_HOME:${env.GRADLE_HOME}</echo>
 	-->
+
+	<!--  Runs Gradle (gradlew or gradlew.bat 
+		 with correct task 'shadowJar' to create runnable jar -->
+
+	 <!-- Set program to run for Windows, else Non-Windows (Linux/Mac) -->
+	    <condition property="executableToRun_Build_FrontEnd_CopyToComcat" value="./gradlew.bat" else="./gradlew">
+	        <os family="windows"/>
+	    </condition>
 	
 	<!-- Need A unique property name since will run ant script 'ant_Copy_FrontEnd_ToTomcat.xml' -->
 	
@@ -61,9 +69,17 @@
 	-->
 	<target name="build-front-end" description="">
 		
-		<echo>Executing gradle using executable: ${gradle.wrapper.executable}</echo>
+		<echo>Executing gradle using executable: ${executableToRun_Build_FrontEnd_CopyToComcat}</echo>
 		
-		<exec executable="${gradle.wrapper.executable}" dir="." failonerror="true" >
+		<exec executable="${executableToRun_Build_FrontEnd_CopyToComcat}" dir="." failonerror="true" 
+		    resolveexecutable="true" >
+		    <!--
+		    resolveexecutable:
+		    When this attribute is true, the name of the executable is resolved firstly against the project basedir 
+		    and if that does not exist, against the execution directory if specified. 
+		    On Unix systems, if you only want to allow execution of 
+		    commands in the user's path, set this to false. since Ant 1.6
+		    -->
 			<!--   <arg value="XXXX" /> -->
 		</exec>
 

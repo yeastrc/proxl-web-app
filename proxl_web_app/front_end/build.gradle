@@ -63,7 +63,10 @@ task delete_outputDirs(type: Delete) {
   	  println("delete_outputDirs::doFirst called")
   	  
 	   println("delete_outputDirs called")
-	   delete 'handlebars_templates_precompiled'
+
+     //  No longer delete since added build avoidance input dir and output file
+	   // delete 'handlebars_templates_precompiled'
+
 	   delete 'webpack_build_output'
 	   delete '../src/main/webapp/static/js_generated_bundles'
 	   delete '../src/main/webapp/static/css_generated'
@@ -160,6 +163,14 @@ task createHandlebarsOutputDirs {
 //  Handlebars Precompile for input handlebars_templates/peptide_page_single_search
 
 task handlebarsPrecompile_peptide_page(type: NodeTask) {
+
+  def precompile_Input_Directory = "handlebars_templates/peptide_page_single_search"
+  def precompile_Output_File = "handlebars_templates_precompiled/peptide_page/peptide_page_single_search_template-bundle.js"
+  
+  // Gradle Build Avoidance information.  Must specify correct inputs and outputs.
+  inputs.dir( precompile_Input_Directory )
+  outputs.file( precompile_Output_File )
+
   def osName = System.getProperty("os.name").toLowerCase();
   if (osName.contains("windows")) {
     script = project.file('node_modules/handlebars/bin/handlebars')
@@ -168,14 +179,22 @@ task handlebarsPrecompile_peptide_page(type: NodeTask) {
   }
   args = [ '--amd' , // parameters must be before file list
   '--min',
-  '-f', 'handlebars_templates_precompiled/peptide_page/peptide_page_single_search_template-bundle.js',
-   'handlebars_templates/peptide_page_single_search'
+  '-f', precompile_Output_File,
+   precompile_Input_Directory
    ]
 }
 
 //  Handlebars Precompile for input handlebars_templates/protein_page_single_search
 
 task handlebarsPrecompile_protein_page(type: NodeTask) {
+
+  def precompile_Input_Directory = "handlebars_templates/protein_page_single_search"
+  def precompile_Output_File = "handlebars_templates_precompiled/protein_page/protein_page_single_search_template-bundle.js"
+  
+  // Gradle Build Avoidance information.  Must specify correct inputs and outputs.
+  inputs.dir( precompile_Input_Directory )
+  outputs.file( precompile_Output_File )
+
   def osName = System.getProperty("os.name").toLowerCase();
   if (osName.contains("windows")) {
     script = project.file('node_modules/handlebars/bin/handlebars')
@@ -184,14 +203,22 @@ task handlebarsPrecompile_protein_page(type: NodeTask) {
   }
   args = [ '--amd' , // parameters must be before file list
   '--min',
-  '-f', 'handlebars_templates_precompiled/protein_page/protein_page_single_search_template-bundle.js',
-   'handlebars_templates/protein_page_single_search'
+  '-f', precompile_Output_File,
+   precompile_Input_Directory
    ]
 }
 
 //  Handlebars Precompile for input handlebars_templates/mod_view_page
 
 task handlebarsPrecompile_mod_view_page(type: NodeTask) {
+
+  def precompile_Input_Directory = "handlebars_templates/mod_view_page"
+  def precompile_Output_File = "handlebars_templates_precompiled/mod_view_page/mod_view_page_template-bundle.js"
+  
+  // Gradle Build Avoidance information.  Must specify correct inputs and outputs.
+  inputs.dir( precompile_Input_Directory )
+  outputs.file( precompile_Output_File )
+
   def osName = System.getProperty("os.name").toLowerCase();
   if (osName.contains("windows")) {
     script = project.file('node_modules/handlebars/bin/handlebars')
@@ -200,13 +227,21 @@ task handlebarsPrecompile_mod_view_page(type: NodeTask) {
   }
   args = [ '--amd' , // parameters must be before file list
   '--min',
-  '-f', 'handlebars_templates_precompiled/mod_view_page/mod_view_page_template-bundle.js',
-   'handlebars_templates/mod_view_page'
+  '-f', precompile_Output_File,
+   precompile_Input_Directory
    ]
 }
 
 //  Handlebars Precompile for input handlebars_templates/common
 task handlebarsPrecompile_common(type: NodeTask) {
+
+  def precompile_Input_Directory = "handlebars_templates/common"
+  def precompile_Output_File = "handlebars_templates_precompiled/common/common_template-bundle.js"
+  
+  // Gradle Build Avoidance information.  Must specify correct inputs and outputs.
+  inputs.dir( precompile_Input_Directory )
+  outputs.file( precompile_Output_File )
+
   def osName = System.getProperty("os.name").toLowerCase();
   if (osName.contains("windows")) {
     script = project.file('node_modules/handlebars/bin/handlebars')
@@ -215,13 +250,21 @@ task handlebarsPrecompile_common(type: NodeTask) {
   }
   args = [ '--amd' , // parameters must be before file list
   '--min',
-  '-f', 'handlebars_templates_precompiled/common/common_template-bundle.js',
-   'handlebars_templates/common'
+  '-f', precompile_Output_File,
+   precompile_Input_Directory
    ]
 }
 
 //  Handlebars Precompile for input handlebars_templates/save_view
 task handlebarsPrecompile_save_view(type: NodeTask) {
+
+  def precompile_Input_Directory = "handlebars_templates/save_view"
+  def precompile_Output_File = "handlebars_templates_precompiled/save_view/save_view_template-bundle.js"
+  
+  // Gradle Build Avoidance information.  Must specify correct inputs and outputs.
+  inputs.dir( precompile_Input_Directory )
+  outputs.file( precompile_Output_File )
+
   def osName = System.getProperty("os.name").toLowerCase();
   if (osName.contains("windows")) {
     script = project.file('node_modules/handlebars/bin/handlebars')
@@ -230,14 +273,22 @@ task handlebarsPrecompile_save_view(type: NodeTask) {
   }
   args = [ '--amd' , // parameters must be before file list
   '--min',
-  '-f', 'handlebars_templates_precompiled/save_view/save_view_template-bundle.js',
-   'handlebars_templates/save_view'
+  '-f', precompile_Output_File,
+   precompile_Input_Directory
    ]
 }
 
 //  Handlebars Precompile for input handlebars_templates/protein_sequence_formatted_display
 
 task handlebarsPrecompile_protein_sequence_formatted_display(type: NodeTask) {
+
+  def precompile_Input_Directory = "handlebars_templates/protein_sequence_formatted_display"
+  def precompile_Output_File = "handlebars_templates_precompiled/protein_sequence_formatted_display/protein_sequence_formatted_display_template-bundle.js"
+  
+  // Gradle Build Avoidance information.  Must specify correct inputs and outputs.
+  inputs.dir( precompile_Input_Directory )
+  outputs.file( precompile_Output_File )
+
   def osName = System.getProperty("os.name").toLowerCase();
   if (osName.contains("windows")) {
     script = project.file('node_modules/handlebars/bin/handlebars')
@@ -246,14 +297,22 @@ task handlebarsPrecompile_protein_sequence_formatted_display(type: NodeTask) {
   }
   args = [ '--amd' , // parameters must be before file list
   '--min',
-  '-f', 'handlebars_templates_precompiled/protein_sequence_formatted_display/protein_sequence_formatted_display_template-bundle.js',
-   'handlebars_templates/protein_sequence_formatted_display'
+  '-f', precompile_Output_File,
+   precompile_Input_Directory
    ]
 }
 
 //  Handlebars Precompile for input handlebars_templates/search_detail_section_main_page
 
 task handlebarsPrecompile_search_detail_section_main_page(type: NodeTask) {
+
+  def precompile_Input_Directory = "handlebars_templates/search_detail_section_main_page"
+  def precompile_Output_File = "handlebars_templates_precompiled/search_detail_section_main_page/search_detail_section_main_page_template-bundle.js"
+  
+  // Gradle Build Avoidance information.  Must specify correct inputs and outputs.
+  inputs.dir( precompile_Input_Directory )
+  outputs.file( precompile_Output_File )
+
   def osName = System.getProperty("os.name").toLowerCase();
   if (osName.contains("windows")) {
     script = project.file('node_modules/handlebars/bin/handlebars')
@@ -262,8 +321,8 @@ task handlebarsPrecompile_search_detail_section_main_page(type: NodeTask) {
   }
   args = [ '--amd' , // parameters must be before file list
   '--min',
-  '-f', 'handlebars_templates_precompiled/search_detail_section_main_page/search_detail_section_main_page_template-bundle.js',
-   'handlebars_templates/search_detail_section_main_page'
+  '-f', precompile_Output_File,
+   precompile_Input_Directory
    ]
 }
 
@@ -271,6 +330,14 @@ task handlebarsPrecompile_search_detail_section_main_page(type: NodeTask) {
 //  Handlebars Precompile for input handlebars_templates/search_detail_section_user_input_section
 
 task handlebarsPrecompile_search_detail_section_user_input_section(type: NodeTask) {
+
+  def precompile_Input_Directory = "handlebars_templates/search_detail_section_user_input_section"
+  def precompile_Output_File = "handlebars_templates_precompiled/search_detail_section_user_input_section/search_detail_section_user_input_section_template-bundle.js"
+  
+  // Gradle Build Avoidance information.  Must specify correct inputs and outputs.
+  inputs.dir( precompile_Input_Directory )
+  outputs.file( precompile_Output_File )
+
   def osName = System.getProperty("os.name").toLowerCase();
   if (osName.contains("windows")) {
     script = project.file('node_modules/handlebars/bin/handlebars')
@@ -279,8 +346,8 @@ task handlebarsPrecompile_search_detail_section_user_input_section(type: NodeTas
   }
   args = [ '--amd' , // parameters must be before file list
   '--min',
-  '-f', 'handlebars_templates_precompiled/search_detail_section_user_input_section/search_detail_section_user_input_section_template-bundle.js',
-   'handlebars_templates/search_detail_section_user_input_section'
+  '-f', precompile_Output_File,
+   precompile_Input_Directory
    ]
 }
 
@@ -289,6 +356,14 @@ task handlebarsPrecompile_search_detail_section_user_input_section(type: NodeTas
 //  Handlebars Precompile for input handlebars_templates/psm_list
 
 task handlebarsPrecompile_psm_list(type: NodeTask) {
+
+  def precompile_Input_Directory = "handlebars_templates/psm_list"
+  def precompile_Output_File = "handlebars_templates_precompiled/psm_list/psm_list_template-bundle.js"
+  
+  // Gradle Build Avoidance information.  Must specify correct inputs and outputs.
+  inputs.dir( precompile_Input_Directory )
+  outputs.file( precompile_Output_File )
+
   def osName = System.getProperty("os.name").toLowerCase();
   if (osName.contains("windows")) {
     script = project.file('node_modules/handlebars/bin/handlebars')
@@ -297,14 +372,22 @@ task handlebarsPrecompile_psm_list(type: NodeTask) {
   }
   args = [ '--amd' , // parameters must be before file list
   '--min',
-  '-f', 'handlebars_templates_precompiled/psm_list/psm_list_template-bundle.js',
-   'handlebars_templates/psm_list'
+  '-f', precompile_Output_File,
+   precompile_Input_Directory
    ]
 }
 
 //  Handlebars Precompile for input handlebars_templates/lorikeet_overlay
 
 task handlebarsPrecompile_lorikeet_overlay(type: NodeTask) {
+
+  def precompile_Input_Directory = "handlebars_templates/lorikeet_overlay"
+  def precompile_Output_File = "handlebars_templates_precompiled/lorikeet_overlay/lorikeet_overlay_template-bundle.js"
+  
+  // Gradle Build Avoidance information.  Must specify correct inputs and outputs.
+  inputs.dir( precompile_Input_Directory )
+  outputs.file( precompile_Output_File )
+
   def osName = System.getProperty("os.name").toLowerCase();
   if (osName.contains("windows")) {
     script = project.file('node_modules/handlebars/bin/handlebars')
@@ -313,14 +396,22 @@ task handlebarsPrecompile_lorikeet_overlay(type: NodeTask) {
   }
   args = [ '--amd' , // parameters must be before file list
   '--min',
-  '-f', 'handlebars_templates_precompiled/lorikeet_overlay/lorikeet_overlay_template-bundle.js',
-   'handlebars_templates/lorikeet_overlay'
+  '-f', precompile_Output_File,
+   precompile_Input_Directory
    ]
 }
 
 //  Handlebars Precompile for input handlebars_templates/project_page__project_info_section_all_users_interaction
 
 task handlebarsPrecompile_project_page__project_info_section_all_users_interaction(type: NodeTask) {
+
+  def precompile_Input_Directory = "handlebars_templates/project_page__project_info_section_all_users_interaction"
+  def precompile_Output_File = "handlebars_templates_precompiled/project_page__project_info_section_all_users_interaction/project_page__project_info_section_all_users_interaction_template-bundle.js"
+  
+  // Gradle Build Avoidance information.  Must specify correct inputs and outputs.
+  inputs.dir( precompile_Input_Directory )
+  outputs.file( precompile_Output_File )
+
   def osName = System.getProperty("os.name").toLowerCase();
   if (osName.contains("windows")) {
     script = project.file('node_modules/handlebars/bin/handlebars')
@@ -329,14 +420,22 @@ task handlebarsPrecompile_project_page__project_info_section_all_users_interacti
   }
   args = [ '--amd' , // parameters must be before file list
   '--min',
-  '-f', 'handlebars_templates_precompiled/project_page__project_info_section_all_users_interaction/project_page__project_info_section_all_users_interaction_template-bundle.js',
-   'handlebars_templates/project_page__project_info_section_all_users_interaction'
+  '-f', precompile_Output_File,
+   precompile_Input_Directory
    ]
 }
 
 //  Handlebars Precompile for input handlebars_templates/project_page__project_info_section_logged_in_users_interaction
 
 task handlebarsPrecompile_project_page__project_info_section_logged_in_users_interaction(type: NodeTask) {
+
+  def precompile_Input_Directory = "handlebars_templates/project_page__project_info_section_logged_in_users_interaction"
+  def precompile_Output_File = "handlebars_templates_precompiled/project_page__project_info_section_logged_in_users_interaction/project_page__project_info_section_logged_in_users_interaction_template-bundle.js"
+  
+  // Gradle Build Avoidance information.  Must specify correct inputs and outputs.
+  inputs.dir( precompile_Input_Directory )
+  outputs.file( precompile_Output_File )
+
   def osName = System.getProperty("os.name").toLowerCase();
   if (osName.contains("windows")) {
     script = project.file('node_modules/handlebars/bin/handlebars')
@@ -345,14 +444,22 @@ task handlebarsPrecompile_project_page__project_info_section_logged_in_users_int
   }
   args = [ '--amd' , // parameters must be before file list
   '--min',
-  '-f', 'handlebars_templates_precompiled/project_page__project_info_section_logged_in_users_interaction/project_page__project_info_section_logged_in_users_interaction_template-bundle.js',
-   'handlebars_templates/project_page__project_info_section_logged_in_users_interaction'
+  '-f', precompile_Output_File,
+   precompile_Input_Directory
    ]
 }
 
 //  Handlebars Precompile for input handlebars_templates/project_page_searches_section_all_users_interaction
 
 task handlebarsPrecompile_project_page_searches_section_all_users_interaction(type: NodeTask) {
+
+  def precompile_Input_Directory = "handlebars_templates/project_page_searches_section_all_users_interaction"
+  def precompile_Output_File = "handlebars_templates_precompiled/project_page_searches_section_all_users_interaction/project_page_searches_section_all_users_interaction_template-bundle.js"
+  
+  // Gradle Build Avoidance information.  Must specify correct inputs and outputs.
+  inputs.dir( precompile_Input_Directory )
+  outputs.file( precompile_Output_File )
+
   def osName = System.getProperty("os.name").toLowerCase();
   if (osName.contains("windows")) {
     script = project.file('node_modules/handlebars/bin/handlebars')
@@ -361,14 +468,22 @@ task handlebarsPrecompile_project_page_searches_section_all_users_interaction(ty
   }
   args = [ '--amd' , // parameters must be before file list
   '--min',
-  '-f', 'handlebars_templates_precompiled/project_page_searches_section_all_users_interaction/project_page_searches_section_all_users_interaction_template-bundle.js',
-   'handlebars_templates/project_page_searches_section_all_users_interaction'
+  '-f', precompile_Output_File,
+   precompile_Input_Directory
    ]
 }
 
 //  Handlebars Precompile for input handlebars_templates/project_page_searches_section_researcher_user_interaction
 
 task handlebarsPrecompile_project_page_searches_section_researcher_user_interaction(type: NodeTask) {
+
+  def precompile_Input_Directory = "handlebars_templates/project_page_searches_section_researcher_user_interaction"
+  def precompile_Output_File = "handlebars_templates_precompiled/project_page_searches_section_researcher_user_interaction/project_page_searches_section_researcher_user_interaction_template-bundle.js"
+  
+  // Gradle Build Avoidance information.  Must specify correct inputs and outputs.
+  inputs.dir( precompile_Input_Directory )
+  outputs.file( precompile_Output_File )
+
   def osName = System.getProperty("os.name").toLowerCase();
   if (osName.contains("windows")) {
     script = project.file('node_modules/handlebars/bin/handlebars')
@@ -377,14 +492,22 @@ task handlebarsPrecompile_project_page_searches_section_researcher_user_interact
   }
   args = [ '--amd' , // parameters must be before file list
   '--min',
-  '-f', 'handlebars_templates_precompiled/project_page_searches_section_researcher_user_interaction/project_page_searches_section_researcher_user_interaction_template-bundle.js',
-   'handlebars_templates/project_page_searches_section_researcher_user_interaction'
+  '-f', precompile_Output_File,
+   precompile_Input_Directory
    ]
 }
 
 //  Handlebars Precompile for input handlebars_templates/project_page_upload_data_section_project_owner_user_interaction
 
 task handlebarsPrecompile_project_page_upload_data_section_project_owner_user_interaction(type: NodeTask) {
+
+  def precompile_Input_Directory = "handlebars_templates/project_page_upload_data_section_project_owner_user_interaction"
+  def precompile_Output_File = "handlebars_templates_precompiled/project_page_upload_data_section_project_owner_user_interaction/project_page_upload_data_section_project_owner_user_interaction_template-bundle.js"
+  
+  // Gradle Build Avoidance information.  Must specify correct inputs and outputs.
+  inputs.dir( precompile_Input_Directory )
+  outputs.file( precompile_Output_File )
+
   def osName = System.getProperty("os.name").toLowerCase();
   if (osName.contains("windows")) {
     script = project.file('node_modules/handlebars/bin/handlebars')
@@ -393,14 +516,22 @@ task handlebarsPrecompile_project_page_upload_data_section_project_owner_user_in
   }
   args = [ '--amd' , // parameters must be before file list
   '--min',
-  '-f', 'handlebars_templates_precompiled/project_page_upload_data_section_project_owner_user_interaction/project_page_upload_data_section_project_owner_user_interaction_template-bundle.js',
-   'handlebars_templates/project_page_upload_data_section_project_owner_user_interaction'
+  '-f', precompile_Output_File,
+   precompile_Input_Directory
    ]
 }
 
 //  Handlebars Precompile for input handlebars_templates/project_page__saved_views_section
 
 task handlebarsPrecompile_project_page__saved_views_section(type: NodeTask) {
+
+  def precompile_Input_Directory = "handlebars_templates/project_page__saved_views_section"
+  def precompile_Output_File = "handlebars_templates_precompiled/project_page__saved_views_section/project_page__saved_views_section_template-bundle.js"
+  
+  // Gradle Build Avoidance information.  Must specify correct inputs and outputs.
+  inputs.dir( precompile_Input_Directory )
+  outputs.file( precompile_Output_File )
+
   def osName = System.getProperty("os.name").toLowerCase();
   if (osName.contains("windows")) {
     script = project.file('node_modules/handlebars/bin/handlebars')
@@ -409,14 +540,22 @@ task handlebarsPrecompile_project_page__saved_views_section(type: NodeTask) {
   }
   args = [ '--amd' , // parameters must be before file list
   '--min',
-  '-f', 'handlebars_templates_precompiled/project_page__saved_views_section/project_page__saved_views_section_template-bundle.js',
-   'handlebars_templates/project_page__saved_views_section'
+  '-f', precompile_Output_File,
+   precompile_Input_Directory
    ]
 }
 
 //  Handlebars Precompile for input handlebars_templates/project_page__saved_views_section_loggedin_users
 
 task handlebarsPrecompile_project_page__saved_views_section_loggedin_users(type: NodeTask) {
+
+  def precompile_Input_Directory = "handlebars_templates/project_page__saved_views_section_loggedin_users"
+  def precompile_Output_File = "handlebars_templates_precompiled/project_page__saved_views_section_loggedin_users/project_page__saved_views_section_loggedin_users_template-bundle.js"
+  
+  // Gradle Build Avoidance information.  Must specify correct inputs and outputs.
+  inputs.dir( precompile_Input_Directory )
+  outputs.file( precompile_Output_File )
+
   def osName = System.getProperty("os.name").toLowerCase();
   if (osName.contains("windows")) {
     script = project.file('node_modules/handlebars/bin/handlebars')
@@ -425,14 +564,22 @@ task handlebarsPrecompile_project_page__saved_views_section_loggedin_users(type:
   }
   args = [ '--amd' , // parameters must be before file list
   '--min',
-  '-f', 'handlebars_templates_precompiled/project_page__saved_views_section_loggedin_users/project_page__saved_views_section_loggedin_users_template-bundle.js',
-   'handlebars_templates/project_page__saved_views_section_loggedin_users'
+  '-f', precompile_Output_File,
+   precompile_Input_Directory
    ]
 }
 
 //  Handlebars Precompile for input handlebars_templates/project_page__share_data_section_loggedin_users
 
 task handlebarsPrecompile_project_page__share_data_section_loggedin_users(type: NodeTask) {
+
+  def precompile_Input_Directory = "handlebars_templates/project_page__share_data_section_loggedin_users"
+  def precompile_Output_File = "handlebars_templates_precompiled/project_page__share_data_section_loggedin_users/project_page__share_data_section_loggedin_users_template-bundle.js"
+  
+  // Gradle Build Avoidance information.  Must specify correct inputs and outputs.
+  inputs.dir( precompile_Input_Directory )
+  outputs.file( precompile_Output_File )
+
   def osName = System.getProperty("os.name").toLowerCase();
   if (osName.contains("windows")) {
     script = project.file('node_modules/handlebars/bin/handlebars')
@@ -441,8 +588,8 @@ task handlebarsPrecompile_project_page__share_data_section_loggedin_users(type: 
   }
   args = [ '--amd' , // parameters must be before file list
   '--min',
-  '-f', 'handlebars_templates_precompiled/project_page__share_data_section_loggedin_users/project_page__share_data_section_loggedin_users_template-bundle.js',
-   'handlebars_templates/project_page__share_data_section_loggedin_users'
+  '-f', precompile_Output_File,
+   precompile_Input_Directory
    ]
 }
 
@@ -450,6 +597,14 @@ task handlebarsPrecompile_project_page__share_data_section_loggedin_users(type: 
 //  Handlebars Precompile for input handlebars_templates/project_list
 
 task handlebarsPrecompile_project_list(type: NodeTask) {
+
+  def precompile_Input_Directory = "handlebars_templates/project_list"
+  def precompile_Output_File = "handlebars_templates_precompiled/project_list/project_list_template-bundle.js"
+  
+  // Gradle Build Avoidance information.  Must specify correct inputs and outputs.
+  inputs.dir( precompile_Input_Directory )
+  outputs.file( precompile_Output_File )
+
   def osName = System.getProperty("os.name").toLowerCase();
   if (osName.contains("windows")) {
     script = project.file('node_modules/handlebars/bin/handlebars')
@@ -458,14 +613,22 @@ task handlebarsPrecompile_project_list(type: NodeTask) {
   }
   args = [ '--amd' , // parameters must be before file list
   '--min',
-  '-f', 'handlebars_templates_precompiled/project_list/project_list_template-bundle.js',
-   'handlebars_templates/project_list'
+  '-f', precompile_Output_File,
+   precompile_Input_Directory
    ]
 }
 
 //  Handlebars Precompile for input handlebars_templates/user_account_create_account
 
 task handlebarsPrecompile_user_account_create_account(type: NodeTask) {
+
+  def precompile_Input_Directory = "handlebars_templates/user_account_create_account"
+  def precompile_Output_File = "handlebars_templates_precompiled/user_account_create_account/user_account_create_account_template-bundle.js"
+  
+  // Gradle Build Avoidance information.  Must specify correct inputs and outputs.
+  inputs.dir( precompile_Input_Directory )
+  outputs.file( precompile_Output_File )
+
   def osName = System.getProperty("os.name").toLowerCase();
   if (osName.contains("windows")) {
     script = project.file('node_modules/handlebars/bin/handlebars')
@@ -474,14 +637,22 @@ task handlebarsPrecompile_user_account_create_account(type: NodeTask) {
   }
   args = [ '--amd' , // parameters must be before file list
   '--min',
-  '-f', 'handlebars_templates_precompiled/user_account_create_account/user_account_create_account_template-bundle.js',
-   'handlebars_templates/user_account_create_account'
+  '-f', precompile_Output_File,
+   precompile_Input_Directory
    ]
 }
 
 //  Handlebars Precompile for input handlebars_templates/user_account_login_forgot_password
 
 task handlebarsPrecompile_user_account_login_forgot_password(type: NodeTask) {
+
+  def precompile_Input_Directory = "handlebars_templates/user_account_login_forgot_password"
+  def precompile_Output_File = "handlebars_templates_precompiled/user_account_login_forgot_password/user_account_login_forgot_password_template-bundle.js"
+  
+  // Gradle Build Avoidance information.  Must specify correct inputs and outputs.
+  inputs.dir( precompile_Input_Directory )
+  outputs.file( precompile_Output_File )
+
   def osName = System.getProperty("os.name").toLowerCase();
   if (osName.contains("windows")) {
     script = project.file('node_modules/handlebars/bin/handlebars')
@@ -490,14 +661,22 @@ task handlebarsPrecompile_user_account_login_forgot_password(type: NodeTask) {
   }
   args = [ '--amd' , // parameters must be before file list
   '--min',
-  '-f', 'handlebars_templates_precompiled/user_account_login_forgot_password/user_account_login_forgot_password_template-bundle.js',
-   'handlebars_templates/user_account_login_forgot_password'
+  '-f', precompile_Output_File,
+   precompile_Input_Directory
    ]
 }
 
 //  Handlebars Precompile for input handlebars_templates/user_invite_processing
 
 task handlebarsPrecompile_user_invite_processing(type: NodeTask) {
+
+  def precompile_Input_Directory = "handlebars_templates/user_invite_processing"
+  def precompile_Output_File = "handlebars_templates_precompiled/user_invite_processing/user_invite_processing_template-bundle.js"
+  
+  // Gradle Build Avoidance information.  Must specify correct inputs and outputs.
+  inputs.dir( precompile_Input_Directory )
+  outputs.file( precompile_Output_File )
+
   def osName = System.getProperty("os.name").toLowerCase();
   if (osName.contains("windows")) {
     script = project.file('node_modules/handlebars/bin/handlebars')
@@ -506,14 +685,22 @@ task handlebarsPrecompile_user_invite_processing(type: NodeTask) {
   }
   args = [ '--amd' , // parameters must be before file list
   '--min',
-  '-f', 'handlebars_templates_precompiled/user_invite_processing/user_invite_processing_template-bundle.js',
-   'handlebars_templates/user_invite_processing'
+  '-f', precompile_Output_File,
+   precompile_Input_Directory
    ]
 }
 
 //  Handlebars Precompile for input handlebars_templates/dummy_template
 
 task handlebarsPrecompile_dummy_template(type: NodeTask) {
+
+  def precompile_Input_Directory = "handlebars_templates/dummy_template"
+  def precompile_Output_File = "handlebars_templates_precompiled/dummy_template/dummy_template_template-bundle.js"
+  
+  // Gradle Build Avoidance information.  Must specify correct inputs and outputs.
+  inputs.dir( precompile_Input_Directory )
+  outputs.file( precompile_Output_File )
+
   def osName = System.getProperty("os.name").toLowerCase();
   if (osName.contains("windows")) {
     script = project.file('node_modules/handlebars/bin/handlebars')
