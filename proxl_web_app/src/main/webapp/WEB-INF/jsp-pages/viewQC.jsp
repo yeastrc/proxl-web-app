@@ -53,65 +53,6 @@
 		<!-- use minimized version  -->
 		<script type="text/javascript" src="js/libs/handlebars-v2.0.0.min.js"></script>
 
-		
-
-<%--  Replaced with the JS bundle listed next
-
-		<script type="text/javascript" src="js/handleServicesAJAXErrors.js?x=${cacheBustValue}"></script> 
-		 
-		<script type="text/javascript" src="js/toggleVisibility.js?x=${cacheBustValue}"></script>
-		
-		<script type="text/javascript" src="js/spinner.js?x=${cacheBustValue}"></script> 
-		
-		<script type="text/javascript" src="js/download-string-as-file.js?x=${cacheBustValue}"></script>
-
-		<script type="text/javascript" src="js/psmPeptideCutoffsCommon.js?x=${cacheBustValue}"></script>
-		
-		<script type="text/javascript" src="js/psmPeptideAnnDisplayDataCommon.js?x=${cacheBustValue}"></script>
-		
-		<script type="text/javascript" src="js/webserviceDataParamsDistribution.js?x=${cacheBustValue}"></script>
-
-		<script type="text/javascript" src="js/sharePageURLShortener.js?x=${cacheBustValue}"></script>
-		
-		<script type="text/javascript" src="js/qc_pages_Single_Merged_Common.js?x=${cacheBustValue}"></script>
-		
-		<script type="text/javascript" src="js/qcChart_Download_Help_HTMLBlock.js?x=${cacheBustValue}"></script>
-	
-		<script type="text/javascript" src="js/qcPageChartSummaryStatistics.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="js/qcPageChartDigestionStatistics.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="js/qcPageChartScanFileStatistics.js?x=${cacheBustValue}"></script>
-		
-		<script type="text/javascript" src="js/qcPageChart_PPM_Error_PSM.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="js/qcPageChart_Error_Vs_RetentionTime_PSM.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="js/qcPageChart_Error_Vs_M_Over_Z_PSM.js?x=${cacheBustValue}"></script>
-				
-		<script type="text/javascript" src="js/qcPageChart_PSM_Count_Vs_RetentionTime_PSM.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="js/qcPageChart_PSM_Count_Vs_Score_PSM.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="js/qcPageChart_PSM_Score_Vs_Score_PSM.js?x=${cacheBustValue}"></script>
-		
-		<script type="text/javascript" src="js/qcPageChartChargeStateStatistics.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="js/qcPageChart_M_Over_Z_Statistics_PSM.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="js/qcPageChart_Peptide_Length_Vs_PSM_Count.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="js/qcPageChart_PeptideLength_Vs_RetentionTime_PSM.js?x=${cacheBustValue}"></script>
-		
-		<script type="text/javascript" src="js/qcPageChart_PSM_Per_Modification.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="js/qcPageChart_Peptide_Lengths.js?x=${cacheBustValue}"></script>
-		
-		
-		<script type="text/javascript" src="js/qcPageSectionSummaryStatistics.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="js/qcPageSectionDigestionStatistics.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="js/qcPageSectionScanFileStatistics.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="js/qcPageSection_PSM_Level_Statistics.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="js/qcPageSection_PSM_Error_Estimates.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="js/qcPageSectionModificationStatistics.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="js/qcPageSection_Peptide_Level_Statistics.js?x=${cacheBustValue}"></script>
-			 
-		<script type="text/javascript" src="js/qcPageMain.js?x=${cacheBustValue}"></script>
---%>
-	
-		<%--  Bundle version of core page JS --%>
-		<script type="text/javascript" src="static/js_generated_bundles/data_pages/qcView-bundle.js?x=${cacheBustValue}"></script>
-			
 				<%-- 
 					The Struts Action for this page must call GetProteinNamesTooltipConfigData
 					This include is required on this page:
@@ -1502,5 +1443,8 @@ This is the length of both linked peptides added together.</div>
 	</div>
 </script>
 		
-							
+	
+		<%--  Bundle version of core page JS --%>
+		<script type="text/javascript" src="static/js_generated_bundles/data_pages/qcView-bundle.js?x=${cacheBustValue}"></script>
+										
 <%@ include file="/WEB-INF/jsp-includes/footer_main.jsp" %>

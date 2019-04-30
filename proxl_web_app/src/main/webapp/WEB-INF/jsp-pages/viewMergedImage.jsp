@@ -64,8 +64,6 @@
 			<%--  On this page Snap also used by crosslink-image-viewer.js and crosslink-image-viewer-click-element-handlers.js --%>				
 		<script type="text/javascript" src="js/libs/snap.svg-min.js"></script> <%--  Used by lorikeetPageProcessing.js --%>
 
-		<script type="text/javascript" src="static/js_generated_bundles/data_pages/imageView-bundle.js?x=${cacheBustValue}"></script>
-		
 				<%-- 
 					The Struts Action for this page must call GetProteinNamesTooltipConfigData
 					This include is required on this page:
@@ -1197,6 +1195,7 @@
 			<%@ include file="/WEB-INF/jsp-includes/lorikeet_overlay_section.jsp" %>	
 			
 	</div>  <%--  END  <div class="overall-enclosing-block"> --%>
-	
 
+		<script type="text/javascript" src="static/js_generated_bundles/data_pages/imageView-bundle.js?x=${cacheBustValue}"></script>
+		
 <%@ include file="/WEB-INF/jsp-includes/footer_main.jsp" %>

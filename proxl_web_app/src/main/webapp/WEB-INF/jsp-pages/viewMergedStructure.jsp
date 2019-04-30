@@ -66,55 +66,6 @@
 		
 		<script type="text/javascript" src="js/libs/snap.svg-min.js"></script> <%--  Used by lorikeetPageProcessing.js --%>
 				
-<%--  Pre Front End Build
-		 
-		<script type="text/javascript" src="js/lorikeetPageProcessing.js?x=${cacheBustValue}"></script>
-		
-		<script type="text/javascript" src="js/handleServicesAJAXErrors.js?x=${cacheBustValue}"></script> 
-		 
-		<script type="text/javascript" src="js/spinner.js?x=${cacheBustValue}"></script> 
-		 
-		<script type="text/javascript" src="js/psmPeptideCutoffsCommon.js?x=${cacheBustValue}"></script>
-		
-		<script type="text/javascript" src="js/psmPeptideAnnDisplayDataCommon.js?x=${cacheBustValue}"></script>
-	
-		<script type="text/javascript" src="js/minimumPSM_Count_Filter.js?x=${cacheBustValue}"></script>
-
-
-		<script type="text/javascript" src="js/structure-viewer-pdb-upload.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="js/structure-viewer-map-protein.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="js/structure-viewer-click-element-handlers.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="js/structure-viewer-color-handler.js?x=${cacheBustValue}"></script> 
-		<script type="text/javascript" src="js/structure-viewer-page.js?x=${cacheBustValue}"></script> 
-
-	
-
-		Image page and Structure Page Shared
-		
-		<script type="text/javascript" src="js/nrseqProteinIdToProteinSequenceVersionIdLookup.js?x=${cacheBustValue}"></script>
-
-		<script type="text/javascript" src="js/image_structure_click_element_common.js?x=${cacheBustValue}"></script>
-
-		<script type="text/javascript" src="js/viewLooplinkReportedPeptidesLoadedFromWebServiceTemplate.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="js/viewCrosslinkReportedPeptidesLoadedFromWebServiceTemplate.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="js/viewMonolinkReportedPeptidesLoadedFromWebServiceTemplate.js?x=${cacheBustValue}"></script>
-
-		<script type="text/javascript" src="js/viewPsmPerPeptideLoadedFromWebServiceTemplate.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="js/viewPsmsLoadedFromWebServiceTemplate.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="js/webserviceDataParamsDistribution.js?x=${cacheBustValue}"></script>
-
-		<script type="text/javascript" src="js/sharePageURLShortener.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="js/defaultPageView.js?x=${cacheBustValue}"></script>
-				
-		<script type="text/javascript" src="js/toggleVisibility.js?x=${cacheBustValue}"></script>
-		
-		<script type="text/javascript" src="js/download-string-as-file.js?x=${cacheBustValue}"></script>
---%>
-  
-  <%--  Front End Build  --%>
-  
-  		<script type="text/javascript" src="static/js_generated_bundles/data_pages/structureView-bundle.js?x=${cacheBustValue}"></script> 
-  		
 				<%-- 
 					The Struts Action for this page must call GetProteinNamesTooltipConfigData
 					This include is required on this page:
@@ -124,11 +75,6 @@
 			<script type="text/javascript" src="js/createTooltipForProteinNames.js?x=${cacheBustValue}"></script>
   --%>
   		
-		
-		
-
-		
-		
 		<link type="text/css" rel="stylesheet" href="css/jquery.qtip.min.css" />
 		
 		<link rel="stylesheet" href="css/tablesorter.css" type="text/css" media="print, projection, screen" />
@@ -820,6 +766,10 @@
 			<%@ include file="/WEB-INF/jsp-includes/pdb-map-protein-overlay.jsp" %>
 						
 	</div>  <%--  END  <div class="overall-enclosing-block"> --%>
-	
+	  
+  <%--  Front End Build  --%>
+  
+  		<script type="text/javascript" src="static/js_generated_bundles/data_pages/structureView-bundle.js?x=${cacheBustValue}"></script> 
+  		
 
 <%@ include file="/WEB-INF/jsp-includes/footer_main.jsp" %>
