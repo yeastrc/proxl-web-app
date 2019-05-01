@@ -16,16 +16,17 @@
 
 plugins {
 	id 'com.github.johnrengelman.shadow' version '5.0.0'
+	id 'org.ajoberstar.grgit' version '3.1.1'
 }
 
 apply plugin: 'java'
-apply plugin: 'com.github.johnrengelman.shadow'
 
 sourceCompatibility = 1.8      //    defaults to currently installed JVM
 // targetCompatibility  = 1.8  //    defaults to sourceCompatibility
 
 repositories {
     mavenCentral()
+    jcenter()
 }
 
 //  Set default task for this build.gradle file
@@ -76,11 +77,45 @@ dependencies {
 	
 }
 
+import org.ajoberstar.grgit.Grgit
+
+def gitRepo = Grgit.open({
+  dir = ".."  //  Use parent directory since that is root of GIT repo
+//  currentDir = <path>
+//  credentials = <credentals>
+})
+
+def gitHeadId = gitRepo.head().id
+def gitCommit = gitRepo.head().getAbbreviatedId(8)
+def gitBranch = gitRepo.branch.getCurrent().getName()
+
+//  Get tag at GIT HEAD: like git tag --points-at HEAD
+def repoHead = gitRepo.head()
+def repoHeadTag = gitRepo.tag.list().find {
+	it.commit == repoHead
+}
+def repoTagName = "NO GIT Tag at HEAD"
+
+if ( repoHeadTag ) {
+	println("GIT Tag at HEAD found")
+	repoTagName = repoHeadTag.getName()
+}
+
+
+println("gitHeadId: " + gitHeadId )
+println("gitCommit: " + gitCommit )
+println("gitBranch: " + gitBranch )
+println("GIT Tag at HEAD: " + repoTagName )
+
 jar {
     manifest {
-        attributes (
-        	'Main-Class': 'org.yeastrc.proxl.import_xml_to_db_submit_pgm.program.SubmitProxlImportProgram'
-        )
+        attributes ('Main-Class': 'org.yeastrc.proxl.import_xml_to_db_submit_pgm.program.SubmitProxlImportProgram')
+        attributes([ 'Project-Title': project.name,
+					'Build-Timestamp': new Date().format("yyyy-MM-dd HH:mm:ssZ"),
+					'Git-Commit': gitCommit,
+					'GIT-Full-HASH': gitHeadId,
+					'GIT-Tag-at-HEAD': repoTagName,
+					'Git-Branch': gitBranch ])
     }
 }
 
