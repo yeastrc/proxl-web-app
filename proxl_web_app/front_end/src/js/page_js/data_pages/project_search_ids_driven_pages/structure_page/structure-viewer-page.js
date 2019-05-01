@@ -1175,7 +1175,7 @@ var StructurePagePrimaryRootCodeClass = function() {
 			
 		defaultPageView.searchFormUpdateButtonPressed_ForDefaultPageView();
 		if ( window.saveView_dataPages ) {
-			window.saveView_dataPages.searchFormChanged_ForDefaultPageView(); 
+			window.saveView_dataPages.searchFormUpdateButtonPressed_ForDefaultPageView(); 
 		}
 		
 		loadDataFromService();

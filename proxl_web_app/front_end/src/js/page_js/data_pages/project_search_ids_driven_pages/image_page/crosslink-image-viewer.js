@@ -1226,7 +1226,7 @@ var ImagePagePrimaryRootCodeClass = function() {
 		updateURLHash( true /* useSearchForm */ );
 		defaultPageView.searchFormUpdateButtonPressed_ForDefaultPageView();
 		if ( window.saveView_dataPages ) {
-			window.saveView_dataPages.searchFormChanged_ForDefaultPageView(); 
+			window.saveView_dataPages.searchFormUpdateButtonPressed_ForDefaultPageView(); 
 		}
 		_coverages = undefined;
 		_ranges = undefined;
