@@ -18,7 +18,7 @@
 		
 <%--  Start of Lorikeet Core Parts --%>		
 
-		<script src="js/libs/jquery-ui-1.10.4.min.js"></script>
+		<script src="js/libs/jquery-ui-1.12.1.min.js"></script>
 		
 		<%--  Only load the excanvas.min.js if it is IE 8 or lower.  IE 8 does not support HTML5 so this is a way to have HTML5 canvas support --%>
 		<!--[if lte IE 8]><script language="javascript" type="text/javascript" src="js/lorikeet_google_code/excanvas.min.js"></script><![endif]-->

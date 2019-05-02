@@ -647,6 +647,8 @@ body.project-page .invite-user-expand-link { text-decoration: none; }
 	
 body.project-page .invited-person-invite-date-block { padding-left: 20px; }	
 
+body.project-page .ui-menu-item-wrapper { padding: 5px; }
+
 
 
 body.project-page .upload-search-block { margin-left: 30px; }

@@ -45,7 +45,7 @@
 		<script type="text/javascript" src="js/libs/lz-string/lz-string.js"></script>
 		--%>
 		
-		<script src="js/libs/jquery-ui-1.10.4.min.js"></script>
+		<script src="js/libs/jquery-ui-1.12.1.min.js"></script>
 					
 		<%--  On this page Snap used by qcMergedPageMain.js for Snap.hsb2rgb(...) to get color --%>				
 		<script type="text/javascript" src="js/libs/snap.svg-min.js"></script> <%--  Used by lorikeetPageProcessing.js --%>

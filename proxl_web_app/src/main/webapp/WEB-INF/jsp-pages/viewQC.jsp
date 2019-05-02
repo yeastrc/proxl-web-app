@@ -42,7 +42,7 @@
 		<script type="text/javascript" src="js/libs/lz-string/lz-string.js"></script>
 		--%>
 		
-		<script src="js/libs/jquery-ui-1.10.4.min.js"></script>
+		<script src="js/libs/jquery-ui-1.12.1.min.js"></script>
 		
 		<!-- Handlebars templating library   -->
 		

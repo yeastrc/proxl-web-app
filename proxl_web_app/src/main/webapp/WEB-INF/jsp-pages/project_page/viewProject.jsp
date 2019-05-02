@@ -23,11 +23,14 @@
 
  <c:set var="headerAdditions">
  
-
+ 	<c:if test="${ authAccessLevel.assistantProjectOwnerAllowed }">
+ 	
+ 		<%--  Stay with prev jQuery UI CSS since it works and the new CSS doesn't work for autocomplete --%>
 		<link REL="stylesheet" TYPE="text/css" HREF="css/jquery-ui-1.10.2-Themes/base/jquery.ui.all.css">
 
-
-		<script type="text/javascript" src="js/libs/jquery-ui-1.10.4.min.js"></script>
+		<script type="text/javascript" src="js/libs/jquery-ui-1.12.1.min.js"></script>
+	</c:if>
+	
 		<script type="text/javascript" src="js/libs/base64.js"></script> 
 		<script type="text/javascript" src="js/libs/jquery.qtip.min.js"></script>
 		<script type="text/javascript" src="js/libs/spin.min.js"></script> 
@@ -72,11 +75,6 @@
  		
 		<link type="text/css" rel="stylesheet" href="css/jquery.qtip.min.css" />
 		
-		
-		<%--  Project Admin Javascript is added at the bottom of the page --%>
-
-		<%--  Project Upload Proxl XML File to import Javascript is added at the bottom of the page --%>
-
 </c:set>
 
 
@@ -2118,43 +2116,11 @@
 			
 			
 			 <!-- END:   Modal dialog for notifying user that the status has changed on one of the Proxl XML Import items -->
-			
-			<%--  Moved to Front End Build Bundles	
-			<script type="text/javascript" src="js/proxlXMLFileImportStatusDisplay.js?x=${cacheBustValue}"></script>
-			--%>
-		
-									
+								
 		  </c:if> <%--  END test="${ authAccessLevel.assistantProjectOwnerAllowed }"  --%>
 		  
 		</c:if> <%--  END test="${ configSystemValues.proxlXMLFileImportFullyConfigured }"  --%>
 		
-		
-	
-		<%--  If Not locked and user allowed to change search data, include the Javascript for it --%>
-		<%--  Moved to Front End Build Bundles	
-		<c:if test="${authAccessLevel.assistantProjectOwnerAllowed }" >
-			<script type="text/javascript" src="js/viewProject_SearchMaint.js?x=${cacheBustValue}"></script>
-		</c:if> 
-		--%>
-		<%--  If admin section rendered, include the Javascript for it --%>
-		<%--  Moved to Front End Build Bundles	
-		<c:if test="${authAccessLevel.assistantProjectOwnerAllowed or authAccessLevel.assistantProjectOwnerIfProjectNotLockedAllowed}" >
-			<script type="text/javascript" src="js/viewProject_ProjectAdminSection.js?x=${cacheBustValue}"></script>
-		</c:if> 
-		--%>
-		<%--  If project owner, include the Javascript for Project Search Order admin --%>
-		<%--  Moved to Front End Build Bundles	
-		<c:if test="${ authAccessLevel.projectOwnerAllowed }" >
-			<script type="text/javascript" src="js/viewProject_OrganizeSearchesAndFoldersAdmin.js?x=${cacheBustValue}"></script>
-		</c:if>		
-		--%>
-		<%--  If project owner, include the Javascript for Project Lock admin --%>
-		<%--  Moved to Front End Build Bundles	
-		<c:if test="${authAccessLevel.projectOwnerAllowed or authAccessLevel.projectOwnerIfProjectNotLockedAllowed}" >
-			<script type="text/javascript" src="js/viewProject_ProjectLockAdmin.js?x=${cacheBustValue}"></script>
-		</c:if>
-		--%>
-	
 	</div>
 
 <%@ include file="/WEB-INF/jsp-includes/footer_main.jsp" %>
