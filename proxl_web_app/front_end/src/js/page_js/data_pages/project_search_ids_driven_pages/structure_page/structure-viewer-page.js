@@ -857,7 +857,7 @@ var StructurePagePrimaryRootCodeClass = function() {
 			
 			defaultPageView.searchFormChanged_ForDefaultPageView();
 			if ( window.saveView_dataPages ) {
-				window.saveView_dataPages.searchFormChanged_ForDefaultPageView(); 
+				window.saveView_dataPages.searchFormChanged_ForSaveView(); 
 			}
 		});
 		
@@ -1178,9 +1178,7 @@ var StructurePagePrimaryRootCodeClass = function() {
 		updateURLHash( true /* useSearchForm */ );
 			
 		defaultPageView.searchFormUpdateButtonPressed_ForDefaultPageView();
-		if ( window.saveView_dataPages ) {
-			window.saveView_dataPages.searchFormUpdateButtonPressed_ForDefaultPageView(); 
-		}
+		saveView_dataPages.searchFormUpdateButtonPressed_ForSaveView(); 
 		
 		loadDataFromService();
 	}
@@ -6665,7 +6663,7 @@ var StructurePagePrimaryRootCodeClass = function() {
 			}
 			try {
 				if ( window.saveView_dataPages ) {
-					window.saveView_dataPages.searchFormChanged_ForDefaultPageView(); 
+					window.saveView_dataPages.searchFormChanged_ForSaveView(); 
 				}
 			} catch( e ) {
 				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
@@ -6684,7 +6682,7 @@ var StructurePagePrimaryRootCodeClass = function() {
 			}
 			try {
 				if ( window.saveView_dataPages ) {
-					window.saveView_dataPages.searchFormChanged_ForDefaultPageView(); 
+					window.saveView_dataPages.searchFormChanged_ForSaveView(); 
 				}
 			} catch( e ) {
 				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
@@ -6700,7 +6698,7 @@ var StructurePagePrimaryRootCodeClass = function() {
 			}
 			try {
 				if ( window.saveView_dataPages ) {
-					window.saveView_dataPages.searchFormChanged_ForDefaultPageView(); 
+					window.saveView_dataPages.searchFormChanged_ForSaveView(); 
 				}
 			} catch( e ) {
 				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
@@ -6720,7 +6718,7 @@ var StructurePagePrimaryRootCodeClass = function() {
 			}
 			try {
 				if ( window.saveView_dataPages ) {
-					window.saveView_dataPages.searchFormChanged_ForDefaultPageView(); 
+					window.saveView_dataPages.searchFormChanged_ForSaveView(); 
 				}
 			} catch( e ) {
 				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );

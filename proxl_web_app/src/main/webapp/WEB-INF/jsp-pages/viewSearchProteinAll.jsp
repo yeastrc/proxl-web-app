@@ -219,19 +219,19 @@
 
 					  <label >
 						<input type="checkbox" class=" link_type_jq " 
-							onchange="defaultPageView.searchFormChanged_ForDefaultPageView();"
+							onchange="if ( window.defaultPageView ) { window.defaultPageView.searchFormChanged_ForDefaultPageView(); } ; if ( window.saveView_dataPages ) { window.saveView_dataPages.searchFormChanged_ForSaveView(); }"
 							value="<%= PeptideViewLinkTypesConstants.CROSSLINK_PSM %>"   >
 						crosslinks
 					  </label>
 					  <label >
 						<input type="checkbox" class=" link_type_jq " 
-							onchange="defaultPageView.searchFormChanged_ForDefaultPageView();"
+							onchange="if ( window.defaultPageView ) { window.defaultPageView.searchFormChanged_ForDefaultPageView(); } ; if ( window.saveView_dataPages ) { window.saveView_dataPages.searchFormChanged_ForSaveView(); }"
 							value="<%= PeptideViewLinkTypesConstants.LOOPLINK_PSM %>" >
 						looplinks
 					  </label> 
 					  <label >
 						<input type="checkbox" class=" link_type_jq " 
-							onchange="defaultPageView.searchFormChanged_ForDefaultPageView();"
+							onchange="if ( window.defaultPageView ) { window.defaultPageView.searchFormChanged_ForDefaultPageView(); } ; if ( window.saveView_dataPages ) { window.saveView_dataPages.searchFormChanged_ForSaveView(); }"
 							value="<%= PeptideViewLinkTypesConstants.UNLINKED_PSM %>" >
 						 unlinked
 					  </label>
@@ -256,7 +256,7 @@
 					<td>
 						<logic:iterate id="taxonomy" name="taxonomies">
 						 <label style="white-space: nowrap" >
-						  <input type="checkbox" name="excludeTaxonomy" value="<bean:write name="taxonomy" property="key"/>" class=" excludeTaxonomy_jq " onchange=" defaultPageView.searchFormChanged_ForDefaultPageView();" >  
+						  <input type="checkbox" name="excludeTaxonomy" value="<bean:write name="taxonomy" property="key"/>" class=" excludeTaxonomy_jq " onchange=" if ( window.defaultPageView ) { window.defaultPageView.searchFormChanged_ForDefaultPageView(); } ; if ( window.saveView_dataPages ) { window.saveView_dataPages.searchFormChanged_ForSaveView(); }" >  
 						  
 						   <span style="font-style:italic;"><bean:write name="taxonomy" property="value"/></span>
 						 </label> 						 
@@ -270,7 +270,7 @@
 						<%--   
 						All <option> values must be parsable as integers:
 						--%>
-						<select name="excludedProteins" multiple="multiple" id="excludeProtein" onchange=" defaultPageView.searchFormChanged_ForDefaultPageView();" >  
+						<select name="excludedProteins" multiple="multiple" id="excludeProtein" onchange=" if ( window.defaultPageView ) { window.defaultPageView.searchFormChanged_ForDefaultPageView(); } ; if ( window.saveView_dataPages ) { window.saveView_dataPages.searchFormChanged_ForSaveView(); }" >  
 						  
 	  						<logic:iterate id="protein" name="proteins">
 	  						  <option value="<c:out value="${ protein.proteinSequenceVersionObject.proteinSequenceVersionId }"></c:out>"><c:out value="${ protein.name }"></c:out></option>

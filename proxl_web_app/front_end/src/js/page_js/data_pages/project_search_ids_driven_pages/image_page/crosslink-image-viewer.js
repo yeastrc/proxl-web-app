@@ -1225,9 +1225,7 @@ var ImagePagePrimaryRootCodeClass = function() {
 	function refreshData() {
 		updateURLHash( true /* useSearchForm */ );
 		defaultPageView.searchFormUpdateButtonPressed_ForDefaultPageView();
-		if ( window.saveView_dataPages ) {
-			window.saveView_dataPages.searchFormUpdateButtonPressed_ForDefaultPageView(); 
-		}
+		saveView_dataPages.searchFormUpdateButtonPressed_ForSaveView(); 
 		_coverages = undefined;
 		_ranges = undefined;
 	//	proteinAnnotationStore.reset(); // don't call since not affected by search criteria on page
@@ -2097,7 +2095,7 @@ var ImagePagePrimaryRootCodeClass = function() {
 			}
 			try {
 				if ( window.saveView_dataPages ) {
-					window.saveView_dataPages.searchFormChanged_ForDefaultPageView(); 
+					window.saveView_dataPages.searchFormChanged_ForSaveView(); 
 				}
 			} catch( e ) {
 				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
@@ -6211,7 +6209,7 @@ var ImagePagePrimaryRootCodeClass = function() {
 			}
 			try {
 				if ( window.saveView_dataPages ) {
-					window.saveView_dataPages.searchFormChanged_ForDefaultPageView(); 
+					window.saveView_dataPages.searchFormChanged_ForSaveView(); 
 				}
 			} catch( e ) {
 				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
@@ -6227,7 +6225,7 @@ var ImagePagePrimaryRootCodeClass = function() {
 			}
 			try {
 				if ( window.saveView_dataPages ) {
-					window.saveView_dataPages.searchFormChanged_ForDefaultPageView(); 
+					window.saveView_dataPages.searchFormChanged_ForSaveView(); 
 				}
 			} catch( e ) {
 				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
@@ -6243,7 +6241,7 @@ var ImagePagePrimaryRootCodeClass = function() {
 			}
 			try {
 				if ( window.saveView_dataPages ) {
-					window.saveView_dataPages.searchFormChanged_ForDefaultPageView(); 
+					window.saveView_dataPages.searchFormChanged_ForSaveView(); 
 				}
 			} catch( e ) {
 				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
@@ -6259,7 +6257,7 @@ var ImagePagePrimaryRootCodeClass = function() {
 			}
 			try {
 				if ( window.saveView_dataPages ) {
-					window.saveView_dataPages.searchFormChanged_ForDefaultPageView(); 
+					window.saveView_dataPages.searchFormChanged_ForSaveView(); 
 				}
 			} catch( e ) {
 				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );

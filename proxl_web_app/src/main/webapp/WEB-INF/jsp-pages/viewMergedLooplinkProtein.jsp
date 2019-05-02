@@ -255,17 +255,9 @@
 					<td>Exclude organisms:</td>
 					<td>
 						<logic:iterate id="taxonomy" name="taxonomies">
-						
-<%-- 						
 						 <label style="white-space: nowrap" >
-						  <html:multibox property="excludeTaxonomy" styleClass="excludeTaxonomy_jq"  >
-						   <bean:write name="taxonomy" property="key"/> 
-						  </html:multibox> 
-						   <span style="font-style:italic;"><bean:write name="taxonomy" property="value"/></span>
-						 </label> 
---%>						 
-						 <label style="white-space: nowrap" >
-						  <input type="checkbox" name="excludeTaxonomy" value="<bean:write name="taxonomy" property="key"/>" class=" excludeTaxonomy_jq "  >  
+						  <input type="checkbox" name="excludeTaxonomy" value="<bean:write name="taxonomy" property="key"/>" class=" excludeTaxonomy_jq " 
+						  		onchange="if ( window.saveView_dataPages ) { window.saveView_dataPages.searchFormChanged_ForSaveView(); }" >  
 						  
 						   <span style="font-style:italic;"><bean:write name="taxonomy" property="value"/></span>
 						 </label> 						 
@@ -276,25 +268,16 @@
 				<tr>
 					<td>Exclude protein(s):</td>
 					<td>
-						<%--  shortened property from "excludeProtein" to "excP" to shorten the URL  --%>
-						<%-- TODO   TEMP
-						<html:select property="excP" multiple="true" styleId="excludeProtein"  >
-							<html:options collection="proteins" property="proteinSequenceVersionObject.proteinSequenceVersionId" labelProperty="name" />
-						</html:select>
-						--%>
-						
-						
-						<%--  New version:  Commented out since not getting the list of proteins in the action yet 
-						
+						<%--  
 						All <option> values must be parsable as integers:
 						--%>
-						<select name="excludedProteins" multiple="multiple" id="excludeProtein"  >  
+						<select name="excludedProteins" multiple="multiple" id="excludeProtein"  
+							onchange="if ( window.saveView_dataPages ) { window.saveView_dataPages.searchFormChanged_ForSaveView(); }" >  
 						  
 	  						<logic:iterate id="protein" name="allProteinsForCrosslinksAndLooplinksUnfilteredList">
 	  						  <option value="<c:out value="${ protein.proteinSequenceVersionObject.proteinSequenceVersionId }"></c:out>"><c:out value="${ protein.name }"></c:out></option>
 	  						</logic:iterate>
 	  					</select>
-									
 					</td>
 				</tr>
 				

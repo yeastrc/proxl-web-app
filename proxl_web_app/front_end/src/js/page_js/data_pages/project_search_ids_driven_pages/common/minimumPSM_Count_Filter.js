@@ -130,7 +130,7 @@ var MinimumPSM_Count_Filter = function() {
 			window.defaultPageView.searchFormChanged_ForDefaultPageView(); 
 		}
 		if ( window.saveView_dataPages ) {
-			window.saveView_dataPages.searchFormChanged_ForDefaultPageView(); 
+			window.saveView_dataPages.searchFormChanged_ForSaveView(); 
 		}
 		
 		minPSMs = parseInt( minimum_psm_count_user_input, 10 );

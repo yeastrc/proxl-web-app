@@ -155,12 +155,12 @@ response.addHeader("Cache-control", "max-age=0"); // stale right away
 		}
 		//  QC Page Init
 		try {	  
-			if ( window.qcPageMain ) {
-				qcPageMain.init();
+			if ( window.qcPageMainPageObject ) {
+				qcPageMainPageObject.init();
 			} else {
 				setTimeout(function() {
-					if ( window.qcPageMain ) {
-						qcPageMain.init();
+					if ( window.qcPageMainPageObject ) {
+						qcPageMainPageObject.init();
 					}
 				}, 1000 );
 			}
@@ -170,12 +170,12 @@ response.addHeader("Cache-control", "max-age=0"); // stale right away
 		}	
 		//  QC Merged Page Init
 		try {	  
-			if ( window.qcMergedPageMain ) {
-				qcMergedPageMain.init();
+			if ( window.qcMergedPageMainPageObject ) {
+				qcMergedPageMainPageObject.init();
 			} else {
 				setTimeout(function() {
-					if ( window.qcMergedPageMain ) {
-						qcMergedPageMain.init();
+					if ( window.qcMergedPageMainPageObject ) {
+						qcMergedPageMainPageObject.init();
 					}
 				}, 1000 );
 			}

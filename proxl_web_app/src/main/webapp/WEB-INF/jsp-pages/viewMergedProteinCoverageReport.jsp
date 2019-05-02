@@ -194,7 +194,8 @@
 					<td>
 						<logic:iterate id="taxonomy" name="taxonomies">
 						 <label style="white-space: nowrap" >
-						  <input type="checkbox" name="excludeTaxonomy" value="<bean:write name="taxonomy" property="key"/>" class=" excludeTaxonomy_jq " onchange=" defaultPageView.searchFormChanged_ForDefaultPageView();" >  
+						  <input type="checkbox" name="excludeTaxonomy" value="<bean:write name="taxonomy" property="key"/>" class=" excludeTaxonomy_jq " 
+						  onchange=" if ( window.defaultPageView ) { window.defaultPageView.searchFormChanged_ForDefaultPageView(); } ; if ( window.saveView_dataPages ) { window.saveView_dataPages.searchFormChanged_ForSaveView(); }" >  
 						  
 						   <span style="font-style:italic;"><bean:write name="taxonomy" property="value"/></span>
 						 </label> 						 
@@ -205,19 +206,11 @@
 				<tr>
 					<td>Exclude protein(s):</td>
 					<td>
-						<%--  shortened property from "excludeProtein" to "excP" to shorten the URL  --%>
-						<%-- TODO   TEMP
-						<html:select property="excP" multiple="true" styleId="excludeProtein" onchange=" defaultPageView.searchFormChanged_ForDefaultPageView();" >
-							<html:options collection="proteins" property="proteinSequenceVersionObject.proteinSequenceVersionId" labelProperty="name" />
-						</html:select>
-						--%>
-						
-						
-						<%--  New version:  
-						
+						<%--  
 						All <option> values must be parsable as integers:
 						--%>
-						<select name="excludedProteins" multiple="multiple" id="excludeProtein" onchange=" defaultPageView.searchFormChanged_ForDefaultPageView();" >  
+						<select name="excludedProteins" multiple="multiple" id="excludeProtein"
+							onchange=" if ( window.defaultPageView ) { window.defaultPageView.searchFormChanged_ForDefaultPageView(); } ; if ( window.saveView_dataPages ) { window.saveView_dataPages.searchFormChanged_ForSaveView(); }" >  
 						  
 	  						<logic:iterate id="protein" name="proteins">
 	  						  <option value="<c:out value="${ protein.proteinSequenceVersionObject.proteinSequenceVersionId }"></c:out>"><c:out value="${ protein.name }"></c:out></option>

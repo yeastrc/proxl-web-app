@@ -598,10 +598,10 @@ var CutoffProcessingCommonCode = function() {
 		addToolTips( $associated_cutoffs_display_block );
 		if ( anyValuesChanged && saveUserValuesRequested ) {
 			if ( window.defaultPageView ) {
-				defaultPageView.searchFormChanged_ForDefaultPageView();
+				window.defaultPageView.searchFormChanged_ForDefaultPageView();
 			}
 			if ( window.saveView_dataPages ) {
-				window.saveView_dataPages.searchFormChanged_ForDefaultPageView(); 
+				window.saveView_dataPages.searchFormChanged_ForSaveView(); 
 			}
 		}
 	};	

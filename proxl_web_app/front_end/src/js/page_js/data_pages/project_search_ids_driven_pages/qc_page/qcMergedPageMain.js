@@ -25,6 +25,8 @@ import { searchesForPageChooser } from 'page_js/data_pages/project_search_ids_dr
 import { sharePageURLShortener  } from 'page_js/data_pages/project_search_ids_driven_pages/common/sharePageURLShortener.js';
 
 
+import { DataPages_LoggedInUser_CommonObjectsFactory } from 'page_js/data_pages/data_pages_common/dataPages_LoggedInUser_CommonObjectsFactory.js';
+
 
 import { webserviceDataParamsDistributionCommonCode } from 'page_js/data_pages/project_search_ids_driven_pages/common/webserviceDataParamsDistribution.js';
 import { annotationDataDisplayProcessingCommonCode } from 'page_js/data_pages/project_search_ids_driven_pages/common/psmPeptideAnnDisplayDataCommon.js';
@@ -120,6 +122,13 @@ var QCMergedPageMain = function() {
 		"; stroke-width: 1; fill-color: " + _OVERALL_GLOBALS.BAR_COLOR_PINK + ";";
 
 
+	const dataPages_LoggedInUser_CommonObjectsFactory = new DataPages_LoggedInUser_CommonObjectsFactory();
+
+	const saveView_dataPages = dataPages_LoggedInUser_CommonObjectsFactory.instantiate_SaveView_dataPages();
+
+
+	//   General
+	
 	var _project_search_ids = null;
 	
 	var _searchIdsObject_Key_projectSearchId = null;
@@ -398,6 +407,9 @@ var QCMergedPageMain = function() {
 
 //			qcMergedPageSection_Peptide_Level_Statistics.show_Section();
 
+
+			saveView_dataPages.initialize();
+
 		} catch( e ) {
 			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
 			throw e;
@@ -611,6 +623,8 @@ var QCMergedPageMain = function() {
 
 		this.updatePageFromFiltersToURLHashJSVarsAndPageData();
 		this.populateNavigation();
+		
+		saveView_dataPages.searchFormUpdateButtonPressed_ForSaveView();
 		
 		this.clearAllDisplayedDataAndCharts();
 		this.loadDataForDisplayedDataAndCharts();
@@ -1422,9 +1436,19 @@ var QCMergedPageMain = function() {
 		window.location.href = newWindowHref;
 	};
 
+
+	this.getQueryJSONString = function() {
+//			var queryJSON = getNavigationJSON_Not_for_Image_Or_Structure();
+		var queryJSON = this.getJsonFromHash();
+		var queryJSONString = JSON.stringify( queryJSON );
+		return queryJSONString;
+	};
+
 };
 
-window.qcMergedPageMain = new QCMergedPageMain();
+const qcMergedPageMain = new QCMergedPageMain();
+
+window.qcMergedPageMainPageObject = qcMergedPageMain;
 
 //  Copy to standard page level JS Code Object
 //  Not currently supported  var standardFullPageCode = qcMergedPageMain;

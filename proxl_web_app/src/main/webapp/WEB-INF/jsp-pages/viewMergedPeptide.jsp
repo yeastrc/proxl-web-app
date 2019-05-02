@@ -254,16 +254,19 @@
 
 					  <label >
 						<input type="checkbox" class=" link_type_jq " 
+							onchange="if ( window.saveView_dataPages ) { window.saveView_dataPages.searchFormChanged_ForSaveView(); }" 
 							value="<%= PeptideViewLinkTypesConstants.CROSSLINK_PSM %>"   >
 						crosslinks
 					  </label>
 					  <label >
 						<input type="checkbox" class=" link_type_jq " 
+							onchange="if ( window.saveView_dataPages ) { window.saveView_dataPages.searchFormChanged_ForSaveView(); }" 
 							value="<%= PeptideViewLinkTypesConstants.LOOPLINK_PSM %>" >
 						looplinks
 					  </label> 
 					  <label >
 						<input type="checkbox" class=" link_type_jq " 
+							onchange="if ( window.saveView_dataPages ) { window.saveView_dataPages.searchFormChanged_ForSaveView(); }" 
 							value="<%= PeptideViewLinkTypesConstants.UNLINKED_PSM %>" >
 						 unlinked
 					  </label>
@@ -275,6 +278,7 @@
 					<td colspan="2">
 					  <label >
 						<input type="checkbox" class=" mod_mass_filter_jq " 
+							onchange="if ( window.saveView_dataPages ) { window.saveView_dataPages.searchFormChanged_ForSaveView(); }" 
 							value="" >
 						No modifications
 					  </label>
@@ -283,6 +287,7 @@
 						
 						 <label style="white-space: nowrap" >
 							<input type="checkbox" class=" mod_mass_filter_jq " 
+								onchange="if ( window.saveView_dataPages ) { window.saveView_dataPages.searchFormChanged_ForSaveView(); }" 
 						  		value="<bean:write name="modMassFilter" />" > 
 						   <bean:write name="modMassFilter" />
 						 </label>
@@ -299,7 +304,8 @@
 
 						 <%--  Checkbox for removeIntraProteinLinks --%>
 						   <label><span style="white-space:nowrap;" >
-								<input type="checkbox" id="removeIntraProteinLinks"  onchange="if ( window.defaultPageView ) { window.defaultPageView.searchFormChanged_ForDefaultPageView(); }" > 					
+								<input type="checkbox" id="removeIntraProteinLinks"  
+									onchange="if ( window.defaultPageView ) { window.defaultPageView.searchFormChanged_ForDefaultPageView(); } ; if ( window.saveView_dataPages ) { window.saveView_dataPages.searchFormChanged_ForSaveView(); }" > 					
 							 	 intra-protein links
 							 </span></label>
 					</td>

@@ -1533,8 +1533,8 @@ var loadPublicAccessControlDataResponse = function( params ) {
 			// Uncheck
 			$( "#require_public_access_code_yes_radio_button" ).prop( "checked", false );
 			$("#generate_new_public_access_code_button").hide();
-			//  The URL is simply the current page
-			$("#project_public_access_code_div").text( window.location.href );
+			//  The URL is the current project URL
+			$("#project_public_access_code_div").html( "See '<b>Current Project URL</b>'" );
 		} else if ( publicAccessCodeEnabled && publicAccessCode ) {
 			// Check
 			$( "#require_public_access_code_yes_radio_button" ).prop( "checked", true );

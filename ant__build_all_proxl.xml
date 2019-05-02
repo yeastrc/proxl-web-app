@@ -42,7 +42,6 @@
 	<property file="${config_file_with_path}" />
 	
 	<echo>Properties after read config file:</echo>
-	<echo>gradle.wrapper.executable: ${gradle.wrapper.executable}</echo>
 	<echo>npm.executable: ${npm.executable}</echo>
 	
 

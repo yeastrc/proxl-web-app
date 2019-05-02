@@ -40,10 +40,12 @@ public class ViewProjectAction extends Action {
 	
 	private static final Logger log = LoggerFactory.getLogger( ViewProjectAction.class);
 	
-	//  For use in projectNotFound.jsp
+	//  Struts Config forward to projectNotFound.jsp
 	public final static String PROJECT_NOT_FOUND = "ProjectNotFound";
 		
+	//  For use in projectNotFound.jsp
 	private static final String REQUEST_PROJECT_ID_FROM_VIEW_PROJECT_ACTION = "projectId_FromViewProjectAction";
+	//  For use in projectNotFound.jsp
 	private static final String REQUEST_ADMIN_EMAIL_ADDRESS = "adminEmailAddress";
 	
 	@Override
@@ -77,14 +79,22 @@ public class ViewProjectAction extends Action {
 					return mapping.findForward( PROJECT_NOT_FOUND );
 				}
 			}
-			//  Confirm projectId is in database
-			Integer authShareableObjectId =	ProjectDAO.getInstance().getAuthShareableObjectIdForProjectId( projectId );
-			if ( authShareableObjectId == null ) {
-				// should never happen
-				String msg = "Project id is not in database: " + projectId;
-				log.warn( msg );
-				this.getDataForProjectNotFoundPage(request);
-				return mapping.findForward( PROJECT_NOT_FOUND );
+			{
+				//  Confirm projectId is in database and is not marked for deletion and is enabled
+				// !!!  Only populates properties projectLocked, publicAccessLevel, public_access_locked, enabled, markedForDeletion,
+				ProjectDTO projectDTO_Partial =	ProjectDAO.getInstance().getProjectLockedPublicAccessLevelPublicAccessLockedForProjectId( projectId );
+				if ( projectDTO_Partial == null ) {
+					String msg = "Project id is not in database: " + projectId;
+					log.warn( msg );
+					this.getDataForProjectNotFoundPage(request);
+					return mapping.findForward( PROJECT_NOT_FOUND );
+				}
+				if ( ( ! projectDTO_Partial.isEnabled() ) || projectDTO_Partial.isMarkedForDeletion() ) {
+					String msg = "Project is not enabled or is marked for deletion for id: " + projectId;
+					log.warn( msg );
+					this.getDataForProjectNotFoundPage(request);
+					return mapping.findForward( PROJECT_NOT_FOUND );
+				}
 			}
 			GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result accessAndSetupWebSessionResult =
 					GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.getSinglesonInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request, response );

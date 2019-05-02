@@ -10,11 +10,13 @@
 
 <!-- In Page fragment -->
  <label><span style="white-space:nowrap;" >
-	<input type="checkbox" id="filterNonUniquePeptides" onchange=" if ( window.defaultPageView ) { window.defaultPageView.searchFormChanged_ForDefaultPageView(); }" > 					
+	<input type="checkbox" id="filterNonUniquePeptides" 
+	onchange=" if ( window.defaultPageView ) { window.defaultPageView.searchFormChanged_ForDefaultPageView(); }; if ( window.saveView_dataPages ) { window.saveView_dataPages.searchFormChanged_ForSaveView(); }" > 					
  	 no unique peptides
  </span></label>
  <label><span style="white-space:nowrap;" >
-	<input type="checkbox" id="filterOnlyOnePeptide"  onchange=" if ( window.defaultPageView ) { window.defaultPageView.searchFormChanged_ForDefaultPageView(); }" > 					
+	<input type="checkbox" id="filterOnlyOnePeptide"  
+	onchange=" if ( window.defaultPageView ) { window.defaultPageView.searchFormChanged_ForDefaultPageView(); }; if ( window.saveView_dataPages ) { window.saveView_dataPages.searchFormChanged_ForSaveView(); }" > 					
  	 only one peptide
  </span></label>
  <%--  Checkbox for removeNonUniquePSMs --%>

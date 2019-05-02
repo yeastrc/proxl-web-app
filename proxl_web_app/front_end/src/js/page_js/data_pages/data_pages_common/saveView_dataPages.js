@@ -137,14 +137,14 @@ export class SaveView_dataPages {
 
 
 	//  Called from "onchange" and from CutoffProcessingCommonCode code when cutoffs change
-	searchFormChanged_ForDefaultPageView() {
+	searchFormChanged_ForSaveView() {
 		$("#savePageViewButton").prop("disabled",true);
 		$("#savePageViewButtonDisabledOverlay").show();
 	};
 	
 	//  Called from Image and Structure when the Update button has been pressed
-	searchFormUpdateButtonPressed_ForDefaultPageView() {
-		console.log( "searchFormUpdateButtonPressed_ForDefaultPageView()" );
+	searchFormUpdateButtonPressed_ForSaveView() {
+		// console.log( "searchFormUpdateButtonPressed_ForSaveView()" );
 		$("#savePageViewButton").prop("disabled",false);
 		$("#savePageViewButtonDisabledOverlay").hide();
 	};

@@ -172,17 +172,19 @@
 
 					  <label >
 						<input type="checkbox" class=" link_type_jq " id="link_type_crosslink_selector"
-							 <%-- checked="checked" TODO TEMP --%>
+							onchange="if ( window.saveView_dataPages ) { window.saveView_dataPages.searchFormChanged_ForSaveView(); }" 
 							value="<%= PeptideViewLinkTypesConstants.CROSSLINK_PSM %>"   >
 						crosslinks
 					  </label>
 					  <label >
 						<input type="checkbox" class=" link_type_jq " 
+							onchange="if ( window.saveView_dataPages ) { window.saveView_dataPages.searchFormChanged_ForSaveView(); }" 
 							value="<%= PeptideViewLinkTypesConstants.LOOPLINK_PSM %>" >
 						looplinks
 					  </label> 
 					  <label >
 						<input type="checkbox" class=" link_type_jq " 
+							onchange="if ( window.saveView_dataPages ) { window.saveView_dataPages.searchFormChanged_ForSaveView(); }" 
 							value="<%= PeptideViewLinkTypesConstants.UNLINKED_PSM %>" >
 						 unlinked
 					  </label>
@@ -200,6 +202,7 @@
 					<td colspan="2">
 					  <label >
 						<input type="checkbox" class=" mod_mass_filter_jq " 
+							onchange="if ( window.saveView_dataPages ) { window.saveView_dataPages.searchFormChanged_ForSaveView(); }" 
 							value="" >
 						No modifications
 					  </label>
@@ -208,6 +211,7 @@
 						
 						 <label style="white-space: nowrap" >
 							<input type="checkbox" class=" mod_mass_filter_jq " 
+								onchange="if ( window.saveView_dataPages ) { window.saveView_dataPages.searchFormChanged_ForSaveView(); }" 
 						  		value="<bean:write name="modMassFilter" />" > 
 						   <bean:write name="modMassFilter" />
 						 </label>
@@ -219,7 +223,8 @@
 					<td valign="top" style="white-space: nowrap;">Only Include:</td>
 					<td colspan="2">
 				
-						<select name="includedProteins" multiple="multiple" id="includeProtein" >  
+						<select name="includedProteins" multiple="multiple" id="includeProtein"
+							onchange="if ( window.saveView_dataPages ) { window.saveView_dataPages.searchFormChanged_ForSaveView(); }"  >  
 						  	<c:forEach var="protein" items="${ proteinIdsAndNames  }">
 	  						  <option value="<c:out value="${ protein.proteinSequenceVersionId }"></c:out>"><c:out value="${ protein.annotationName }"></c:out></option>
 						  	</c:forEach>
@@ -235,6 +240,10 @@
 						
 						<input id="update_from_database_button"
 							type="button" value="${ UpdateButtonText }" > 
+
+						<c:set var="page_JS_Object" value="qcMergedPageMainPageObject"/>
+							
+						<%@ include file="/WEB-INF/jsp-includes/savePageViewButtonFragment.jsp" %>
 
 						<%@ include file="/WEB-INF/jsp-includes/sharePageURLShortenerButtonFragment.jsp" %>
 					</td>
