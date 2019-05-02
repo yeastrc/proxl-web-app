@@ -20,12 +20,12 @@
 			<!-- Handlebars templating library   -->
 			
 			<%--  
-			<script type="text/javascript" src="js/libs/handlebars-v2.0.0.js"></script>
+			<script type="text/javascript" src="js/libs/handlebars-v4.1.2.js"></script>
 			--%>
 			
 			<!-- use minimized version  -->
 <%-- 			
-			<script type="text/javascript" src="js/libs/handlebars-v2.0.0.min.js"></script>
+			<script type="text/javascript" src="js/libs/handlebars.min-v4.1.2.js"></script>
 --%>
 			
 	<script type="text/javascript" src="static/js_generated_bundles/proxl_config_page/configureProxlForAdminPage-bundle.js?x=${ cacheBustValue }"></script>
