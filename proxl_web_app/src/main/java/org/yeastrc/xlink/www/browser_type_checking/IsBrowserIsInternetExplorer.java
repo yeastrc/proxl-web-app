@@ -85,7 +85,7 @@ public class IsBrowserIsInternetExplorer {
 			return false;
 
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
+			log.error( "Error determining if Browser is Internet Explorer", e );
 			throw e;
 		}
 	}
