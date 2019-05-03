@@ -32,53 +32,56 @@ public class IsBrowserIsInternetExplorer {
 			HttpServletRequest httpRequest = (HttpServletRequest) request;
 
 			String userAgentString = httpRequest.getHeader("User-Agent");
+			
+			if ( userAgentString != null ) {
 
-			//  Works up to IE 10
-			boolean isIE = userAgentString.contains("MSIE");
+				//  Works up to IE 10
+				boolean isIE = userAgentString.contains("MSIE");
 
-			//For IE 11
-			boolean isIE11 = userAgentString.contains("rv:11.0");
+				//For IE 11
+				boolean isIE11 = userAgentString.contains("rv:11.0");
 
 
-			if ( isIE || isIE11 ) {
+				if ( isIE || isIE11 ) {
 
-				try {
-					String requestURL = httpRequest.getRequestURL().toString();
+					try {
+						String requestURL = httpRequest.getRequestURL().toString();
 
-					if ( requestURL.contains(".do") ) {
+						if ( requestURL.contains(".do") ) {
 
-						//  If a struts action, log the access
-						
-						if ( log.isDebugEnabled() ) {
+							//  If a struts action, log the access
 
-							String userSessionUsername = "";
+							if ( log.isDebugEnabled() ) {
 
-							String username = null;
+								String userSessionUsername = "";
 
-							try {
-								username = getUsername( httpRequest );
-							} catch ( Exception e ) {
-								log.error( "Error getting username" );
+								String username = null;
+
+								try {
+									username = getUsername( httpRequest );
+								} catch ( Exception e ) {
+									log.error( "Error getting username" );
+								}
+
+								if ( username != null ) {
+									userSessionUsername = "\t, session username: \t" + username;
+								}
+
+								log.debug( "Browser is Internet Explorer.  "
+										+ "UserAgent: \t" + userAgentString
+										+ "\t, requested URL: \t" + requestURL
+										+ "\t, remote IP: \t" + request.getRemoteAddr()
+										+ userSessionUsername );
 							}
-
-							if ( username != null ) {
-								userSessionUsername = "\t, session username: \t" + username;
-							}
-
-							log.debug( "Browser is Internet Explorer.  "
-									+ "UserAgent: \t" + userAgentString
-									+ "\t, requested URL: \t" + requestURL
-									+ "\t, remote IP: \t" + request.getRemoteAddr()
-									+ userSessionUsername );
 						}
+					} catch ( Throwable e ) {
+						log.error( "Error getting username. Exception ignored. ", e );
+						//  Swallow any exceptions getting username
 					}
-				} catch ( Exception e ) {
-					log.error( "Error getting username" );
+
+					return true;
 				}
-
-				return true;
 			}
-
 			return false;
 
 		} catch (Exception e) {
