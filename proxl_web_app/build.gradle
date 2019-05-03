@@ -92,12 +92,8 @@ dependencies {
 	// https://mvnrepository.com/artifact/com.google.guava/guava
 //	compile group: 'com.google.guava', name: 'guava', version: '24.0-jre'
 	
-	
-	//  compile('javax.servlet:jstl')
-	
-	//  moved
-	// https://mvnrepository.com/artifact/javax.servlet.jsp.jstl/javax.servlet.jsp.jstl-api
-	compile group: 'javax.servlet.jsp.jstl', name: 'javax.servlet.jsp.jstl-api', version: '1.2.2'
+	// https://mvnrepository.com/artifact/javax.servlet/jstl
+	compile group: 'javax.servlet', name: 'jstl', version: '1.2'
 	
 	
 	
@@ -139,10 +135,8 @@ dependencies {
 
 	//  
 	// https://mvnrepository.com/artifact/javax.servlet/servlet-api
-	providedCompile group: 'javax.servlet', name: 'servlet-api', version: '2.5'
-	
 	//  Most current servlet spec:
-	// providedCompile group: 'javax.servlet', name: 'javax.servlet-api', version: '3.1.0'
+	providedCompile group: 'javax.servlet', name: 'javax.servlet-api', version: '3.1.0'
 	
 	// https://mvnrepository.com/artifact/javax.servlet.jsp/javax.servlet.jsp-api
 	providedCompile group: 'javax.servlet.jsp', name: 'javax.servlet.jsp-api', version: '2.3.3'
