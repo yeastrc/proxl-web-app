@@ -54,7 +54,8 @@ import {StructureWebserviceMethods} from "./structure-webservice-methods.js";
 import {StructureUtils} from "./stucture-utils.js";
 import {StructureAlignmentUtils} from "./structure-alignment-utils.js";
 import {DensityPlot} from "./density-plot.js";
-import {SVGDownloadUtils} from "../common/svgDownloadUtils.js";
+import {LinkablePositionDataManager} from "./linkable-position-data-manager";
+import {PValueUtils} from "./p-value-utils";
 
 /////////////////////////////
 
@@ -408,6 +409,9 @@ var StructurePagePrimaryRootCodeClass = function() {
 
 	// object to handle link exclusions
 	var _linkExclusionHandler = new LinkExclusionHandler();
+
+	// object to handle link exclusions
+	var _linkablePositionDataManager = new LinkablePositionDataManager();
 
 	// object to handle chain colors
 	var _backboneColorManager = new BackboneColorManager();
@@ -3701,6 +3705,9 @@ var StructurePagePrimaryRootCodeClass = function() {
 		html += "<span id=\"total-links-meeting-cutoff-val\">0</span> / <span id=\"total-links-val\">0</span></div>\n";
 		html += "<div id=\"distance-cutoff-report-text\"></div>\n";
 
+		html += "<div style=\"font-size:14pt;margin-top:15px;\">P-value: <span style=\"font-size:12pt;\" id=\"p-value-display\"></span></div>";
+		html += "<div style=\"font-size:8pt;\" id=\"p-value-legend\"></div>";
+
 		html += "<div style=\"font-size:14pt;margin-top:15px;\">Distance Density Plot:</div>";
 		html += "<div id=\"svg-download\"></div>";
 
@@ -3732,21 +3739,91 @@ var StructurePagePrimaryRootCodeClass = function() {
 		
 		$distanceReportDiv.html( html );
 		
-		$( '#distance-cutoff-report-field' ).on('input',function(e){ updateURLHash( false ); updateDistanceCutoffReport(); });
+		$( '#distance-cutoff-report-field' ).on('input',function(e){
+			updateURLHash( false );
+			updateDistanceCutoffReport();
+			updatePValue();
+		});
 
 		updateDistanceCutoffReport();
 		updateShownLinks();
+		updateDensityPlotAndPValue();
 
-		DensityPlot.loadAndShowDensityPlot({
-			divToUpdateSelector : "#distance-density-plot",
-			projectSearchIds : _projectSearchIds,
-			visibleProteinsMap : getVisibleProteins(),
-			onlyShortest : true,
-			alignments : _ALIGNMENTS,
-			structure : _STRUCTURE,
-			renderedLinks : _renderedLinks
+	};
+
+	const updateDensityPlotAndPValue = function() {
+
+		const densityPlotSelector = "#distance-density-plot";
+
+		const onlyShortest = getShowUniqueUDRs();
+
+		$(densityPlotSelector).empty();
+
+		const visibleProteins = getVisibleProteins();
+		const visibleProteinsList = Object.keys( visibleProteins );
+		if( !visibleProteinsList || !visibleProteinsList.length ) { return; }
+
+		const selectedPDBFile = getSelectedPDBFile();
+
+		const linkablePositionDataPromise = _linkablePositionDataManager.getLinkablePositionData( {
+			visibleProteinList: visibleProteinsList,
+			pdbFileName: selectedPDBFile.filename,
+			projectSearchIds: _projectSearchIds
 		});
 
+		linkablePositionDataPromise.then( (data) => {
+
+			// update the density plot
+			DensityPlot.loadAndShowDensityPlot({
+				linkablePositionData : data,
+				divToUpdateSelector : densityPlotSelector,
+				visibleProteinsMap : visibleProteins,
+				onlyShortest : onlyShortest,
+				alignments : _ALIGNMENTS,
+				structure : _STRUCTURE,
+				renderedLinks : _renderedLinks
+			});
+
+			PValueUtils.updatePValueDisplay({
+				linkablePositionData : data,
+				visibleProteinsMap : visibleProteins,
+				onlyShortest : onlyShortest,
+				alignments : _ALIGNMENTS,
+				structure : _STRUCTURE,
+				renderedLinks : _renderedLinks
+			});
+
+		});
+	};
+
+	const updatePValue = function() {
+
+		const onlyShortest = getShowUniqueUDRs();
+
+		const visibleProteins = getVisibleProteins();
+		const visibleProteinsList = Object.keys( visibleProteins );
+		if( !visibleProteinsList || !visibleProteinsList.length ) { return; }
+
+		const selectedPDBFile = getSelectedPDBFile();
+
+		const linkablePositionDataPromise = _linkablePositionDataManager.getLinkablePositionData( {
+			visibleProteinList: visibleProteinsList,
+			pdbFileName: selectedPDBFile.filename,
+			projectSearchIds: _projectSearchIds
+		});
+
+		linkablePositionDataPromise.then( (data) => {
+
+			PValueUtils.updatePValueDisplay({
+				linkablePositionData : data,
+				visibleProteinsMap : visibleProteins,
+				onlyShortest : onlyShortest,
+				alignments : _ALIGNMENTS,
+				structure : _STRUCTURE,
+				renderedLinks : _renderedLinks
+			});
+
+		});
 	};
 
 	var updateShownLinks = function () {

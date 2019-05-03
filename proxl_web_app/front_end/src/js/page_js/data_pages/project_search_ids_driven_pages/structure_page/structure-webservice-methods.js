@@ -33,7 +33,7 @@ export class StructureWebserviceMethods {
                 failure: function (errMsg) {
                     if( endCallout ) { endCallout(); }
                     handleAJAXFailure(errMsg);
-                    reject();
+                    reject(errMsg);
                 },
                 error: function (jqXHR, textStatus, errorThrown) {
                     if( endCallout ) { endCallout(); }

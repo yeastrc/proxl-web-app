@@ -1,41 +1,28 @@
 
 "use strict";
 
-import {StructureWebserviceMethods} from "./structure-webservice-methods.js";
-import {StructureAlignmentUtils} from "./structure-alignment-utils.js";
-import {StructureUtils} from "./stucture-utils.js";
 import * as d3 from "d3";
 import {SVGDownloadUtils} from "../common/svgDownloadUtils.js";
+import {LinkablePositionUtils} from "./linkable-positions-utils";
 
 export class DensityPlot {
 
-    static loadAndShowDensityPlot( { divToUpdateSelector, projectSearchIds, visibleProteinsMap, onlyShortest, alignments, structure, renderedLinks} ) {
+    static loadAndShowDensityPlot( { linkablePositionData, divToUpdateSelector, visibleProteinsMap, onlyShortest, alignments, structure, renderedLinks} ) {
 
         if( !visibleProteinsMap ) { return; }
 
-        const visibleProteinsList = Object.keys( visibleProteinsMap );
-        if( !visibleProteinsList || !visibleProteinsList.length ) { return; }
+        const renderedDistanceArray = LinkablePositionUtils.getRenderedDistanceArray( renderedLinks );
 
-        let dataLoadPromise =  StructureWebserviceMethods.doLinkablePositionsLookup({
-            proteins :  visibleProteinsList,
-            projectSearchIds : projectSearchIds,
+        const pdbDistanceArray = LinkablePositionUtils.getDistanceArrayFromLinkablePositions({
+            data : linkablePositionData,
+            visibleProteinsMap,
+            onlyShortest,
+            alignments,
+            structure
         });
 
-        dataLoadPromise.then( ( data ) => {
+        DensityPlot.staticShowDensityPlot( { divToUpdateSelector, pdbDistanceArray, renderedDistanceArray } );
 
-            const renderedDistanceArray = DensityPlot.getRenderedDistanceArray( renderedLinks );
-
-            const pdbDistanceArray = DensityPlot.processData({
-                data,
-                visibleProteinsMap,
-                onlyShortest,
-                alignments,
-                structure
-            });
-
-            DensityPlot.staticShowDensityPlot( { divToUpdateSelector, pdbDistanceArray, renderedDistanceArray } );
-
-        });
     }
 
 
@@ -188,73 +175,6 @@ export class DensityPlot {
 
     }
 
-    static processData( { data, visibleProteinsMap, onlyShortest, alignments, structure } ) {
-
-        const pdbDistanceArray = [ ];
-
-        for( let i = 0; i < data.length; i++ ) {
-
-            const protein1 =  parseInt(data[ i ][ 'protein1' ]);
-            const protein2 =  parseInt(data[ i ][ 'protein2' ]);
-
-            const position1 = parseInt(data[ i ][ 'position1' ]);
-            const position2 = parseInt(data[ i ][ 'position2' ]);
-
-            const chains1 = visibleProteinsMap[ protein1 ];
-            const chains2 = visibleProteinsMap[ protein2 ];
-
-            let shortestDistance = -1;
-
-            if( !chains1 || chains1 == undefined || chains1.length < 1 ) {
-                console.log( "ERROR: Got no chains for protein: " + protein1 );
-                return;
-            }
-
-            if( !chains2 || chains2 == undefined || chains2.length < 1 ) {
-                console.log( "ERROR: Got no chains for protein: " + protein2 );
-                return;
-            }
-
-            for( let j = 0; j < chains1.length; j++ ) {
-                const chain1 = chains1[ j ];
-
-                const coordsArray1 = StructureAlignmentUtils.findCACoords( protein1, position1, [ chain1 ], alignments, structure );
-                if( coordsArray1 == undefined || coordsArray1.length < 1 ) { continue; }
-
-                for( let k = 0; k < chains2.length; k++ ) {
-                    const chain2 = chains2[ k ];
-
-                    if( chain1 == chain2 && protein1 == protein2 && position1 == position2 ) { continue; }
-
-                    const coordsArray2 = StructureAlignmentUtils.findCACoords( protein2, position2, [ chain2 ], alignments, structure );
-                    if( coordsArray1 == undefined || coordsArray2.length < 1 ) { continue; }
-
-                    const distance = StructureUtils.calculateDistance( coordsArray1[ 0 ], coordsArray2[ 0 ] );
-
-                    if( !onlyShortest ) {
-
-                        pdbDistanceArray.push( distance );
-
-                    } else {
-
-                        if( shortestDistance === -1 || shortestDistance > distance ) {
-                            shortestDistance = distance;
-                        }
-
-                    }
-                }
-            }
-
-            if( onlyShortest ) {
-                if( shortestDistance != -1 ) {
-                    pdbDistanceArray.push(shortestDistance);
-                }
-            }
-        }
-
-        return pdbDistanceArray;
-    }
-
     static getMaximumHeight( pdbDensity, renderedDensity ) {
 
         let maxPdbHeight = DensityPlot.getMaximumHeightForDensity( pdbDensity );
@@ -322,25 +242,6 @@ export class DensityPlot {
         }
 
         return maxPdbDistance > maxRenderedDistance ? maxPdbDistance : maxRenderedDistance;
-    }
-
-    static getRenderedDistanceArray( renderedLinks ) {
-
-        let distanceArray = [ ];
-
-        if( renderedLinks.crosslinks ) {
-            for (let i = 0; i < renderedLinks['crosslinks'].length; i++) {
-                distanceArray.push(parseFloat(renderedLinks['crosslinks'][i]['link']['length']));
-            }
-        }
-
-        if( renderedLinks.looplinks ) {
-            for (let i = 0; i < renderedLinks['looplinks'].length; i++) {
-                distanceArray.push(parseFloat(renderedLinks['looplinks'][i]['link']['length']));
-            }
-        }
-
-        return distanceArray;
     }
 
 
