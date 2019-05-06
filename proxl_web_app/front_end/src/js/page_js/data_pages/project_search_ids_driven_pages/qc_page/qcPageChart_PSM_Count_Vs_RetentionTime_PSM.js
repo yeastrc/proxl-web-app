@@ -192,10 +192,24 @@ var QCPageChart_PSM_Count_Vs_RetentionTime_PSM = function() {
 
 			//  Get Help tooltip HTML - Overlay Interactive Chart
 			var $psm_level_block_help_tooltip_psm_counts_vs_retention_time_overlay_interactive = $("#psm_level_block_help_tooltip_psm_counts_vs_retention_time_overlay_interactive");
-			if ( $psm_level_block_help_tooltip_psm_counts_vs_retention_time_overlay_interactive.length === 0 ) {
-				throw Error( "No element found with id 'psm_level_block_help_tooltip_psm_counts_vs_retention_time_overlay_interactive' " );
+			if ( $psm_level_block_help_tooltip_psm_counts_vs_retention_time_overlay_interactive.length !== 0 ) {
+				_help_InteractiveChart_TooltipHTML = $psm_level_block_help_tooltip_psm_counts_vs_retention_time_overlay_interactive.html();
+			} else {
+				//  Try again after a timeout of 3 seconds
+				window.setTimeout( ()=> {
+					try {
+						//  Get Help tooltip HTML - Overlay Interactive Chart
+						var $psm_level_block_help_tooltip_psm_counts_vs_retention_time_overlay_interactive_Local = $("#psm_level_block_help_tooltip_psm_counts_vs_retention_time_overlay_interactive");
+						if ( $psm_level_block_help_tooltip_psm_counts_vs_retention_time_overlay_interactive_Local.length === 0 ) {
+							throw Error( "No element found with id 'psm_level_block_help_tooltip_psm_counts_vs_retention_time_overlay_interactive' " );
+						}
+						_help_InteractiveChart_TooltipHTML = $psm_level_block_help_tooltip_psm_counts_vs_retention_time_overlay_interactive_Local.html();
+					} catch( e ) {
+						reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+						throw e;
+					}
+				}, 3000 );
 			}
-			_help_InteractiveChart_TooltipHTML = $psm_level_block_help_tooltip_psm_counts_vs_retention_time_overlay_interactive.html();
 
 			this.addClickAndOnChangeHandlers();
 
