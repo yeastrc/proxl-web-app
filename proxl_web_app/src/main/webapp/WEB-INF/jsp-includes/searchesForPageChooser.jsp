@@ -110,7 +110,18 @@
 			if ( window.$ ) {
 				$(document).ready(function()  { 
 					try {
-						window.searchesForPageChooser.init();
+						if ( window.searchesForPageChooser ) {
+							window.searchesForPageChooser.init();
+						} else {
+							window.setTimeout( function() {
+								try {
+									window.searchesForPageChooser.init();
+								} catch( e ) {
+									reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+									throw e;
+								}
+							}, 5000 ); // delay for 5 seconds
+						}
 					} catch( e ) {
 						reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
 						throw e;
