@@ -1,27 +1,22 @@
 package org.yeastrc.proxl.import_xml_to_db_submit_pgm.server_communication;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
-import java.net.URLEncoder;
-import java.util.Arrays;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
+import java.nio.charset.StandardCharsets;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.mime.FormBodyPart;
-import org.apache.http.entity.mime.FormBodyPartBuilder;
-import org.apache.http.entity.mime.HttpMultipartMode;
-import org.apache.http.entity.mime.MultipartEntityBuilder;
-import org.apache.http.entity.mime.content.FileBody;
-import org.apache.http.entity.mime.content.StringBody;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
-import org.yeastrc.proxl.import_xml_to_db_submit_pgm.constants.JSONStringCharsetConstants;
 import org.yeastrc.proxl.import_xml_to_db_submit_pgm.constants.SendToServerConstants;
-import org.yeastrc.proxl.import_xml_to_db_submit_pgm.exceptions.ProxlSubImportServerReponseException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -52,6 +47,8 @@ public class UploadFilePost {
 	 */
 	public UploadFileResult uploadFilePost(
 			
+			String jsessionIdCookieResponse,
+			
 			File uploadFile,
 			int fileIndex,
 			int fileType,
@@ -62,162 +59,159 @@ public class UploadFilePost {
 		
 		String filename = uploadFile.getName();
 		
+		long numberOfBytesToSend = uploadFile.length();
+		
 		String uploadFileWPathCanonical = uploadFile.getCanonicalPath();
 		String uploadFileWPathAbsolute = uploadFile.getAbsolutePath();
 		
-		String filenameURIEncoded = URLEncoder.encode( filename, SendToServerConstants.ENCODING_CHARACTER_SET );
-		
-		String url = baseURL + SUB_URL
-				+ SendToServerConstants.UPLOAD_FILE_QUERY_PARAMETER_UPLOAD_KEY + "=" +  uploadKey
-				+ "&" + SendToServerConstants.UPLOAD_FILE_QUERY_PARAMETER_PROJECT_ID + "=" + projectIdString
-				+ "&" + SendToServerConstants.UPLOAD_FILE_QUERY_PARAMETER_FILE_INDEX + "=" + fileIndex
-				+ "&" + SendToServerConstants.UPLOAD_FILE_QUERY_PARAMETER_FILE_TYPE + "=" + fileType
-				+ "&" + SendToServerConstants.UPLOAD_FILE_QUERY_PARAMETER_FILENAME + "=" + filenameURIEncoded;
+		String url = baseURL + SUB_URL;
 
-		HttpPost post = null;
-		HttpResponse response = null;
 
-		InputStream responseInputStream = null;
+		//   Create object for connecting to server
+		URL urlObject;
+		try {
+			urlObject = new URL( url );
+		} catch (MalformedURLException e) {
+			throw e;
+		}
+		//   Open connection to server
+		URLConnection urlConnection;
+		try {
+			urlConnection = urlObject.openConnection();
+		} catch (IOException e) {
+			throw e;
+		}
+		// Downcast URLConnection to HttpURLConnection to allow setting of HTTP parameters 
+		if ( ! ( urlConnection instanceof HttpURLConnection ) ) {
+			throw new RuntimeException( "if ( ! ( urlConnection instanceof HttpURLConnection ) ) {" );
+		}
+		HttpURLConnection httpURLConnection = null;
+		try {
+			httpURLConnection = (HttpURLConnection) urlConnection;
+		} catch (Exception e) {
+			throw e;
+		}
+		//  Set HttpURLConnection properties
+
+		//   Set Number of bytes to send, can be int or long
+		//     ( Calling setFixedLengthStreamingMode(...) allows > 2GB to be sent 
+		//       and HttpURLConnection does NOT buffer the sent bytes using ByteArrayOutputStream )
+		httpURLConnection.setFixedLengthStreamingMode( numberOfBytesToSend );
 		
+		httpURLConnection.setRequestProperty( 
+				SendToServerConstants.UPLOAD_FILE_HEADER_NAME_UPLOADED_FILENAME_W_PATH_CANONICAL, uploadFileWPathCanonical );
+		httpURLConnection.setRequestProperty( 
+				SendToServerConstants.UPLOAD_FILE_HEADER_NAME_UPLOADED_FILENAME_W_PATH_ABSOLUTE, uploadFileWPathAbsolute );
+
+		httpURLConnection.setRequestProperty( 
+				SendToServerConstants.UPLOAD_FILE_HEADER_NAME_UPLOAD_KEY , String.valueOf( uploadKey ) );
+		httpURLConnection.setRequestProperty( 
+				SendToServerConstants.UPLOAD_FILE_HEADER_NAME_PROJECT_ID , String.valueOf( projectIdString ) );
+		httpURLConnection.setRequestProperty( 
+				SendToServerConstants.UPLOAD_FILE_HEADER_NAME_FILE_INDEX , String.valueOf( fileIndex ) );
+		httpURLConnection.setRequestProperty( 
+				SendToServerConstants.UPLOAD_FILE_HEADER_NAME_FILE_TYPE , String.valueOf( fileType ) );
+		httpURLConnection.setRequestProperty( 
+				SendToServerConstants.UPLOAD_FILE_HEADER_NAME_FILENAME , String.valueOf( filename ) );
+
+
 		
+		httpURLConnection.setRequestProperty( "Cookie", jsessionIdCookieResponse );
+		
+		httpURLConnection.setDoOutput(true);
+		// Send post request to server
+		try {  //  Overall try/catch block to put "httpURLConnection.disconnect();" in the finally block
+
+			httpURLConnection.connect();
+		} finally {
+			
+		}
+		//  Send bytes to server
+		OutputStream outputStream = null;
+		FileInputStream fileInputStream = null; // for when send file
+		try {
+			outputStream = httpURLConnection.getOutputStream();
+				//  Send file contents to server
+				fileInputStream = new FileInputStream( uploadFile );
+				int byteArraySize = 5000;
+				byte[] data = new byte[ byteArraySize ];
+				while (true) {
+					int bytesRead = fileInputStream.read( data );
+					if ( bytesRead == -1 ) {  // end of input
+						break;
+					}
+					if ( bytesRead > 0 ) {
+						outputStream.write( data, 0, bytesRead );
+					}
+				}
+			
+		} catch ( IOException e ) {
+			throw e;
+		} finally {
+			outputStream.close();
+			fileInputStream.close();
+		}
+
+		int httpResponseCode = httpURLConnection.getResponseCode();
+
+		//  Throws ProxlSubImportServerReponseException if  httpStatusCode != HttpStatus.SC_OK (200)
+		A_ProcessHTTP_StatusCode.getInstance().processHTTP_StatusCode( httpResponseCode, url );
+		
+		//  Get response XML from server
+		ByteArrayOutputStream outputStreamBufferOfServerResponse = new ByteArrayOutputStream( 1000000 );
+		InputStream inputStream = null;
+		try {
+			inputStream = httpURLConnection.getInputStream();
+			int nRead;
+			byte[] data = new byte[ 16384 ];
+			while ((nRead = inputStream.read(data, 0, data.length)) != -1) {
+				outputStreamBufferOfServerResponse.write(data, 0, nRead);
+			}
+		} catch ( IOException e ) {
+			throw e;
+		} finally {
+			if ( inputStream != null ) {
+				try {
+					inputStream.close();
+				} catch ( IOException e ) {
+					throw e;
+				}
+			}
+		}
+		byte[] serverResponseByteArray = outputStreamBufferOfServerResponse.toByteArray();
+
+		String responseAsString = new String( serverResponseByteArray, StandardCharsets.UTF_8 );
+		
+		if ( log.isDebugEnabled() ) {
+			
+			System.out.println( "UploadInitPost response: " );
+			System.out.println( responseAsString );
+		}
+
+		ObjectMapper jacksonJSON_Mapper = new ObjectMapper();  //  Jackson JSON library object
+
 		JSON_Servlet_Response_Object uploadFileResponse = null;
 		
-		try {
+		uploadFileResponse = jacksonJSON_Mapper.readValue( serverResponseByteArray, JSON_Servlet_Response_Object.class );
+		
+		if ( ! uploadFileResponse.statusSuccess ) {
+			
+			String msg = "Send File status response not true";
+			System.err.println( msg );
 
-			post = new HttpPost( url );
-			
-			//
-			
-			FileBody fileBody = new FileBody( uploadFile, ContentType.DEFAULT_BINARY );
-
-			FormBodyPartBuilder formBodyPartBuilderForFile = 
-					FormBodyPartBuilder.create( SendToServerConstants.UPLOAD_FILE_FORM_NAME, fileBody );
-			FormBodyPart formBodyPartForFile = formBodyPartBuilderForFile.build(); 
-
-			//
-			
-			StringBody stringBodyFileWPathCanonical = 
-					new StringBody( uploadFileWPathCanonical, ContentType.APPLICATION_FORM_URLENCODED );
-			
-			FormBodyPartBuilder formBodyPartBuilderForFileWPathCanonical = 
-					FormBodyPartBuilder.
-					create( SendToServerConstants.UPLOAD_FILE_FORM_NAME_UPLOADED_FILENAME_W_PATH_CANONICAL, stringBodyFileWPathCanonical );
-			FormBodyPart formBodyPartForFileWPathCanonical = formBodyPartBuilderForFileWPathCanonical.build(); 
-			
-			//
-
-			StringBody stringBodyFileWPathAbsolute = 
-					new StringBody( uploadFileWPathAbsolute, ContentType.APPLICATION_FORM_URLENCODED );
-			
-			FormBodyPartBuilder formBodyPartBuilderForFileWPathAbsolute = 
-					FormBodyPartBuilder.
-					create( SendToServerConstants.UPLOAD_FILE_FORM_NAME_UPLOADED_FILENAME_W_PATH_ABSOLUTE, stringBodyFileWPathAbsolute );
-			FormBodyPart formBodyPartForFileWPathAbsolute = formBodyPartBuilderForFileWPathAbsolute.build(); 
-			
-			///////////
-			
-			MultipartEntityBuilder builder = MultipartEntityBuilder.create();
-			builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
-			
-			builder.addPart( formBodyPartForFile );
-			builder.addPart( formBodyPartForFileWPathCanonical );
-			builder.addPart( formBodyPartForFileWPathAbsolute );
-			
-			HttpEntity httpEntity = builder.build();
-			
-			post.setEntity( httpEntity );
-
-			response = httpclient.execute(post);
-			
-			int httpStatusCode = response.getStatusLine().getStatusCode();
-			
-
-			if ( log.isDebugEnabled() ) {
-
-				log.debug("Send Email: Http Response Status code: " + httpStatusCode );
-			}
-
-			responseInputStream = response.getEntity().getContent();
-			
-			//  optional code for viewing response as string
-			
-			//  responseBytes must be large enough for the whole response, or code something to create larger array and copy to the larger array
-			
-			byte[] responseBytes = new byte[10000000];
-			
-			int responseBytesOffset = 0;
-			int responseBytesLength = responseBytes.length;
-			
-			int totalBytesRead = 0;
-			
-			while (true) {
-
-				int bytesRead = responseInputStream.read(responseBytes, responseBytesOffset, responseBytesLength );
-			
-				if ( bytesRead == -1 ) {
-					
-					break;
-				}
+			if ( ! uploadFileResponse.proxlXMLFilerootXMLNodeIncorrect ) {
 				
-				totalBytesRead += bytesRead;
-				responseBytesOffset += bytesRead;
-				responseBytesLength -= bytesRead;
+				System.err.println( "Proxl  XML file uploaded but file not formatted correctly" );
 			}
-			
-			byte[] responseBytesJustData = Arrays.copyOf(responseBytes, totalBytesRead);
-			
-			String responseAsString = new String(responseBytesJustData, JSONStringCharsetConstants.JSON_STRING_CHARSET_UTF_8 );
-			
-			if ( log.isDebugEnabled() ) {
-				
-				System.out.println( "UploadInitPost response: " );
-				System.out.println( responseAsString );
-			}
-
-			
-			//  Throws ProxlSubImportServerReponseException if  httpStatusCode != HttpStatus.SC_OK (200)
-			A_ProcessHTTP_StatusCode.getInstance().processHTTP_StatusCode( httpStatusCode, url );
-			
-			
-
-
-			ObjectMapper jacksonJSON_Mapper = new ObjectMapper();  //  Jackson JSON library object
-			
-			uploadFileResponse = jacksonJSON_Mapper.readValue( responseBytesJustData, JSON_Servlet_Response_Object.class );
-			
-			
-			if ( ! uploadFileResponse.statusSuccess ) {
-				
-				String msg = "status response not true";
-				log.error( msg );
-//				throw new Exception(msg);
-			}
-			
-			UploadFileResult uploadFileResult = new UploadFileResult();
-			
-			uploadFileResult.statusSuccess = uploadFileResponse.statusSuccess;
-			
-			return uploadFileResult;
-
-		} catch ( ProxlSubImportServerReponseException e ) {
-			
-			// Already reported so do not report
-			
-			throw e;
-			
-		} catch (Exception e) {
-
-			log.error("Failed Upload Init.", e );
-			throw e;
-
-		} finally { 
-
-			if ( responseInputStream != null ) {
-				responseInputStream.close();
-			}
+//			throw new Exception(msg);
 		}
 		
 		
+		
+		UploadFileResult uploadFileResult = new UploadFileResult();
+		uploadFileResult.statusSuccess = uploadFileResponse.statusSuccess;
+		return uploadFileResult;
+			
 	}
 	
 	

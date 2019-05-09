@@ -2,17 +2,12 @@ package org.yeastrc.xlink.www.file_import_proxl_xml_scans.struts_action_as_webse
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
-import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.FileUploadException;
-import org.apache.commons.fileupload.FileUploadBase.FileSizeLimitExceededException;
-import org.apache.commons.fileupload.disk.DiskFileItemFactory;
-import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.apache.struts.action.Action;
@@ -38,6 +33,15 @@ import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAut
 import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+
+///////   In Progress to pass file via the post contents (just getInputStream() instead of via multipart form)
+
+//   The Java Submitter Pgm is successfully passing the cookie for the JSESSIONID so getSession returns the logged in user.
+//
+//   Next need to remove all the Multipart form processing and write from the InputStream directly to the final file on disk.
+//   		(This is the way Limelight works) 
+
+
 /**
  * Upload 
  * 
@@ -46,25 +50,27 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class UploadFileForImportWebserviceAction extends Action {
 
 	private static final Logger log = LoggerFactory.getLogger(  UploadFileForImportWebserviceAction.class );
+
+	private static final int COPY_FILE_ARRAY_SIZE = 32 * 1024;
 	
 	//  Keep all these Strings in sync with the class SendToServerConstants in subdir proxl_submit_import
 	
-	public static final String UPLOAD_FILE_QUERY_PARAMETER_UPLOAD_KEY = "upload_key";
-	public static final String UPLOAD_FILE_QUERY_PARAMETER_PROJECT_ID = "project_id";
-	public static final String UPLOAD_FILE_QUERY_PARAMETER_FILE_INDEX = "file_index";
-	public static final String UPLOAD_FILE_QUERY_PARAMETER_FILE_TYPE = "file_type";
-	public static final String UPLOAD_FILE_QUERY_PARAMETER_FILENAME = "filename";
+	public static final String UPLOAD_FILE_HEADER_NAME_UPLOAD_KEY = "X-Proxl-upload_key";
+	public static final String UPLOAD_FILE_HEADER_NAME_PROJECT_ID = "X-Proxl-project_id";
+	public static final String UPLOAD_FILE_HEADER_NAME_FILE_INDEX = "X-Proxl-file_index";
+	public static final String UPLOAD_FILE_HEADER_NAME_FILE_TYPE = "X-Proxl-file_type";
+	public static final String UPLOAD_FILE_HEADER_NAME_FILENAME = "X-Proxl-filename";
 	
 	/**
-	 * Form name for uploaded file on submitting machine ( Java Canonical Path )
+	 * Header name for uploaded file on submitting machine ( Java Canonical Path )
 	 */
-	public static final String UPLOAD_FILE_FORM_NAME_UPLOADED_FILENAME_W_PATH_CANONICAL = 
-			"canonicalFilename_W_Path_OnSubmitMachine";
+	public static final String UPLOAD_FILE_HEADER_NAME_UPLOADED_FILENAME_W_PATH_CANONICAL = 
+			"X-Proxl-uploadFileWPathCanonical";
 	/**
-	 * Form name for uploaded file on submitting machine ( Java Absolute Path )
+	 * Header name for uploaded file on submitting machine ( Java Absolute Path )
 	 */
-	public static final String UPLOAD_FILE_FORM_NAME_UPLOADED_FILENAME_W_PATH_ABSOLUTE = 
-			"absoluteFilename_W_Path_OnSubmitMachine";
+	public static final String UPLOAD_FILE_HEADER_NAME_UPLOADED_FILENAME_W_PATH_ABSOLUTE = 
+			"X-Proxl-uploadFileWPathAbsolute";
 	
 	@Override
 	public ActionForward execute( ActionMapping mapping,
@@ -72,7 +78,8 @@ public class UploadFileForImportWebserviceAction extends Action {
 			  HttpServletRequest request,
 			  HttpServletResponse response ) throws Exception {
 
-		//  For multipart forms (which is what is passed to this servlet), 
+		
+		
 		//  	request.getParameter(...) only comes from the query string
 //		String uploadType = request.getParameter( "uploadTypeQueryString" ); 
 		String scanFileSuffix = null;
@@ -89,12 +96,15 @@ public class UploadFileForImportWebserviceAction extends Action {
 		try {
 //			String requestURL = request.getRequestURL().toString();
 			
-			String uploadedFilename = request.getParameter( UPLOAD_FILE_QUERY_PARAMETER_FILENAME );
-			String fileIndexString = request.getParameter( UPLOAD_FILE_QUERY_PARAMETER_FILE_INDEX );
-			String fileTypeString = request.getParameter( UPLOAD_FILE_QUERY_PARAMETER_FILE_TYPE );
-			String projectIdString = request.getParameter( UPLOAD_FILE_QUERY_PARAMETER_PROJECT_ID );
-			String uploadKeyString = request.getParameter( UPLOAD_FILE_QUERY_PARAMETER_UPLOAD_KEY );
-			
+			canonicalFilename_W_Path_OnSubmitMachine = request.getHeader( UPLOAD_FILE_HEADER_NAME_UPLOADED_FILENAME_W_PATH_CANONICAL );
+			absoluteFilename_W_Path_OnSubmitMachine = request.getHeader( UPLOAD_FILE_HEADER_NAME_UPLOADED_FILENAME_W_PATH_ABSOLUTE );
+
+			String uploadedFilename = request.getHeader( UPLOAD_FILE_HEADER_NAME_FILENAME );
+			String fileIndexString = request.getHeader( UPLOAD_FILE_HEADER_NAME_FILE_INDEX );
+			String fileTypeString = request.getHeader( UPLOAD_FILE_HEADER_NAME_FILE_TYPE );
+			String projectIdString = request.getHeader( UPLOAD_FILE_HEADER_NAME_PROJECT_ID );
+			String uploadKeyString = request.getHeader( UPLOAD_FILE_HEADER_NAME_UPLOAD_KEY );
+
 			if ( StringUtils.isEmpty( uploadedFilename ) ) {
 				log.error( "'filename' query parameter is not sent or is empty" );
 				response.setStatus( HttpServletResponse.SC_BAD_REQUEST /* 400  */ );
@@ -186,6 +196,29 @@ public class UploadFileForImportWebserviceAction extends Action {
 				log.error( msg );
 				throw new ProxlWebappFileUploadFileSystemException( msg );
 			}
+			
+			//  Validate maxFileSize against reported upload size in header
+			
+			long uploadFileSizeInHeader = request.getContentLengthLong();
+
+			if ( uploadFileSizeInHeader > maxFileSize ) {
+				//  Return Error -  Status Code 400
+				response.setStatus( HttpServletResponse.SC_BAD_REQUEST /* 400  */ );
+				JSON_Servlet_Response_Object importFileServletResponse = new JSON_Servlet_Response_Object();
+				importFileServletResponse.setStatusSuccess(false);
+				importFileServletResponse.setFileSizeLimitExceeded( true );
+				importFileServletResponse.setMaxSize( maxFileSize );
+				importFileServletResponse.setMaxSizeFormatted( maxFileSizeFormatted );
+				OutputStream responseOutputStream = response.getOutputStream();
+				// send the JSON response 
+				ObjectMapper mapper = new ObjectMapper();  //  Jackson JSON library object
+				mapper.writeValue( responseOutputStream, importFileServletResponse ); // where first param can be File, OutputStream or Writer
+				responseOutputStream.flush();
+				responseOutputStream.close();
+				throw new FailResponseSentException();
+			}
+			
+			
 			///////  Add additional checking of the filename for scan files
 			if ( fileType == ProxlXMLFileImportFileType.SCAN_FILE ) {
 				if ( uploadedFilename.endsWith( ProxlXMLFileUploadWebConstants.UPLOAD_SCAN_FILE_ALLOWED_SUFFIX_MZML ) ) {
@@ -301,151 +334,62 @@ public class UploadFileForImportWebserviceAction extends Action {
 				log.warn( msg );
 				throw new ProxlWebappFileUploadFileSystemException(msg);
 			}
-			//  Create ServletFileUpload object from Apache Commons File Upload
-			//  	to process the servlet request from the browser.
-			//  This processes the form submitted from the browser
-			//		and transfers upload files to temporary files on the server
-			//		in the directory specified in the DiskFileItemFactory object
-			//  DiskFileItemFactory is part of Apache Commons File Upload and is used to help copy the files in this HTTP request
-			//                        to files on the local disk
-			DiskFileItemFactory diskFileItemFactory = new DiskFileItemFactory();
-//					
-//					In DiskFileItemFactory, if temp directory is not specified, it uses 
-//					tempDir = new File(System.getProperty("java.io.tmpdir"));
-//					
-//					which on one Tomcat installation is
-//					/data/webtools/apache-tomcat-7.0.53/temp
-			log.info( "DiskFileItemFactory.DEFAULT_SIZE_THRESHOLD: " + DiskFileItemFactory.DEFAULT_SIZE_THRESHOLD );
-			if ( diskFileItemFactory.getRepository() == null ) {
-				log.info( "diskFileItemFactory.getRepository() == null" );
-			} else {
-				log.info( "diskFileItemFactory.getRepository().getAbsolutePath(): '" 
-						+ diskFileItemFactory.getRepository().getAbsolutePath() + "'" );
-			}
-			log.info( "diskFileItemFactory.getSizeThreshold(): '" 
-					+ diskFileItemFactory.getSizeThreshold() + "'" );
-			File diskFileItemFactoryRepository = uploadFileTempSubDirForThisRequestFileObj; // Put diskFileItemFactory temp files in subdirectory directory
-			diskFileItemFactory.setRepository( diskFileItemFactoryRepository );
-			ServletFileUpload servletFileUpload = new ServletFileUpload( diskFileItemFactory );
-		       // file upload size limit
-			servletFileUpload.setFileSizeMax( maxFileSize );
-			int filesUploadedCount = 0;
-			List<FileItem> fileItemListFromServletFileUpload = null;
-			try {
-				//  This will throw an exception if the send is aborted in the browser
-				fileItemListFromServletFileUpload = servletFileUpload.parseRequest( request );
-			} catch ( FileUploadException e ) {
-				log.error( "FileUploadException parsing the request to get the parts in 'servletFileUpload.parseRequest( request )'", e );
-				throw e;
-			} catch ( Exception e ) {
-				log.error( "Exception parsing the request to get the parts in 'servletFileUpload.parseRequest( request )'", e );
-				throw e;
-			}
-			//  ServletFileUpload object from Apache Commons File Upload 
-			//		is done processing the form and uploaded file(s) 
-			//		have been transfered to the server
+			
+			//  File object to write incoming file to:  uploadedFileOnDisk
 			//   Create the filename that the uploaded file will be saved as
 			uploadedFileOnDisk = 
 					Proxl_XML_Importer_Work_Directory_And_SubDirs_Web.getInstance()
 					.getUploadFile( scanFileSuffix, fileIndex, fileType, uploadFileTempSubDirForThisRequestFileObj );
 			String uploadedFileOnDiskFilename = uploadedFileOnDisk.getName();
-			//  Process the parsed form and uploaded files
-			boolean processedUploadedFile = false;
-			//  collect form fields here.  No form fields so no variables here
-			//   String aFormFieldValue = null;
-			// fileItemListFromServletFileUpload object is returned from  ServletFileUpload object from Apache Commons File Upload
-			log.info( "fileItemListFromServletFileUpload size " + fileItemListFromServletFileUpload.size() );
-			for ( FileItem fileItem : fileItemListFromServletFileUpload ) {
-			    if ( fileItem.isFormField() ) {
-			    	//  form field that is not a file upload
-			    	String fieldName = fileItem.getFieldName();
-			    	String fieldValue = fileItem.getString();
+			
 
-			    	if ( UPLOAD_FILE_FORM_NAME_UPLOADED_FILENAME_W_PATH_CANONICAL.equals( fieldName) ) {
-			    		
-			    		canonicalFilename_W_Path_OnSubmitMachine = fieldValue;
+			//  Copy InputStream containing POST body into file on disk
+			{
+				long totalBytesCopied = 0;
+				boolean fileTooLarge = false;
+				
+				try ( InputStream inputStreamFromPOSTLocal = request.getInputStream() ) {
 
-			    	} else if ( UPLOAD_FILE_FORM_NAME_UPLOADED_FILENAME_W_PATH_ABSOLUTE.equals( fieldName) ) {
-				    		
-				    		absoluteFilename_W_Path_OnSubmitMachine = fieldValue;
-			    	} else {
-						log.error( "Form Field in request not accepted: " + fieldName );
-						response.setStatus( HttpServletResponse.SC_BAD_REQUEST /* 400  */ );
-						JSON_Servlet_Response_Object importFileServletResponse = new JSON_Servlet_Response_Object();
-						importFileServletResponse.setStatusSuccess(false);
-						importFileServletResponse.setMoreThanOneuploadedFile(true);;
-						OutputStream responseOutputStream = response.getOutputStream();
-						// send the JSON response 
-						ObjectMapper mapper = new ObjectMapper();  //  Jackson JSON library object
-						mapper.writeValue( responseOutputStream, importFileServletResponse ); // where first param can be File, OutputStream or Writer
-						responseOutputStream.flush();
-						responseOutputStream.close();
-						throw new FailResponseSentException();
-			    	}
-			    } else {
-					String fieldName = fileItem.getFieldName();
-					//  Only allow the expected field name
-					if ( ! ProxlXMLFileUploadWebConstants.UPLOAD_FILE_FORM_NAME.equals( fieldName ) ) {
-						log.error( "File uploaded using field name other than allowed field name. " 
-								+ "Allowed field name: " + ProxlXMLFileUploadWebConstants.UPLOAD_FILE_FORM_NAME
-								+ ", received field name: " + fieldName );
-						response.setStatus( HttpServletResponse.SC_BAD_REQUEST /* 400  */ );
-						JSON_Servlet_Response_Object importFileServletResponse = new JSON_Servlet_Response_Object();
-						importFileServletResponse.setStatusSuccess(false);
-						importFileServletResponse.setUploadFile_fieldNameInvalid(true);
-						OutputStream responseOutputStream = response.getOutputStream();
-						// send the JSON response 
-						ObjectMapper mapper = new ObjectMapper();  //  Jackson JSON library object
-						mapper.writeValue( responseOutputStream, importFileServletResponse ); // where first param can be File, OutputStream or Writer
-						responseOutputStream.flush();
-						responseOutputStream.close();
-						throw new FailResponseSentException();
+					try ( FileOutputStream fos = new FileOutputStream( uploadedFileOnDisk )) {
+						byte[] buf = new byte[ COPY_FILE_ARRAY_SIZE ];
+						int len;
+						while ((len = inputStreamFromPOSTLocal.read(buf)) != -1){
+							if ( len > 0 ) {
+								fos.write(buf, 0, len);
+								totalBytesCopied += len;
+								if ( totalBytesCopied > maxFileSize ) {
+	
+									fileTooLarge = true;
+									break;
+								}
+							}
+						}
 					}
-					filesUploadedCount++;
-					//  Only allow one file to be uploaded in the request
-					if ( filesUploadedCount > 1 ) {
-						log.error( "More than one file uploaded in the request." );
-						response.setStatus( HttpServletResponse.SC_BAD_REQUEST /* 400  */ );
-						JSON_Servlet_Response_Object importFileServletResponse = new JSON_Servlet_Response_Object();
-						importFileServletResponse.setStatusSuccess(false);
-						importFileServletResponse.setMoreThanOneuploadedFile(true);;
-						OutputStream responseOutputStream = response.getOutputStream();
-						// send the JSON response 
-						ObjectMapper mapper = new ObjectMapper();  //  Jackson JSON library object
-						mapper.writeValue( responseOutputStream, importFileServletResponse ); // where first param can be File, OutputStream or Writer
-						responseOutputStream.flush();
-						responseOutputStream.close();
-						throw new FailResponseSentException();
-					}
-				    String fileNameForFormObject = fileItem.getName();
-				    @SuppressWarnings("unused")
-				    String contentType = fileItem.getContentType();
-				    @SuppressWarnings("unused")
-				    boolean isInMemory = fileItem.isInMemory();
-				    @SuppressWarnings("unused")
-				    long sizeInBytes = fileItem.getSize();
-				    uploadedFilename = fileNameForFormObject;  // re-assign filename to the filename from the form
-					log.info( "started Upload for filename " + fileNameForFormObject );
-					log.info( "item.getSize(): " + fileItem.getSize() );
-					fileItem.write( uploadedFileOnDisk );
-					log.info( "Completed transfer to server for user uploaded filename " + fileNameForFormObject );
-					processedUploadedFile = true;
 				}
-			}  //  END:  for ( FileItem fileItem : fileItemListFromServletFileUpload ) {
-			if ( ! processedUploadedFile ) {
-				log.error( "No file uploaded." );
-				response.setStatus( HttpServletResponse.SC_BAD_REQUEST /* 400  */ );
-				JSON_Servlet_Response_Object importFileServletResponse = new JSON_Servlet_Response_Object();
-				importFileServletResponse.setStatusSuccess(false);
-				importFileServletResponse.setNoUploadedFile(true);
-				OutputStream responseOutputStream = response.getOutputStream();
-				// send the JSON response 
-				ObjectMapper mapper = new ObjectMapper();  //  Jackson JSON library object
-				mapper.writeValue( responseOutputStream, importFileServletResponse ); // where first param can be File, OutputStream or Writer
-				responseOutputStream.flush();
-				responseOutputStream.close();
-				throw new FailResponseSentException();
+				if ( fileTooLarge ) {
+					
+					if ( ! uploadedFileOnDisk.delete() ) {
+						log.warn("Failed to delete upload file that is canceled since too large.  file: " + uploadedFileOnDisk.getAbsolutePath() );
+					}
+					//  Return Error -  Status Code 400
+					response.setStatus( HttpServletResponse.SC_BAD_REQUEST /* 400  */ );
+					JSON_Servlet_Response_Object importFileServletResponse = new JSON_Servlet_Response_Object();
+					importFileServletResponse.setStatusSuccess(false);
+					importFileServletResponse.setFileSizeLimitExceeded( true );
+					importFileServletResponse.setMaxSize( maxFileSize );
+					importFileServletResponse.setMaxSizeFormatted( maxFileSizeFormatted );
+					OutputStream responseOutputStream = response.getOutputStream();
+					// send the JSON response 
+					ObjectMapper mapper = new ObjectMapper();  //  Jackson JSON library object
+					mapper.writeValue( responseOutputStream, importFileServletResponse ); // where first param can be File, OutputStream or Writer
+					responseOutputStream.flush();
+					responseOutputStream.close();
+					throw new FailResponseSentException();
+				}
 			}
+			
+			//  After have file uploaded:
+			
 			String searchNameInProxlXMLFile = null;
 			if ( fileType == ProxlXMLFileImportFileType.PROXL_XML_FILE ) {
 				//////   Validate that the user uploaded a Proxl XML file and get the "name" attr on root element
@@ -580,24 +524,6 @@ public class UploadFileForImportWebserviceAction extends Action {
 		} catch ( FailResponseSentException e ) {
 			//  No longer delete dir
 //			cleanupOnError( uploadFileTempSubDirForThisRequestFileObj );
-		} catch (FileSizeLimitExceededException ex ) {
-			ex.getActualSize();
-			ex.getPermittedSize();
-			log.error( "SizeLimitExceededException: " + ex.toString(), ex );
-			response.setStatus( HttpServletResponse.SC_BAD_REQUEST /* 400  */ );
-			JSON_Servlet_Response_Object importFileServletResponse = new JSON_Servlet_Response_Object();
-			importFileServletResponse.setStatusSuccess(false);
-			importFileServletResponse.setFileSizeLimitExceeded(true);
-			importFileServletResponse.setMaxSize( ex.getPermittedSize() );
-			importFileServletResponse.setMaxSizeFormatted( maxFileSizeFormatted );
-			OutputStream responseOutputStream = response.getOutputStream();
-			// send the JSON response 
-			ObjectMapper mapper = new ObjectMapper();  //  Jackson JSON library object
-			mapper.writeValue( responseOutputStream, importFileServletResponse ); // where first param can be File, OutputStream or Writer
-			responseOutputStream.flush();
-			responseOutputStream.close();
-			//  No longer delete dir
-//			cleanupOnError( uploadFileTempSubDirForThisRequestFileObj );
 		} catch (Throwable ex){
 			log.error( "Exception: " + ex.toString(), ex );
 			response.setStatus( HttpServletResponse.SC_INTERNAL_SERVER_ERROR /* 500  */ );
@@ -635,9 +561,6 @@ public class UploadFileForImportWebserviceAction extends Action {
 		private long maxSize;
 		private String maxSizeFormatted;
 		private boolean uploadFile_fieldNameInvalid;
-		private boolean moreThanOneuploadedFile;
-		private boolean filenameInFormNotMatchFilenameInQueryString;
-		private boolean noUploadedFile;
 		private boolean uploadKeyNotValid;
 		private boolean proxlXMLFileFailsInitialParse;
 		private boolean proxlXMLFilerootXMLNodeIncorrect;
@@ -677,32 +600,6 @@ public class UploadFileForImportWebserviceAction extends Action {
 		@SuppressWarnings("unused")
 		public boolean isUploadFile_fieldNameInvalid() {
 			return uploadFile_fieldNameInvalid;
-		}
-		public void setUploadFile_fieldNameInvalid(boolean uploadFile_fieldNameInvalid) {
-			this.uploadFile_fieldNameInvalid = uploadFile_fieldNameInvalid;
-		}
-		@SuppressWarnings("unused")
-		public boolean isMoreThanOneuploadedFile() {
-			return moreThanOneuploadedFile;
-		}
-		public void setMoreThanOneuploadedFile(boolean moreThanOneuploadedFile) {
-			this.moreThanOneuploadedFile = moreThanOneuploadedFile;
-		}
-		@SuppressWarnings("unused")
-		public boolean isFilenameInFormNotMatchFilenameInQueryString() {
-			return filenameInFormNotMatchFilenameInQueryString;
-		}
-		@SuppressWarnings("unused")
-		public void setFilenameInFormNotMatchFilenameInQueryString(
-				boolean filenameInFormNotMatchFilenameInQueryString) {
-			this.filenameInFormNotMatchFilenameInQueryString = filenameInFormNotMatchFilenameInQueryString;
-		}
-		@SuppressWarnings("unused")
-		public boolean isNoUploadedFile() {
-			return noUploadedFile;
-		}
-		public void setNoUploadedFile(boolean noUploadedFile) {
-			this.noUploadedFile = noUploadedFile;
 		}
 		@SuppressWarnings("unused")
 		public boolean isProjectLocked() {

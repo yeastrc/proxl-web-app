@@ -1,7 +1,7 @@
 Usage: java -jar submitProxlXMLImport.jar -i import_file.proxl.xml 
                                     [ --no-scan-files ]  
                                     [ -s scan_file.mzML ]
-                                    [ -c submit_upload.properties ] 
+                                    [ --proxl-web-app-url=<URL to Proxl web app, including the "/proxl" > ] 
                                     [-p project_id  ]
                                     [ --username-password-file=proxl_username_password_file ]
                                     [ --username=xxx  ]
@@ -11,17 +11,21 @@ Usage: java -jar submitProxlXMLImport.jar -i import_file.proxl.xml
 Examples:
 
     To submit for import a Proxl XML file (with no scans):
-    java -jar submitProxlXMLImport.jar -p 1 -i proxlInput.xml --no-scan-files -c /path/to/submit_upload.properties
+    java -jar submitProxlXMLImport.jar -p 1 -i proxlInput.xml --no-scan-files --proxl-web-app-url=<URL to Proxl web app, including the "/proxl" >
 
     To submit for import a Proxl XML file and related scan file:
-    java -jar submitProxlXMLImport.jar -p 1 -i proxlInput.xml -s /path/to/file.mzML -c /path/to/submit_upload.properties
+    java -jar submitProxlXMLImport.jar -p 1 -i proxlInput.xml -s /path/to/file.mzML  --proxl-web-app-url=<URL to Proxl web app, including the "/proxl" >
 	
 	
 Parameters:
-
-    -c (--config=) : [Required] : The configuration file, with it's relative or absolute path.
-    					***  Not required if config data file embedded in executed JAR file
-    
+	
+	proxl-web-app-url= : [Required] :  The URL of the Proxl Server
+	    **  See information at end of help about configuration file
+	    
+		More Info:
+		--proxl-web-app-url=<URL to Proxl web app, including the "/proxl" > 
+		         (may be different from "/proxl" 
+		          if the deployed war file was changed from "proxl.war")
 
     -i (--import-file=) : [Required] : The Proxl XML file to import, with it's relative or absolute path.
 	
@@ -44,4 +48,23 @@ Parameters:
    	
    				If no username or password is on the command line or in the file, 
    				they will be prompted for when the program is run.
+
+
+
+-----------------------------------
+
+Configuration File:
+
+    run the program with --help-configuration-file for more information
+
+A configuration file may be specified as a parameter 
+(or included in a script used to run the executable)
+or embedded in the executable jar file.
+
+    If a script is provided to run this program,
+    it may pass '-c' (or '--config=') with a value.
+    Try running the script without 
+    --proxl-web-app-url= 
+    first and see if it is successful.
+
    				                        

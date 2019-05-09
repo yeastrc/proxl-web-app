@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
@@ -42,9 +43,19 @@ public class LoginPost {
 
 
 	
-	public void loginPost( String username, String password, String baseURL, HttpClient httpclient ) throws Exception {
+	/**
+	 * @param username
+	 * @param password
+	 * @param baseURL
+	 * @param httpclient
+	 * @return - JSESSIONID Cookie contents
+	 * @throws Exception
+	 */
+	public String loginPost( String username, String password, String baseURL, HttpClient httpclient ) throws Exception {
 		
 		String url = baseURL + SUB_URL;
+		
+		String jsessionIdCookieResponse = null;
 
 		HttpPost post = null;
 		List<NameValuePair> nameValuePairs = null;
@@ -66,7 +77,24 @@ public class LoginPost {
 			response = httpclient.execute(post);
 			
 			int httpStatusCode = response.getStatusLine().getStatusCode();
-			
+
+			{
+				String lastCookieString = null;
+				Header[] headers = response.getHeaders("Set-Cookie");
+				for (Header h : headers) {
+					String cookieString = h.getValue().toString();
+					if ( cookieString != null && cookieString.contains( "JSESSIONID" ) ) {
+						jsessionIdCookieResponse = cookieString;
+					}
+//					System.out.println( "In Login: Headers for 'Set-Cookie', cookieString: " + cookieString );  
+				}
+				if ( jsessionIdCookieResponse == null ) {
+					//  If Cookie not found for JSESSIONID, just try the last cookie found
+					System.out.println( "No cookie found containing 'JSESSIONID' so using the last cookie string. Header count: " 
+							+ headers.length + ",  lastCookieString: " + lastCookieString );
+					jsessionIdCookieResponse = lastCookieString;
+				}
+			}
 
 			if ( log.isDebugEnabled() ) {
 
@@ -168,6 +196,7 @@ public class LoginPost {
 			}
 		}
 		
+		return jsessionIdCookieResponse;
 	}
 	
 	

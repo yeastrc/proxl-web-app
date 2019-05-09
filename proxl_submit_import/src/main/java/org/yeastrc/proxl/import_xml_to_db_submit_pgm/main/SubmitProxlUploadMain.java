@@ -305,7 +305,8 @@ public class SubmitProxlUploadMain {
 			}
 
 			//  Throws ProxlSubImportUserDataException on failed login
-			LoginPost.getInstance().loginPost( username, password, baseURLWithServicesPath, httpclient );
+			String jsessionIdCookieResponse = 
+					LoginPost.getInstance().loginPost( username, password, baseURLWithServicesPath, httpclient );
 
 
 			///////////////
@@ -539,6 +540,7 @@ public class SubmitProxlUploadMain {
 					UploadFileResult uploadFileResult =
 							UploadFilePost.getInstance()
 							.uploadFilePost( 
+									jsessionIdCookieResponse,
 									proxlXMLFile, 
 									uploadSubmitRequestFileItem.getFileIndex(), 
 									uploadSubmitRequestFileItem.getFileType(), 
@@ -592,6 +594,7 @@ public class SubmitProxlUploadMain {
 						UploadFileResult uploadFileResult =
 								UploadFilePost.getInstance()
 								.uploadFilePost( 
+										jsessionIdCookieResponse,
 										scanFile, 
 										uploadSubmitRequestFileItem.getFileIndex(), 
 										uploadSubmitRequestFileItem.getFileType(), 
@@ -653,7 +656,7 @@ public class SubmitProxlUploadMain {
 //					System.out.println( "Importer Sub Dir full path does NOT EXIST: " + importSubDir.getCanonicalPath() );
 				}
 				
-				String writeProxlUploadDirFilename = ConfigParams.getInstance().getWriteProxlUploadDirFilename();
+				String writeProxlUploadDirFilename = ConfigParams.getSingletonInstance().getWriteProxlUploadDirFilename();
 				
 				if ( StringUtils.isNotEmpty( writeProxlUploadDirFilename ) ) {
 					

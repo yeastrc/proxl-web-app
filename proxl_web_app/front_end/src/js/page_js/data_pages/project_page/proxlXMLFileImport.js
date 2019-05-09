@@ -1348,10 +1348,7 @@ ProxlXMLFileImport.prototype.uploadFile  = function ( params ) {
 	var isProxlXMLFile = params.isProxlXMLFile;
 	var $containingBlock = params.$containingBlock;
 
-
-
-	var formData;
-
+	let fileToUpload;
 	var filename;
 	
 	var proxlXMLFileImportFileData;
@@ -1401,16 +1398,9 @@ ProxlXMLFileImport.prototype.uploadFile  = function ( params ) {
 			throw Error( "file type for saved fileData does not match file type in DOM element" );
 		}
 		
-		var file = proxlXMLFileImportFileData.getFile();
+		fileToUpload = proxlXMLFileImportFileData.getFile();
 
-		filename = file.name;
-
-		formData = new FormData();
-		formData.append( this.CONSTANTS.UPLOAD_FILE_FORM_NAME, file, file.name );
-
-//		formData.append( 'fastaDescription', fastaDescription );  // sent as part of the multipart form
-
-
+		filename = fileToUpload.name;
 
 	} catch (e) { 
 
@@ -1753,20 +1743,28 @@ ProxlXMLFileImport.prototype.uploadFile  = function ( params ) {
 	//  parameters added to the query string are available when the request is first received at the server.
 
 
-	var filenameURIEncoded = encodeURIComponent( filename );
-
-	var postURL = "uploadProxlXmlOrScanFileForImport.do?"
-	+ "upload_key=" +  uploadKey
-	+ "&project_id=" + projectId
-	+ "&file_index=" + fileIndex
-	+ "&file_type=" + fileType
-	+ "&filename=" + filenameURIEncoded;
-
-
+	var postURL = "uploadProxlXmlOrScanFileForImport.do"
 
 	xmlHttpRequest.open('POST', postURL);
-	xmlHttpRequest.send(formData);
 
+	xmlHttpRequest.setRequestHeader( "Content-Type", "application/octet-stream" );
+		
+	//  Send values in Request Header
+
+	xmlHttpRequest.setRequestHeader( "X-Proxl-upload_key", uploadKey );
+	xmlHttpRequest.setRequestHeader( "X-Proxl-project_id", projectId );
+	xmlHttpRequest.setRequestHeader( "X-Proxl-file_index", fileIndex );
+	xmlHttpRequest.setRequestHeader( "X-Proxl-file_type", fileType );
+	xmlHttpRequest.setRequestHeader( "X-Proxl-filename", filename );
+		
+	try {
+		//  Send File object from page <input type="file"> element instead of creating a Form and appending a File to it
+		
+		xmlHttpRequest.send( fileToUpload );
+
+	} catch( e ) {
+		throw e;
+	}
 };
 
 

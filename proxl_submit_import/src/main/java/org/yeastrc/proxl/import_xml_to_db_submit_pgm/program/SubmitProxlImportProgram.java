@@ -74,6 +74,8 @@ public class SubmitProxlImportProgram {
 
 			CmdLineParser cmdLineParser = new CmdLineParser();
 
+			CmdLineParser.Option proxlWebappURLFromCommandLineCommandLineOpt = cmdLineParser.addStringOption( 'Z', "proxl-web-app-url" );
+
 			CmdLineParser.Option configFileFromCommandLineCommandLineOpt = cmdLineParser.addStringOption( 'c', "config" );
 
 			CmdLineParser.Option projectIdFromCommandLineCommandLineOpt = cmdLineParser.addStringOption( 'p', "project-id" );
@@ -105,6 +107,9 @@ public class SubmitProxlImportProgram {
 
 			CmdLineParser.Option helpOpt = cmdLineParser.addBooleanOption('h', "help"); 
 
+			CmdLineParser.Option helpConfigurationFileCommandLineOpt = cmdLineParser.addBooleanOption( 'Z', "help-configuration-file" );
+			
+
 
 			// parse command line options
 			try { cmdLineParser.parse(args); }
@@ -127,14 +132,22 @@ public class SubmitProxlImportProgram {
 				System.exit( PROGRAM_EXIT_CODE_INVALID_INPUT );
 			}
 
-			Boolean help = (Boolean) cmdLineParser.getOptionValue(helpOpt, Boolean.FALSE);
-			if(help) {
-
-				printHelp();
-
-				System.exit( PROGRAM_EXIT_CODE_HELP );
+			{
+				Boolean help = (Boolean) cmdLineParser.getOptionValue(helpOpt, Boolean.FALSE);
+				if(help) {
+	
+					printHelp();
+	
+					System.exit( PROGRAM_EXIT_CODE_HELP );
+				}
 			}
-
+			{
+				Boolean helpConfigurationFile = (Boolean) cmdLineParser.getOptionValue(helpConfigurationFileCommandLineOpt, Boolean.FALSE);
+				if(helpConfigurationFile) {
+					printHelpConfigurationFile();
+					System.exit( PROGRAM_EXIT_CODE_HELP );
+				}
+			}
 			
 			usernameFromCommandLine = (String)cmdLineParser.getOptionValue( usernameCommandLineOpt );
 
@@ -142,8 +155,22 @@ public class SubmitProxlImportProgram {
 			
 			usernamePasswordFileCommandLine = (String)cmdLineParser.getOptionValue( usernamePasswordFileCommandLineOpt );
 			
+
+			String proxlWebappURL_CommandLineString = (String)cmdLineParser.getOptionValue( proxlWebappURLFromCommandLineCommandLineOpt );
 			
 			String configFile = (String)cmdLineParser.getOptionValue( configFileFromCommandLineCommandLineOpt );
+
+			if ( StringUtils.isNotEmpty( proxlWebappURL_CommandLineString ) ) {
+				// Have value for proxlWebappURL_CommandLineString so no value allowed for config file
+				
+				if ( StringUtils.isNotEmpty( configFile ) || ConfigParams.getSingletonInstance().isConfigFileOnClassPath() ) {
+					System.err.println( "paramter --proxl-web-app-url= is not allowed since a configuration file has been provided using parameter '-c' (--config=) or embedded in the executable");
+					System.err.println( "" );
+					System.err.println( FOR_HELP_STRING );
+					System.exit( PROGRAM_EXIT_CODE_INVALID_INPUT );
+				}
+			}
+			
 
 			projectIdString = (String)cmdLineParser.getOptionValue( projectIdFromCommandLineCommandLineOpt );
 			
@@ -244,55 +271,62 @@ public class SubmitProxlImportProgram {
 			
 			Boolean sendSearchPathCommandLineOptChosen = (Boolean) cmdLineParser.getOptionValue( sendSearchPathCommandLineOpt, Boolean.FALSE);
 
+			String baseURL = null;
+			boolean submitterSameMachine = false;
+			File uploadBaseDir = null;
 			
-			ConfigParams configParams = ConfigParams.getInstance();
-			
-			if ( StringUtils.isNotEmpty( configFile ) ) {
+			if ( StringUtils.isNotEmpty( proxlWebappURL_CommandLineString ) ) {
+				// Have value for proxlWebappURL_CommandLineString so use it and not config file
+				baseURL = proxlWebappURL_CommandLineString;
 				
-				File configFileCommandLine = new File( configFile );
-				
-				if ( ! configFileCommandLine.exists() ) {
-					
-					System.err.println( "config file specified on command line does not exist: " + configFileCommandLine.getAbsolutePath() );
-					
-					System.err.println( "" );
-					System.err.println( FOR_HELP_STRING );
+			} else {
 
-					System.exit(PROGRAM_EXIT_CODE_INVALID_INPUT);  //  EARLY EXIT
+				ConfigParams configParams = ConfigParams.getSingletonInstance();
+
+				if ( StringUtils.isNotEmpty( configFile ) ) {
+
+					File configFileCommandLine = new File( configFile );
+
+					if ( ! configFileCommandLine.exists() ) {
+
+						System.err.println( "config file specified on command line does not exist: " + configFileCommandLine.getAbsolutePath() );
+
+						System.err.println( "" );
+						System.err.println( FOR_HELP_STRING );
+
+						System.exit(PROGRAM_EXIT_CODE_INVALID_INPUT);  //  EARLY EXIT
+					}
+
+					configParams.setConfigFileCommandLine( configFileCommandLine );
 				}
-				
-				configParams.setConfigFileCommandLine( configFileCommandLine );
+
+				configParams.readConfigParams();
+
+				baseURL = configParams.getProxlWebAppUrl();
+
+				submitterSameMachine = configParams.isSubmitterSameMachine();
+				String uploadBaseDirString = configParams.getProxlUploadBaseDir();
+
+				if ( StringUtils.isNotEmpty( uploadBaseDirString ) ) {
+
+					uploadBaseDir = new File( uploadBaseDirString );
+
+
+					if ( ! uploadBaseDir.exists() ) {
+
+						System.err.println( "Upload Base Directory in configuration does not exist: " + uploadBaseDir.getCanonicalPath() );
+
+						System.err.println( "" );
+						System.err.println( FOR_HELP_STRING );
+
+						System.exit( PROGRAM_EXIT_CODE_INVALID_CONFIGURATION );  //  EARLY EXIT
+					}
+				}
 			}
-			
-			configParams.readConfigParams();
-			
-			String baseURL = configParams.getProxlWebAppUrl();
-			
-			boolean submitterSameMachine = configParams.isSubmitterSameMachine();
-			String uploadBaseDirString = configParams.getProxlUploadBaseDir();
-			
 
 
 			String baseURLWithServicesPath = baseURL + "/services";
 
-			File uploadBaseDir = null;
-
-			if ( StringUtils.isNotEmpty( uploadBaseDirString ) ) {
-
-				uploadBaseDir = new File( uploadBaseDirString );
-
-
-				if ( ! uploadBaseDir.exists() ) {
-
-					System.err.println( "Upload Base Directory in configuration does not exist: " + uploadBaseDir.getCanonicalPath() );
-
-					System.err.println( "" );
-					System.err.println( FOR_HELP_STRING );
-
-					System.exit( PROGRAM_EXIT_CODE_INVALID_CONFIGURATION );  //  EARLY EXIT
-				}
-			}
-			
 			String searchPath = null;
 			
 			if ( sendSearchPathCommandLineOptChosen ) {
@@ -417,5 +451,24 @@ public class SubmitProxlImportProgram {
 	}
 
 
+	/**
+	 * @throws Exception
+	 */
+	private static void printHelpConfigurationFile() throws Exception {
+
+		try( BufferedReader br = 
+				new BufferedReader(
+						new InputStreamReader( 
+								SubmitProxlImportProgram.class
+								.getResourceAsStream( "/help_configuration_file.txt" ) ) ) ) {
+
+			String line = null;
+			while ( ( line = br.readLine() ) != null )
+				System.out.println( line );				
+
+		} catch ( Exception e ) {
+			System.out.println( "Error printing help for configuration file." );
+		}
+	}
 
 }

@@ -28,7 +28,7 @@ public class ConfigParams {
 	private static final ConfigParams instance = new ConfigParams();
 
 	private ConfigParams() { }
-	public static ConfigParams getInstance() { return instance; }
+	public static ConfigParams getSingletonInstance() { return instance; }
 
 
 	private static final String NO_PROPERTIES_FILE_ERROR_MESSAGE = "No Configuration Properties file found.";
@@ -78,6 +78,17 @@ public class ConfigParams {
 	}
 
 
+	/**
+	 * @return
+	 */
+	public boolean isConfigFileOnClassPath() {
+		URL configFileUrlObjUrlLocal = getConfigFileOnClasspath_URL();
+		if ( configFileUrlObjUrlLocal == null ) {
+			return false;
+		}
+		return true;
+	}
+	
 	public void readConfigParams() throws Exception {
 
 		if ( configured ) {
@@ -127,9 +138,7 @@ public class ConfigParams {
 
 				propertiesFilenameMaybeWithPath = ConfigPropertiesConstants.CONFIG_FILENAME;
 
-				ClassLoader thisClassLoader = this.getClass().getClassLoader();
-
-				URL configFileUrlObjUrlLocal = thisClassLoader.getResource( ConfigPropertiesConstants.CONFIG_FILENAME );
+				URL configFileUrlObjUrlLocal = getConfigFileOnClasspath_URL();
 
 				if ( configFileUrlObjUrlLocal == null ) {
 
@@ -232,6 +241,15 @@ public class ConfigParams {
 
 		
 		configured = true;
+	}
+
+	/**
+	 * @return
+	 */
+	private URL getConfigFileOnClasspath_URL() {
+		ClassLoader thisClassLoader = this.getClass().getClassLoader();
+		URL configFileUrlObjUrlLocal = thisClassLoader.getResource( ConfigPropertiesConstants.CONFIG_FILENAME );
+		return configFileUrlObjUrlLocal;
 	}
 	
 	

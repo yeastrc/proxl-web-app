@@ -89,7 +89,7 @@ public class A_ProcessHTTP_StatusCode {
 			
 			System.err.println( "Server is not found at this URL (404 code)." );
 			System.err.println( "Server webservice URL: " + webserviceURL );
-			System.err.println( "Server URL from configuration: " + ConfigParams.getInstance().getProxlWebAppUrl() );
+			System.err.println( "Server URL from configuration: " + ConfigParams.getSingletonInstance().getProxlWebAppUrl() );
 			
 			System.err.println( "Confirm that this URL is correct or contact the administrator of your Proxl Instance." );
 			

@@ -1,0 +1,26 @@
+
+The configuration file provides a way to specify some parameters
+
+The configuration file is a Java Properties file and must adhere to that format.
+(Any '\' must be doubled for escaping, so '\' would be '\\')
+(Comments start with '#')
+
+Values:
+
+#  Same as command line option --proxl-web-app-url=
+proxl.web.app.url=
+
+#  The next property is only used when the submit program and the web app have access to the same file system.
+#  When this is set properly, the locations of the files are sent to the web app, not the file contents.
+
+#  Same as configured in the web app
+proxl.upload.base.dir=
+
+#  !!!   WARNING:   Only configure this value if 'proxl.upload.base.dir' is also configured. 
+
+#    write.proxl.upload.dir.filename - The filename to put the upload directory in.
+
+#   example   write.proxl.upload.dir.filename=proxlImporterDir.txt
+
+
+# write.proxl.upload.dir.filename=
