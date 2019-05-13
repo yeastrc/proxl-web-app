@@ -35,7 +35,7 @@ public class PDBFileSearcher {
 	 * @return
 	 * @throws Exception
 	 */
-	public List<WWWPDBFile> getPDBFilesNoContent( int userId, int projectId ) throws Exception {
+	public List<WWWPDBFile> getPDBFilesNoContent( int userId, int projectId, boolean isOwner ) throws Exception {
 		List<WWWPDBFile> pdbFiles = new ArrayList<WWWPDBFile>();
 		Connection conn = null;
 		PreparedStatement pstmt = null;
@@ -49,10 +49,12 @@ public class PDBFileSearcher {
 			while( rs.next() ) {
 				WWWPDBFile wpf = new WWWPDBFile();
 				wpf.setDto( PDBFileDAO.getInstance().getPDBFileNoContent( rs.getInt( 1 ) ) );
-				if( userId == wpf.getDto().getUploadedBy() )
-					wpf.setCanEdit( true );
-				else
-					wpf.setCanEdit( false );
+				if( isOwner || userId == wpf.getDto().getUploadedBy() ) {
+					wpf.setCanEdit(true);
+				} else {
+					wpf.setCanEdit(false);
+				}
+
 				pdbFiles.add( wpf );
 			}
 		} catch ( Exception e ) {

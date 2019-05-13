@@ -72,7 +72,7 @@ public class PDBService {
 				return PDBFileSearcher.getInstance().getPDBFilesNoContent( projectId );
 			}
 			
-			return PDBFileSearcher.getInstance().getPDBFilesNoContent( userSession.getAuthUserId(), projectId);
+			return PDBFileSearcher.getInstance().getPDBFilesNoContent( userSession.getAuthUserId(), projectId, authAccessLevel.isProjectOwnerAllowed() );
 			
 		} catch ( WebApplicationException e ) {
 			throw e;
