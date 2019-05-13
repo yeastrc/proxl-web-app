@@ -20,8 +20,9 @@ const mainConfig = {
 	
 	devtool: 'source-map',
 	resolve: {
-	    alias: {
-	       'handlebars.runtime': 'handlebars/dist/handlebars.runtime.min.js'
+	    alias: { // A trailing $ can also be added to the given object's keys to signify an exact match:
+	       'handlebars.runtime$': 'handlebars/dist/handlebars.runtime.min.js',
+	       'handlebars$': 'handlebars/dist/handlebars.min.js'
 	    },
 	    modules: [
 	        path.resolve('./src/js'),

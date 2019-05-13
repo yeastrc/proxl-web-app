@@ -19,7 +19,9 @@
 	--%>
 	
 	<!-- use minimized version  -->
-	<script type="text/javascript" src="js/libs/handlebars.min-v4.1.2.js"></script>
+
+	<%--  	<script type="text/javascript" src="js/libs/handlebars.min-v4.1.2.js"></script>  --%>
+
 
 	<script type="text/javascript" src="static/js_generated_bundles/data_pages/projectsListPage-bundle.js?x=${ cacheBustValue }"></script>
 

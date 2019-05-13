@@ -12,6 +12,11 @@
 ///////////////////////////////////////////
 
 
+//  require full Handlebars since compiling templates
+const Handlebars = require('handlebars');
+
+
+
 import { webserviceCallStandardPost } from 'page_js/webservice_call_common/webserviceCallStandardPost.js';
 
 
