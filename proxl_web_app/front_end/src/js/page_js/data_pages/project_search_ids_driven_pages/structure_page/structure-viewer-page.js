@@ -4551,7 +4551,7 @@ var StructurePagePrimaryRootCodeClass = function() {
 		$html.click( function() {
 			_backboneColorManager.resetColors();
 
-			const rgbaArray = _backboneColorManager.getDefaultColor();
+			const rgbaArray = _backboneColorManager.getDefaultColor( getRenderMode() );
 			$('.chain-color-picker').css('backgroundColor',
 				"rgba(" + rgbaArray[ 0 ] + "," + rgbaArray[ 1 ] + "," + rgbaArray[ 2 ] + "," + rgbaArray[ 3 ] + ")");
 
@@ -4598,7 +4598,7 @@ var StructurePagePrimaryRootCodeClass = function() {
 	};
 
 	const getRGBAForChain = function( chainName ) {
-		const rgbaArray = _backboneColorManager.getChainColor( chainName );
+		const rgbaArray = _backboneColorManager.getChainColor( chainName, getRenderMode() );
 
 		return "rgba(" + rgbaArray[ 0 ] + "," + rgbaArray[ 1 ] + "," + rgbaArray[ 2 ] + "," + rgbaArray[ 3 ] + ")";
 	};
@@ -5443,7 +5443,7 @@ var StructurePagePrimaryRootCodeClass = function() {
 			for( let i = 0; i < chains.length; i++ ) {
 				const chain = _STRUCTURE.select({cname : chains[i].name()});
 
-				_VIEWER.renderAs( 'protein', chain, getRenderMode(), { color:color.uniform( getColorArrayForView( _backboneColorManager.getChainColor( chains[i].name() ) ) ) } );
+				_VIEWER.renderAs( 'protein', chain, getRenderMode(), { color:color.uniform( getColorArrayForView( _backboneColorManager.getChainColor( chains[i].name(), getRenderMode() ) ) ) } );
 			}
 
 

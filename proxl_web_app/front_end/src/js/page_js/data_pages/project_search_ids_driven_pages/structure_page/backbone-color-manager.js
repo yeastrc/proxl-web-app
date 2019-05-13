@@ -5,7 +5,15 @@
 "use strict";
 
 // rgba arrays for pre-defined colors
-const _COLOR_DEFAULT_BACKBONE = [ 190, 190, 190, 0.75 ];
+const _COLOR_DEFAULT_BACKBONE_LIGHT = [ 190, 190, 190, 0.75 ];
+const _COLOR_DEFAULT_BACKBONE_DARK = [ 100, 100, 100, 0.75 ];
+const _COLOR_DEFAULT_BACKBONE_DARKER = [ 50, 50, 50, 0.75 ];
+
+const _RENDER_MODE_CARTOON = 'cartoon';
+const _RENDER_MODE_SLINE = 'sline';
+const _RENDER_MODE_TRACE = 'trace';
+const _RENDER_MODE_LINES = 'lines';
+const _RENDER_MODE_POINTS = 'points';
 
 export class BackboneColorManager {
 
@@ -30,11 +38,10 @@ export class BackboneColorManager {
      * @param chainName
      * @returns {number[]|*}
      */
-    getChainColor( chainName ) {
-
+    getChainColor( chainName, renderMode ) {
 
         if( !(chainName in this._colorsForChains ) ) {
-            return _COLOR_DEFAULT_BACKBONE;
+            return this.getDefaultColor( renderMode );
         }
 
         return this._colorsForChains[ chainName ];
@@ -47,8 +54,17 @@ export class BackboneColorManager {
 
     }
 
-    getDefaultColor() {
-        return _COLOR_DEFAULT_BACKBONE;
+    getDefaultColor( renderMode ) {
+
+        if( renderMode === _RENDER_MODE_LINES || renderMode === _RENDER_MODE_SLINE) {
+            return _COLOR_DEFAULT_BACKBONE_DARK;
+        }
+
+        if( renderMode === _RENDER_MODE_POINTS) {
+            return _COLOR_DEFAULT_BACKBONE_DARKER;
+        }
+
+        return _COLOR_DEFAULT_BACKBONE_LIGHT;
     }
 
 
