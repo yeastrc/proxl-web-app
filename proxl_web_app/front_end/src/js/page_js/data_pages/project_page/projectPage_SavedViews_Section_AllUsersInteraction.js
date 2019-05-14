@@ -16,6 +16,9 @@
 
 //  module import 
 
+//  Import Handlebars Runtime since using pre-compiled templates
+const Handlebars = require('handlebars/runtime');
+
 //  Import Handlebars templates
 
 const _project_page__saved_views_section_template = require("../../../../../handlebars_templates_precompiled/project_page__saved_views_section/project_page__saved_views_section_template-bundle.js");

@@ -7,6 +7,10 @@
  */
 "use strict";
 
+//  require full Handlebars since compiling templates
+const Handlebars = require('handlebars');
+
+
 
 
 var imagePagePrimaryRootCodeObject_LocalCopy = undefined; // passed in from "crosslink-image-viewer.js"

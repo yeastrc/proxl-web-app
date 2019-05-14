@@ -9,17 +9,6 @@
 
  <c:set var="headerAdditions">
 
-		
-		<!-- Handlebars templating library   -->
-		
-		<%--  
-		<script type="text/javascript" src="js/libs/handlebars-v4.1.2.js"></script>
-		--%>
-		
-		<!-- use minimized version  -->
-		<script type="text/javascript" src="js/libs/handlebars.min-v4.1.2.js"></script>
-
-		
 		<script type="text/javascript" src="js/libs/jquery.tablesorter_Modified.js"></script> 
 		<script type="text/javascript" src="js/libs/jquery.qtip.min.js"></script>
 
@@ -28,42 +17,12 @@
 					This include is required on this page:
 					/WEB-INF/jsp-includes/proteinNameTooltipDataForJSCode.jsp
 				  --%>
-<%--  Replaced with the JS bundle listed next
-			<script type="text/javascript" src="js/createTooltipForProteinNames.js?x=${cacheBustValue}"></script>
-  --%>
-  		
-
-		
-		
-		
-<%--  Replaced with the JS bundle listed next
-			 	
-		<script type="text/javascript" src="js/defaultPageView.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="js/sharePageURLShortener.js?x=${cacheBustValue}"></script>
-
-		<script type="text/javascript" src="js/handleServicesAJAXErrors.js?x=${cacheBustValue}"></script> 
-		
-		<script type="text/javascript" src="js/toggleVisibility.js?x=${cacheBustValue}"></script>
-		
-		<script type="text/javascript" src="js/psmPeptideCutoffsCommon.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="js/psmPeptideAnnDisplayDataCommon.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="js/minimumPSM_Count_Filter.js?x=${cacheBustValue}"></script>
-
-		<script type="text/javascript" src="js/webserviceDataParamsDistribution.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="js/viewProteinPageCommonCrosslinkLooplinkCoverageSearchMerged.js?x=${cacheBustValue}"></script>
-		
-		<script type="text/javascript" src="js/viewProteinCoverageReport.js?x=${cacheBustValue}"></script>
---%>
-	
-		<%--  Bundle version of core page JS --%>
+				  
 		<script type="text/javascript" src="static/js_generated_bundles/data_pages/proteinCoverageReportView-bundle.js?x=${cacheBustValue}"></script>
 	
 	
 		<link rel="stylesheet" href="css/tablesorter.css" type="text/css" media="print, projection, screen" />
 		<link type="text/css" rel="stylesheet" href="css/jquery.qtip.min.css" />
-
-
-
 
 </c:set>
 

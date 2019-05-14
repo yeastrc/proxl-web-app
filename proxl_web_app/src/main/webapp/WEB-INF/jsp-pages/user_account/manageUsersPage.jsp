@@ -12,15 +12,6 @@
 
  <c:set var="headerAdditions">
 
-			<!-- Handlebars templating library   -->
-			
-			<%--  
-			<script type="text/javascript" src="js/libs/handlebars-v4.1.2.js"></script>
-			--%>
-			
-			<!-- use minimized version  -->
-	<%--  		<script type="text/javascript" src="js/libs/handlebars.min-v4.1.2.js"></script>  --%>
-
  </c:set>
 
 

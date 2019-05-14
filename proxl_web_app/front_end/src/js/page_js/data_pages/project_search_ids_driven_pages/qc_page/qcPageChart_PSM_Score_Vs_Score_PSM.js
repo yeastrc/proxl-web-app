@@ -18,6 +18,10 @@
 //JavaScript directive:   all variables have to be declared with "var", maybe other things
 "use strict";
 
+//  require full Handlebars since compiling templates
+const Handlebars = require('handlebars');
+
+
 import { qcChartDownloadHelp } from './qcChart_Download_Help_HTMLBlock.js';
 
 import { downloadStringAsFile } from 'page_js/data_pages/project_search_ids_driven_pages/common/download-string-as-file.js';

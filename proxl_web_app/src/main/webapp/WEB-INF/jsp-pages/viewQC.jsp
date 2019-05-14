@@ -44,15 +44,6 @@
 		
 		<script src="js/libs/jquery-ui-1.12.1.min.js"></script>
 		
-		<!-- Handlebars templating library   -->
-		
-		<%--  
-		<script type="text/javascript" src="js/libs/handlebars-v4.1.2.js"></script>
-		--%>
-		
-		<!-- use minimized version  -->
-		<script type="text/javascript" src="js/libs/handlebars.min-v4.1.2.js"></script>
-
 				<%-- 
 					The Struts Action for this page must call GetProteinNamesTooltipConfigData
 					This include is required on this page:

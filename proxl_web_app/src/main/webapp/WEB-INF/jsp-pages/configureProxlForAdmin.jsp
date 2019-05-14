@@ -17,25 +17,7 @@
 
  <c:set var="headerAdditions">
 
-			<!-- Handlebars templating library   -->
-			
-			<%--  
-			<script type="text/javascript" src="js/libs/handlebars-v4.1.2.js"></script>
-			--%>
-			
-			<!-- use minimized version  -->
-<%-- 			
-			<script type="text/javascript" src="js/libs/handlebars.min-v4.1.2.js"></script>
---%>
-			
 	<script type="text/javascript" src="static/js_generated_bundles/proxl_config_page/configureProxlForAdminPage-bundle.js?x=${ cacheBustValue }"></script>
-
-<%--  Moved to Front End Build Bundles		
-	
-	<script type="text/javascript" src="js/handleServicesAJAXErrors.js?x=${cacheBustValue}"></script> 
-	
-	<script type="text/javascript" src="js/configureProxlForAdminPage.js?x=${cacheBustValue}"></script> 
---%>
 
  </c:set>
 

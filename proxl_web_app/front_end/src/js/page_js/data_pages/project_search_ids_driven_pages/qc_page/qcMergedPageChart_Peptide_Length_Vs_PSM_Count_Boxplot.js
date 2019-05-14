@@ -14,6 +14,10 @@
 //JavaScript directive:   all variables have to be declared with "var", maybe other things
 "use strict";
 
+//  require full Handlebars since compiling templates
+const Handlebars = require('handlebars');
+
+
 import { webserviceCallStandardPost } from 'page_js/webservice_call_common/webserviceCallStandardPost.js';
 
 import { qc_pages_Single_Merged_Common } from './qc_pages_Single_Merged_Common.js';

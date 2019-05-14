@@ -13,6 +13,10 @@
 //  JavaScript directive:   all variables have to be declared with "var", maybe other things
 "use strict";
 
+//  require full Handlebars since compiling templates
+const Handlebars = require('handlebars');
+
+
 
 
 import { addSingleGenericProxlToolTip } from 'page_js/header_section_js_all_pages_main_pages/header_section_every_page/genericToolTip.js';

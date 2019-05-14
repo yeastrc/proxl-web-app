@@ -33,20 +33,6 @@
 		<script src="js/lorikeet/ion.js?x=${cacheBustValue}"></script>		
 		
 <%--  End of Lorikeet Core Parts --%>		
-
-		
-		
-		<!-- Handlebars templating library   -->
-		
-		<%--  
-		<script type="text/javascript" src="js/libs/handlebars-v4.1.2.js"></script>
-		--%>
-		
-		<!-- use minimized version  -->
-		<script type="text/javascript" src="js/libs/handlebars.min-v4.1.2.js"></script>
-
-		
-				
 		
 		
 		<script type="text/javascript" src="js/libs/snap.svg-min.js"></script> <%--  Used by lorikeetPageProcessing.js --%>
@@ -56,40 +42,7 @@
 					This include is required on this page:
 					/WEB-INF/jsp-includes/proteinNameTooltipDataForJSCode.jsp
 				  --%>
-<%--  Replaced with the JS bundle listed next
-			<script type="text/javascript" src="js/createTooltipForProteinNames.js?x=${cacheBustValue}"></script>
-  --%>
-  		
 
-	
-
-		
-<%--  Replaced with the JS bundle listed next
-	
-		<script type="text/javascript" src="js/lorikeetPageProcessing.js?x=${cacheBustValue}"></script>
-		
-		<script type="text/javascript" src="js/handleServicesAJAXErrors.js?x=${cacheBustValue}"></script> 
- 
-		<script type="text/javascript" src="js/toggleVisibility.js?x=${cacheBustValue}"></script>
- 
-		<script type="text/javascript" src="js/defaultPageView.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="js/psmPeptideCutoffsCommon.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="js/psmPeptideAnnDisplayDataCommon.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="js/minimumPSM_Count_Filter.js?x=${cacheBustValue}"></script>
-						
-		<script type="text/javascript" src="js/webserviceDataParamsDistribution.js?x=${cacheBustValue}"></script>
-
-		<script type="text/javascript" src="js/viewPsmPerPeptideLoadedFromWebServiceTemplate.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="js/viewPsmsLoadedFromWebServiceTemplate.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="js/viewLooplinkReportedPeptidesLoadedFromWebServiceTemplate.js?x=${cacheBustValue}"></script>
-	
-		<script type="text/javascript" src="js/sharePageURLShortener.js?x=${cacheBustValue}"></script>
-		<script type="text/javascript" src="js/viewProteinPageCommonCrosslinkLooplinkCoverageSearchMerged.js?x=${cacheBustValue}"></script>
-			 
-		<script type="text/javascript" src="js/viewSearchLooplinkProteinPage.js?x=${cacheBustValue}"></script>
---%>
-	
-		<%--  Bundle version of core page JS --%>
 		<script type="text/javascript" src="static/js_generated_bundles/data_pages/looplinkProteinView-bundle.js?x=${cacheBustValue}"></script>
 			
 		
