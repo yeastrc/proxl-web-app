@@ -347,25 +347,25 @@
 							
 							 <div >
 							  <span style="white-space:nowrap;">
-							 	<span id="legend_by_link_length_color_block_short" 
+							 	<span id="legend_by_link_length_color_block_short"
 							 		class=" tool_tip_attached_jq color_picker_link_length_jq " 
 							 		data-tooltip="Click to change the color"
-							 		style="display:inline-block;width:15px;height:15px; cursor: pointer;"></span> 
-							 	&lt;= <span id="legend_by_link_length_cutoff_1"></span> Å 
+							 		style="border-style:solid;border-color:black;border-width:1px;display:inline-block;width:15px;height:15px; cursor: pointer;"></span>
+							 	&lt;= <span id="legend_by_link_length_cutoff_1"></span> &#8491;
 							  </span>
 							  <span style="white-space:nowrap;margin-left:15px;">
 							 	<span id="legend_by_link_length_color_block_medium"
 							 		class=" tool_tip_attached_jq color_picker_link_length_jq " 
 							 		data-tooltip="Click to change the color"
-							 		style="display:inline-block;width:15px;height:15px; cursor: pointer;"></span> 
-							 	&lt;= <span id="legend_by_link_length_cutoff_2"></span> Å 
+							 		style="border-style:solid;border-color:black;border-width:1px;display:inline-block;width:15px;height:15px; cursor: pointer;"></span>
+							 	&lt;= <span id="legend_by_link_length_cutoff_2"></span> &#8491;
 							  </span>
 							  <span style="white-space:nowrap;margin-left:15px;">
-							 	<span id="legend_by_link_length_color_block_long" 
+							 	<span id="legend_by_link_length_color_block_long"
 							 		class=" tool_tip_attached_jq color_picker_link_length_jq " 
 							 		data-tooltip="Click to change the color"
-							 		style="display:inline-block;width:15px;height:15px; cursor: pointer;"></span>
-							 	&gt; <span id="legend_by_link_length_cutoff_3"></span> Å 
+							 		style="border-style:solid;border-color:black;border-width:1px;display:inline-block;width:15px;height:15px; cursor: pointer;"></span>
+							 	&gt; <span id="legend_by_link_length_cutoff_3"></span> &#8491;
 							  </span>
 							  <span style="margin-left:15px; white-space: nowrap;">
 							 	[<a href="javascript:" onclick="userChangeDistanceConstraintsInterface()"
@@ -396,12 +396,12 @@
 									<span id="userConstraintFormShortDistance_color_block"
 										style="display:inline-block;width:22px;height:11px;"></span>
 										
-									<input id="userConstraintFormShortDistance" type="text" style="width:30px;" value="">Å
+									<input id="userConstraintFormShortDistance" type="text" style="width:30px;" value="">&#8491;
 									 
 									<span id="userConstraintFormMediumDistance_color_block" 
 										style="display:inline-block;width:22px;height:11px;"></span> 
 										
-									<input id="userConstraintFormLongDistance" type="text" style="width:30px;" value="">Å
+									<input id="userConstraintFormLongDistance" type="text" style="width:30px;" value="">&#8491;
 									 
 									<span id="userConstraintFormLongDistance_color_block"  
 										style="display:inline-block;width:22px;height:11px;"></span>
@@ -688,7 +688,7 @@
 					  </tr>
 					  <tr>
 					  	<td>Length:</td>
-					  	<td><span id="looplink_length"></span> Å</td>
+					  	<td><span id="looplink_length"></span> ï¿½</td>
 					  </tr>
 					</table>
 				
@@ -712,7 +712,7 @@
 					  </tr>
 					  <tr>
 					  	<td>Length:</td>
-					  	<td><span id="crosslink_length"></span> Å</td>
+					  	<td><span id="crosslink_length"></span> ï¿½</td>
 					  </tr>
 					</table>
 
