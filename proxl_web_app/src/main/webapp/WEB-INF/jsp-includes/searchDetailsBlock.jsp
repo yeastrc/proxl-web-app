@@ -18,6 +18,12 @@
 <script id="search_details_block_filter_direction_above_value" type="text/text" ><%= FilterDirectionType.ABOVE.value()  %></script>
 <script id="search_details_block_filter_direction_below_value" type="text/text" ><%= FilterDirectionType.BELOW.value()  %></script>
 
+
+<c:if test="${ searches_user_sorted }">
+	<%--  For the JS to pick up --%>
+	<script id="search_details_block_searches_user_sorted" type="text/text" >true</script>
+</c:if>
+	
 <%--  Set page variable "singleSearch" --%>
 
 <c:set var="singleSearch" value="${ true }" />
@@ -62,9 +68,10 @@
 			
 	<c:set var="search" value="${ search_details.searchDTO }"></c:set>
  
- 	 <%--  On Merged Peptide, Protein pages, this is draggable for re-ording.    'search_list_item_jq' for searchesChangeDisplayOrder.js --%>
-	 <table class="table-no-border-no-cell-spacing-no-cell-padding  searches_sort_list_item_jq search_list_item_jq  " 
+ 	 <%--  'search_list_item_jq' for searchesChangeDisplayOrder.js --%>
+	 <table class="table-no-border-no-cell-spacing-no-cell-padding  search_list_item_jq  " 
 	 	data-project_search_id="${ search.projectSearchId }"
+	 	data-search_id="${ search.searchId }"
 	 	data-search_order_index="${ searchVarStatus.index }"
 	 	style="border-width:0px;" >
 	  <tr>

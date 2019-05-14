@@ -77,6 +77,8 @@ public class WebConstants {
 	
 	public static final String PARAMETER_SEARCHES_DETAILS_LIST_REQUEST_KEY = "searches_details_list";
 	
+	public static final String PARAMETER_SEARCHES_USER_SORTED_REQUEST_KEY = "searches_user_sorted";
+	
 	public static final String PARAMETER_CUTOFF_PAGE_DISPLAY_ROOT_REQUEST_ENTRY = "cutoffPageDisplayRootRequestEntry";
 
 

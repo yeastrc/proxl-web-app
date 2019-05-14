@@ -63,7 +63,8 @@
 
 <%--  Search Item to put in Overlay --%>		
 <script id="searches_for_page_chooser_overlay_search_entry_template"  type="text/x-handlebars-template">
-  <div class=" search_select_jq single-search-select-item " data-project_search_id="{{ projectSearchId }}" >
+  <div class=" search_select_jq single-search-select-item " data-project_search_id="{{ projectSearchId }}" 
+	 data-search_id="{{ searchId }}" >
 	{{ name }} ({{ searchId }})
   </div>
 </script>

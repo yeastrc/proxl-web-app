@@ -21,22 +21,29 @@ public class GetSearchDetailsData {
 	private GetSearchDetailsData() { }
 	public static GetSearchDetailsData getInstance() { return instance; }
 	
+	public enum SearchesAreUserSorted { YES, NO }
+	
 	/**
 	 * @param search
 	 * @param request
 	 * @throws Exception
 	 */
-	public void getSearchDetailsData( SearchDTO search, HttpServletRequest request ) throws Exception {
+	public void getSearchDetailsData( SearchDTO search, SearchesAreUserSorted searchesAreUserSorted, HttpServletRequest request ) throws Exception {
 		List<SearchDTO> searches = new ArrayList<>( 1 );
 		searches.add(search);
-		getSearchDetailsData( searches, request );
+		getSearchDetailsData( searches, searchesAreUserSorted, request );
 	}
 	/**
 	 * @param searches
 	 * @param request
 	 * @throws Exception
 	 */
-	public void getSearchDetailsData( List<SearchDTO> searches, HttpServletRequest request ) throws Exception {
+	public void getSearchDetailsData( List<SearchDTO> searches, SearchesAreUserSorted searchesAreUserSorted, HttpServletRequest request ) throws Exception {
+		
+		if ( searchesAreUserSorted == SearchesAreUserSorted.YES ) {
+			request.setAttribute( WebConstants.PARAMETER_SEARCHES_USER_SORTED_REQUEST_KEY, true );
+		}
+		
 		List<SearchDTODetailsDisplayWrapper> searchDTODetailsList = new ArrayList<>( searches.size() );
 		StringBuilder searchIdListCommaDelimSB = new StringBuilder( 1000 );
 		GetCutoffPageDisplayRoot getCutoffPageDisplayRoot = GetCutoffPageDisplayRoot.getInstance();

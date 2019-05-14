@@ -36,6 +36,7 @@ var SearchesForPageChooser = function( params ) {
 
 SearchesForPageChooser.prototype.CONSTANTS = {
 		QUERY_STRING_PROJECT_SEARCH_ID : "projectSearchId",
+		QUERY_STRING_USER_SORTED_FLAG : "ds=y",
 		USER_CHOSE_SEARCH_CSS_CLASS : "searches-for-page-chooser-overlay-user-selected-search"
 };
 
@@ -183,6 +184,7 @@ SearchesForPageChooser.prototype.init = function( params ) {
  * 
  */
 SearchesForPageChooser.prototype.openOverlay = function( ) {
+
 	this.loadSearchData();
 };
 
@@ -547,46 +549,128 @@ SearchesForPageChooser.prototype.changeButtonClicked = function() {
 	var projectSearchIdsForCurrentPage = this.getProjectSearchIdsForCurrentPage();
 	var projectSearchIdsForCurrentPageAsArray = projectSearchIdsForCurrentPage.asArray;
 
+	var chosenProjectSearchIdSearchIdPairs_Map_Key_ProjectSearchId = new Map();
+	const chosenProjectSearchIds_Sorted = [];
+
 	var $search_select_jq_All = $("#searches_for_page_chooser_list_container .search_select_jq");
-	var chosenProjectSearchIds = [];
 	$search_select_jq_All.each(function() {
 		var $this = $( this );
 		if ( $this.hasClass( objectThis.CONSTANTS.USER_CHOSE_SEARCH_CSS_CLASS ) ) {
 			var chosenProjectSearchId = $this.attr("data-project_search_id");
-			chosenProjectSearchIds.push( chosenProjectSearchId );
+			var chosenSearchId = $this.attr("data-search_id");
+			chosenProjectSearchIds_Sorted.push( chosenProjectSearchId );
+			chosenProjectSearchIdSearchIdPairs_Map_Key_ProjectSearchId.set( chosenProjectSearchId, { chosenProjectSearchId, chosenSearchId } );
 		}
 	});
-	if ( chosenProjectSearchIds.length === 0 ) {
-		throw Error( "chosenProjectSearchIds.length === 0" );
+	if ( chosenProjectSearchIds_Sorted.length === 0 ) {
+		throw Error( "chosenProjectSearchIds_Sorted.length === 0" );
 	}
-	chosenProjectSearchIds.sort();
-	//  If chose exact same searches as current page, do nothing and exit 
-	if ( projectSearchIdsForCurrentPageAsArray.length === chosenProjectSearchIds.length	) {
-		// Length same so confirm all values the same
-		var allValuesMatch = true;
-		for ( var index = 0; index < projectSearchIdsForCurrentPageAsArray.length; index++ ) {
-			if ( projectSearchIdsForCurrentPageAsArray[ index ] != chosenProjectSearchIds[ index ] ) {
-				allValuesMatch = false;
+
+	//  projectSearchIdsForCurrentPageAsArray is sorted on project search id
+
+	
+	chosenProjectSearchIds_Sorted.sort();
+
+	{
+		//  If chose exact same searches as current page, do nothing and exit 
+		
+		if ( projectSearchIdsForCurrentPageAsArray.length === chosenProjectSearchIds_Sorted.length	) {
+
+			// Length same so confirm all values the same
+
+			
+			var allValuesMatch = true;
+			for ( var index = 0; index < projectSearchIdsForCurrentPageAsArray.length; index++ ) {
+				if ( projectSearchIdsForCurrentPageAsArray[ index ] != chosenProjectSearchIds_Sorted[ index ] ) {
+					allValuesMatch = false;
+				}
+			}
+			if ( allValuesMatch ) {
+				//  Chose exact same searches as current page, do nothing and exit
+				console.log( "No changes to chosen project search ids so just exit without changing URL" );
+				this.closeOverlay();
+				return;
 			}
 		}
-		if ( allValuesMatch ) {
-			//  Chose exact same searches as current page, do nothing and exit
-			console.log( "No changes to chosen project search ids so just exit without changing URL" );
-			this.closeOverlay();
-			return;
-		}
 	}
-	
+
+	let chosenProjectSearchIds_Final = undefined;
+
+	let searchesUserSorted = false;
+
+	const $search_details_block_searches_user_sorted = $("#search_details_block_searches_user_sorted");
+	if ( $search_details_block_searches_user_sorted.length !== 0 ) {
+
+		//  User has sorted the searches on the current page so keep those in the same order 
+		//  and add the new entries to the end sorted on search id
+
+		searchesUserSorted = true; // so ds=y will be put on the URL
+
+		//  Process current searches from Search Details Block
+		//  This is the current searches in the order the user chose.
+
+		const projectSearchIdsInOrderUserChose_WithAdditions = [];
+
+		var $searches_details_list_container = $("#searches_details_list_container")
+			
+		var $search_list_item_jq_ALL = $searches_details_list_container.find(".search_list_item_jq");
+		$search_list_item_jq_ALL.each( function() {
+			var $this = $( this );
+			var projectSearchId = $this.attr("data-project_search_id");
+			var searchId = $this.attr("data-search_id");
+
+			if ( chosenProjectSearchIdSearchIdPairs_Map_Key_ProjectSearchId.has( projectSearchId ) ) {
+				//  add to output array
+				projectSearchIdsInOrderUserChose_WithAdditions.push( projectSearchId );
+				//  remove from map since in output array
+				chosenProjectSearchIdSearchIdPairs_Map_Key_ProjectSearchId.delete( projectSearchId )
+			}
+			var z = 0;
+		} );
+
+		if ( chosenProjectSearchIdSearchIdPairs_Map_Key_ProjectSearchId.size !== 0 ) {
+			//  Entries in new chosen list that are not in existing entries on the page
+			//    These are to be sorted on search id and added to the end of the output list
+
+			const additional_projectSearchIdSearchIdPairs = [];
+			for ( const entry of chosenProjectSearchIdSearchIdPairs_Map_Key_ProjectSearchId.values() ) {
+				additional_projectSearchIdSearchIdPairs.push( entry );
+			}
+			//  Sort on Search Id
+			additional_projectSearchIdSearchIdPairs.sort( (a, b) => {
+				if ( a.chosenSearchId < b.chosenSearchId ) {
+					return -1;
+				} else if ( a.chosenSearchId > b.chosenSearchId ) {
+					return 1;
+				} else {
+					return 0;
+				}
+			});
+			//  Add additional_projectSearchIdSearchIdPairs to output list
+
+			for ( const entry of additional_projectSearchIdSearchIdPairs ) {
+				projectSearchIdsInOrderUserChose_WithAdditions.push( entry.chosenProjectSearchId );
+			}
+
+		}
+
+		chosenProjectSearchIds_Final = projectSearchIdsInOrderUserChose_WithAdditions;
+
+	} else {
+
+		chosenProjectSearchIds_Final = chosenProjectSearchIds_Sorted;
+	}
+
 	var urlPathname = window.location.pathname;
 	
 	if ( urlPathname.indexOf( this._image_uri_path ) != -1
 			|| urlPathname.indexOf( this._structure_uri_path ) != -1
 			|| urlPathname.indexOf( this._qc_data_uri_path ) != -1 ) {
 		
-		this.changePageUrlForImageOrStructureOrQCDataPage( { chosenProjectSearchIds : chosenProjectSearchIds } );
+		this.changePageUrlForImageOrStructureOrQCDataPage( { chosenProjectSearchIds : chosenProjectSearchIds_Final, searchesUserSorted } );
 	}
 
-	this.changePageUrlFor_NOT_ImageOrStructurePage( { chosenProjectSearchIds : chosenProjectSearchIds } );
+	this.changePageUrlFor_NOT_ImageOrStructurePage( { chosenProjectSearchIds : chosenProjectSearchIds_Final, searchesUserSorted } );
 	
 };
 
@@ -595,9 +679,7 @@ SearchesForPageChooser.prototype.changeButtonClicked = function() {
  * For NOT Image or Structure page
  * Update form on page with new project search id(s) and submit it
  */
-SearchesForPageChooser.prototype.changePageUrlFor_NOT_ImageOrStructurePage = function( params ) {
-
-	var chosenProjectSearchIds = params.chosenProjectSearchIds;
+SearchesForPageChooser.prototype.changePageUrlFor_NOT_ImageOrStructurePage = function({ chosenProjectSearchIds, searchesUserSorted }) {
 
 	if ( chosenProjectSearchIds.length === 1 ) {
 		//  1 project search id chosen
@@ -629,11 +711,25 @@ SearchesForPageChooser.prototype.changePageUrlFor_NOT_ImageOrStructurePage = fun
 	var $project_search_id_in_update_form_jq_All = $form_get_for_updated_parameters_multiple_searches.find(".project_search_id_in_update_form_jq");
 	$project_search_id_in_update_form_jq_All.remove(); // Removes all existing input fields
 
-	//   Remove 'ds' query param
+	
 	var $query_param_do_not_sort_in_update_form_jq = $form_get_for_updated_parameters_multiple_searches.find(".query_param_do_not_sort_in_update_form_jq");
-	$query_param_do_not_sort_in_update_form_jq.remove(); // Removes existing do not search input field
+	if ( searchesUserSorted ) {
+		if ( $query_param_do_not_sort_in_update_form_jq.length === 0 ) {
+			//   Add 'ds' query param
+			const $query_param_do_not_sort_yes_input_template = $("#query_param_do_not_sort_yes_input_template");
+			if ( $query_param_do_not_sort_yes_input_template.length === 0 ) {
+				throw Error("No DOM element with id 'query_param_do_not_sort_yes_input_template'");
+			}
+			const html = $query_param_do_not_sort_yes_input_template.text();
+			$( html ).prependTo( $form_get_for_updated_parameters_multiple_searches );
+		}
+	} else {
+		//   Remove 'ds' query param
+		$query_param_do_not_sort_in_update_form_jq.remove(); // Removes existing do not search input field
+	}
+	
 
-	for ( var index = 0; index < chosenProjectSearchIds.length; index++ ) {
+	for ( var index = chosenProjectSearchIds.length - 1; index >= 0; index-- ) { // Add in reverse order since using .prependTo
 		var projectSearchId = chosenProjectSearchIds[ index ];
 		var inputFieldForProjectSearchIdHTML = this._project_search_id_input_template.replace( "#", projectSearchId );
 		var $addedItem = 
@@ -648,10 +744,8 @@ SearchesForPageChooser.prototype.changePageUrlFor_NOT_ImageOrStructurePage = fun
  * For Image or Structure or QC Data page
  * Create new URL with new project search id(s) and change browser URL to it
  */
-SearchesForPageChooser.prototype.changePageUrlForImageOrStructureOrQCDataPage = function( params ) {
-	
-	var chosenProjectSearchIds = params.chosenProjectSearchIds;
-	
+SearchesForPageChooser.prototype.changePageUrlForImageOrStructureOrQCDataPage = function({ chosenProjectSearchIds, searchesUserSorted }) {
+		
 	// Build new URL
 	var href = window.location.href;
 	var pathname = window.location.pathname;
@@ -667,6 +761,9 @@ SearchesForPageChooser.prototype.changePageUrlForImageOrStructureOrQCDataPage = 
 			+ "="
 			+ projectSearchId;
 		queryStringProjectSearchIds.push( singleProjectSearchIdAssignment );
+	}
+	if ( searchesUserSorted ) {
+		queryStringProjectSearchIds.push( this.CONSTANTS.QUERY_STRING_USER_SORTED_FLAG );
 	}
 	var queryString = queryStringProjectSearchIds.join( "&" );
 	
