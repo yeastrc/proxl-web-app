@@ -7,6 +7,10 @@
 // JavaScript directive:   all variables have to be declared with "var", maybe other things
 "use strict";
 
+//  require full Handlebars since compiling templates
+const Handlebars = require('handlebars');
+
+
 
 
 //  For showing Data for links (Drilldown) (Called by HTML onclick):

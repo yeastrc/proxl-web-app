@@ -12,6 +12,9 @@
 
 //  module import 
 
+//  Import Handlebars Runtime since using pre-compiled templates
+const Handlebars = require('handlebars/runtime');
+
 //  Import Handlebars templates
 
 const _project_page__saved_views_section_loggedin_users_template = require("../../../../../handlebars_templates_precompiled/project_page__saved_views_section_loggedin_users/project_page__saved_views_section_loggedin_users_template-bundle.js");

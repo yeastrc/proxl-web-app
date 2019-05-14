@@ -11,6 +11,10 @@
 //  If the status changes in the DB, prompt the user to refresh the page with an overlay
 
 
+//  require full Handlebars since compiling templates
+const Handlebars = require('handlebars');
+
+
 
 $(document).ready(function() {
 	

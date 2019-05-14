@@ -10,6 +10,10 @@
 
 "use strict";
 
+//  require full Handlebars since compiling templates
+const Handlebars = require('handlebars');
+
+
 
 $(document).ready(function()  { 
 	try {

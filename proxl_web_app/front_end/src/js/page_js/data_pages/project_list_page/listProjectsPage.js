@@ -10,6 +10,8 @@
 
 "use strict";
 
+//  require full Handlebars since compiling templates
+const Handlebars = require('handlebars');
 
 import { header_mainVariable } from 'page_js/header_section_js_all_pages_main_pages/header_section_main_pages/header_main.js';
 

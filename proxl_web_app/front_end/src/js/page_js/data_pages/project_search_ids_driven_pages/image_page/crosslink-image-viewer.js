@@ -31,6 +31,10 @@
 // JavaScript directive:   all variables have to be declared with "var", maybe other things
 "use strict";
 
+//  require full Handlebars since compiling templates
+const Handlebars = require('handlebars');
+
+
 
 //  Import to make available on the page
 

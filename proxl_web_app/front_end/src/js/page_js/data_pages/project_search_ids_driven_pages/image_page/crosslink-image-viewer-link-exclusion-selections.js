@@ -18,6 +18,10 @@
 // JavaScript directive:   all variables have to be declared with "var", maybe other things
 "use strict";
 
+//  require full Handlebars since compiling templates
+const Handlebars = require('handlebars');
+
+
 ////////////////////////////
 //   All references to proteinId or protein_id are actually referencing the protein sequence id
 ////////////////////////////

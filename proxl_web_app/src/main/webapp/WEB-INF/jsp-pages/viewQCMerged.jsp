@@ -50,15 +50,6 @@
 		<%--  On this page Snap used by qcMergedPageMain.js for Snap.hsb2rgb(...) to get color --%>				
 		<script type="text/javascript" src="js/libs/snap.svg-min.js"></script> <%--  Used by lorikeetPageProcessing.js --%>
 		
-		<!-- Handlebars templating library   -->
-		
-		<%--  
-		<script type="text/javascript" src="js/libs/handlebars-v4.1.2.js"></script>
-		--%>
-		
-		<!-- use minimized version  -->
-		<script type="text/javascript" src="js/libs/handlebars.min-v4.1.2.js"></script>
-
 				<%-- 
 					The Struts Action for this page must call GetProteinNamesTooltipConfigData
 					This include is required on this page:

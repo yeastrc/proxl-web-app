@@ -29,20 +29,6 @@
 		<%--  Used by lz-string.min.js --%>
 		<script type="text/javascript" src="js/libs/lz-string/base64-string.js"></script>
 
-		
-		
-		<!-- Handlebars templating library   -->
-		
-		<%--  
-		<script type="text/javascript" src="js/libs/handlebars-v4.1.2.js"></script>
-		--%>
-		
-		<!-- use minimized version  -->
-		<script type="text/javascript" src="js/libs/handlebars.min-v4.1.2.js"></script>
-
-
-		
-		
 <%--  Start of Lorikeet Core Parts --%>		
 
 		<script src="js/libs/jquery-ui-1.12.1.min.js"></script>
