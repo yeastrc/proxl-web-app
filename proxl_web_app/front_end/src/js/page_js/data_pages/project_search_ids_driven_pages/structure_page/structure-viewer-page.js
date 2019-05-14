@@ -3779,7 +3779,8 @@ var StructurePagePrimaryRootCodeClass = function() {
 				onlyShortest : onlyShortest,
 				alignments : _ALIGNMENTS,
 				structure : _STRUCTURE,
-				renderedLinks : _renderedLinks
+				renderedLinks : _renderedLinks,
+				linkExclusionHandler: _linkExclusionHandler
 			});
 
 			PValueUtils.updatePValueDisplay({
@@ -3788,7 +3789,8 @@ var StructurePagePrimaryRootCodeClass = function() {
 				onlyShortest : onlyShortest,
 				alignments : _ALIGNMENTS,
 				structure : _STRUCTURE,
-				renderedLinks : _renderedLinks
+				renderedLinks : _renderedLinks,
+				linkExclusionHandler: _linkExclusionHandler
 			});
 
 		});
@@ -3818,13 +3820,14 @@ var StructurePagePrimaryRootCodeClass = function() {
 				onlyShortest : onlyShortest,
 				alignments : _ALIGNMENTS,
 				structure : _STRUCTURE,
-				renderedLinks : _renderedLinks
+				renderedLinks : _renderedLinks,
+				linkExclusionHandler: _linkExclusionHandler,
 			});
 
 		});
 	};
 
-	var updateShownLinks = function () {
+	const updateShownLinks = function () {
 
 		updateShownCrosslinks();
 		updateShownLooplinks();
@@ -3920,12 +3923,22 @@ var StructurePagePrimaryRootCodeClass = function() {
 		addToolTips( $shownCrosslinksDiv );
 
 		// add click handlers for toggling visibility of links
-		_linkExclusionHandler.addClickHandlerToCrosslinkToggles( _renderedLinks, drawCrosslinks_noReportRedraw, updateURLHash );
+		_linkExclusionHandler.addClickHandlerToCrosslinkToggles( _renderedLinks, updateURLHash, clickedCrosslinkVisibilityToggle );
 
 	}
 
+	const clickedCrosslinkVisibilityToggle = function() {
+		drawCrosslinks_noReportRedraw();
+		updateDensityPlotAndPValue();
+	};
 
-	var updateShownLooplinksHeader = function() {
+	const clickedLooplinkVisibilityToggle = function() {
+		drawLooplinks_noReportRedraw();
+		updateDensityPlotAndPValue();
+	};
+
+
+	const updateShownLooplinksHeader = function() {
 
 		var exclusionCount =  _linkExclusionHandler.getExcludedRenderedLooplinkCount( _renderedLinks[ 'looplinks' ] );
 		var $headerDiv = $( 'div#shown-looplinks-header' );
@@ -3939,7 +3952,7 @@ var StructurePagePrimaryRootCodeClass = function() {
 		}
 
 		$headerDiv.html( html );
-	}
+	};
 
 	var updateShownLooplinks = function() {
 
@@ -4011,7 +4024,7 @@ var StructurePagePrimaryRootCodeClass = function() {
 		addToolTips( $shownLooplinksDiv );
 
 		// add click handlers for toggling visibility of links
-		_linkExclusionHandler.addClickHandlerToLooplinkToggles( _renderedLinks, drawLooplinks_noReportRedraw, updateURLHash );
+		_linkExclusionHandler.addClickHandlerToLooplinkToggles( _renderedLinks, updateURLHash, clickedLooplinkVisibilityToggle );
 	}
 
 

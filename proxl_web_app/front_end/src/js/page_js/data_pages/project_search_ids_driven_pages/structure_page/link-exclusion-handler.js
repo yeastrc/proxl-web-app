@@ -343,54 +343,58 @@ LinkExclusionHandler.prototype.getSortedLooplinkInfo = function(proteinId, prote
 
 /************  Items related to the user interface ****************/
 
-LinkExclusionHandler.prototype.addClickHandlerToCrosslinkToggles = function( _renderedLinks, drawStructureFunction, updateHashFunction ) {
+LinkExclusionHandler.prototype.addClickHandlerToCrosslinkToggles = function( _renderedLinks, updateHashFunction, functionToCall ) {
 
     if (_renderedLinks['crosslinks'] && _renderedLinks['crosslinks'].length > 0) {
 
         for (let i = 0; i < _renderedLinks['crosslinks'].length; i++) {
             const link = _renderedLinks['crosslinks'][i]['link'];
 
-            this.addClickHandlerToCrosslinkToggle(link, i, drawStructureFunction, updateHashFunction);
+            this.addClickHandlerToCrosslinkToggle(link, i, updateHashFunction, functionToCall);
         }
     }
 };
 
-LinkExclusionHandler.prototype.addClickHandlerToLooplinkToggles = function( _renderedLinks, drawStructureFunction, updateHashFunction ) {
+LinkExclusionHandler.prototype.addClickHandlerToLooplinkToggles = function( _renderedLinks, updateHashFunction, functionToCall ) {
 
     if (_renderedLinks['looplinks'] && _renderedLinks['looplinks'].length > 0) {
 
         for (let i = 0; i < _renderedLinks['looplinks'].length; i++) {
             const link = _renderedLinks['looplinks'][i]['link'];
 
-            this.addClickHandlerToLooplinkToggle(link, i, drawStructureFunction, updateHashFunction);
+            this.addClickHandlerToLooplinkToggle(link, i, updateHashFunction, functionToCall);
         }
     }
 };
 
 
-LinkExclusionHandler.prototype.addClickHandlerToCrosslinkToggle = function(link, index, drawStructureFunction, updateHashFunction ) {
+LinkExclusionHandler.prototype.addClickHandlerToCrosslinkToggle = function(link, index, updateHashFunction, functionToCall ) {
 
     const $clickedElement = $('span#cross-link-show-toggle-index-' + index);
     const objectThis = this;
 
     $clickedElement.click( function( e ) {
         e.preventDefault();
+        e.stopPropagation();
+
         objectThis.processClickedLinkVisibility( link, updateHashFunction );
-        drawStructureFunction();
+        functionToCall();
 
         return false;
     });
 };
 
-LinkExclusionHandler.prototype.addClickHandlerToLooplinkToggle = function(link, index, drawStructureFunction, updateHashFunction ) {
+LinkExclusionHandler.prototype.addClickHandlerToLooplinkToggle = function(link, index, updateHashFunction, functionToCall ) {
 
     const $clickedElement = $('span#loop-link-show-toggle-index-' + index);
     const objectThis = this;
 
     $clickedElement.click( function( e ) {
         e.preventDefault();
+        e.stopPropagation();
+
         objectThis.processClickedLinkVisibility( link, updateHashFunction );
-        drawStructureFunction();
+        functionToCall();
 
         return false;
     });

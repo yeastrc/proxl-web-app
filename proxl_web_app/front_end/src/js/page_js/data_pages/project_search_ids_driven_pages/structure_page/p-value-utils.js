@@ -7,7 +7,7 @@ import {StatsUtils} from "../../../../utils/stats";
 export class PValueUtils {
 
     static updatePValueDisplay({linkablePositionData, visibleProteinsMap,
-                                   onlyShortest, alignments, structure, renderedLinks }) {
+                                   onlyShortest, alignments, structure, renderedLinks, linkExclusionHandler }) {
 
         if( !visibleProteinsMap ) { return; }
 
@@ -20,14 +20,16 @@ export class PValueUtils {
             return;
         }
 
-        const renderedDistanceArray = LinkablePositionUtils.getRenderedDistanceArray( renderedLinks );
+        const renderedDistanceArray = LinkablePositionUtils.getRenderedDistanceArray( renderedLinks, linkExclusionHandler );
 
         const pdbDistanceArray = LinkablePositionUtils.getDistanceArrayFromLinkablePositions({
             data : linkablePositionData,
             visibleProteinsMap,
             onlyShortest,
             alignments,
-            structure
+            structure,
+            renderedLinks,
+            linkExclusionHandler
         });
 
         const T = pdbDistanceArray.length;

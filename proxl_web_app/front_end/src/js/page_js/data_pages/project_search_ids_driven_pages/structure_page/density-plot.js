@@ -7,18 +7,20 @@ import {LinkablePositionUtils} from "./linkable-positions-utils";
 
 export class DensityPlot {
 
-    static loadAndShowDensityPlot( { linkablePositionData, divToUpdateSelector, visibleProteinsMap, onlyShortest, alignments, structure, renderedLinks} ) {
+    static loadAndShowDensityPlot( { linkablePositionData, divToUpdateSelector, visibleProteinsMap, onlyShortest, alignments, structure, renderedLinks, linkExclusionHandler} ) {
 
         if( !visibleProteinsMap ) { return; }
 
-        const renderedDistanceArray = LinkablePositionUtils.getRenderedDistanceArray( renderedLinks );
+        const renderedDistanceArray = LinkablePositionUtils.getRenderedDistanceArray( renderedLinks, linkExclusionHandler );
 
         const pdbDistanceArray = LinkablePositionUtils.getDistanceArrayFromLinkablePositions({
             data : linkablePositionData,
             visibleProteinsMap,
             onlyShortest,
             alignments,
-            structure
+            structure,
+            linkExclusionHandler,
+            renderedLinks
         });
 
         DensityPlot.staticShowDensityPlot( { divToUpdateSelector, pdbDistanceArray, renderedDistanceArray } );
