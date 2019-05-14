@@ -84,11 +84,6 @@ var QCMergedPageChart_PPM_Error_PSM = function() {
 
 	var _DUMMY_CHART_STATUS_WHOLE_TEXT_SCANS_NOT_UPLOADED = undefined;
 
-	var _IS_LOADED_YES = "YES";
-	var _IS_LOADED_NO = "NO";
-	var _IS_LOADED_LOADING = "LOADING";
-	
-
 	//  passed in functions
 
 	//  Copy references to qcPageMain functions to here
@@ -104,8 +99,6 @@ var QCMergedPageChart_PPM_Error_PSM = function() {
 	///////////
 	
 	//   Variables for this chart
-	
-	var _chart_isLoaded = _IS_LOADED_NO;
 	
 	/**
 	 * Init page Actual - Called from qcPageMain.initActual
@@ -169,30 +162,26 @@ var QCMergedPageChart_PPM_Error_PSM = function() {
 
 	};
 
-
-
 	/**
-	 * Add Click and onChange handlers 
+	 * Add Click and onChange handlers   - called from this.initActual(...)
 	 */
 	this.addClickAndOnChangeHandlers = function() {
 		var objectThis = this;
-
 	};
 
-
-	///////////////////////////////////////////
-
-	///////////////////////////////////////////
-
-	/////////   
-
-
 	/**
+	 * Called when the selection criteria at the top of the page has changed and user has clicked "Update from Database".
+	 *   The current chart(s) and it's data are no longer applicable and can be deleted and removed.
+	 * 
 	 * Clear data 
 	 */
 	this.clearChart = function() {
 
-		_chart_isLoaded = _IS_LOADED_NO;
+		_loadChartIfNeeded_PreviouslyCalled = false;
+		_chartsDisplayed_All = false
+		//  clear maps
+		_chartsData.clear();
+		_chartsDisplayed_PerLinkType.clear();
 
 		var $PSM_PPM_Error_CountsBlock = $("#PSM_PPM_Error_CountsBlock");
 		$PSM_PPM_Error_CountsBlock.empty();
@@ -211,39 +200,83 @@ var QCMergedPageChart_PPM_Error_PSM = function() {
 		_activeAjax = null;
 	};
 
+	/**
+	 * Called when the section is hidden
+	 * 
+	 * Clear data for Summary_Statistics_Counts
+	 */
+	this.sectionHidden = function() {
+
+		_sectionVisible = false;
+	}
+
+	let _sectionVisible = false; //  When true, the section is visible
+
+	let _loadChartIfNeeded_PreviouslyCalled = false; // Also false if this.clearChart() called
+
+	let _selectedLinkTypesLoadingDataFor = undefined;  // For this call to loadChartIfNeeded(), the link types that are loading data for
+
+	//  Map since multiple AJAX call
+	let _chartsData = new Map();
+
+	//  Map since NOT all created at once
+	let _chartsDisplayed_PerLinkType = new Map();
+
+	//  Map since NOT all created at once
+	let _chartsDisplayed_All = false; // Also false if this.clearChart() called
+
 
 	/**
-	 * If not currently loaded, load
+	 * This Method should be called 'createChartIfNeeded'.  Also when called, the section is shown.
+	 * 
+	 * Called when the section on the page that this chart is in is opened (or on page load for section open on page load)
+	 * 
 	 */
 	this.loadChartIfNeeded = function() {
 
-		if ( _chart_isLoaded === _IS_LOADED_NO ) {
-			this.load_PPM_Error_For_PSMs_Histogram();
+		_sectionVisible = true;
+
+		if ( ! _chartsDisplayed_All ) {
+
+			if ( _loadChartIfNeeded_PreviouslyCalled ) {
+				//  loadChartIfNeeded previously called so for charts that are not displayed, display charts that have data for
+
+				for ( const selectedLinkType of _selectedLinkTypesLoadingDataFor ) {
+					const chartData_ForLinkType = _chartsData.get( selectedLinkType );
+					const chartDisplayed_ForLinkType = _chartsDisplayed_PerLinkType.get( selectedLinkType );
+					if ( chartData_ForLinkType && ( ! chartDisplayed_ForLinkType ) ) {
+						//  have chart data and chart not displayed so display chart for link type
+						this.createChart( chartData_ForLinkType );
+					}
+				}
+			} else {
+				//  Process request to Load data and display charts
+
+				_loadChartIfNeeded_PreviouslyCalled = true;
+
+				this.getData_FromServer();
+			}
 		}
 	};
 
-	var _load_PPM_Error_PSMCountActiveAjax = null;
-
 	/**
-	 * Load the data for  PPM Error for PSMs Histogram
+	 *  Load the data from the server
 	 */
-	this.load_PPM_Error_For_PSMs_Histogram = function() {
+	this.getData_FromServer = function() {
 		var objectThis = this;
-
-		_chart_isLoaded = _IS_LOADED_LOADING;
 
 		var $PSM_PPM_Error_CountsBlock = $("#PSM_PPM_Error_CountsBlock");
 		$PSM_PPM_Error_CountsBlock.empty();
 
 		var hash_json_Contents = _get_hash_json_Contents();
 		
-		var selectedLinkTypes = hash_json_Contents.linkTypes;
+		_selectedLinkTypesLoadingDataFor = hash_json_Contents.linkTypes;
 
 		if ( ! _anySearchesHaveScanDataYes ) {
 
 			// Show cells for selected link types
-			for ( var index = 0; index < selectedLinkTypes.length; index++ ) {
-				var selectedLinkType = selectedLinkTypes[ index ];
+			for ( var index = 0; index < _selectedLinkTypesLoadingDataFor.length; index++ ) {
+				var selectedLinkType = _selectedLinkTypesLoadingDataFor[ index ];
 				//  Add empty chart with Loading message
 
 				var $chart_outer_container_jq =
@@ -255,7 +288,7 @@ var QCMergedPageChart_PPM_Error_PSM = function() {
 				} );
 			}
 
-			_chart_isLoaded = _IS_LOADED_YES;
+			_chartsDisplayed_All = true;
 
 			//  Exit since no data to display
 
@@ -266,7 +299,7 @@ var QCMergedPageChart_PPM_Error_PSM = function() {
 		var hash_json_Contents_COPY = $.extend( true /*deep*/,  {}, hash_json_Contents );
 
 		// Add cells for selected link types
-		selectedLinkTypes.forEach( function ( currentArrayValue, indexForLinkType, array ) {
+		_selectedLinkTypesLoadingDataFor.forEach( function ( currentArrayValue, indexForLinkType, array ) {
 			var selectedLinkType = currentArrayValue;
 
 			//  Add empty chart with Loading message
@@ -346,70 +379,32 @@ var QCMergedPageChart_PPM_Error_PSM = function() {
 						indexForLinkType : indexForLinkType,
 						$chart_outer_container_jq : $chart_outer_container_jq
 				};
-				objectThis.load_PPM_Error_For_PSMs_HistogramResponse( responseParams );
+				objectThis.createChart( responseParams );
 			} catch( e ) {
 				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
 				throw e;
 			}
 		});
-
-		//  Set to returned jQuery XMLHttpRequest (jqXHR) object
-// 		_activeAjax[ selectedLinkType ] = 
-// 			$.ajax({
-// 				type : "POST",
-// 				url : url,
-// 				traditional: true,  //  Force traditional serialization of the data sent
-// 				//   One thing this means is that arrays are sent as the object property instead of object property followed by "[]".
-// 				//   So project_search_ids array is passed as "project_search_ids=<value>" which is what Jersey expects
-// 				data : hash_json_field_Contents_JSONString,  // The data sent as the POST body
-// 				contentType: "application/json; charset=utf-8",
-// 				dataType : "json",
-// 				success : function( ajaxResponseData ) {
-// 					try {
-// 						if ( _activeAjax ) {
-// 							_activeAjax[ selectedLinkType ] = null;
-// 						}
-// 						var responseParams = {
-// 								ajaxResponseData : ajaxResponseData, 
-// 								selectedLinkType : selectedLinkType,
-// 								indexForLinkType : indexForLinkType,
-// 								$chart_outer_container_jq : $chart_outer_container_jq
-// 						};
-// 						objectThis.load_PPM_Error_For_PSMs_HistogramResponse( responseParams );
-// //						$topTRelement.data( _DATA_LOADED_DATA_KEY, true );
-// 					} catch( e ) {
-// 						reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
-// 						throw e;
-// 					}
-// 				},
-// 				failure: function(errMsg) {
-// 					if ( _activeAjax ) {
-// 						_activeAjax[ selectedLinkType ] = null;
-// 					}
-// 					handleAJAXFailure( errMsg );
-// 				},
-// 				error : function(jqXHR, textStatus, errorThrown) {
-// 					if ( _activeAjax ) {
-// 						_activeAjax[ selectedLinkType ] = null;
-// 					}
-// 					if ( objectThis._passAJAXErrorTo_handleAJAXError(jqXHR, textStatus, errorThrown) ) {
-// 						handleAJAXError(jqXHR, textStatus, errorThrown);
-// 					}
-// 				}
-// 			});
-		// indent due to assignment
 	};
 
 	/**
-	 * Process AJAX Response
+	 * Create Chart - Called from AJAX response or when Section opened and have data
 	 */
-	this.load_PPM_Error_For_PSMs_HistogramResponse = function( params ) {
+	this.createChart = function( params ) {
 		var objectThis = this;
 
 		var ajaxResponseData = params.ajaxResponseData;
 		var selectedLinkType = params.selectedLinkType;
 		var indexForLinkType = params.indexForLinkType;
 		var $chart_outer_container_jq = params.$chart_outer_container_jq;
+
+		if ( ! _sectionVisible ) {
+
+			//  Section not visible so save off data and return
+			_chartsData.set( selectedLinkType, params );
+
+			return;  // EARLY RETURN
+		}
 
 		var dataForChartPerLinkTypeList = ajaxResponseData.dataForChartPerLinkTypeList;
 
@@ -486,9 +481,24 @@ var QCMergedPageChart_PPM_Error_PSM = function() {
 
 		}
 
-		//  TODO  FIX THIS
+		_chartsDisplayed_PerLinkType.set( selectedLinkType, true );
 
-//		_chart_isLoaded = _IS_LOADED_YES;
+		{
+			//  if displayed for all selected link types, update '_chartsDisplayed_All'
+
+			let chartsDisplayed_All_LOCAL = true;
+
+			for ( const selectedLinkTypeEntry of _selectedLinkTypesLoadingDataFor ) {
+				const chartsDisplayed_ForLinkType = _chartsDisplayed_PerLinkType.get( selectedLinkTypeEntry );
+				if ( ! chartsDisplayed_ForLinkType ) {
+					chartsDisplayed_All_LOCAL = false;
+					break;
+				}
+			}
+			if ( chartsDisplayed_All_LOCAL ) {
+				_chartsDisplayed_All = true;
+			}
+		}
 	};
 
 	//  Overridden for Specific elements like Chart Title and X and Y Axis labels

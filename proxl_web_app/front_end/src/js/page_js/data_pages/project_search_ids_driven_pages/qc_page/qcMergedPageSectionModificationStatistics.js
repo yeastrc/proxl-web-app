@@ -224,6 +224,10 @@ var QCMergedPageSectionModificationStatistics = function() {
 		$modification_stats_collapse_link.hide();
 
 		_sectionDisplayed = false;
+
+		_pageChartObjectsForSection.forEach( function( pageChartObjectForSection, index, array ) {
+			pageChartObjectForSection.sectionHidden();
+		}, this );
 	};
 
 	/**

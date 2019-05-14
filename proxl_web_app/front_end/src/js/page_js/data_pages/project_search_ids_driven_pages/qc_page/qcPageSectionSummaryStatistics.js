@@ -241,6 +241,10 @@ var QCPageSectionSummaryStatistics = function() {
 		$summary_collapse_link.hide();
 
 		_sectionDisplayed = false;
+
+		_pageChartObjectsForSection.forEach( function( pageChartObjectForSection, index, array ) {
+			pageChartObjectForSection.sectionHidden();
+		}, this );
 	};
 
 	/**

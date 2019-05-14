@@ -223,8 +223,12 @@ var QCMergedPageSectionScanFileStatistics = function() {
 		$scan_level_expand_link.show();
 		var $scan_level_collapse_link = $("#scan_level_collapse_link");
 		$scan_level_collapse_link.hide();
-
+		
 		_sectionDisplayed = false;
+
+		_pageChartObjectsForSection.forEach( function( pageChartObjectForSection, index, array ) {
+			pageChartObjectForSection.sectionHidden();
+		}, this );
 	};
 
 	/**

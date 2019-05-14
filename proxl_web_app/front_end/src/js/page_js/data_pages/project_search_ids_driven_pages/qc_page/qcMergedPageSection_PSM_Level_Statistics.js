@@ -229,6 +229,10 @@ var QCMergedPageSection_PSM_Level_Statistics = function() {
 		$psm_level_collapse_link.hide();
 
 		_sectionDisplayed = false;
+
+		_pageChartObjectsForSection.forEach( function( pageChartObjectForSection, index, array ) {
+			pageChartObjectForSection.sectionHidden();
+		}, this );
 	};
 
 	/**

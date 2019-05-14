@@ -87,10 +87,6 @@ var QCMergedPageChartSummaryStatistics = function() {
 
 	var _DUMMY_CHART_STATUS_WHOLE_TEXT_SCANS_NOT_UPLOADED = undefined;
 
-	var _IS_LOADED_YES = "YES";
-	var _IS_LOADED_NO = "NO";
-	var _IS_LOADED_LOADING = "LOADING";
-	
 
 	//  passed in functions
 
@@ -107,10 +103,7 @@ var QCMergedPageChartSummaryStatistics = function() {
 	///////////
 	
 	//   Variables for this chart
-	
-	var _chart_isLoaded = _IS_LOADED_NO;
-	
-	
+		
 	var _psmCountChart_helpTooltipHTML = undefined;
 	var _peptideCountChart_helpTooltipHTML = undefined;
 	var _proteinCountChart_helpTooltipHTML = undefined;
@@ -201,27 +194,24 @@ var QCMergedPageChartSummaryStatistics = function() {
 
 
 	/**
-	 * Add Click and onChange handlers 
+	 * Add Click and onChange handlers  - called from this.initActual(...)
 	 */
 	this.addClickAndOnChangeHandlers = function() {
 		var objectThis = this;
 
 	};
 
-
-	///////////////////////////////////////////
-
-	///////////////////////////////////////////
-
-	/////////   Summary Statistics
-
-
 	/**
-	 * Clear data for Summary_Statistics_Counts
+	 * Called when the selection criteria at the top of the page has changed and user has clicked "Update from Database".
+	 *   The current chart(s) and it's data are no longer applicable and can be deleted and removed.
+	 * 
+	 * Clear data 
 	 */
 	this.clearChart = function() {
 
-		_chart_isLoaded = _IS_LOADED_NO;
+		_loadChartIfNeeded_PreviouslyCalled = false;
+		_chartsData = undefined;
+		_chartsDisplayed = false;
 
 		//  PSM Summary Summary 
 		var $Summary_Statistics_CountsBlock = $("#Summary_Statistics_CountsBlock");
@@ -234,31 +224,78 @@ var QCMergedPageChartSummaryStatistics = function() {
 		}
 	};
 
+	/**
+	 * Called when the section is hidden
+	 * 
+	 * Clear data for Summary_Statistics_Counts
+	 */
+	this.sectionHidden = function() {
+
+		_sectionVisible = false;
+	}
+
+	let _sectionVisible = false; //  When true, the section is visible
+
+	let _loadChartIfNeeded_PreviouslyCalled = false; // Also false if this.clearChart() called
+
+	//  Single variable since single AJAX call
+	let _chartsData = undefined;
+
+	//  Single variable since all created at once
+	let _chartsDisplayed = false; // Also false if this.clearChart() called
+
 
 	/**
-	 * If not currently loaded, call loadSummaryStatisticsCount()
+	 * This Method should be called 'createChartIfNeeded'.  Also when called, the section is shown.
+	 * 
+	 * Called when the section on the page that this chart is in is opened (or on page load for section open on page load)
+	 * 
 	 */
 	this.loadChartIfNeeded = function() {
 
-		if ( _chart_isLoaded === _IS_LOADED_NO ) {
-			this.loadSummaryStatisticsCount();
-		}
+		_sectionVisible = true;
+
+		if ( ! _chartsDisplayed ) {
+			if ( ! _chartsData ) {
+				if ( ! _loadChartIfNeeded_PreviouslyCalled ) {
+					// loadChartIfNeeded not previously called so start at the top
+
+					_loadChartIfNeeded_PreviouslyCalled = true;
+
+					const promise_getData_FromServer = this.getData_FromServer();
+
+					promise_getData_FromServer.catch( () => {} );
+					promise_getData_FromServer.then( ({ responseData }) => {
+						_chartsData = responseData;
+						if ( ! _sectionVisible ) {
+							//  Section no longer visible so skip creating the charts
+							return; // EARLY EXIT
+						}
+						this.createCharts();
+					});
+				} else {
+					//  Loading is already in progress so exit
+					return; // EARLY RETURN
+				}
+			} else {
+				//  Have charts data but not displayed so display the chart data
+				this.createCharts();
+			}
+		} 
 	};
 
 	/**
-	 * Keep this in sync with the number of charts actually created in this.loadSummaryStatisticsCount(...)
+	 * Keep this in sync with the number of charts actually created
 	 */
 	var _SUMMARY_STATISTICS_CHART_COUNT = 3;
 
 	var _activeAjax = null;
 
 	/**
-	 * Load the data for SummaryStatisticsCount
+	 * Load the data from the server
 	 */
-	this.loadSummaryStatisticsCount = function() {
+	this.getData_FromServer = function() {
 		var objectThis = this;
-
-		_chart_isLoaded = _IS_LOADED_LOADING;
 
 		// Block for "Summary Statistics"
 		var $Summary_Statistics_CountsBlock = $("#Summary_Statistics_CountsBlock");
@@ -283,26 +320,34 @@ var QCMergedPageChartSummaryStatistics = function() {
 			_activeAjax = null;
 		}
 
-		const hash_json_Contents = _get_hash_json_Contents();
-
-		const ajaxRequestData = { projectSearchIds : _project_search_ids, qcPageQueryJSONRoot : hash_json_Contents };
-
-		const url = "services/qc/dataPage/summaryStatistics_Merged";
-
-		const webserviceCallStandardPostResult = webserviceCallStandardPost({ dataToSend : ajaxRequestData, url }); //  External Function
-
-		const promise_webserviceCallStandardPost = webserviceCallStandardPostResult.promise; 
-		_activeAjax = webserviceCallStandardPostResult.api;
-
-		promise_webserviceCallStandardPost.catch( ( ) => { _activeAjax = null; } );
-
-		promise_webserviceCallStandardPost.then( ({ responseData }) => {
+		return new Promise( (resolve, reject) => {
 			try {
-				_activeAjax = null;
-				var responseParams = {
-					ajaxResponseData : responseData 
-			};
-			objectThis.loadSummaryStatisticsCountProcessResponse( responseParams );
+				const hash_json_Contents = _get_hash_json_Contents();
+
+				const ajaxRequestData = { projectSearchIds : _project_search_ids, qcPageQueryJSONRoot : hash_json_Contents };
+
+				const url = "services/qc/dataPage/summaryStatistics_Merged";
+
+				const webserviceCallStandardPostResult = webserviceCallStandardPost({ dataToSend : ajaxRequestData, url }); //  External Function
+
+				const promise_webserviceCallStandardPost = webserviceCallStandardPostResult.promise; 
+				_activeAjax = webserviceCallStandardPostResult.api;
+
+				promise_webserviceCallStandardPost.catch( ( ) => {
+					 _activeAjax = null;
+					 reject();
+				} );
+
+				promise_webserviceCallStandardPost.then( ({ responseData }) => {
+					try {
+						_activeAjax = null;
+						resolve({ responseData });
+				
+					} catch( e ) {
+						reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+						throw e;
+					}
+				});
 			} catch( e ) {
 				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
 				throw e;
@@ -311,12 +356,11 @@ var QCMergedPageChartSummaryStatistics = function() {
 	};
 
 	/**
-	 * Load the data for Summary_Statistics_Counts
+	 * Create the charts
 	 */
-	this.loadSummaryStatisticsCountProcessResponse = function( params ) {
-		var ajaxResponseData = params.ajaxResponseData;
+	this.createCharts = function() {
 
-		var qc_SummaryCountsResults_Merged = ajaxResponseData;
+		var qc_SummaryCountsResults_Merged = _chartsData;
 
 		// Block for "Summary Statistics"
 		var $Summary_Statistics_CountsBlock = $("#Summary_Statistics_CountsBlock");
@@ -424,6 +468,9 @@ var QCMergedPageChartSummaryStatistics = function() {
 
 		// Add tooltips for download links
 		addToolTips( $Summary_Statistics_CountsBlock );
+
+
+		_chartsDisplayed = true;
 	};
 
 	/**

@@ -224,6 +224,10 @@ var QCMergedPageSection_PSM_Error_Estimates = function() {
 		$psm_error_estimates_collapse_link.hide();
 
 		_sectionDisplayed = false;
+
+		_pageChartObjectsForSection.forEach( function( pageChartObjectForSection, index, array ) {
+			pageChartObjectForSection.sectionHidden();
+		}, this );
 	};
 
 	/**

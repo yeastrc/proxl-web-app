@@ -224,6 +224,10 @@ var QCMergedPageSection_Peptide_Level_Statistics = function() {
 		$peptide_level_collapse_link.hide();
 
 		_sectionDisplayed = false;
+
+		_pageChartObjectsForSection.forEach( function( pageChartObjectForSection, index, array ) {
+			pageChartObjectForSection.sectionHidden();
+		}, this );
 	};
 
 	/**

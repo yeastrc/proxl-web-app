@@ -84,11 +84,6 @@ var QCMergedPageChart_Peptide_Length_Vs_PSM_Count_Boxplot = function() {
 
 	var _DUMMY_CHART_STATUS_WHOLE_TEXT_SCANS_NOT_UPLOADED = undefined;
 
-	var _IS_LOADED_YES = "YES";
-	var _IS_LOADED_NO = "NO";
-	var _IS_LOADED_LOADING = "LOADING";
-	
-
 	//  passed in functions
 
 	//  Copy references to qcPageMain functions to here
@@ -104,8 +99,6 @@ var QCMergedPageChart_Peptide_Length_Vs_PSM_Count_Boxplot = function() {
 	///////////
 	
 	//   Variables for this chart
-	
-	var _chart_isLoaded = _IS_LOADED_NO;
 	
 	/**
 	 * Init page Actual - Called from qcPageMain.initActual
@@ -169,7 +162,7 @@ var QCMergedPageChart_Peptide_Length_Vs_PSM_Count_Boxplot = function() {
 	};
 
 	/**
-	 * Add Click and onChange handlers 
+	 * Add Click and onChange handlers   - called from this.initActual(...)
 	 */
 	this.addClickAndOnChangeHandlers = function() {
 		var objectThis = this;
@@ -177,11 +170,16 @@ var QCMergedPageChart_Peptide_Length_Vs_PSM_Count_Boxplot = function() {
 	};
 
 	/**
-	 * Clear data for _Peptide_Level__Statistics_Counts
+	 * Called when the selection criteria at the top of the page has changed and user has clicked "Update from Database".
+	 *   The current chart(s) and it's data are no longer applicable and can be deleted and removed.
+	 * 
+	 * Clear data 
 	 */
 	this.clearChart = function() {
 
-		_chart_isLoaded = _IS_LOADED_NO;
+		_loadChartIfNeeded_PreviouslyCalled = false;
+		_chartsData = undefined;;
+		_chartsDisplayed = false;
 
 		var $PeptideLengthVsPSMCountBlock = $("#PeptideLengthVsPSMCountBlock");
 		if ( $PeptideLengthVsPSMCountBlock.length === 0 ) {
@@ -191,24 +189,72 @@ var QCMergedPageChart_Peptide_Length_Vs_PSM_Count_Boxplot = function() {
 	};
 
 	/**
-	 * If not currently loaded, load
+	 * Called when the section is hidden
+	 * 
+	 * Clear data for Summary_Statistics_Counts
+	 */
+	this.sectionHidden = function() {
+
+		_sectionVisible = false;
+	}
+
+	let _sectionVisible = false; //  When true, the section is visible
+
+	let _loadChartIfNeeded_PreviouslyCalled = false; // Also false if this.clearChart() called
+
+	//  Single variable since single AJAX call
+	let _chartsData = undefined;
+
+	//  Single variable since all created at once
+	let _chartsDisplayed = false; // Also false if this.clearChart() called
+
+
+	/**
+	 * This Method should be called 'createChartIfNeeded'.  Also when called, the section is shown.
+	 * 
+	 * Called when the section on the page that this chart is in is opened (or on page load for section open on page load)
+	 * 
 	 */
 	this.loadChartIfNeeded = function() {
 
-		if ( _chart_isLoaded === _IS_LOADED_NO ) {
-			this.loadChart();
-		}
+		_sectionVisible = true;
+
+		if ( ! _chartsDisplayed ) {
+			if ( ! _chartsData ) {
+				if ( ! _loadChartIfNeeded_PreviouslyCalled ) {
+					// loadChartIfNeeded not previously called so start at the top
+
+					_loadChartIfNeeded_PreviouslyCalled = true;
+
+					const promise_getData_FromServer = this.getData_FromServer();
+
+					promise_getData_FromServer.catch( () => {} );
+					promise_getData_FromServer.then( ({ responseData }) => {
+						_chartsData = responseData;
+						if ( ! _sectionVisible ) {
+							//  Section no longer visible so skip creating the charts
+							return; // EARLY EXIT
+						}
+						this.createCharts();
+					});
+				} else {
+					//  Loading is already in progress so exit
+					return; // EARLY RETURN
+				}
+			} else {
+				//  Have charts data but not displayed so display the chart data
+				this.createCharts();
+			}
+		} 
 	};
 
 	var _activeAjax = null;
 
 	/**
-	 * Load the data  
+	 * Load the data from the server
 	 */
-	this.loadChart = function() {
+	this.getData_FromServer = function() {
 		var objectThis = this;
-
-		_chart_isLoaded = _IS_LOADED_LOADING;
 
 		var $PeptideLengthVsPSMCountBlock = $("#PeptideLengthVsPSMCountBlock");
 		if ( $PeptideLengthVsPSMCountBlock.length === 0 ) {
@@ -244,36 +290,45 @@ var QCMergedPageChart_Peptide_Length_Vs_PSM_Count_Boxplot = function() {
 			_activeAjax = null;
 		}
 
-		const ajaxRequestData = { projectSearchIds : _project_search_ids, qcPageQueryJSONRoot : hash_json_Contents };
-
-		const url = "services/qc/dataPage/peptideLengthVsPSMCountBoxplot_Merged";
-
-		const webserviceCallStandardPostResult = webserviceCallStandardPost({ dataToSend : ajaxRequestData, url }); //  External Function
-
-		const promise_webserviceCallStandardPost = webserviceCallStandardPostResult.promise; 
-		_activeAjax = webserviceCallStandardPostResult.api;
-
-		promise_webserviceCallStandardPost.catch( ( ) => { _activeAjax = null; } );
-
-		promise_webserviceCallStandardPost.then( ({ responseData }) => {
+		return new Promise( (resolve, reject) => {
 			try {
-				_activeAjax = null;
-				var responseParams = { ajaxResponseData : responseData };
-				objectThis.loadPeptideLengthsHistogramResponse( responseParams );
-			} catch( e ) {
-				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
-				throw e;
-			}
-		});
+				const ajaxRequestData = { projectSearchIds : _project_search_ids, qcPageQueryJSONRoot : hash_json_Contents };
+
+				const url = "services/qc/dataPage/peptideLengthVsPSMCountBoxplot_Merged";
+
+				const webserviceCallStandardPostResult = webserviceCallStandardPost({ dataToSend : ajaxRequestData, url }); //  External Function
+
+				const promise_webserviceCallStandardPost = webserviceCallStandardPostResult.promise; 
+				_activeAjax = webserviceCallStandardPostResult.api;
+
+				promise_webserviceCallStandardPost.catch( ( ) => {
+					_activeAjax = null;
+					reject();
+			   } );
+
+			   promise_webserviceCallStandardPost.then( ({ responseData }) => {
+				   try {
+					   _activeAjax = null;
+					   resolve({ responseData });
+			   
+				   } catch( e ) {
+					   reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+					   throw e;
+				   }
+			   });
+		   } catch( e ) {
+			   reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			   throw e;
+		   }
+	   });
 	};
 
 	/**
-	 * Process the AJAX response for Peptide Lengths Counts
+	 * Create the charts
 	 */
-	this.loadPeptideLengthsHistogramResponse = function( params ) {
-		var ajaxResponseData = params.ajaxResponseData;
+	this.createCharts = function() {
 
-		var results = ajaxResponseData.results;
+		var results = _chartsData.results;
 		var dataForChartPerLinkTypeList = results.dataForChartPerLinkTypeList;
 
 		var $PeptideLengthVsPSMCountBlock = $("#PeptideLengthVsPSMCountBlock");
@@ -351,7 +406,7 @@ var QCMergedPageChart_Peptide_Length_Vs_PSM_Count_Boxplot = function() {
 			
 		}, this /* passed to function as this */ );
 
-		_chart_isLoaded = _IS_LOADED_YES;
+		_chartsDisplayed = true;
 	};
 
 	/**
