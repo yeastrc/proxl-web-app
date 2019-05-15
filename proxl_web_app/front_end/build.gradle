@@ -767,7 +767,7 @@ task frontEndBuild(type: GradleBuild) {
 
      'webpack',
      'copyFrontEndJS',
-//     'copyFrontEndCSS'
+     'copyFrontEndCSS'
    ]
 }
 

@@ -94,7 +94,7 @@ response.addHeader("Cache-control", "max-age=0"); // stale right away
 
 
 	<link rel="stylesheet" href="css/jquery.qtip.min.css" type="text/css" media="print, projection, screen" />
-	<link rel="stylesheet" href="css/global.css?x=${cacheBustValue}" type="text/css" media="print, projection, screen" />
+	<link rel="stylesheet" href="static/css_generated/global.css?x=${cacheBustValue}" type="text/css" media="print, projection, screen" />
 
 	<%--  For Google Chart API import:
 	

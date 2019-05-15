@@ -119,7 +119,7 @@ const mainConfig = {
 
 		
 		// SASS files
-		// 'styles' : './src/styles/global.scss',
+		'styles' : './src/styles/global.scss',
 
 	},
 	output: {

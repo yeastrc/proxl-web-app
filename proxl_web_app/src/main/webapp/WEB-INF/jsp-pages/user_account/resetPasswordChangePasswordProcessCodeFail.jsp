@@ -12,7 +12,7 @@
 
  	<title>ProXL DB</title>
 
- <link REL="stylesheet" TYPE="text/css" HREF="css/global.css?x=${cacheBustValue}">
+ <link REL="stylesheet" TYPE="text/css" HREF="static/css_generated/global.css?x=${cacheBustValue}">
 
 	<%--  Loaded in head_section_include_every_page.jsp   --%>
 	<%-- <script type="text/javascript" src="js/jquery-1.11.0.min.js"></script>  --%>

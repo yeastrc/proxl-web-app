@@ -16,7 +16,7 @@
  
  	<title>ProXL DB - Internet Explorer Not Supported</title>
 
- <link REL="stylesheet" TYPE="text/css" HREF="css/global.css?x=${cacheBustValue}">
+ <link REL="stylesheet" TYPE="text/css" HREF="static/css_generated/global.css?x=${cacheBustValue}">
 
 </head>
 
