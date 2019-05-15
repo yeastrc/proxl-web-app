@@ -28,8 +28,6 @@
 				</div>
 				<div id="pdb-upload-overlay-body" class="pdb-upload-overlay-body" style="text-align:left;" >
 			
-					<form enctype="multipart/form-data">
-							
 							<table style="border-width:0px;">
 							
 								<tr>
@@ -59,8 +57,6 @@
 							<input id="pdb-upload-button" type="button" value="Upload PDB File" style="margin-left: 5px;">							
 							<input type="button" value="Cancel" onClick="closePDBUploadOverlay()" style="margin-left: 5px;">
 					
-					</form>
-				
 				</div>
 						 		       				
 			</div>
