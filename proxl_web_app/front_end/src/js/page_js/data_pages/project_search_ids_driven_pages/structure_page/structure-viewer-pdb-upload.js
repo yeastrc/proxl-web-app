@@ -121,11 +121,11 @@ function attachPDBFileUploadHandlers() {
 
 window.uploadPDBFile = function() {
 	
-	// get our file
-	var file = document.getElementById("pdb-file-field").files[ 0 ];
-	var desc = $("#pdb-file-description").val();
-//	var visibility = $("#pdb-file-visibility").val();
-	
+	// get file to upload
+	var fileToUpload = document.getElementById("pdb-file-field").files[ 0 ];
+
+	var pdbUserDescription = $("#pdb-file-description").val();
+
 	var projectId = $("#project_id" ).val();
 	
 	if ( projectId === undefined || projectId === null || projectId === "" ) {
@@ -135,7 +135,7 @@ window.uploadPDBFile = function() {
 	
 	
 
-	if ( file.size > _MAX_PDB_FILESIZE ) {
+	if ( fileToUpload.size > _MAX_PDB_FILESIZE ) {
 		
 		alert( "File to upload is too large, it exceeds " + _MAX_PDB_FILESIZE_IN_MB + "MB." );
 
@@ -143,23 +143,15 @@ window.uploadPDBFile = function() {
 	}
 
 	
-	
-	var formData = new FormData();
-	formData.append( 'file', file, file.name );
-	formData.append( 'description', desc );
-	formData.append( 'projectId', projectId );
-//	formData.append( 'visibility', visibility );
-	
-	var xhr = new XMLHttpRequest();
-	xhr.open('POST', 'uploadPDBFileService.do', true);
+	var xmlHttpRequest = new XMLHttpRequest();
 
-    xhr.onload = function() {
+    xmlHttpRequest.onload = function() {
 
     	try {
 
-    		if (xhr.status === 200) {
+    		if (xmlHttpRequest.status === 200) {
 
-    			var xhrResponse = xhr.response;
+    			var xhrResponse = xmlHttpRequest.response;
 
 
     			var resp = null;
@@ -184,14 +176,14 @@ window.uploadPDBFile = function() {
 
     					alert("File Upload failed. Failed to determine error reason.");
 
-    					throw 'Unknown error occurred: [' + xhr.responseText + ']';
+    					throw 'Unknown error occurred: [' + xmlHttpRequest.responseText + ']';
     				}
 
     			} catch (e) {
 
     				alert("File Upload failed. Failed to get information from server response.");
 
-    				throw 'Unknown error occurred: [' + xhr.responseText + ']';
+    				throw 'Unknown error occurred: [' + xmlHttpRequest.responseText + ']';
     			}
 
 
@@ -205,7 +197,7 @@ window.uploadPDBFile = function() {
     		} else {
 
 
-    			handleAJAXError( xhr );
+    			handleAJAXError( xmlHttpRequest );
 
 
     		}
@@ -214,9 +206,21 @@ window.uploadPDBFile = function() {
     		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
     		throw e;
     	}
-    };
-    
-    xhr.send(formData);
+	};
+	
+	xmlHttpRequest.open('POST', 'uploadPDBFileService.do', true);
+
+	xmlHttpRequest.setRequestHeader( "Content-Type", "application/octet-stream" );
+
+	const filename_of_fileToUpload = fileToUpload.name;
+		
+	//  Send values in Request Header
+
+	xmlHttpRequest.setRequestHeader( "X-Proxl-description", pdbUserDescription );
+	xmlHttpRequest.setRequestHeader( "X-Proxl-project_id", projectId );
+	xmlHttpRequest.setRequestHeader( "X-Proxl-filename", filename_of_fileToUpload );
+
+    xmlHttpRequest.send( fileToUpload );
 
 }
 

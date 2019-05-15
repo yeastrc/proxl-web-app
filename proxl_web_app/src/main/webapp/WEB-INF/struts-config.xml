@@ -18,7 +18,6 @@
   		-->
   		<form-bean name="singleRequestJSONStringFieldForm" type="org.yeastrc.xlink.www.forms.SingleRequestJSONStringFieldForm" />
   		
-  		<form-bean name="uploadPDBFileForm" type="org.yeastrc.xlink.www.forms.UploadPDBFileForm" />
   		<form-bean name="convertAndDownloadSVGForm" type="org.yeastrc.xlink.www.forms.ConvertAndDownloadSVGForm" />
 
 
@@ -595,7 +594,6 @@
 		<action path="/uploadPDBFileService"
 				type="org.yeastrc.xlink.www.struts_services.UploadPDBFileActionService"
 				scope="request"
-				name="uploadPDBFileForm"
 				validate="false">
 		</action>
 
