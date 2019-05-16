@@ -39,6 +39,10 @@ public class ScanFileToSpectralStorageService_Processing {
 	private static final int SEND_FILE_RETRY_COUNT_MAX = 10;
 	private static final int SEND_FILE_RETRY_DELAY = 2 * 1000; // 2 second
 
+	//  Wait Delay after Send/Submit to Spectral Storage Service
+	
+	private static final int WAIT_AFTER_SEND_SUBMIT_DELAY = 3 * 1000; // 3 second
+	
 	//  Get API Key from Spectral Storage Service Retry Max and Delay.  Incrementally longer delays after more retries
 	
 	private static final int GET_API_KEY_RETRY_COUNT_MAX_STEP_1 = 5;  // First 5 retries
@@ -60,10 +64,10 @@ public class ScanFileToSpectralStorageService_Processing {
 //	private static final int GET_API_KEY_RETRY_COUNT_MAX_STEP_3 = 1;
 //	private static final int GET_API_KEY_RETRY_DELAY_STEP_3 = 10; // 10 milliseconds
 
+	private static ScanFileToSpectralStorageService_Processing _INSTANCE = new ScanFileToSpectralStorageService_Processing();
 
 	private ScanFileToSpectralStorageService_Processing() { }
-	public static ScanFileToSpectralStorageService_Processing getInstance() { return new ScanFileToSpectralStorageService_Processing(); }
-
+	public static ScanFileToSpectralStorageService_Processing getStaticInstance() { return _INSTANCE; }
 
 	/**
 	 * Send the scan file to the Spectral Storage Service, get the API Key, update API key in scan_file table
@@ -111,6 +115,9 @@ public class ScanFileToSpectralStorageService_Processing {
 							scanFileWithPath, 
 							scanFileDTO,
 							callSpectralStorageWebservice );
+
+			//  Wait Delay for submit to Spectral Storage Service to be fully stabilized
+			Thread.sleep( WAIT_AFTER_SEND_SUBMIT_DELAY );
 			
 			getSpectralServiceAPI_AndUpdateScanFileTable( scanFileWithPath, scanFileDTO, callSpectralStorageWebservice, uploadScanFile_Submit_Response );
 			

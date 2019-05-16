@@ -148,7 +148,7 @@ public class Process_MzML_MzXml_File {
 			//  Send scan file to Spectral Storage Service for storage, will update proxl.scan_file record with returned API key
 			//         Send after import to Proxl DB to ensure it is valid first and scans match Proxl Input XML file.
 			//           (Could do the Scan File to Proxl Input XML file matching validation before inserting into the database, then could send to Spectral Storage Service first)
-			ScanFileToSpectralStorageService_Processing.getInstance().sendScanFileToSpectralStorageServiceUpdateScanFileSpectralStorageAPIKey( scanFileWithPath, scanFileDTO );
+			ScanFileToSpectralStorageService_Processing.getStaticInstance().sendScanFileToSpectralStorageServiceUpdateScanFileSpectralStorageAPIKey( scanFileWithPath, scanFileDTO );
 			
 		} catch ( RuntimeException e ) {
 			throw e;
