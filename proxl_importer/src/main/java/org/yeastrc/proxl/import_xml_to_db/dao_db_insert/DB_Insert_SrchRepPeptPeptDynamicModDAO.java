@@ -29,16 +29,16 @@ public class DB_Insert_SrchRepPeptPeptDynamicModDAO {
 	private static final String INSERT_SQL = "INSERT INTO srch_rep_pept__pept__dynamic_mod "
 
 			+ " ( search_reported_peptide_peptide_id, "
-			+   " position, mass, is_monolink )"
+			+   " position, mass, is_monolink, is_n_terminal, is_c_terminal )"
 
-			+ " VALUES ( ?, ?, ?, ? )";
+			+ " VALUES ( ?, ?, ?, ?, ?, ? )";
 
 	private static final String QUERY_UNIQUE_RECORD_SQL = 
 			
 			"SELECT id FROM srch_rep_pept__pept__dynamic_mod "
 
 			+ " WHERE search_reported_peptide_peptide_id = ?  "
-			+   " AND position = ? AND mass = ? AND is_monolink = ? ";
+			+   " AND position = ? AND mass = ? AND is_monolink = ? AND is_n_terminal = ? AND is_c_terminal = ? ";
 
 	
 	/**
@@ -80,6 +80,19 @@ public class DB_Insert_SrchRepPeptPeptDynamicModDAO {
 				pstmt.setInt( counter, Database_OneTrueZeroFalse_Constants.DATABASE_FIELD_FALSE );
 			}
 
+			counter++;
+			if ( item.isIs_N_Terminal() ) {
+				pstmt.setInt( counter, Database_OneTrueZeroFalse_Constants.DATABASE_FIELD_TRUE );
+			} else {
+				pstmt.setInt( counter, Database_OneTrueZeroFalse_Constants.DATABASE_FIELD_FALSE );
+			}
+			counter++;
+			if ( item.isIs_C_Terminal() ) {
+				pstmt.setInt( counter, Database_OneTrueZeroFalse_Constants.DATABASE_FIELD_TRUE );
+			} else {
+				pstmt.setInt( counter, Database_OneTrueZeroFalse_Constants.DATABASE_FIELD_FALSE );
+			}
+			
 			pstmt.executeUpdate();
 
 			rs = pstmt.getGeneratedKeys();
@@ -116,6 +129,19 @@ public class DB_Insert_SrchRepPeptPeptDynamicModDAO {
 
 				counter++;
 				if ( item.isMonolink() ) {
+					pstmt.setInt( counter, Database_OneTrueZeroFalse_Constants.DATABASE_FIELD_TRUE );
+				} else {
+					pstmt.setInt( counter, Database_OneTrueZeroFalse_Constants.DATABASE_FIELD_FALSE );
+				}
+
+				counter++;
+				if ( item.isIs_N_Terminal() ) {
+					pstmt.setInt( counter, Database_OneTrueZeroFalse_Constants.DATABASE_FIELD_TRUE );
+				} else {
+					pstmt.setInt( counter, Database_OneTrueZeroFalse_Constants.DATABASE_FIELD_FALSE );
+				}
+				counter++;
+				if ( item.isIs_C_Terminal() ) {
 					pstmt.setInt( counter, Database_OneTrueZeroFalse_Constants.DATABASE_FIELD_TRUE );
 				} else {
 					pstmt.setInt( counter, Database_OneTrueZeroFalse_Constants.DATABASE_FIELD_FALSE );

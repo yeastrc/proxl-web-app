@@ -15,7 +15,9 @@ public class UnifiedRepPepDynamicModLookupDTO {
 	private String massRoundedString;
 	private int massRoundingPlaces;
 	private int modOrder;
-
+	private boolean is_N_Terminal;
+	private boolean is_C_Terminal;
+	
 	public String getMassRoundedString() {
 		return massRoundedString;
 	}
@@ -63,5 +65,17 @@ public class UnifiedRepPepDynamicModLookupDTO {
 	}
 	public void setMass(double mass) {
 		this.mass = mass;
+	}
+	public boolean isIs_N_Terminal() {
+		return is_N_Terminal;
+	}
+	public void setIs_N_Terminal(boolean is_N_Terminal) {
+		this.is_N_Terminal = is_N_Terminal;
+	}
+	public boolean isIs_C_Terminal() {
+		return is_C_Terminal;
+	}
+	public void setIs_C_Terminal(boolean is_C_Terminal) {
+		this.is_C_Terminal = is_C_Terminal;
 	}
 }

@@ -30,7 +30,7 @@ public class PerPeptideData {
 		
 	private List<SrchRepPeptPeptDynamicModDTO> srchRepPeptPeptDynamicModDTOList_Peptide;
 	
-	private List<Integer> monolinkPositionList;
+	private List<MonolinkDataFromModificationContainer> monolinkDataFromModificationContainerList;
 	
 	private List<MonolinkContainer> monolinkContainerList;
 	
@@ -93,14 +93,6 @@ public class PerPeptideData {
 		this.srchRepPeptPeptDynamicModDTOList_Peptide = srchRepPeptPeptDynamicModDTOList_Peptide;
 	}
 
-	public List<Integer> getMonolinkPositionList() {
-		return monolinkPositionList;
-	}
-
-	public void setMonolinkPositionList(List<Integer> monolinkPositionList) {
-		this.monolinkPositionList = monolinkPositionList;
-	}
-
 	public SrchRepPeptPeptideDTO getSrchRepPeptPeptideDTO() {
 		return srchRepPeptPeptideDTO;
 	}
@@ -125,6 +117,15 @@ public class PerPeptideData {
 	public void setSrchRepPeptPeptide_IsotopeLabel_DTOList_Peptide(
 			List<SrchRepPeptPeptide_IsotopeLabel_DTO> srchRepPeptPeptide_IsotopeLabel_DTOList_Peptide) {
 		this.srchRepPeptPeptide_IsotopeLabel_DTOList_Peptide = srchRepPeptPeptide_IsotopeLabel_DTOList_Peptide;
+	}
+
+	public List<MonolinkDataFromModificationContainer> getMonolinkDataFromModificationContainerList() {
+		return monolinkDataFromModificationContainerList;
+	}
+
+	public void setMonolinkDataFromModificationContainerList(
+			List<MonolinkDataFromModificationContainer> monolinkDataFromModificationContainerList) {
+		this.monolinkDataFromModificationContainerList = monolinkDataFromModificationContainerList;
 	}
 
 	

@@ -284,6 +284,8 @@ public class LorikeetSpectrumService {
         		LorikeetPerPeptideData lorikeetPerPeptideData = getUnlinkData( psmDTO );
         		lorikeetRootData.setSequence( lorikeetPerPeptideData.getSequence() );
         		lorikeetRootData.setVariableMods( lorikeetPerPeptideData.getVariableMods() );
+    	        lorikeetRootData.setNtermMod( lorikeetPerPeptideData.getNtermMod() );
+    	        lorikeetRootData.setCtermMod( lorikeetPerPeptideData.getCtermMod() );
         		lorikeetRootData.setLabel( lorikeetPerPeptideData.getLabel() );
         	} else if ( linkTypeNumber == XLinkUtils.TYPE_DIMER ) {  
         		LorikeetDimerData dimerDataInputFormat = getDimerData( psmDTO );
@@ -598,18 +600,31 @@ public class LorikeetSpectrumService {
 		    	        );
 		}
 		String sequence = peptide.getSequence();
-        List<LorikeetVariableMod> variableMods = new ArrayList<>( dynamicModList.size() );
+        
+		List<LorikeetVariableMod> variableMods = new ArrayList<>( dynamicModList.size() );
+
+		double ntermMod = 0; // additional mass to be added to the n-term
+		double ctermMod = 0; // additional mass to be added to the c-term
+		
         for ( SrchRepPeptPeptDynamicModDTO dynamicMod : dynamicModList ) {
-        	int dynamicModPosition = dynamicMod.getPosition();
-        	String aminoAcid = sequence.substring( dynamicModPosition - 1 /* chg to zero based */, dynamicModPosition );
-        	LorikeetVariableMod lorikeetVariableMod = new LorikeetVariableMod();
-        	lorikeetVariableMod.setIndex( dynamicMod.getPosition() );
-        	lorikeetVariableMod.setModMass( dynamicMod.getMass() );
-        	lorikeetVariableMod.setAminoAcid( aminoAcid );
-        	variableMods.add( lorikeetVariableMod );
+        	if ( dynamicMod.isIs_N_Terminal() ) {
+        		ntermMod += dynamicMod.getMass();
+        	} else if ( dynamicMod.isIs_C_Terminal() ) {
+        		ctermMod += dynamicMod.getMass();
+        	} else {
+        		int dynamicModPosition = dynamicMod.getPosition();
+        		String aminoAcid = sequence.substring( dynamicModPosition - 1 /* chg to zero based */, dynamicModPosition );
+        		LorikeetVariableMod lorikeetVariableMod = new LorikeetVariableMod();
+        		lorikeetVariableMod.setIndex( dynamicMod.getPosition() );
+        		lorikeetVariableMod.setModMass( dynamicMod.getMass() );
+        		lorikeetVariableMod.setAminoAcid( aminoAcid );
+        		variableMods.add( lorikeetVariableMod );
+        	}
         }
 		lorikeetPerPeptideData.setSequence( sequence );
 		lorikeetPerPeptideData.setVariableMods( variableMods );
+		lorikeetPerPeptideData.setNtermMod( ntermMod );
+		lorikeetPerPeptideData.setCtermMod( ctermMod );
 		
 		// get any stable isotope label
 		IsotopeLabelDTO labelDTO = IsotopeLabelSearcher.getInstance().getIsotopeLabelForSearchReportedPeptide_Peptide( srchRepPeptPeptideDTO );

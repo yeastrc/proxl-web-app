@@ -1,0 +1,41 @@
+
+--  2019_05_Update_2__add_user_submit_import_program_key.txt
+
+--  Add tables now, add code later
+
+--  Add code so submit import can use a key instead of username/password
+
+-- -----------------------------------------------------
+-- Table proxl_xml_file_import_submit_import_program_key_per_user
+-- -----------------------------------------------------
+
+CREATE TABLE  proxl_xml_file_import_submit_import_program_key_per_user (
+  auth_user_id INT UNSIGNED NOT NULL,
+  submit_import_program_key VARCHAR(300) NOT NULL,
+  created_date_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  last_updated_date_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (auth_user_id),
+  CONSTRAINT file_impt_sbmtimptprgm_key_pusr_usr_id_fk
+    FOREIGN KEY (auth_user_id)
+    REFERENCES auth_user (id)
+    ON DELETE CASCADE
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table proxl_xml_file_import_submit_import_program_key_per_user_history
+-- -----------------------------------------------------
+
+CREATE TABLE  proxl_xml_file_import_submit_import_program_key_per_user_history (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  auth_user_id INT UNSIGNED NOT NULL,
+  submit_import_program_key VARCHAR(300) NOT NULL,
+  original_table_created_date_time DATETIME NOT NULL,
+  original_table_last_updated_date_time DATETIME NOT NULL,
+  inserted_to_history_date_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id))
+ENGINE = InnoDB;
+
+
+

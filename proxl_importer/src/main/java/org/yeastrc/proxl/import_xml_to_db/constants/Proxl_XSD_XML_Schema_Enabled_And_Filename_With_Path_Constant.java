@@ -12,7 +12,7 @@ public class Proxl_XSD_XML_Schema_Enabled_And_Filename_With_Path_Constant {
 	/**
 	 * The "/" specifies to start at the root of the package path
 	 */
-	public static final String PROXL_XSD_XML_SCHEMA_FILENAME_WITH_PATH = "/proxl-xml-v1.8.1.xsd";
+	public static final String PROXL_XSD_XML_SCHEMA_FILENAME_WITH_PATH = "/proxl-xml-v1.9.0.xsd";
 	
 	
 }

@@ -33,6 +33,9 @@ class Z_Internal_ProcessUnifiedReportedPeptideObj {
 
 	private static final Logger log = LoggerFactory.getLogger( Z_Internal_ProcessUnifiedReportedPeptideObj.class);
 
+	//  Strings to place before 'n' and 'c' terminus mods
+	private static final String N_TERMINUS_START_STRING = "n";
+	private static final String C_TERMINUS_START_STRING = "c";
 
 	//  add the formatted peptides with the separator
 	
@@ -632,67 +635,104 @@ class Z_Internal_ProcessUnifiedReportedPeptideObj {
 
 			//  Build list of local holder dynamic mods 
 
-			List<UnifiedRpSinglePeptideDynamicMod> unifiedRpSinglePeptideDynamicModList = new ArrayList<>( srchRepPeptPeptDynamicModDTOList.size() );
+			List<UnifiedRpSinglePeptideDynamicMod> unifiedRpSinglePeptideDynamic_Main_Not_N_C_Term_ModList = new ArrayList<>( srchRepPeptPeptDynamicModDTOList.size() );
+
+			List<UnifiedRpSinglePeptideDynamicMod> unifiedRpSinglePeptideDynamic_N_Term_ModList = new ArrayList<>( srchRepPeptPeptDynamicModDTOList.size() );
+			List<UnifiedRpSinglePeptideDynamicMod> unifiedRpSinglePeptideDynamic_C_Term_ModList = new ArrayList<>( srchRepPeptPeptDynamicModDTOList.size() );
 
 			for ( SrchRepPeptPeptDynamicModDTO srchRepPeptPeptDynamicModDTO : srchRepPeptPeptDynamicModDTOList ) {
 
 				UnifiedRpSinglePeptideDynamicMod unifiedRpSinglePeptideDynamicMod = new UnifiedRpSinglePeptideDynamicMod();
-				unifiedRpSinglePeptideDynamicModList.add(unifiedRpSinglePeptideDynamicMod);
 
 				unifiedRpSinglePeptideDynamicMod.setPosition( srchRepPeptPeptDynamicModDTO.getPosition() );
 				unifiedRpSinglePeptideDynamicMod.setMass( srchRepPeptPeptDynamicModDTO.getMass() );
+				unifiedRpSinglePeptideDynamicMod.setIs_N_Terminal( srchRepPeptPeptDynamicModDTO.isIs_N_Terminal() );
+				unifiedRpSinglePeptideDynamicMod.setIs_C_Terminal( srchRepPeptPeptDynamicModDTO.isIs_C_Terminal() );
+				
+				//  Split into 3 Lists for: N Term mods, C Term mods, and 'Main' mods not on N or C terminus
+				if ( srchRepPeptPeptDynamicModDTO.isIs_N_Terminal() ) {
+					unifiedRpSinglePeptideDynamic_N_Term_ModList.add( unifiedRpSinglePeptideDynamicMod );
+				} else if ( srchRepPeptPeptDynamicModDTO.isIs_C_Terminal() ) {
+					unifiedRpSinglePeptideDynamic_C_Term_ModList.add( unifiedRpSinglePeptideDynamicMod );
+				} else {
+					unifiedRpSinglePeptideDynamic_Main_Not_N_C_Term_ModList.add( unifiedRpSinglePeptideDynamicMod );
+				}
+				
 			}
 
 
-			Collections.sort( unifiedRpSinglePeptideDynamicModList );
-
-			Iterator<UnifiedRpSinglePeptideDynamicMod> dynamicModIterator = unifiedRpSinglePeptideDynamicModList.iterator();
-
-			UnifiedRpSinglePeptideDynamicMod mod = dynamicModIterator.next();
-
-			char[] peptideSequenceArray = peptideSequence.toCharArray();
-
-			int modOrder = 0;
+			Collections.sort( unifiedRpSinglePeptideDynamic_Main_Not_N_C_Term_ModList );
+			Collections.sort( unifiedRpSinglePeptideDynamic_N_Term_ModList );
+			Collections.sort( unifiedRpSinglePeptideDynamic_C_Term_ModList );
 			
-			for ( int seqIndex = 0; seqIndex < peptideSequenceArray.length; seqIndex++ ) {
 
-				int modPosition = seqIndex + 1; // since mod position is 1 based
+			int modOrder = 0; //  Overall Mod Mass order.  The order they are added to the string
+			
+			
+			if ( ! unifiedRpSinglePeptideDynamic_N_Term_ModList.isEmpty() ) {
 
-				char seqChar = peptideSequenceArray[ seqIndex ];
-
-				peptideSequenceOutSB.append( seqChar );
-
-				while ( mod != null && mod.getPosition() == modPosition ) {
+				//  Have 'n' terminus mods so add to output sequence first
+				
+				//  Add 'n' before N Terminus Mods
+				
+				peptideSequenceOutSB.append( N_TERMINUS_START_STRING );
+				
+				for ( UnifiedRpSinglePeptideDynamicMod mod : unifiedRpSinglePeptideDynamic_N_Term_ModList ) {
 
 					modOrder++;
-
-					BigDecimal modMassRounded = mod.getMassRounded();
-
-					peptideSequenceOutSB.append( "[" );
-					peptideSequenceOutSB.append( modMassRounded );
-					peptideSequenceOutSB.append( "]" );
-
-					Z_Internal_UnifiedRpDynamicMod_Holder unifiedRpDynamicMod_Holder = new Z_Internal_UnifiedRpDynamicMod_Holder();
-					unifiedRpDynamicMod_Holder_List.add( unifiedRpDynamicMod_Holder );
-
-					UnifiedRepPepDynamicModLookupDTO unifiedRpDynamicModDTO = new UnifiedRepPepDynamicModLookupDTO();
-					unifiedRpDynamicMod_Holder.setUnifiedRpDynamicModDTO( unifiedRpDynamicModDTO );
-
-					unifiedRpDynamicModDTO.setPosition( mod.getPosition() );
-
-					unifiedRpDynamicModDTO.setMass( mod.getMass() );
-					unifiedRpDynamicModDTO.setMassRounded( mod.getMassRounded().doubleValue() );
-					unifiedRpDynamicModDTO.setMassRoundedString( mod.getMassRounded().toString() );
-					unifiedRpDynamicModDTO.setMassRoundingPlaces( UnifiedReportedPeptideConstants.DECIMAL_POSITIONS_ROUNDED_TO );
-					unifiedRpDynamicModDTO.setModOrder( modOrder );
-
-					if ( dynamicModIterator.hasNext() ) {
-						mod = dynamicModIterator.next();
-					} else {
-						mod = null;
-					}
+					addSingleModToResultSequenceString( peptideSequenceOutSB, unifiedRpDynamicMod_Holder_List, modOrder, mod );
 				}
+			}
 
+			if ( ! unifiedRpSinglePeptideDynamic_Main_Not_N_C_Term_ModList.isEmpty() ) {
+				///   Add 'Main' mods not on N or C terminus
+
+				Iterator<UnifiedRpSinglePeptideDynamicMod> dynamicModIterator = unifiedRpSinglePeptideDynamic_Main_Not_N_C_Term_ModList.iterator();
+
+				UnifiedRpSinglePeptideDynamicMod mod = dynamicModIterator.next();
+
+				char[] peptideSequenceArray = peptideSequence.toCharArray();
+
+
+				for ( int seqIndex = 0; seqIndex < peptideSequenceArray.length; seqIndex++ ) {
+
+					int modPosition = seqIndex + 1; // since mod position is 1 based
+
+					char seqChar = peptideSequenceArray[ seqIndex ];
+
+					peptideSequenceOutSB.append( seqChar );
+
+					while ( mod != null && mod.getPosition() == modPosition ) {
+						
+						//  Have a mod for this position so output it to the string buffer
+
+						modOrder++;
+
+						addSingleModToResultSequenceString( peptideSequenceOutSB, unifiedRpDynamicMod_Holder_List, modOrder, mod );
+
+						if ( dynamicModIterator.hasNext() ) {
+							mod = dynamicModIterator.next();
+						} else {
+							mod = null;
+						}
+					}
+
+				}
+			}
+
+			if ( ! unifiedRpSinglePeptideDynamic_C_Term_ModList.isEmpty() ) {
+
+				//  Have 'c' terminus mods so add to output sequence last
+				
+				//  Add 'c' before C Terminus Mods
+				
+				peptideSequenceOutSB.append( C_TERMINUS_START_STRING );
+				
+				for ( UnifiedRpSinglePeptideDynamicMod mod : unifiedRpSinglePeptideDynamic_C_Term_ModList ) {
+
+					modOrder++;
+					addSingleModToResultSequenceString( peptideSequenceOutSB, unifiedRpDynamicMod_Holder_List, modOrder, mod );
+				}
 			}
 		} 
 		
@@ -739,6 +779,44 @@ class Z_Internal_ProcessUnifiedReportedPeptideObj {
 		unifiedRpMatchedPeptide_Holder.setPeptideStringWithModsAndIsotopeLabels( peptideSequenceOut );
 		
 		return unifiedRpMatchedPeptide_Holder;
+	}
+
+
+	/**
+	 * Called for 'main' mods, 'n' and 'c' terminus mods
+	 * 
+	 * @param peptideSequenceOutSB
+	 * @param unifiedRpDynamicMod_Holder_List
+	 * @param modOrder
+	 * @param mod
+	 */
+	private void addSingleModToResultSequenceString(
+			StringBuilder peptideSequenceOutSB,
+			List<Z_Internal_UnifiedRpDynamicMod_Holder> unifiedRpDynamicMod_Holder_List, 
+			int modOrder,
+			UnifiedRpSinglePeptideDynamicMod mod ) {
+		
+		BigDecimal modMassRounded = mod.getMassRounded();
+
+		peptideSequenceOutSB.append( "[" );
+		peptideSequenceOutSB.append( modMassRounded );
+		peptideSequenceOutSB.append( "]" );
+
+		Z_Internal_UnifiedRpDynamicMod_Holder unifiedRpDynamicMod_Holder = new Z_Internal_UnifiedRpDynamicMod_Holder();
+		unifiedRpDynamicMod_Holder_List.add( unifiedRpDynamicMod_Holder );
+
+		UnifiedRepPepDynamicModLookupDTO unifiedRpDynamicModDTO = new UnifiedRepPepDynamicModLookupDTO();
+		unifiedRpDynamicMod_Holder.setUnifiedRpDynamicModDTO( unifiedRpDynamicModDTO );
+
+		unifiedRpDynamicModDTO.setPosition( mod.getPosition() );
+
+		unifiedRpDynamicModDTO.setMass( mod.getMass() );
+		unifiedRpDynamicModDTO.setMassRounded( mod.getMassRounded().doubleValue() );
+		unifiedRpDynamicModDTO.setMassRoundedString( mod.getMassRounded().toString() );
+		unifiedRpDynamicModDTO.setMassRoundingPlaces( UnifiedReportedPeptideConstants.DECIMAL_POSITIONS_ROUNDED_TO );
+		unifiedRpDynamicModDTO.setModOrder( modOrder );
+		unifiedRpDynamicModDTO.setIs_N_Terminal( mod.isIs_N_Terminal() );
+		unifiedRpDynamicModDTO.setIs_C_Terminal( mod.isIs_C_Terminal() );
 	}
 	
 }

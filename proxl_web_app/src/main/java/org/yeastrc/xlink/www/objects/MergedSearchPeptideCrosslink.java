@@ -105,7 +105,7 @@ public class MergedSearchPeptideCrosslink implements IMergedSearchLink {
 			unifiedRpDynamicModListPeptide1 = UnifiedRepPepDynamicModLookupDAO.getInstance().getUnifiedRpDynamicModDTOForMatchedPeptideId( unifiedRpMatchedPeptide1.getId() );
 			unifiedRpDynamicModListPeptide2 = UnifiedRepPepDynamicModLookupDAO.getInstance().getUnifiedRpDynamicModDTOForMatchedPeptideId( unifiedRpMatchedPeptide2.getId() );
 			
-			modsStringPeptide1 = FormatDynamicModsToString.formatDynamicModsToString( unifiedRpDynamicModListPeptide1 );
+			modsStringPeptide1 = FormatDynamicModsToString.formatDynamicModsToString( unifiedRpDynamicModListPeptide1 ) + "MMMMMMM";
 			modsStringPeptide2 = FormatDynamicModsToString.formatDynamicModsToString( unifiedRpDynamicModListPeptide2 );
 			
 			unifiedRepPepIsotopeLabelListPeptide1 =

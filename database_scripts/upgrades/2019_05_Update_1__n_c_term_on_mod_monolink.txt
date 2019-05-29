@@ -1,0 +1,24 @@
+
+--  2019_05_Update_1__n_c_term_on_mod_monolink.txt
+
+--  Add 'n' and 'c' terminal indicator for modification and monolink
+--  Add unique index
+
+
+--  Add 'n' and 'c' 
+
+ALTER TABLE srch_rep_pept__pept__dynamic_mod 
+ADD COLUMN is_n_terminal TINYINT(1) UNSIGNED NOT NULL DEFAULT 0 AFTER is_monolink,
+ADD COLUMN is_c_terminal TINYINT(1) UNSIGNED NOT NULL DEFAULT 0 AFTER is_n_terminal;
+
+
+ALTER TABLE unified_rep_pep_dynamic_mod_lookup 
+ADD COLUMN is_n_terminal TINYINT(1) UNSIGNED NOT NULL DEFAULT 0 AFTER mod_order,
+ADD COLUMN is_c_terminal TINYINT(1) UNSIGNED NOT NULL DEFAULT 0 AFTER is_n_terminal;
+
+ALTER TABLE srch_rep_pept__prot_seq_id_pos_monolink 
+ADD COLUMN is_n_terminal TINYINT(1) UNSIGNED NOT NULL DEFAULT 0 AFTER protein_sequence_position,
+ADD COLUMN is_c_terminal TINYINT(1) UNSIGNED NOT NULL DEFAULT 0 AFTER is_n_terminal;
+
+
+

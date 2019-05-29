@@ -22,6 +22,7 @@ import org.yeastrc.proxl.import_xml_to_db.dto.SrchRepPeptProtSeqIdPosMonolinkDTO
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterDataException;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterInteralException;
 import org.yeastrc.proxl.import_xml_to_db.objects.MonolinkContainer;
+import org.yeastrc.proxl.import_xml_to_db.objects.MonolinkDataFromModificationContainer;
 import org.yeastrc.proxl.import_xml_to_db.objects.PerPeptideData;
 import org.yeastrc.proxl.import_xml_to_db.objects.ProteinImporterContainer;
 import org.yeastrc.proxl.import_xml_to_db.peptide_protein_position.ProteinCoverageDTO_SaveToDB_NoDups;
@@ -221,7 +222,7 @@ public class ProcessLinkTypeCrosslink {
 		///  Data in perPeptideData for Monolinks
 		List<MonolinkContainer> monolinkContainerList = new ArrayList<>();
 		perPeptideData.setMonolinkContainerList( monolinkContainerList );
-		List<Integer> peptideMonolinkPositionList = perPeptideData.getMonolinkPositionList();
+		List<MonolinkDataFromModificationContainer> monolinkDataFromModificationContainerList = perPeptideData.getMonolinkDataFromModificationContainerList();
 		List <SrchRepPeptProtSeqIdPosCrosslinkDTO_ProteinImporterContainer_Pair> srchRepPeptProtSeqIdPosCrosslinkDTO_ProteinImporterContainer_PairList = new ArrayList<>();
 		for( Map.Entry<ProteinImporterContainer, Collection<Integer>> proteinMapEntry : proteinMap.entrySet() ) {
 			ProteinImporterContainer proteinImporterContainer = proteinMapEntry.getKey();
@@ -235,13 +236,16 @@ public class ProcessLinkTypeCrosslink {
 				srchRepPeptProtSeqIdPosCrosslinkDTO_ProteinImporterContainer_Pair.proteinImporterContainer = proteinImporterContainer;
 				srchRepPeptProtSeqIdPosCrosslinkDTO_ProteinImporterContainer_PairList.add( srchRepPeptProtSeqIdPosCrosslinkDTO_ProteinImporterContainer_Pair );
 				//  Process the monolink positions
-				if ( peptideMonolinkPositionList != null && ( ! peptideMonolinkPositionList.isEmpty() ) ) {
-					for ( Integer peptideMonolinkPosition : peptideMonolinkPositionList ) {
+				if ( monolinkDataFromModificationContainerList != null && ( ! monolinkDataFromModificationContainerList.isEmpty() ) ) {
+					for ( MonolinkDataFromModificationContainer monolinkDataFromModificationContainer : monolinkDataFromModificationContainerList ) {
+						int peptideMonolinkPosition = monolinkDataFromModificationContainer.getPosition();
 						//  Convert peptide monolink position to protein position
 						int proteinMonolinkPosition = proteinCrosslinkPosition - peptideCrossLinkPosition + peptideMonolinkPosition; 
 						SrchRepPeptProtSeqIdPosMonolinkDTO srchRepPeptProtSeqIdPosMonolinkDTO = new SrchRepPeptProtSeqIdPosMonolinkDTO();
 						srchRepPeptProtSeqIdPosMonolinkDTO.setPeptidePosition( peptideMonolinkPosition );
 						srchRepPeptProtSeqIdPosMonolinkDTO.setProteinSequencePosition( proteinMonolinkPosition );
+						srchRepPeptProtSeqIdPosMonolinkDTO.setIs_N_Terminal( monolinkDataFromModificationContainer.isIs_N_Terminal() );
+						srchRepPeptProtSeqIdPosMonolinkDTO.setIs_C_Terminal( monolinkDataFromModificationContainer.isIs_C_Terminal() );
 						MonolinkContainer monolinkContainer = new MonolinkContainer();
 						monolinkContainer.setProteinImporterContainer( proteinImporterContainer );
 						monolinkContainer.setSrchRepPeptProtSeqIdPosMonolinkDTO( srchRepPeptProtSeqIdPosMonolinkDTO );
