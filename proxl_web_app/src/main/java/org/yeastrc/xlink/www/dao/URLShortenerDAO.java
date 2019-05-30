@@ -131,8 +131,8 @@ public class URLShortenerDAO {
 		}
 	}
 	private final String INSERT_SQL = "INSERT INTO url_shortener "
-			+ " (shortened_url_key, auth_user_id, url, date_record_created ) "
-			+ " VALUES ( ?, ?, ?, NOW() ) ";
+			+ " (shortened_url_key, auth_user_id, url, remote_user_ip_address, date_record_created ) "
+			+ " VALUES ( ?, ?, ?, ?, NOW() ) ";
 	/**
 	 * @param item
 	 * @throws Exception
@@ -143,6 +143,7 @@ public class URLShortenerDAO {
 		final String sql = INSERT_SQL;
 		try {
 			pstmt = dbConnection.prepareStatement( sql, Statement.RETURN_GENERATED_KEYS );
+			
 			int counter = 0;
 			counter++;
 			pstmt.setString( counter, item.getShortenedUrlKey() );
@@ -154,7 +155,11 @@ public class URLShortenerDAO {
 			}
 			counter++;
 			pstmt.setString( counter, item.getUrl() );
+			counter++;
+			pstmt.setString( counter, item.getRemoteUserIpAddress() );
+
 			pstmt.executeUpdate();
+			
 			rs = pstmt.getGeneratedKeys();
 			if( rs.next() ) {
 				item.setId( rs.getInt( 1 ) );

@@ -1,0 +1,8 @@
+
+--  2019_05_Update_4__add__remote_user_ip_address__to_url_shortener.txt
+
+
+ALTER TABLE url_shortener 
+ADD COLUMN remote_user_ip_address VARCHAR(45) NULL AFTER url;
+
+

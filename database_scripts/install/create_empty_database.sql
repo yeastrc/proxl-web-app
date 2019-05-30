@@ -1910,6 +1910,7 @@ CREATE TABLE  url_shortener (
   auth_user_id INT UNSIGNED NULL,
   date_record_created DATETIME NOT NULL,
   url MEDIUMTEXT NOT NULL,
+  remote_user_ip_address VARCHAR(45) NULL,
   PRIMARY KEY (id, shortened_url_key))
 ENGINE = InnoDB;
 
