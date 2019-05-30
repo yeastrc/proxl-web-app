@@ -671,7 +671,7 @@
 					  </tr>
 					  <tr>
 					  	<td>Length:</td>
-					  	<td><span id="looplink_length"></span> �</td>
+					  	<td><span id="looplink_length"></span> &#8491;</td>
 					  </tr>
 					</table>
 				
@@ -695,7 +695,7 @@
 					  </tr>
 					  <tr>
 					  	<td>Length:</td>
-					  	<td><span id="crosslink_length"></span> �</td>
+					  	<td><span id="crosslink_length"></span> &#8491;</td>
 					  </tr>
 					</table>
 
