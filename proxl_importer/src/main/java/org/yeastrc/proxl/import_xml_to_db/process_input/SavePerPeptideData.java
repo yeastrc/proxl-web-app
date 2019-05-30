@@ -1,12 +1,14 @@
 package org.yeastrc.proxl.import_xml_to_db.process_input;
 
-// import org.slf4j.LoggerFactory;import org.slf4j.Logger;
+ import org.slf4j.LoggerFactory;import org.slf4j.Logger;
 import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_SrchRepPeptProtSeqIdPosMonolinkDAO;
 
 import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_SrchRepPeptPeptDynamicModDAO;
 import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_SrchRepPeptPeptideDAO;
 import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_SrchRepPeptPeptide_IsotopeLabel_DAO;
 import org.yeastrc.proxl.import_xml_to_db.dto.SrchRepPeptProtSeqIdPosMonolinkDTO;
+import org.yeastrc.proxl.import_xml_to_db.exception.ProxlImporterDuplicateDataException;
+import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterDataException;
 import org.yeastrc.xlink.dto.SrchRepPeptPeptDynamicModDTO;
 import org.yeastrc.proxl.import_xml_to_db.dto.SrchRepPeptPeptideDTO;
 import org.yeastrc.proxl.import_xml_to_db.dto.SrchRepPeptPeptide_IsotopeLabel_DTO;
@@ -21,7 +23,7 @@ import org.yeastrc.xlink.dto.ReportedPeptideDTO;
  */
 public class SavePerPeptideData {
 
-//	private static final Logger log = LoggerFactory.getLogger(  SavePerPeptideData.class );
+	private static final Logger log = LoggerFactory.getLogger(  SavePerPeptideData.class );
 	/**
 	 * private constructor
 	 */
@@ -77,7 +79,67 @@ public class SavePerPeptideData {
 
 				srchRepPeptProtSeqIdPosMonolinkDTO.setProteinSequenceVersionId( proteinImporterContainer.getProteinSequenceVersionDTO().getId() );
 
-				DB_Insert_SrchRepPeptProtSeqIdPosMonolinkDAO.getInstance().save( srchRepPeptProtSeqIdPosMonolinkDTO );
+				try {
+					DB_Insert_SrchRepPeptProtSeqIdPosMonolinkDAO.getSingletonInstance().save( srchRepPeptProtSeqIdPosMonolinkDTO );
+					
+				} catch ( ProxlImporterDuplicateDataException e ) {
+					
+					String peptidePosition_N_C_Terminus_errorMsg_Addition = "";
+					
+					if ( srchRepPeptProtSeqIdPosMonolinkDTO.isIs_N_Terminal() ) {
+						
+						peptidePosition_N_C_Terminus_errorMsg_Addition =
+								"Monolink at N terminus of peptide";
+						
+					} else if ( srchRepPeptProtSeqIdPosMonolinkDTO.isIs_N_Terminal() ) {
+
+						peptidePosition_N_C_Terminus_errorMsg_Addition =
+								"Monolink at C terminus of peptide";
+					} else {
+						peptidePosition_N_C_Terminus_errorMsg_Addition =
+								"Peptide Position: " 
+										+ srchRepPeptProtSeqIdPosMonolinkDTO.getPeptidePosition();
+					}
+					
+					String msg = "Reported Peptide has more than one monolink at the same position.  Reported peptide string: '"
+							+ reportedPeptideDTO.getSequence()
+							+ "'.  "
+							+ peptidePosition_N_C_Terminus_errorMsg_Addition;
+					log.warn(msg);
+					throw new ProxlImporterDataException(msg);
+
+					
+				} catch ( Exception e ) {
+					
+					if ( e.toString() != null && e.toString().contains( "Duplicate entry" ) ) {
+
+						String peptidePosition_N_C_Terminus_errorMsg_Addition = "";
+						
+						if ( srchRepPeptProtSeqIdPosMonolinkDTO.isIs_N_Terminal() ) {
+							
+							peptidePosition_N_C_Terminus_errorMsg_Addition =
+									"Monolink at N terminus of peptide";
+							
+						} else if ( srchRepPeptProtSeqIdPosMonolinkDTO.isIs_N_Terminal() ) {
+
+							peptidePosition_N_C_Terminus_errorMsg_Addition =
+									"Monolink at C terminus of peptide";
+						} else {
+							peptidePosition_N_C_Terminus_errorMsg_Addition =
+									"Peptide Position: " 
+											+ srchRepPeptProtSeqIdPosMonolinkDTO.getPeptidePosition();
+						}
+						
+						String msg = "Reported Peptide has more than one monolink at the same position.  Reported peptide string: '"
+								+ reportedPeptideDTO.getSequence()
+								+ "'.  "
+								+ peptidePosition_N_C_Terminus_errorMsg_Addition;
+						log.warn(msg);
+						throw new ProxlImporterDataException(msg);
+					}
+					
+					throw e;
+				}
 			}
 		}
 
@@ -88,8 +150,6 @@ public class SavePerPeptideData {
 				DB_Insert_SrchRepPeptPeptide_IsotopeLabel_DAO.getInstance().save( srchRepPeptPeptide_IsotopeLabel_DTO );
 			}
 		}
-
-		
 	}
 		
 }

@@ -44,11 +44,29 @@ public class SrchRepPeptPeptDynamicModSearcher {
 				result.setSearchReportedPeptidepeptideId( rs.getInt( "search_reported_peptide_peptide_id" ) );
 				result.setPosition( rs.getInt( "position" ) );
 				result.setMass( rs.getDouble( "mass" ) );
-				int isMonolinkInt = rs.getInt( "is_monolink" );
-				if ( isMonolinkInt == Database_OneTrueZeroFalse_Constants.DATABASE_FIELD_TRUE ) {
-					result.setMonolink( true );
-				} else {
-					result.setMonolink( false );
+				{
+					int isMonolinkInt = rs.getInt( "is_monolink" );
+					if ( isMonolinkInt == Database_OneTrueZeroFalse_Constants.DATABASE_FIELD_TRUE ) {
+						result.setMonolink( true );
+					} else {
+						result.setMonolink( false );
+					}
+				}
+				{
+					int Is_N_TerminalInt = rs.getInt( "is_n_terminal" );
+					if ( Is_N_TerminalInt == Database_OneTrueZeroFalse_Constants.DATABASE_FIELD_TRUE ) {
+						result.setIs_N_Terminal(true);
+					} else {
+						result.setIs_N_Terminal( false );
+					}
+				}
+				{
+					int Is_C_TerminalInt = rs.getInt( "is_c_terminal" );
+					if ( Is_C_TerminalInt == Database_OneTrueZeroFalse_Constants.DATABASE_FIELD_TRUE ) {
+						result.setIs_C_Terminal( true );
+					} else {
+						result.setIs_C_Terminal( false );
+					}
 				}
 				results.add(result);
 			}

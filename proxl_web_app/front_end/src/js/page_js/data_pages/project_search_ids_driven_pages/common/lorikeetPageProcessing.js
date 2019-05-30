@@ -270,6 +270,8 @@ function addOpenLorikeetViewerClickHandlers( $openLorkeetLinks ) {
 			lorikeetOptions.sequence = lorikeetOptions.loopLinkDataInputFormat.peptideData.sequence;
 			lorikeetOptions.label = lorikeetOptions.loopLinkDataInputFormat.peptideData.label;
 			lorikeetOptions.variableMods = lorikeetOptions.loopLinkDataInputFormat.peptideData.variableMods;
+			lorikeetOptions.ntermMod = lorikeetOptions.loopLinkDataInputFormat.peptideData.ntermMod;
+			lorikeetOptions.ctermMod = lorikeetOptions.loopLinkDataInputFormat.peptideData.ctermMod;
 			
 //			loopLinkDataInputFormat: Object
 //			linkerMass: 138.0681
@@ -843,6 +845,8 @@ function addOpenLorikeetViewerClickHandlers( $openLorkeetLinks ) {
 			
 			lorikeetOptions.sequence = lorikeetOptions.dimerDataInputFormat.peptideData1.sequence;
 			lorikeetOptions.variableMods = lorikeetOptions.dimerDataInputFormat.peptideData1.variableMods;
+			lorikeetOptions.ntermMod = lorikeetOptions.dimerDataInputFormat.peptideData1.ntermMod;
+			lorikeetOptions.ctermMod = lorikeetOptions.dimerDataInputFormat.peptideData1.ctermMod;
 			
 			
 			createSingleDimerLorikeet( lorikeetOptions, 1 /* indexStartAtOne */ );
@@ -851,6 +855,8 @@ function addOpenLorikeetViewerClickHandlers( $openLorkeetLinks ) {
 			
 			lorikeetOptions.sequence = lorikeetOptions.dimerDataInputFormat.peptideData2.sequence;
 			lorikeetOptions.variableMods = lorikeetOptions.dimerDataInputFormat.peptideData2.variableMods;
+			lorikeetOptions.ntermMod = lorikeetOptions.dimerDataInputFormat.peptideData2.ntermMod;
+			lorikeetOptions.ctermMod = lorikeetOptions.dimerDataInputFormat.peptideData2.ctermMod;
 			
 			createSingleDimerLorikeet( lorikeetOptions, 2 /* indexStartAtOne */ );
 
@@ -897,6 +903,8 @@ function addOpenLorikeetViewerClickHandlers( $openLorkeetLinks ) {
 		
 		lorikeetOptions.sequence = lorikeetOptions.crossLinkDataInputFormat.peptideData1.sequence;
 		lorikeetOptions.variableMods = lorikeetOptions.crossLinkDataInputFormat.peptideData1.variableMods;
+		lorikeetOptions.ntermMod = lorikeetOptions.crossLinkDataInputFormat.peptideData1.ntermMod;
+		lorikeetOptions.ctermMod = lorikeetOptions.crossLinkDataInputFormat.peptideData1.ctermMod;
 		lorikeetOptions.label = lorikeetOptions.crossLinkDataInputFormat.peptideData1.label;
 		
 		createSingleCrossLinkLorikeet( lorikeetOptions, 1 /* indexStartAtOne */ );
@@ -910,6 +918,8 @@ function addOpenLorikeetViewerClickHandlers( $openLorkeetLinks ) {
 		
 		lorikeetOptions.sequence = lorikeetOptions.crossLinkDataInputFormat.peptideData2.sequence;
 		lorikeetOptions.variableMods = lorikeetOptions.crossLinkDataInputFormat.peptideData2.variableMods;
+		lorikeetOptions.ntermMod = lorikeetOptions.crossLinkDataInputFormat.peptideData2.ntermMod;
+		lorikeetOptions.ctermMod = lorikeetOptions.crossLinkDataInputFormat.peptideData2.ctermMod;
 		lorikeetOptions.label = lorikeetOptions.crossLinkDataInputFormat.peptideData2.label;
 
 		createSingleCrossLinkLorikeet( lorikeetOptions, 2 /* indexStartAtOne */ );

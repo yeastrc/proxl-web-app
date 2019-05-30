@@ -1,0 +1,19 @@
+
+--  2019_05_Update_2__n_c_term_on_mod_monolink_add_UNIQUE_index.txt
+
+--  Add unique index
+
+
+--  Add unique index
+
+--  It is OK if this fails.  The Importer code has been updated to also enforce this for new imports.
+
+ALTER TABLE srch_rep_pept__prot_seq_id_pos_monolink 
+ADD UNIQUE INDEX unique_record 
+(search_id ASC, reported_peptide_id ASC, search_reported_peptide_peptide_id ASC,
+ peptide_position ASC, protein_sequence_version_id ASC, protein_sequence_position ASC, 
+ is_n_terminal ASC, is_c_terminal ASC);
+
+
+
+

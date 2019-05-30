@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 
 import org.slf4j.LoggerFactory;import org.slf4j.Logger;
+import org.yeastrc.xlink.base.constants.Database_OneTrueZeroFalse_Constants;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.dto.UnifiedRepPepDynamicModLookupDTO;
 
@@ -53,8 +54,9 @@ public class DB_Insert_UnifiedRepPepDynamicModLookupDAO {
 	
 
 	private static String SAVE_SQL = "INSERT INTO unified_rep_pep_dynamic_mod_lookup "
-			+ " (rp_matched_peptide_id, position, mass, mass_rounded, mass_rounded_string, mass_rounding_places, mod_order ) "
-			+ " VALUES (?, ?, ?, ?, ?, ?, ?)";
+			+ " (rp_matched_peptide_id, position, mass, mass_rounded, mass_rounded_string, mass_rounding_places, mod_order, "
+			+ " is_n_terminal, is_c_terminal ) "
+			+ " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
 	
 	/**
@@ -90,6 +92,19 @@ public class DB_Insert_UnifiedRepPepDynamicModLookupDAO {
 			pstmt.setInt( counter,  dmod.getMassRoundingPlaces() );
 			counter++;
 			pstmt.setInt( counter,  dmod.getModOrder() );
+			
+			counter++;
+			if ( dmod.isIs_N_Terminal() ) {
+				pstmt.setInt( counter, Database_OneTrueZeroFalse_Constants.DATABASE_FIELD_TRUE );
+			} else {
+				pstmt.setInt( counter, Database_OneTrueZeroFalse_Constants.DATABASE_FIELD_FALSE );
+			}
+			counter++;
+			if ( dmod.isIs_C_Terminal() ) {
+				pstmt.setInt( counter, Database_OneTrueZeroFalse_Constants.DATABASE_FIELD_TRUE );
+			} else {
+				pstmt.setInt( counter, Database_OneTrueZeroFalse_Constants.DATABASE_FIELD_FALSE );
+			}
 			
 			pstmt.executeUpdate();
 			

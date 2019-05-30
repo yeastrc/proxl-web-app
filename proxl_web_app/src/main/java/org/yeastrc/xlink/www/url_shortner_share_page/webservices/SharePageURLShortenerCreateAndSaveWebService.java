@@ -130,6 +130,7 @@ public class SharePageURLShortenerCreateAndSaveWebService {
 					authUserId = userSession.getAuthUserId();
 				}
 				urlShortenerDTO.setUrl( pageUrlAfterContext );
+				urlShortenerDTO.setRemoteUserIpAddress( httpServletRequest.getRemoteAddr() );
 				urlShortenerDTO.setAuthUserId( authUserId );
 				boolean saveSuccessful = false;
 				int saveAttemptCounter = 0;

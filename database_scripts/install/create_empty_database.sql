@@ -775,9 +775,11 @@ CREATE TABLE  unified_rep_pep_dynamic_mod_lookup (
   position INT(10) UNSIGNED NOT NULL,
   mass DOUBLE NOT NULL,
   mass_rounded DOUBLE NOT NULL,
-  mass_rounded_string VARCHAR(200) NOT NULL,
+  mass_rounded_string VARCHAR(200) COLLATE 'latin1_general_ci' NOT NULL,
   mass_rounding_places SMALLINT NOT NULL,
   mod_order SMALLINT NOT NULL,
+  is_n_terminal TINYINT(1) UNSIGNED NOT NULL DEFAULT 0,
+  is_c_terminal TINYINT(1) UNSIGNED NOT NULL DEFAULT 0,
   PRIMARY KEY (id),
   CONSTRAINT unified_rp_dynamic_mod__rp_matched_peptide_id_fk
     FOREIGN KEY (rp_matched_peptide_id)
@@ -1252,6 +1254,8 @@ CREATE TABLE  srch_rep_pept__pept__dynamic_mod (
   position INT(10) UNSIGNED NOT NULL,
   mass DOUBLE NOT NULL,
   is_monolink INT(1) UNSIGNED NOT NULL DEFAULT 0,
+  is_n_terminal TINYINT(1) UNSIGNED NOT NULL DEFAULT 0,
+  is_c_terminal TINYINT(1) UNSIGNED NOT NULL DEFAULT 0,
   PRIMARY KEY (id),
   CONSTRAINT srch_rp_ppt_ppt_dn_md_schrptpeppep_fk
     FOREIGN KEY (search_reported_peptide_peptide_id)
@@ -1407,6 +1411,8 @@ CREATE TABLE  srch_rep_pept__prot_seq_id_pos_monolink (
   peptide_position INT UNSIGNED NOT NULL,
   protein_sequence_version_id INT UNSIGNED NOT NULL,
   protein_sequence_position INT UNSIGNED NOT NULL,
+  is_n_terminal TINYINT(1) UNSIGNED NOT NULL DEFAULT 0,
+  is_c_terminal TINYINT(1) UNSIGNED NOT NULL DEFAULT 0,
   PRIMARY KEY (id),
   CONSTRAINT srch_rppp_prt_sq_d_ps_mnlnk_srch_rppptpptd
     FOREIGN KEY (search_reported_peptide_peptide_id)
@@ -1419,6 +1425,8 @@ COMMENT = 'Each entry is a mapping of a peptide entry in the table srch_rep_pept
 CREATE INDEX search_rep_pept_idx ON srch_rep_pept__prot_seq_id_pos_monolink (search_id ASC, reported_peptide_id ASC);
 
 CREATE INDEX srch_rppp_prt_sq_d_ps_mnlnk_srch_rppptpptd ON srch_rep_pept__prot_seq_id_pos_monolink (search_reported_peptide_peptide_id ASC);
+
+CREATE UNIQUE INDEX unique_record ON srch_rep_pept__prot_seq_id_pos_monolink (search_id ASC, reported_peptide_id ASC, search_reported_peptide_peptide_id ASC, peptide_position ASC, protein_sequence_version_id ASC, protein_sequence_position ASC, is_n_terminal ASC, is_c_terminal ASC);
 
 
 -- -----------------------------------------------------
@@ -1902,6 +1910,7 @@ CREATE TABLE  url_shortener (
   auth_user_id INT UNSIGNED NULL,
   date_record_created DATETIME NOT NULL,
   url MEDIUMTEXT NOT NULL,
+  remote_user_ip_address VARCHAR(45) NULL,
   PRIMARY KEY (id, shortened_url_key))
 ENGINE = InnoDB;
 
@@ -2515,6 +2524,45 @@ ENGINE = InnoDB;
 CREATE INDEX fk_dtpg_svdvw_ascprjsch_tbl_mnid_idx ON data_page_saved_view_assoc_project_search_id_tbl (assoc_main_id ASC);
 
 
+-- -----------------------------------------------------
+-- Table proxl_xml_file_import_submit_import_program_key_per_user
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS proxl_xml_file_import_submit_import_program_key_per_user ;
+
+CREATE TABLE  proxl_xml_file_import_submit_import_program_key_per_user (
+  auth_user_id INT UNSIGNED NOT NULL,
+  submit_import_program_key VARCHAR(300) NOT NULL,
+  created_date_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  last_updated_date_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (auth_user_id),
+  CONSTRAINT file_impt_sbmtimptprgm_key_pusr_usr_id_fk
+    FOREIGN KEY (auth_user_id)
+    REFERENCES auth_user (id)
+    ON DELETE CASCADE
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table proxl_xml_file_import_submit_import_program_key_per_user_history
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS proxl_xml_file_import_submit_import_program_key_per_user_history ;
+
+CREATE TABLE  proxl_xml_file_import_submit_import_program_key_per_user_history (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  auth_user_id INT UNSIGNED NOT NULL,
+  submit_import_program_key VARCHAR(300) NOT NULL,
+  original_table_created_date_time DATETIME NOT NULL,
+  original_table_last_updated_date_time DATETIME NOT NULL,
+  inserted_to_history_date_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id))
+ENGINE = InnoDB;
+
+
+SET SQL_MODE=@OLD_SQL_MODE;
+SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
+SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
+
 
 DELIMITER $$
 
@@ -2534,8 +2582,4 @@ END$$
 
 
 DELIMITER ;
-
-SET SQL_MODE=@OLD_SQL_MODE;
-SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
-SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
 

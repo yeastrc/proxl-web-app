@@ -25,7 +25,7 @@
 	    </fileset>
 	    <fileset dir="." includes="proxl_importer/config_sample_files_proxl_xml_importer/**">
 	    </fileset>
-	    <fileset dir="." includes="proxl_importer/config_sample_files_RUN_proxl_xml_importer_PGM/**">
+	    <fileset dir="." includes="proxl_run_importer/config_sample_file/**">
 	    </fileset>
 		<fileset dir="." includes="proxl_submit_import/submit_import__config_sample_files/**">
 	    </fileset>

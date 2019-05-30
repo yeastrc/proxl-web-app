@@ -64,6 +64,17 @@
 			<input type="hidden" name="ds" value="<%= PeptideProteinCommonForm.DO_NOT_SORT_PROJECT_SEARCH_IDS_YES %>" class=" query_param_do_not_sort_in_update_form_jq " />
 		</script>	 	
 				
+	<%--  Handlebars template for displaying a Single Filter value --%>		
+
+<script id="filter_single_value_display_template"  type="text/x-handlebars-template">
+			
+	<span class="filter-single-value-display-block {{#if data.description }} tool_tip_attached_jq {{/if}} " 
+		{{#if data.description }} data-tooltip="{{ data.description }}" {{/if}}
+		 style=" cursor: pointer;" onclick="cutoffProcessingCommonCode.openCutoffOverlay( { clickedThis : this } )"
+				>{{ data.display_name }}: {{ data.value }}</span>
+
+</script >		
+	
   <c:forEach  var="search_details"  items="${ searches_details_list }" varStatus="searchVarStatus">
 			
 	<c:set var="search" value="${ search_details.searchDTO }"></c:set>
@@ -286,17 +297,6 @@
  </c:otherwise>
 </c:choose>				
 
-	<%--  Handlebars template for displaying a Single Filter value --%>		
-
-<script id="filter_single_value_display_template"  type="text/x-handlebars-template">
-			
-	<span class="filter-single-value-display-block {{#if data.description }} tool_tip_attached_jq {{/if}} " 
-		{{#if data.description }} data-tooltip="{{ data.description }}" {{/if}}
-		 style=" cursor: pointer;" onclick="cutoffProcessingCommonCode.openCutoffOverlay( { clickedThis : this } )"
-				>{{ data.display_name }}: {{ data.value }}</span>
-
-</script >		
-	
 			
 			</c:if>		
 			
@@ -327,7 +327,10 @@
 			<%@ include file="/WEB-INF/jsp-includes/searchesForPageChooser.jsp" %>
 			
 			<%@ include file="/WEB-INF/jsp-includes/searchesChangeDisplayOrder.jsp" %>
-						
+
+  <c:if test="${ not singleSearch }" >
+				<%--  Only when not single search --%>	
 	 </td>
 	</tr>
-		
+	
+  </c:if>

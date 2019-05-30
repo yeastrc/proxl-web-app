@@ -10,6 +10,7 @@ public class URLShortenerDTO {
 	private String shortenedUrlKey;
 	private Integer authUserId;
 	private String url;
+	private String remoteUserIpAddress;
 	
 	public int getId() {
 		return id;
@@ -34,6 +35,12 @@ public class URLShortenerDTO {
 	}
 	public void setShortenedUrlKey(String shortenedUrlKey) {
 		this.shortenedUrlKey = shortenedUrlKey;
+	}
+	public String getRemoteUserIpAddress() {
+		return remoteUserIpAddress;
+	}
+	public void setRemoteUserIpAddress(String remoteUserIpAddress) {
+		this.remoteUserIpAddress = remoteUserIpAddress;
 	}
 	
 }

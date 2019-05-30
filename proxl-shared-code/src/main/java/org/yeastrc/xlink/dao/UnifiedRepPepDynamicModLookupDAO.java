@@ -9,7 +9,7 @@ import java.util.List;
 
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
-
+import org.yeastrc.xlink.base.constants.Database_OneTrueZeroFalse_Constants;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.dto.UnifiedRepPepDynamicModLookupDTO;
 
@@ -108,6 +108,23 @@ public class UnifiedRepPepDynamicModLookupDAO {
 		returnItem.setMassRoundedString( rs.getString( "mass_rounded_string" ) );
 		returnItem.setMassRoundingPlaces( rs.getInt( "mass_rounding_places" ) );
 		returnItem.setModOrder( rs.getInt( "mod_order" ) );
+
+		{
+			int Is_N_TerminalInt = rs.getInt( "is_n_terminal" );
+			if ( Is_N_TerminalInt == Database_OneTrueZeroFalse_Constants.DATABASE_FIELD_TRUE ) {
+				returnItem.setIs_N_Terminal(true);
+			} else {
+				returnItem.setIs_N_Terminal( false );
+			}
+		}
+		{
+			int Is_C_TerminalInt = rs.getInt( "is_c_terminal" );
+			if ( Is_C_TerminalInt == Database_OneTrueZeroFalse_Constants.DATABASE_FIELD_TRUE ) {
+				returnItem.setIs_C_Terminal( true );
+			} else {
+				returnItem.setIs_C_Terminal( false );
+			}
+		}
 		
 		return returnItem;
 	}

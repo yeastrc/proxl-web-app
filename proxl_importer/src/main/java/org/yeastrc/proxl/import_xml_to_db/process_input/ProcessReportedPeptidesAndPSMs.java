@@ -384,7 +384,7 @@ public class ProcessReportedPeptidesAndPSMs {
 					&& ( ! perPeptideData.getSrchRepPeptPeptDynamicModDTOList_Peptide().isEmpty() ) ) {
 				hasDynamicModifications = true;
 			}
-			if ( perPeptideData.getMonolinkPositionList() != null && ( ! perPeptideData.getMonolinkPositionList().isEmpty() ) ) {
+			if ( perPeptideData.getMonolinkDataFromModificationContainerList() != null && ( ! perPeptideData.getMonolinkDataFromModificationContainerList().isEmpty() ) ) {
 				hasMonolinks = true;
 			}
 			if ( perPeptideData.getSrchRepPeptPeptide_IsotopeLabel_DTOList_Peptide() != null && ( ! perPeptideData.getSrchRepPeptPeptide_IsotopeLabel_DTOList_Peptide().isEmpty() ) ) {

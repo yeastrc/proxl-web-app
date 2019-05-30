@@ -17,7 +17,13 @@ public class FormatDynamicModsToString {
 			if ( modsStringPeptideSB.length() > 0 )  {
 				modsStringPeptideSB.append( ", " );
 			}
-			modsStringPeptideSB.append( UnifiedRpDynamicModDTO.getPosition() );
+			if ( UnifiedRpDynamicModDTO.isIs_N_Terminal() ) {
+				modsStringPeptideSB.append( "n" );
+			} else if ( UnifiedRpDynamicModDTO.isIs_C_Terminal() ) {
+				modsStringPeptideSB.append( "c" );
+			} else {
+				modsStringPeptideSB.append( UnifiedRpDynamicModDTO.getPosition() );
+			}
 			modsStringPeptideSB.append( "(" );
 			modsStringPeptideSB.append( UnifiedRpDynamicModDTO.getMassRoundedString() );
 			modsStringPeptideSB.append( ")" );
