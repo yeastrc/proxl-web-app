@@ -89,7 +89,18 @@
 			if ( window.$ ) {
 				$(document).ready(function()  { 
 					try {
-						window.searchesChangeDisplayOrder.init();
+						if ( window.searchesChangeDisplayOrder ) {
+							window.searchesChangeDisplayOrder.init();
+						} else {
+							window.setTimeout( function() {
+								try {
+									window.searchesChangeDisplayOrder.init();
+								} catch( e ) {
+									reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+									throw e;
+								}
+							}, 7000 ); // delay for 7 seconds
+						}
 					} catch( e ) {
 						reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
 						throw e;
