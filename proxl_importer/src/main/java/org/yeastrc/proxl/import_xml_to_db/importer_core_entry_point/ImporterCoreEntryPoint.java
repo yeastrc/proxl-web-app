@@ -8,6 +8,9 @@ import java.util.List;
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import org.apache.commons.lang3.StringUtils;
@@ -34,6 +37,7 @@ import org.yeastrc.proxl.import_xml_to_db.pre_validate_xml.ValidateScanFilenames
 import org.yeastrc.proxl.import_xml_to_db.process_input.ProcessProxlInput;
 import org.yeastrc.proxl.import_xml_to_db.project_importable_validation.IsImportingAllowForProject;
 import org.yeastrc.proxl_import.api.xml_dto.ProxlInput;
+import org.yeastrc.xlink.base.XMLInputFactory_XXE_Safe_Creator.XMLInputFactory_XXE_Safe_Creator;
 import org.yeastrc.xlink.enum_classes.SearchRecordStatus;
 
 /**
@@ -182,7 +186,9 @@ public class ImporterCoreEntryPoint {
 			}
 			Object unmarshalledObject = null;
 			try {
-				unmarshalledObject = unmarshaller.unmarshal( inputStream );
+				XMLInputFactory xmlInputFactory = XMLInputFactory_XXE_Safe_Creator.xmlInputFactory_XXE_Safe_Creator();
+				XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(new StreamSource( inputStream ) );
+				unmarshalledObject = unmarshaller.unmarshal( xmlStreamReader );
 			} catch ( Exception e ) {
 				System.out.println( "Exception in deserializing the primary input XML file" );
 				System.err.println( "Exception in deserializing the primary input XML file" );

@@ -24,9 +24,14 @@ import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.transform.stream.StreamSource;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
+import org.yeastrc.xlink.base.XMLInputFactory_XXE_Safe_Creator.XMLInputFactory_XXE_Safe_Creator;
 import org.yeastrc.xlink.base.file_import_proxl_xml_scans.constants.ProxlXMLFileUploadCommonConstants;
 import org.yeastrc.xlink.base.file_import_proxl_xml_scans.dto.ProxlXMLFileImportTrackingDTO;
 import org.yeastrc.xlink.base.file_import_proxl_xml_scans.dto.ProxlXMLFileImportTrackingSingleFileDTO;
@@ -649,7 +654,9 @@ public class ProxlXMLFileImportUploadSubmitService {
 					InputStream inputStream = null;
 					try {
 						inputStream = new FileInputStream( tempSubdirFile );
-						objectFromFile = unmarshaller.unmarshal( inputStream );
+						XMLInputFactory xmlInputFactory = XMLInputFactory_XXE_Safe_Creator.xmlInputFactory_XXE_Safe_Creator();
+						XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(new StreamSource( inputStream ) );
+						objectFromFile = unmarshaller.unmarshal( xmlStreamReader );
 					} catch ( Exception e ) {
 						String msg = "Failed to read and unmarshall data from file: " + tempSubdirFile.getCanonicalPath();
 						log.error( msg );

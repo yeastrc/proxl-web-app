@@ -19,6 +19,10 @@ import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.transform.stream.StreamSource;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -29,6 +33,7 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
+import org.yeastrc.xlink.base.XMLInputFactory_XXE_Safe_Creator.XMLInputFactory_XXE_Safe_Creator;
 import org.yeastrc.xlink.dto.ProteinSequenceAnnotationDTO;
 import org.yeastrc.xlink.www.config_system_table.ConfigSystemCaching;
 import org.yeastrc.xlink.www.constants.ConfigSystemsKeysConstants;
@@ -237,7 +242,9 @@ public class ProteinNameForTooltipService {
 						inputStreamFromHTTP = httpEntity.getContent();
 						Object unmarshalledObject = null;
 						try {
-							unmarshalledObject = unmarshaller.unmarshal( inputStreamFromHTTP );
+							XMLInputFactory xmlInputFactory = XMLInputFactory_XXE_Safe_Creator.xmlInputFactory_XXE_Safe_Creator();
+							XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(new StreamSource( inputStreamFromHTTP ) );
+							unmarshalledObject = unmarshaller.unmarshal( xmlStreamReader );
 						} catch ( Exception e ) {
 							throw e;
 						}

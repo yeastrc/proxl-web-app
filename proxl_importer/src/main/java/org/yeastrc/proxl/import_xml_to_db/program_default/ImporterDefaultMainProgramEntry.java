@@ -20,6 +20,10 @@ import java.util.List;
 import java.util.Vector;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.transform.stream.StreamSource;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;import org.slf4j.Logger;
 import org.apache.logging.log4j.Level;
@@ -53,6 +57,7 @@ import org.yeastrc.proxl.import_xml_to_db.file_import_proxl_xml_scans.run_import
 import org.yeastrc.proxl.import_xml_to_db.file_import_proxl_xml_scans.run_importer_to_importer_file_data.RunImporterToImporterParameterNamesConstants;
 import org.yeastrc.proxl.import_xml_to_db.utils.SHA1SumCalculator;
 import org.yeastrc.proxl_import.api.xml_dto.ProxlInput;
+import org.yeastrc.xlink.base.XMLInputFactory_XXE_Safe_Creator.XMLInputFactory_XXE_Safe_Creator;
 import org.yeastrc.xlink.base.config_system_table_common_access.ConfigSystemTableGetValueCommon;
 import org.yeastrc.xlink.base.file_import_proxl_xml_scans.dao.ProxlXMLFileImportTrackingRun_Base_DAO;
 import org.yeastrc.xlink.base.file_import_proxl_xml_scans.dao.ProxlXMLFileImportTrackingSingleFileDAO;
@@ -384,7 +389,9 @@ public class ImporterDefaultMainProgramEntry {
 				InputStream inputStream = null;
 				try {
 					inputStream = new FileInputStream( runImporterParamsFile );
-					unmarshalledObject = unmarshaller.unmarshal( inputStream );
+					XMLInputFactory xmlInputFactory = XMLInputFactory_XXE_Safe_Creator.xmlInputFactory_XXE_Safe_Creator();
+					XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(new StreamSource( inputStream ) );
+					unmarshalledObject = unmarshaller.unmarshal( xmlStreamReader );
 				} catch ( Exception e ) {
 					throw e;
 				} finally {
