@@ -58,26 +58,64 @@ configurations.all {
 
 dependencies {
 
-//  Specify dependency on Proxl Shared Code
+	//  Specify dependency on Proxl Shared Code
 	
-	compile project(":proxl-shared-code")
+	compile project(":proxl-shared-code") //  !! See Dependencies of proxl-shared-code
 	
-//  Specify dependency on proxl_submit_import_client_connector to get Webservice Request and Response Java Classes
+	/////////////////////////////////////
 	
-	// compile project(":proxl_submit_import_client_connector")
+	
+	//  Jersey Server for webservices
+	
+	//        latest version requires Java > 8
+	// https://mvnrepository.com/artifact/org.glassfish.jersey.core/jersey-server
+	// compile group: 'org.glassfish.jersey.core', name: 'jersey-server', version: '2.28'
+	
+	// https://mvnrepository.com/artifact/org.glassfish.jersey.core/jersey-server
+	compile group: 'org.glassfish.jersey.core', name: 'jersey-server', version: '2.27'
+	
+	// https://mvnrepository.com/artifact/org.glassfish.jersey.containers/jersey-container-servlet-core
+	compile group: 'org.glassfish.jersey.containers', name: 'jersey-container-servlet-core', version: '2.27'
+	
+	// https://mvnrepository.com/artifact/org.glassfish.jersey.inject/jersey-hk2
+	compile group: 'org.glassfish.jersey.inject', name: 'jersey-hk2', version: '2.27'
+	
+	
+	// https://mvnrepository.com/artifact/org.glassfish.jersey.media/jersey-media-json-jackson
+	compile group: 'org.glassfish.jersey.media', name: 'jersey-media-json-jackson', version: '2.27'
+	
+	//  Java Advanced Imaging
+	
+	//   Since not find 'jai_imageio' in Maven Central or JCentral, use all JAI jars from local directory
+	
+	// https://mvnrepository.com/artifact/javax.media/jai_core
+	// compile group: 'javax.media', name: 'jai_core', version: '1.1.3'
+	
+	// https://mvnrepository.com/artifact/javax.media/jai_codec
+	// compile group: 'javax.media', name: 'jai_codec', version: '1.1.3'
+	
+	//  Not found:   error msg: Could not find javax.media:jai_imageio:1.1.1.
+	// https://mvnrepository.com/artifact/javax.media/jai_imageio
+	// compile group: 'javax.media', name: 'jai_imageio', version: '1.1.1'
+	
+	//  Not found:   error msg: Could not find javax.media:jai_imageio:1.1.
+	// https://mvnrepository.com/artifact/javax.media/jai_imageio
+	// compile group: 'javax.media', name: 'jai_imageio', version: '1.1'
 	
 	
 	//  Mail
 	
 	// https://mvnrepository.com/artifact/javax.mail/mail
-	// compile group: 'javax.mail', name: 'mail', version: '1.4.1'
+	compile group: 'javax.mail', name: 'mail', version: '1.4.1'
 	
 	//  Later versions like this have license CDDL and GPL
 	// https://mvnrepository.com/artifact/javax.mail/javax.mail-api
 //	compile group: 'javax.mail', name: 'javax.mail-api', version: '1.6.1'
-	
-	// https://mvnrepository.com/artifact/org.apache.commons/commons-dbcp2
-	// compile group: 'org.apache.commons', name: 'commons-dbcp2', version: '2.2.0'
+
+
+	// https://mvnrepository.com/artifact/commons-dbcp/commons-dbcp
+	compile group: 'commons-dbcp', name: 'commons-dbcp', version: '1.1' // 1.4 exists but compile fails
+
 	
 	// https://mvnrepository.com/artifact/mysql/mysql-connector-java
 //	compile group: 'mysql', name: 'mysql-connector-java', version: '5.1.45'
@@ -98,22 +136,17 @@ dependencies {
 	compile group: 'org.apache.logging.log4j', name: 'log4j-1.2-api', version: '2.2'
 		
 	
-	
 	//  redirects log4j to slf4j, the opposite of how logging is set up
 	// https://mvnrepository.com/artifact/org.slf4j/log4j-over-slf4j
 //	compile group: 'org.slf4j', name: 'log4j-over-slf4j', version: '1.7.25'
+
 	
 	// Used by included yeastrc jar password management
 	// https://mvnrepository.com/artifact/org.springframework.security/spring-security-crypto
 	compile group: 'org.springframework.security', name: 'spring-security-crypto', version: '5.1.5.RELEASE'
 	
-	// Used by included yeastrc jars
-	// https://mvnrepository.com/artifact/com.google.guava/guava
-//	compile group: 'com.google.guava', name: 'guava', version: '24.0-jre'
-	
 	// https://mvnrepository.com/artifact/javax.servlet/jstl
 	compile group: 'javax.servlet', name: 'jstl', version: '1.2'
-	
 	
 	
 	//   Apache Commons
@@ -129,6 +162,34 @@ dependencies {
 	// https://mvnrepository.com/artifact/commons-io/commons-io
 	compile group: 'commons-io', name: 'commons-io', version: '2.6'
 	
+	// https://mvnrepository.com/artifact/org.apache.commons/commons-math3
+	compile group: 'org.apache.commons', name: 'commons-math3', version: '3.6.1'
+	
+	
+	//   Apache HTPP Client
+
+	// https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient
+	compile group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.8' // Was using 4.1.2
+
+	// https://mvnrepository.com/artifact/org.apache.httpcomponents/httpcore
+	compile group: 'org.apache.httpcomponents', name: 'httpcore', version: '4.4.11' // Was using 4.1.2
+ 	
+	
+	// https://mvnrepository.com/artifact/com.google.guava/guava
+	compile group: 'com.google.guava', name: 'guava', version: '27.1-jre'
+	
+	// https://mvnrepository.com/artifact/joda-time/joda-time
+	compile group: 'joda-time', name: 'joda-time', version: '2.10.2'
+	
+	//  Jackson JSON parsing
+	
+	// https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core
+	compile group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.9.9'
+	
+	// https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
+	compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.9'
+
+	
 	
 	//  Apache Batik:   For creating JPEG and PNG images from SVG in class ConvertAndDownloadSVGAction
 	// https://mvnrepository.com/artifact/org.apache.xmlgraphics/batik-all
@@ -138,7 +199,30 @@ dependencies {
 	// https://mvnrepository.com/artifact/org.apache.xmlgraphics/fop
 	compile group: 'org.apache.xmlgraphics', name: 'fop', version: '2.3'
 	
+	//  BioJava
 	
+		//  version 5 exists for all jars:  https://mvnrepository.com/artifact/org.biojava/
+		
+	// https://mvnrepository.com/artifact/org.biojava/biojava-core
+	compile group: 'org.biojava', name: 'biojava-core', version: '4.2.12'
+	
+	// https://mvnrepository.com/artifact/org.biojava/biojava-structure
+	compile group: 'org.biojava', name: 'biojava-structure', version: '4.2.12'
+	
+	// https://mvnrepository.com/artifact/org.biojava/biojava-alignment
+	compile group: 'org.biojava', name: 'biojava-alignment', version: '4.2.12'
+	
+	
+	//  Struts 1.2.9
+	
+	// https://mvnrepository.com/artifact/struts/struts
+	compile group: 'struts', name: 'struts', version: '1.2.9'
+		
+	// https://mvnrepository.com/artifact/struts/struts-el
+	compile group: 'struts', name: 'struts-el', version: '1.2.9'
+		
+		///////////
+		
 	//  Other Proxl Jars
 		
 	//  Jars built from other Proxl Github repositories
@@ -170,18 +254,6 @@ dependencies {
 	// https://mvnrepository.com/artifact/javax.servlet.jsp/javax.servlet.jsp-api
 	providedCompile group: 'javax.servlet.jsp', name: 'javax.servlet.jsp-api', version: '2.3.3'
 	
-    // compile('org.springframework.boot:spring-boot-starter-web')
-	
-	// https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-configuration-processor
-	// compile group: 'org.springframework.boot', name: 'spring-boot-configuration-processor', version: '2.0.0.RELEASE'
-    
-	// https://mvnrepository.com/artifact/org.springframework/spring-jdbc
-	// compile group: 'org.springframework', name: 'spring-jdbc', version: '5.0.4.RELEASE'
-    
-    //  Mark provided since creating a war
-	// providedRuntime('org.springframework.boot:spring-boot-starter-tomcat')
-	
-	// testCompile('org.springframework.boot:spring-boot-starter-test')
 }
 
 /*

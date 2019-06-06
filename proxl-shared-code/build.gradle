@@ -23,36 +23,20 @@ plugins {
 dependencies {
 
 	// https://mvnrepository.com/artifact/org.slf4j/slf4j-simple
-	compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
+	compileOnly group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
 
 	// https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
-	// compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.7'
-	
-	//////////////////////////////
-	
-	//  Jars copied and placed here	
-//	compile fileTree(dir: 'lib', include: ['*.jar'])
-	
-	//  Jars built from other Emozi Github repositories
-//	compile fileTree(dir: '../libs_emozi_github_jars', include: ['*.jar'])
-	
-	//  Jars built from other Yeastrc Github repositories
-//	compile fileTree(dir: '../libs_yeastrc_github_jars', include: ['*.jar'])
+	compileOnly group: 'org.apache.commons', name: 'commons-lang3', version: '3.9'
 
-	/////////////////////////////////////
+	// https://mvnrepository.com/artifact/joda-time/joda-time
+	compileOnly group: 'joda-time', name: 'joda-time', version: '2.10.2'
 
-    // Use JUnit test framework
-    testCompile 'junit:junit:4.12'
-    
-    
-    // Instead of compile only here, could:
-    //  1) move these to parent folder and include everywhere
-    //  2) remove from dependent projects
-    //  3) May not be a problem when list dependencies here instead of including these jars in this folder 
-    
-	//  Jars provided for compiling shared code only	
-	compileOnly fileTree(dir: 'libs_compile_only_other', include: ['*.jar'])
-	
+	// https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core
+	compileOnly group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.8.11'
+
+	// https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
+	compileOnly group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.9'
+
 	
 }
 

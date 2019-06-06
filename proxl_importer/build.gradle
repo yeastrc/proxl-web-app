@@ -62,18 +62,26 @@ configurations.all {
 
 dependencies {
 	
-    // This dependency is found on compile classpath of this component and consumers.
-//	compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.10.0'
-//	compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.10.0'	
 
+	//  Specify dependency on Proxl Shared Code
+	
+	compile project(":proxl-shared-code")
+
+	//  Specify dependency on proxl_importer_run_importer_shared
+
+	compile project(":proxl_importer_run_importer_shared")
+
+	/////////////////////////////////////
+	
+	//  New StringUtils
 	// https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
-	// compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.7'
+	compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.9'
 	
 	// https://mvnrepository.com/artifact/org.apache.commons/commons-dbcp2
-	// compile group: 'org.apache.commons', name: 'commons-dbcp2', version: '2.2.0'
+	compile group: 'org.apache.commons', name: 'commons-dbcp2', version: '2.2.0'
 	
 	// https://mvnrepository.com/artifact/mysql/mysql-connector-java
-	// compile group: 'mysql', name: 'mysql-connector-java', version: '5.1.45'
+	compile group: 'mysql', name: 'mysql-connector-java', version: '5.1.45'
 	
 	
 	//  Logging
@@ -90,6 +98,11 @@ dependencies {
 	//  Log4j 1 to 2 bridge
 	compile group: 'org.apache.logging.log4j', name: 'log4j-1.2-api', version: '2.2'
 		
+		
+		
+	// https://mvnrepository.com/artifact/joda-time/joda-time
+	compile group: 'joda-time', name: 'joda-time', version: '2.10.2'
+	
 
 	//  NOT FOUND  either jcenter() or mavenCentral()
 	
@@ -109,17 +122,6 @@ dependencies {
 	
 	compile fileTree(dir: 'lib_spectal_storage_client_connector_code', include: ['*.jar'])
 	
-
-//  Specify dependency on Proxl Shared Code
-	
-	compile project(":proxl-shared-code")
-
-//  Specify dependency on proxl_importer_run_importer_shared
-
-	compile project(":proxl_importer_run_importer_shared")
-
-	/////////////////////////////////////
-
 }
 
 

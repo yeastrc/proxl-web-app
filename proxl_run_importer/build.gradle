@@ -53,18 +53,25 @@ defaultTasks 'shadowJar'
 
 dependencies {
 	
-    // This dependency is found on compile classpath of this component and consumers.
-//	compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.10.0'
-//	compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.10.0'	
+	//  Specify dependency on Proxl Shared Code
+	
+	compile project(":proxl-shared-code")
 
+	//  Specify dependency on proxl_importer_run_importer_shared
+
+	compile project(":proxl_importer_run_importer_shared")
+		
+	/////////////////////////////////////
+	
+	//  New StringUtils
 	// https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
-	// compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.7'
+	compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.9'
 	
 	// https://mvnrepository.com/artifact/org.apache.commons/commons-dbcp2
-	// compile group: 'org.apache.commons', name: 'commons-dbcp2', version: '2.2.0'
+	compile group: 'org.apache.commons', name: 'commons-dbcp2', version: '2.2.0'
 	
 	// https://mvnrepository.com/artifact/mysql/mysql-connector-java
-	// compile group: 'mysql', name: 'mysql-connector-java', version: '5.1.45'
+	compile group: 'mysql', name: 'mysql-connector-java', version: '5.1.45'
 	
 	//  Logging
 	
@@ -80,6 +87,26 @@ dependencies {
 	//  Log4j 1 to 2 bridge
 	compile group: 'org.apache.logging.log4j', name: 'log4j-1.2-api', version: '2.2'
 	
+	
+	//   Apache HTPP Client
+
+	// https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient
+	compile group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.8' // Was using 4.1.2
+
+	// https://mvnrepository.com/artifact/org.apache.httpcomponents/httpcore
+	compile group: 'org.apache.httpcomponents', name: 'httpcore', version: '4.4.11' // Was using 4.1.2
+ 	
+ 	
+	//  Jackson JSON parsing
+	
+	// https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core
+	compile group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.9.9'
+	
+	// https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
+	compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.9'
+
+	
+ 	
 
 	//  NOT FOUND  either jcenter() or mavenCentral()
 	
@@ -87,24 +114,10 @@ dependencies {
     // https://mvnrepository.com/artifact/jargs/jargs
 //	compile group: 'jargs', name: 'jargs', version: '1.0'
 
-	//////////////////////////////
-	
-	//  Jars copied and placed here	
-	// compile fileTree(dir: '../lib_other', include: ['*.jar'])
+	//  jargs since not in Maven Central
 	
 	compile fileTree(dir: '../lib_importer_run_importer__and_importer_run_importer_shared_code', include: ['*.jar'])
 	
-	
-	compile fileTree(dir: 'lib_run_importer_extras', include: ['*.jar'])
-	
-
-//  Specify dependency on Proxl Shared Code
-	
-	compile project(":proxl-shared-code")
-
-//  Specify dependency on proxl_importer_run_importer_shared
-
-	compile project(":proxl_importer_run_importer_shared")
 
 }
 

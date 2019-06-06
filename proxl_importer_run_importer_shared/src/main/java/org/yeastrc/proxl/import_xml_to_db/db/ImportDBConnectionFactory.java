@@ -214,33 +214,21 @@ public class ImportDBConnectionFactory implements IDBConnectionFactory {
 			int maxDBConnections = maxDBConnectionsProxl;
 			
 
-			boolean poolPreparedStatements = true;
-			int maxOpenPreparedStatements = 10;
+//			int maxOpenPreparedStatements = 10;
 			
 
 			if ( inserterConnection ) {
 				
 				maxDBConnections = 1;
-				maxOpenPreparedStatements = 10;
+//				maxOpenPreparedStatements = 10;
 
 			} else if ( ! ( DBConnectionFactory.PROXL.equals( db ) 
 					|| ( dbConnectionParametersProvider.getProxlDbName() != null 
 						&& dbConnectionParametersProvider.getProxlDbName().equals( db ) ) ) ) {
+			
+				maxDBConnections = MAX_TOTAL_OTHER_DB_CONNECTIONS;
 				
-//				if ( DBConnectionFactory.YRC_NRSEQ.equals(db) 
-//						|| ( dbConnectionParametersProvider.getNrseqDbName() != null 
-//								&& dbConnectionParametersProvider.getNrseqDbName().equals( db ) ) ) {
-//					
-//					maxDBConnections = MAX_TOTAL_NRSEQ_DB_CONNECTIONS;
-//					
-//					maxOpenPreparedStatements = 10;
-//				} else {
-					
-					maxDBConnections = MAX_TOTAL_OTHER_DB_CONNECTIONS;
-					
-					maxOpenPreparedStatements = 1;
-//				}
-				
+//				maxOpenPreparedStatements = 1;
 			}
 
 
