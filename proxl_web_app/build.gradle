@@ -54,6 +54,12 @@ configurations.all {
    	//  Exclude Routing of log4j to slf4j since using opposite (slf4j to log4j) and including this would create a circular reference
    exclude group:'org.apache.logging.log4j', module: 'log4j-to-slf4j'
 //   exclude group:'org.apache.logging.log4j', module: 'log4j-api'
+
+	//  Exclude following since OLD
+	//  Included by DBCP 1
+	// https://mvnrepository.com/artifact/xerces/xerces
+	//   compile group: 'xerces', name: 'xerces', version: '2.0.2'
+	exclude group: 'xerces', module: 'xerces'
 }
 
 dependencies {
