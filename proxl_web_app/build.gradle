@@ -236,9 +236,6 @@ dependencies {
 	
 	//  Other Yeastrc Jars
 	
-	//  Jars built from other Yeastrc Github repositories
-	compile fileTree(dir: '../libs_yeastrc_github_jars', include: ['*.jar'])
-
 	//  Jars built from other Yeastrc Github repositories - Webapp only	
 	compile fileTree(dir: 'libs_webapp__yeastrc_github_jars', include: ['*.jar'])
 	

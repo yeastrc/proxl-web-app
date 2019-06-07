@@ -112,14 +112,13 @@ dependencies {
 
 	//////////////////////////////
 	
-	//  Jars copied and placed here	
-	// compile fileTree(dir: '../lib_other', include: ['*.jar'])
-	
+	//  Jars from other Proxl Repos projects
 	compile fileTree(dir: '../libs_proxl_github_jars', include: ['*.jar'])
 	
+	//   jargs.jar
 	compile fileTree(dir: '../lib_importer_run_importer__and_importer_run_importer_shared_code', include: ['*.jar'])
 	
-	
+	//  Jars from other Yeastrc projects
 	compile fileTree(dir: 'lib_spectal_storage_client_connector_code', include: ['*.jar'])
 	
 }
