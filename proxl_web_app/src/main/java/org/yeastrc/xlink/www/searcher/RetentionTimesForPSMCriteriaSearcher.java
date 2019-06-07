@@ -7,7 +7,6 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.dbcp.DelegatingPreparedStatement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.yeastrc.xlink.base.constants.Database_OneTrueZeroFalse_Constants;
@@ -552,9 +551,11 @@ public class RetentionTimesForPSMCriteriaSearcher {
 //			if ( log.isDebugEnabled() ) {
 //				log.debug( "Executed Statement: " + ((DelegatingPreparedStatement)pstmt).getDelegate().toString() );
 //			}
-			if ( log.isDebugEnabled() ) {
-				log.debug( "Executed Statement: " + ((DelegatingPreparedStatement)pstmt).getDelegate().toString() );
-			}
+//			if ( log.isDebugEnabled() ) {
+//			//  Commented out since is specific DBCP dependency
+//				log.debug( "Executed Statement: " 
+//						+ ((org.apache.commons.dbcp2.DelegatingPreparedStatement)pstmt).getDelegate().toString() );
+//			}
 //			log.warn( "Executed Statement: " + ((DelegatingPreparedStatement)pstmt).getDelegate().toString() );
 
 			rs = pstmt.executeQuery();
@@ -565,7 +566,10 @@ public class RetentionTimesForPSMCriteriaSearcher {
 			
 		} catch ( Exception e ) {
 			String msg = "Exception in search( ... ), \n sql: " + sql
-					+ "\n Executed Statement: " + ((DelegatingPreparedStatement)pstmt).getDelegate().toString();
+				//  Commented out since is specific DBCP dependency
+//					+ "\n Executed Statement: " 
+//					+ ((org.apache.commons.dbcp2.DelegatingPreparedStatement)pstmt).getDelegate().toString()
+					;
 			log.error( msg, e );
 			throw e;
 		} finally {

@@ -8,8 +8,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.apache.commons.dbcp.DelegatingPreparedStatement;
-import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.dto.AnnotationTypeDTO;
 import org.yeastrc.xlink.enum_classes.FilterDirectionType;
@@ -274,9 +274,11 @@ public class PeptideProteinPositionsForCutoffsAndProtSeqIdsSearcher {
 					}
 				}
 			}
-			if ( log.isDebugEnabled() ) {
-				log.debug( "Executed Statement: " + ((DelegatingPreparedStatement)pstmt).getDelegate().toString() );
-			}
+//			if ( log.isDebugEnabled() ) {
+//				//  Commented out since is specific DBCP dependency
+//				log.debug( "Executed Statement: "
+//						+ ((org.apache.commons.dbcp2.DelegatingPreparedStatement)pstmt).getDelegate().toString() );
+//			}
 			rs = pstmt.executeQuery();
 			Map<Integer, Boolean> foundAtLeastOnePSMForSearchReportedPeptideIdMap = new HashMap<>();
 			while( rs.next() ) {

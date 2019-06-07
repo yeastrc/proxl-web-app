@@ -9,7 +9,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.dbcp.DelegatingPreparedStatement;
 import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.base.constants.Database_OneTrueZeroFalse_Constants;
 import org.yeastrc.xlink.db.DBConnectionFactory;
@@ -529,12 +528,14 @@ public class PreMZ_For_PSMPeptideCutoffsSearcher {
 //				}
 			}
 //			if ( log.isDebugEnabled() ) {
-//				log.debug( "Executed Statement: " + ((DelegatingPreparedStatement)pstmt).getDelegate().toString() );
+//				log.debug( "Executed Statement: " + ((org.apache.commons.dbcp2.DelegatingPreparedStatement)pstmt).getDelegate().toString() );
 //			}
-			if ( log.isDebugEnabled() ) {
-				log.debug( "Executed Statement: " + ((DelegatingPreparedStatement)pstmt).getDelegate().toString() );
-			}
-//			log.warn( "Executed Statement: " + ((DelegatingPreparedStatement)pstmt).getDelegate().toString() );
+//			if ( log.isDebugEnabled() ) {
+//				//  Commented out since is specific DBCP dependency
+//				log.debug( "Executed Statement: " 
+//						+ ((org.apache.commons.dbcp2.DelegatingPreparedStatement)pstmt).getDelegate().toString() );
+//			}
+//			log.warn( "Executed Statement: " + ((org.apache.commons.dbcp2.DelegatingPreparedStatement)pstmt).getDelegate().toString() );
 
 			rs = pstmt.executeQuery();
 			
@@ -559,7 +560,10 @@ public class PreMZ_For_PSMPeptideCutoffsSearcher {
 			}
 		} catch ( Exception e ) {
 			String msg = "Exception in search( ... ), \n sql: " + sql
-					+ "\n Executed Statement: " + ((DelegatingPreparedStatement)pstmt).getDelegate().toString();
+//					+ "\n Executed Statement: " 
+				//  Commented out since is specific DBCP dependency
+//					+ ((org.apache.commons.dbcp2.DelegatingPreparedStatement)pstmt).getDelegate().toString()
+					;
 			log.error( msg, e );
 			throw e;
 		} finally {

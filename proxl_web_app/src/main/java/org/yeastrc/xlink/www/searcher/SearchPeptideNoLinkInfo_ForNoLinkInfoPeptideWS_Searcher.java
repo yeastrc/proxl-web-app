@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.apache.commons.dbcp.DelegatingPreparedStatement;
 import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.www.constants.PeptideViewLinkTypesConstants;
 import org.yeastrc.xlink.www.dao.SearchDAO;
@@ -523,9 +522,11 @@ public class SearchPeptideNoLinkInfo_ForNoLinkInfoPeptideWS_Searcher {
 					}
 				}
 			}
-			if ( log.isDebugEnabled() ) {
-				log.debug( "Executed Statement: " + ((DelegatingPreparedStatement)pstmt).getDelegate().toString() );
-			}
+//			if ( log.isDebugEnabled() ) {
+//				//  Commented out since is specific DBCP dependency
+//				log.debug( "Executed Statement: " 
+//						+ ((org.apache.commons.dbcp2.DelegatingPreparedStatement)pstmt).getDelegate().toString() );
+//			}
 			rs = pstmt.executeQuery();
 			//  Build a Map of Lists of query results keyed on Reported Peptide Id
 			Map<Integer, List<QueryResultItem>> queryResultItemListMapKeyedOnReportedPeptideId = new HashMap<>();

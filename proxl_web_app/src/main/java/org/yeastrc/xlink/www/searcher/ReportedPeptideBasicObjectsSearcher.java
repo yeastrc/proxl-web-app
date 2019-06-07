@@ -10,7 +10,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.apache.commons.dbcp.DelegatingPreparedStatement;
 import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.base.constants.Database_OneTrueZeroFalse_Constants;
 import org.yeastrc.xlink.base_searcher.PsmCountForSearchIdReportedPeptideIdSearcher;
@@ -553,9 +552,11 @@ public class ReportedPeptideBasicObjectsSearcher {
 //			if ( log.isDebugEnabled() ) {
 //				log.debug( "Executed Statement: " + ((DelegatingPreparedStatement)pstmt).getDelegate().toString() );
 //			}
-			if ( log.isDebugEnabled() ) {
-				log.debug( "Executed Statement: " + ((DelegatingPreparedStatement)pstmt).getDelegate().toString() );
-			}
+//			if ( log.isDebugEnabled() ) {
+//				log.debug( "Executed Statement: "
+//					//  Commented out since is specific DBCP dependency
+//						+ ((org.apache.commons.dbcp2.DelegatingPreparedStatement)pstmt).getDelegate().toString() );
+//			}
 			rs = pstmt.executeQuery();
 			Set<Integer> retrieved_reported_peptide_id_values_Set = new HashSet<>();
 			while( rs.next() ) {
