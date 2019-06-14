@@ -4,6 +4,8 @@
 /.gradle/
 /.settings/
 .project
-package-lock.json
 VS_Code_Workspace.code-workspace
 ant_buildFrontEnd_CopyToTomcat.settings.properties
+
+#  Start committing package-lock.json
+# package-lock.json
