@@ -48,6 +48,28 @@ public class XLinkUtils {
 	public static final String UNLINKED_TYPE_STRING_UPPERCASE  = UNLINKED_TYPE_STRING.toUpperCase();
 
 	
+	//  For Display
+	
+	/**
+	 * For Display, with first letter capitalized and rest lower case
+	 */
+	public static final String CROSS_TYPE_STRING_CAPITAL_CASE  = "Crosslink";
+	/**
+	 * For Display, with first letter capitalized and rest lower case
+	 */
+	public static final String LOOP_TYPE_STRING_CAPITAL_CASE  = "Looplink";
+	/**
+	 * For Display, with first letter capitalized and rest lower case
+	 */
+	public static final String DIMER_TYPE_STRING_CAPITAL_CASE  = "Dimer";
+	/**
+	 * For Display, with first letter capitalized and rest lower case
+	 */
+	public static final String UNLINKED_TYPE_STRING_CAPITAL_CASE  = "Unlinked";
+	/**
+	 * For Display, with first letter capitalized and rest lower case
+	 */
+	public static final String UNKNOWN_TYPE_STRING_CAPITAL_CASE  = "Unknown";
 
 	/**
 	 * Get the string representation of a type of linked peptide

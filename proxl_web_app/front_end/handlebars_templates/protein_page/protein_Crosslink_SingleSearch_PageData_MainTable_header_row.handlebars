@@ -1,0 +1,38 @@
+{{!-- protein_Crosslink_SingleSearch_PageData_MainTable_header_row.handlebars in 'protein_page' 
+
+	Protein Crosslink Page Single Search - Main Table - Header Row
+	
+    The Root of data returned from webservice is in the property 'viewSearchProteinsPageDataRoot'.
+--}}
+
+
+    <tr>
+        <th data-tooltip="Name of first protein" class="tool_tip_attached_jq" style="text-align:left;width:10%;font-weight:bold;">Protein 1</th>
+        <th data-tooltip="Linked position in first protein" class="tool_tip_attached_jq integer-number-column-header" style="width:10%;font-weight:bold;">Position</th>
+        <th data-tooltip="Name of second protein" class="tool_tip_attached_jq" style="width:10%;font-weight:bold;">Protein 2</th>
+        <th data-tooltip="Linked position in second protein" class="tool_tip_attached_jq integer-number-column-header" style="width:10%;font-weight:bold;">Position</th>
+        <th data-tooltip="Number of peptide spectrum matches showing this link" class="tool_tip_attached_jq integer-number-column-header" style="width:10%;font-weight:bold;">PSMs</th>
+        <th data-tooltip="Number of distinct pairs of peptides showing link" class="tool_tip_attached_jq integer-number-column-header" style="width:10%;font-weight:bold;">#&nbsp;Peptides</th>
+        <th data-tooltip="Number of found peptide pairs that uniquely map to these two proteins from the FASTA file" class="tool_tip_attached_jq integer-number-column-header" style="width:10%;font-weight:bold;">#&nbsp;Unique Peptides</th>
+        
+        {{#each viewSearchProteinsPageDataRoot.peptideAnnotationDisplayNameDescriptionList as |peptideAnnotationDisplayNameDescription| }}
+
+                {{!-- Consider displaying the description somewhere   peptideAnnotationDisplayNameDescription.description --}}
+            <th data-tooltip="Best Peptide-level {{ peptideAnnotationDisplayNameDescription.displayName }} for this peptide (or linked pair)" 
+                    class="tool_tip_attached_jq" 
+                    style="width:10%;font-weight:bold;">
+                <span style="white-space: nowrap">{{ peptideAnnotationDisplayNameDescription.displayName }}</span>
+            </th>
+            
+        {{/each}}
+                         
+        {{#each viewSearchProteinsPageDataRoot.psmAnnotationDisplayNameDescriptionList as |psmAnnotationDisplayNameDescription| }}
+
+                {{!-- Consider displaying the description somewhere   psmAnnotationDisplayNameDescription.description --}}
+            <th data-tooltip="Best PSM-level {{ psmAnnotationDisplayNameDescription.displayName }} for PSMs matched to peptides that show this link" class="tool_tip_attached_jq" style="width:10%;font-weight:bold;"
+            ><span style="white-space: nowrap">Best PSM</span> 
+                <span style="white-space: nowrap">{{ psmAnnotationDisplayNameDescription.displayName }}</span></th>
+
+        {{/each}}
+                    
+    </tr>

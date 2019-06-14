@@ -28,7 +28,14 @@ $(document).ready(function() {
 	},10);
 });
 
-var createTooltipForProteinNames = function() {
+var createTooltipForProteinNames = function( params ) {
+
+	let $findElementsRoot = $( "document" );
+	if ( params ) {
+		if ( params.$findElementsRoot ) {
+			$findElementsRoot = params.$findElementsRoot;
+		}
+	}
 
 	_protein_listing_webservice_base_url_set = $("#protein_listing_webservice_base_url_set").val();
 	if ( _protein_listing_webservice_base_url_set === undefined 
@@ -44,7 +51,7 @@ var createTooltipForProteinNames = function() {
 	});
 	setTimeout( function() { // put in setTimeout so if it fails it doesn't kill anything else
 		try {
-			$('.proteinName').each(function() {
+			$findElementsRoot.find('.proteinName').each(function() {
 				var $elementToAddToolTipTo =  $(this);
 				var htmlIdString = $elementToAddToolTipTo.attr( "id" );
 				var proteinIdString = htmlIdString.replace( "protein-id-", "" );

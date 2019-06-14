@@ -76,6 +76,8 @@
 
 <%@ include file="/WEB-INF/jsp-includes/header_main.jsp" %>
 	
+	<%@ include file="/WEB-INF/jsp-includes/body_section_data_pages_after_header_main.jsp" %>
+	
 	<%--  used by createTooltipForProteinNames.js --%>
 	<%@ include file="/WEB-INF/jsp-includes/proteinNameTooltipDataForJSCode.jsp" %>
 

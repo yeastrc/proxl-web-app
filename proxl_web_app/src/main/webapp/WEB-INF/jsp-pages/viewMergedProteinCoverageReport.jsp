@@ -18,8 +18,7 @@
 					/WEB-INF/jsp-includes/proteinNameTooltipDataForJSCode.jsp
 				  --%>
 				  
-		<script type="text/javascript" src="static/js_generated_bundles/data_pages/proteinCoverageReportView-bundle.js?x=${cacheBustValue}"></script>
-	
+		<script type="text/javascript" src="js/libs/spin.min.js"></script> 
 	
 		<link rel="stylesheet" href="css/tablesorter.css" type="text/css" media="print, projection, screen" />
 		<link type="text/css" rel="stylesheet" href="css/jquery.qtip.min.css" />
@@ -30,6 +29,8 @@
 
 <%@ include file="/WEB-INF/jsp-includes/header_main.jsp" %>
 
+	<%@ include file="/WEB-INF/jsp-includes/body_section_data_pages_after_header_main.jsp" %>
+
 	<input type="hidden" id="project_id" value="<c:out value="${ project_id }"></c:out>"> 
 
 	<c:forEach var="projectSearchId" items="${ projectSearchIds }">
@@ -38,6 +39,9 @@
 		<input type="hidden" class=" project_search_id_jq " value="<c:out value="${ projectSearchId }"></c:out>">
 	</c:forEach>	
 		
+		<%--  loading spinner location --%>
+	<div style="opacity:1.0;position:absolute;left:50%;top:50%; z-index: 20001" id="coverage-map-loading-spinner" style="" ></div>
+	
 	<%--  used by createTooltipForProteinNames.js --%>
 	<%@ include file="/WEB-INF/jsp-includes/proteinNameTooltipDataForJSCode.jsp" %>
 
@@ -129,8 +133,8 @@
 			</form>
 		 
 			
-			<table style="border-width:0px;">
-					
+			<table id="search_details_and_main_filter_criteria_main_page_root" style=" border-width: 0px; display: none; ">
+			
 				<%--  Set to false to not show color block before search for key --%>
 				<c:set var="showSearchColorBlock" value="${ false }" />
 				
@@ -150,15 +154,7 @@
 
 				<tr>
 					<td>Exclude organisms:</td>
-					<td>
-						<logic:iterate id="taxonomy" name="taxonomies">
-						 <label style="white-space: nowrap" >
-						  <input type="checkbox" name="excludeTaxonomy" value="<bean:write name="taxonomy" property="key"/>" class=" excludeTaxonomy_jq " 
-						  onchange=" if ( window.defaultPageView ) { window.defaultPageView.searchFormChanged_ForDefaultPageView(); } ; if ( window.saveView_dataPages ) { window.saveView_dataPages.searchFormChanged_ForSaveView(); }" >  
-						  
-						   <span style="font-style:italic;"><bean:write name="taxonomy" property="value"/></span>
-						 </label> 						 
-						</logic:iterate>				
+					<td id="excludeTaxonomies"> <%--  Populated in JS --%>
 					</td>
 				</tr>
 
@@ -170,10 +166,7 @@
 						--%>
 						<select name="excludedProteins" multiple="multiple" id="excludeProtein"
 							onchange=" if ( window.defaultPageView ) { window.defaultPageView.searchFormChanged_ForDefaultPageView(); } ; if ( window.saveView_dataPages ) { window.saveView_dataPages.searchFormChanged_ForSaveView(); }" >  
-						  
-	  						<logic:iterate id="protein" name="proteins">
-	  						  <option value="<c:out value="${ protein.proteinSequenceVersionObject.proteinSequenceVersionId }"></c:out>"><c:out value="${ protein.name }"></c:out></option>
-	  						</logic:iterate>
+							<%-- Populated in JS --%>	
 	  					</select>
 					</td>
 				</tr>
@@ -202,41 +195,24 @@
 					</td>
 				</tr>
 			</table>
+				
+			<%--  <div> to contain all the remaining items --%>
+
+			<div id="main_rest_after_filters_table_container"  style=" display: none;"> <%--  Main Table Container --%>
 			
-			<div style="height: 10px;">&nbsp;</div>			
+				<div style="height: 10px;">&nbsp;</div>			
+		
+				<h3 style="display:inline;">Protein Coverage Report:</h3>
 	
-			<h3 style="display:inline;">Protein Coverage Report:</h3>
+				<div style="display:inline;">
+					[<a class="tool_tip_attached_jq" data-tooltip="Download as tab-delimited text" href="downloadProteinCoverageReport.do?<bean:write name="queryString" />">Download Coverage Report</a>]
+				</div>
+	
+				<c:set var="coveragePageForAnnDispMgmt" value="${ true }"/>
+				
+				<%--  Block for user choosing which annotation types to display  --%>
+				<%@ include file="/WEB-INF/jsp-includes/annotationDisplayManagementBlock.jsp" %>
 
-			<div style="display:inline;">
-				[<a class="tool_tip_attached_jq" data-tooltip="Download as tab-delimited text" href="downloadProteinCoverageReport.do?<bean:write name="queryString" />">Download Coverage Report</a>]
-			</div>
-
-			<c:set var="coveragePageForAnnDispMgmt" value="${ true }"/>
-			
-			<%--  Block for user choosing which annotation types to display  --%>
-			<%@ include file="/WEB-INF/jsp-includes/annotationDisplayManagementBlock.jsp" %>
-
-			<%--  Create via javascript the parts that will be above the main table --%>
-			<script type="text/javascript">
-
-			//  If object exists, call function on it now, otherwise call the function on document ready
-			if ( window.viewProteinCoverageReportPageCode ) {
-				window.viewProteinCoverageReportPageCode.createPartsAboveMainTable();
-			} else {
-
-				$(document).ready(function() 
-				    { 
-					   setTimeout( function() { // put in setTimeout so if it fails it doesn't kill anything else
-						  
-						   window.viewProteinCoverageReportPageCode.createPartsAboveMainTable();
-					   },10);
-				    } 
-				); // end $(document).ready(function() 
-			}
-									
-			</script>
-			
-			
 				<table style="" id="main_page_data_table" class="tablesorter">
 				
 					<thead>
@@ -312,194 +288,168 @@
 						
 					</tr>
 					</thead>
+					<tbody>
+					</tbody>
 						
-					<logic:iterate id="coverage" name="proteinCoverageData">
-
-						<tr>
-							<td><bean:write name="coverage" property="name" /></td>
-							<td><bean:write name="coverage" property="numResidues" /></td>
-							<td>
-								<bean:write name="coverage" property="sequenceCoverage" />
-							</td>
-							<td><bean:write name="coverage" property="numLinkableResidues" /></td>
-							<td><bean:write name="coverage" property="numLinkableResiduesCovered" /></td>
-							<td><bean:write name="coverage" property="linkableResiduesCoverageFmt" /></td>
-
-							<td><bean:write name="coverage" property="numMLCResidues" /></td>
-							<td><bean:write name="coverage" property="MLCSequenceCoverage" /></td>
-							
-							<td><bean:write name="coverage" property="numLCResidues" /></td>
-							<td><bean:write name="coverage" property="LCSequenceCoverage" /></td>
-							
-							<td><bean:write name="coverage" property="monolinkedResidues" /></td>
-							<td><bean:write name="coverage" property="MSequenceCoverage" /></td>
-							
-							<td><bean:write name="coverage" property="looplinkedResidues" /></td>
-							<td><bean:write name="coverage" property="LSequenceCoverage" /></td>
-							
-							<td><bean:write name="coverage" property="crosslinkedResidues" /></td>
-							<td><bean:write name="coverage" property="CSequenceCoverage" /></td>
-							
-						</tr>
-
-
-
-					</logic:iterate>
 				</table>
-				
-		<style>
-		
-		   .header-def-label { padding-right: 5px; }
-		   .header-def-description { padding-left: 5px; }
-		</style>
-				
-				
-				<table >
-				
-					<tr>
-						<td class="header-def-label" style="padding-bottom: 5px;">
-							Column Header
-						</td>
-						<td class="header-def-description" style="padding-bottom: 5px;">
-							Column Description
-						</td>
-					</tr>	
-				
-					<tr>
-						<td class="header-def-label">
-							Protein
-						</td>
-					</tr>				
-					<tr>
-						<td class="header-def-label">
-							Residues
-						</td>
-						<td class="header-def-description">
-								Count of Residues
-						</td>
-					</tr>				
-					<tr>
-						<td class="header-def-label">
-							Sequence Coverage
-						</td>
-						<td class="header-def-description">
-								Sequence Coverage
-						</td>
-					</tr>				
-					<tr>
-						<td class="header-def-label">
-							Linkable Residues
-						</td>
-						<td class="header-def-description">
-								Count of Linkable Residues
-						</td>
-					</tr>			
+					
+			<style>
 			
-					<tr>
-						<td class="header-def-label">
-							Linkable Residues Covered
-						</td>
-						<td class="header-def-description">
-								Count of Linkable Residues covered by Sequence Coverage
-						</td>
-					</tr>	
-					<tr>
-						<td class="header-def-label">
-							Linkable Residues Coverage
-						</td>
-						<td class="header-def-description">
-								Fraction of Linkable Residues covered by Sequence Coverage
-						</td>
-					</tr>				
-					<tr>
-
-						<td class="header-def-label">
-							M+L+C Residues
-						</td>
-						<td class="header-def-description">
-								Count of Monolinks, Looplinks and Crosslinks Residues
-						</td>
-					</tr>				
-					<tr>
-						<td class="header-def-label">
-							M+L+C Coverage
-						</td>
-						<td class="header-def-description">
-								Fraction of Linkable Residues covered by Monolinks, Looplinks and Crosslinks   
-						</td>
-					</tr>				
-					<tr>
-
-						<td class="header-def-label">
-							L+C Residues
-						</td>
-						<td class="header-def-description">
-								Count of Looplinks and Crosslinks Residues
-						</td>
-					</tr>				
-					<tr>
-						<td class="header-def-label">
-							L+C Coverage	
-						</td>					
-						<td class="header-def-description">
-								Fraction of Linkable Residues covered by Looplinks and Crosslinks
-						</td>
-					</tr>				
-					<tr>
-
-						<td class="header-def-label">
-							M Residues
-						</td>
-						<td class="header-def-description">
-								Count of Monolinks Residues
-						</td>
-					</tr>				
-					<tr>
-						<td class="header-def-label">
-							M Coverage
-						</td>
-						<td class="header-def-description">
-								Fraction of Linkable Residues covered by Monolinks 
-						</td>
-					</tr>				
-					<tr>
-
-						<td class="header-def-label">
-							L Residues
-						</td>
-						<td class="header-def-description">
-								Count of Looplinks Residues
-						</td>
-					</tr>				
-					<tr>
-						<td class="header-def-label">
-							L Coverage
-						</td>
-						<td class="header-def-description">
-								Fraction of Linkable Residues covered by Looplinks
-						</td>
-					</tr>				
-					<tr>
-
-						<td class="header-def-label">
-							C Residues
-						</td>
-						<td class="header-def-description">
-								Count of Crosslinks Residues
-						</td>
-					</tr>				
-					<tr>
-						<td class="header-def-label">
-							C Coverage
-						</td>
-						<td class="header-def-description">
-								Fraction of Linkable Residues covered by Crosslinks
-						</td>
+			   .header-def-label { padding-right: 5px; }
+			   .header-def-description { padding-left: 5px; }
+			</style>
+					
+					
+					<table >
+					
+						<tr>
+							<td class="header-def-label" style="padding-bottom: 5px;">
+								Column Header
+							</td>
+							<td class="header-def-description" style="padding-bottom: 5px;">
+								Column Description
+							</td>
+						</tr>	
+					
+						<tr>
+							<td class="header-def-label">
+								Protein
+							</td>
+						</tr>				
+						<tr>
+							<td class="header-def-label">
+								Residues
+							</td>
+							<td class="header-def-description">
+									Count of Residues
+							</td>
+						</tr>				
+						<tr>
+							<td class="header-def-label">
+								Sequence Coverage
+							</td>
+							<td class="header-def-description">
+									Sequence Coverage
+							</td>
+						</tr>				
+						<tr>
+							<td class="header-def-label">
+								Linkable Residues
+							</td>
+							<td class="header-def-description">
+									Count of Linkable Residues
+							</td>
+						</tr>			
+				
+						<tr>
+							<td class="header-def-label">
+								Linkable Residues Covered
+							</td>
+							<td class="header-def-description">
+									Count of Linkable Residues covered by Sequence Coverage
+							</td>
+						</tr>	
+						<tr>
+							<td class="header-def-label">
+								Linkable Residues Coverage
+							</td>
+							<td class="header-def-description">
+									Fraction of Linkable Residues covered by Sequence Coverage
+							</td>
+						</tr>				
+						<tr>
+	
+							<td class="header-def-label">
+								M+L+C Residues
+							</td>
+							<td class="header-def-description">
+									Count of Monolinks, Looplinks and Crosslinks Residues
+							</td>
+						</tr>				
+						<tr>
+							<td class="header-def-label">
+								M+L+C Coverage
+							</td>
+							<td class="header-def-description">
+									Fraction of Linkable Residues covered by Monolinks, Looplinks and Crosslinks   
+							</td>
+						</tr>				
+						<tr>
+	
+							<td class="header-def-label">
+								L+C Residues
+							</td>
+							<td class="header-def-description">
+									Count of Looplinks and Crosslinks Residues
+							</td>
+						</tr>				
+						<tr>
+							<td class="header-def-label">
+								L+C Coverage	
+							</td>					
+							<td class="header-def-description">
+									Fraction of Linkable Residues covered by Looplinks and Crosslinks
+							</td>
+						</tr>				
+						<tr>
+	
+							<td class="header-def-label">
+								M Residues
+							</td>
+							<td class="header-def-description">
+									Count of Monolinks Residues
+							</td>
+						</tr>				
+						<tr>
+							<td class="header-def-label">
+								M Coverage
+							</td>
+							<td class="header-def-description">
+									Fraction of Linkable Residues covered by Monolinks 
+							</td>
+						</tr>				
+						<tr>
+	
+							<td class="header-def-label">
+								L Residues
+							</td>
+							<td class="header-def-description">
+									Count of Looplinks Residues
+							</td>
+						</tr>				
+						<tr>
+							<td class="header-def-label">
+								L Coverage
+							</td>
+							<td class="header-def-description">
+									Fraction of Linkable Residues covered by Looplinks
+							</td>
+						</tr>				
+						<tr>
+	
+							<td class="header-def-label">
+								C Residues
+							</td>
+							<td class="header-def-description">
+									Count of Crosslinks Residues
+							</td>
+						</tr>				
+						<tr>
+							<td class="header-def-label">
+								C Coverage
+							</td>
+							<td class="header-def-description">
+									Fraction of Linkable Residues covered by Crosslinks
+							</td>
+							
+						</tr>				
+					</table>
+	
+			</div>
 						
-					</tr>				
-				</table>
-
 		</div>
+		
+		<script type="text/javascript" src="static/js_generated_bundles/data_pages/proteinCoverageReportView-bundle.js?x=${cacheBustValue}"></script>
 	
 
 <%@ include file="/WEB-INF/jsp-includes/footer_main.jsp" %>

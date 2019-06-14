@@ -1,0 +1,82 @@
+{{!-- protein_Looplink_MultipleSearches_PageData_MainTable_MainDataRow.handlebars in 'protein_page' 
+
+	Protein Looplink Page Multiple Searches - Main Table - Main Data Row
+	
+    The actual peptide entry is in the property 'proteinEntry'.
+
+    The Root of data returned from webservice is in the property 'viewSearchProteinsPageDataRoot'.
+--}}
+
+<tr 
+    style="cursor: pointer; "
+    
+    onclick="viewLooplinkProteinsLoadedFromWebServiceTemplate.showHideLooplinkProteins( { clickedElement : this })"
+    data-project_search_ids="{{#each proteinEntry.projectSearchIds_ThisEntry  as |projectSearchId| }},{{ projectSearchId }}{{/each}}"
+    data-protein_id="{{ proteinEntry.proteinSequenceVersionId }}"
+    data-protein_position_1="{{ proteinEntry.linkPosition_1 }}"
+    data-protein_position_2="{{ proteinEntry.linkPosition_2 }}"
+    >
+
+    {{#each proteinEntry.searchContainsProtein_SubList_JS_Generated as |entryContainsSearchObject| }}
+        {{#if entryContainsSearchObject.containsSearch }}
+            <td class=" merged-search-search-background-color-{{ entryContainsSearchObject.colorIndex_OneBased }} ">*</td>
+        {{else}}
+            <td>&nbsp;</td>
+        {{/if}}
+    {{/each}}
+
+    <td class="integer-number-column"><a class="show-child-data-link   " 
+            href="javascript:"
+            >{{ proteinEntry.numSearches }}<span class="toggle_visibility_expansion_span_jq" 
+                    ><img src="images/icon-expand-small.png" 
+                        class=" icon-expand-contract-in-data-table "
+                        ></span><span class="toggle_visibility_contraction_span_jq" 
+                            style="display: none;" 
+                            ><img src="images/icon-collapse-small.png"
+                                class=" icon-expand-contract-in-data-table "
+                                ></span>
+        </a>
+    </td>
+	
+    <td><span class="proteinName" id="{{ proteinEntry.proteinSequenceVersionId }}">{{ proteinEntry.proteinName }}</span></td>
+    <td class="integer-number-column">{{ proteinEntry.linkPosition_1 }}</td>
+    <td class="integer-number-column">{{ proteinEntry.linkPosition_2 }}</td>
+
+    <td class="integer-number-column">{{ proteinEntry.numPsms }}</td>
+    <td class="integer-number-column">{{ proteinEntry.numPeptides }}</td>								
+    <td class="integer-number-column">{{ proteinEntry.numUniquePeptides }}</td>
+			
+ 
+{{!-- 						
+This Loops over the annotation headers per search
+--}}
+    {{#each proteinEntry.peptidePsmAnnotationValueListsForEachSearch as |peptidePsmAnnotationValueListsForASearch| }}
+
+{{!-- 						
+Different from Single Search is that 
+the background color of each cell is set using a CSS class
+with the search index being in the CSS class name.						
+			
+This outputs the Reported Peptide annotation values for a specific search
+--}}
+
+        {{#each peptidePsmAnnotationValueListsForASearch.peptideAnnotationValueList as |annotationDisplayValue| }}
+            <td  class=" merged-search-search-background-color-{{ peptidePsmAnnotationValueListsForASearch.colorIndex_OneBased }}   " 
+                    style="width:10%;">
+                <span style="white-space: nowrap">{{ annotationDisplayValue }}</span>
+            </td>
+        {{/each}}
+{{!--                      
+This outputs the PSM annotation values for a specific search
+--}}
+        {{#each peptidePsmAnnotationValueListsForASearch.psmAnnotationValueList as |annotationDisplayValue| }}
+            <td  class=" merged-search-search-background-color-{{ peptidePsmAnnotationValueListsForASearch.colorIndex_OneBased }}   " 
+                    style="width:10%;">
+                <span style="white-space: nowrap">{{ annotationDisplayValue }}</span>
+            </td>
+        {{/each}}
+
+    {{/each}}
+         					
+    
+</tr>

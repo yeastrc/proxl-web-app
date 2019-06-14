@@ -42,15 +42,14 @@
 				
 		<script type="text/javascript" src="js/libs/snap.svg-min.js"></script> <%--  Used by lorikeetPageProcessing.js --%>
 				
+		<script type="text/javascript" src="js/libs/spin.min.js"></script> 
+				
 				<%-- 
 					The Struts Action for this page must call GetProteinNamesTooltipConfigData
 					This include is required on this page:
 					/WEB-INF/jsp-includes/proteinNameTooltipDataForJSCode.jsp
 				  --%>
 				  
-		<script type="text/javascript" src="static/js_generated_bundles/data_pages/peptideMergedView-bundle.js?x=${cacheBustValue}"></script>
-	
-		
 		<link rel="stylesheet" href="css/tablesorter.css" type="text/css" media="print, projection, screen" />
 		<link type="text/css" rel="stylesheet" href="css/jquery.qtip.min.css" />
 
@@ -73,6 +72,8 @@
 
 <%@ include file="/WEB-INF/jsp-includes/header_main.jsp" %>
 
+	<%@ include file="/WEB-INF/jsp-includes/body_section_data_pages_after_header_main.jsp" %>
+
 
 	<input type="hidden" id="project_id" value="<c:out value="${ project_id }"></c:out>"> 
 	
@@ -81,6 +82,9 @@
 		<input type="hidden" class=" project_search_id_jq " value="<c:out value="${ projectSearchId }"></c:out>">
 	</c:forEach>	
 
+		<%--  loading spinner location --%>
+	<div style="opacity:1.0;position:absolute;left:50%;top:50%; z-index: 20001" id="coverage-map-loading-spinner" style="" ></div>
+	
 	<%--  used by createTooltipForProteinNames.js --%>
 	<%@ include file="/WEB-INF/jsp-includes/proteinNameTooltipDataForJSCode.jsp" %>
 
@@ -186,8 +190,8 @@
 
 			</html:form>			
 								
-			<table style="border-width:0px;">
-
+			<table id="search_details_and_main_filter_criteria_main_page_root" style=" border-width: 0px; display: none; ">
+			
 				<%--  Set to true to show color block before search for key --%>
 				<c:set var="showSearchColorBlock" value="${ true }" />
 				
@@ -279,446 +283,67 @@
 				</tr>
 			
 			</table>
-			
-			<div style="height: 10px;">&nbsp;</div>
-			
-			<div >
-	
-				<h3 style="display:inline;">Peptides (<bean:write name="peptideListSize" />):</h3>
 
-				<div style="display:inline;">
+			<%--  <div> to contain all the remaining items above the main data display table --%>
+			<div id="main_items_below_filter_criteria_table_above_main_display_table" style="display: none;"> 
+								
+				<div style="height: 10px;">&nbsp;</div>
 				
-							<span id="data-download">
-								<a
-									data-tooltip="Download data" style="font-size:10pt;white-space:nowrap;" 
-									href="#" class="tool_tip_attached_jq download-link">[Download Data]</a>
-									
-								<span id="data-download-options">
-									Choose file format:
-									<a data-tooltip="Download peptide results as tab-delimited text." id="download-peptide-tld" class="download-option tool_tip_attached_jq" href="downloadMergedPeptides.do?<bean:write name="queryString" />" style="margin-top:5px;">Tab-delimited peptide data</a>
-									<a data-tooltip="Download all PSMs and associated statistics." id="download-peptide-psm" class="download-option tool_tip_attached_jq" href="downloadMergedPSMsForPeptides.do?<bean:write name="queryString" />">Tab-delimited PSM data</a>
-									<c:if test="${ showDownloadLinks_Skyline}">
-										<a data-tooltip="Download peptide list for Skyline PRM methods (Chavez et al)." id="download-peptide-skyline" class="download-option tool_tip_attached_jq" href="downloadMergedPeptidesForSkylinePRM.do?<bean:write name="queryString" />">Peptides for Skyline PRM methods (Chavez et al)</a>
-										<c:if test="${ showDownloadLink_SkylineShulman }">
-											<a data-tooltip="Download peptide list for Skyline Quantitation (Shulman et al)." id="download-peptide-shulman" class="download-option tool_tip_attached_jq" href="downloadMergedPeptidesForSkylineShulman.do?<bean:write name="queryString" />">Peptides for Skyline Quantitation (Shulman et al)</a>
+				<div >
+		
+					<h3 style="display:inline;">Peptides (<span id="peptide_count_display"></span>):</h3>
+	
+					<div style="display:inline;">
+					
+								<span id="data-download">
+									<a
+										data-tooltip="Download data" style="font-size:10pt;white-space:nowrap;" 
+										href="#" class="tool_tip_attached_jq download-link">[Download Data]</a>
+										
+									<span id="data-download-options">
+										Choose file format:
+										<a data-tooltip="Download peptide results as tab-delimited text." id="download-peptide-tld" class="download-option tool_tip_attached_jq" href="downloadMergedPeptides.do?<bean:write name="queryString" />" style="margin-top:5px;">Tab-delimited peptide data</a>
+										<a data-tooltip="Download all PSMs and associated statistics." id="download-peptide-psm" class="download-option tool_tip_attached_jq" href="downloadMergedPSMsForPeptides.do?<bean:write name="queryString" />">Tab-delimited PSM data</a>
+										<c:if test="${ showDownloadLinks_Skyline}">
+											<a data-tooltip="Download peptide list for Skyline PRM methods (Chavez et al)." id="download-peptide-skyline" class="download-option tool_tip_attached_jq" href="downloadMergedPeptidesForSkylinePRM.do?<bean:write name="queryString" />">Peptides for Skyline PRM methods (Chavez et al)</a>
+											<c:if test="${ showDownloadLink_SkylineShulman }">
+												<a data-tooltip="Download peptide list for Skyline Quantitation (Shulman et al)." id="download-peptide-shulman" class="download-option tool_tip_attached_jq" href="downloadMergedPeptidesForSkylineShulman.do?<bean:write name="queryString" />">Peptides for Skyline Quantitation (Shulman et al)</a>
+											</c:if>
 										</c:if>
-									</c:if>
+									</span>
 								</span>
-							</span>
+					</div>
 				</div>
-			</div>
-			
-
-			<%--  Block for Search lists and Venn Diagram  --%>
-			<%@ include file="/WEB-INF/jsp-includes/mergedPeptideProteinSearchesListVennDiagramSection.jsp" %>
+				
+	
+				<%--  Block for Search lists and Venn Diagram  --%>
+				<%@ include file="/WEB-INF/jsp-includes/mergedPeptideProteinSearchesListVennDiagramSection.jsp" %>
+	 			
+							
+				<%--  Block for user choosing which annotation types to display  --%>
+				<%@ include file="/WEB-INF/jsp-includes/annotationDisplayManagementBlock.jsp" %>
+	
+	
+				<%--  Show this when any of the reported Peptide entries were combined.
+					  Reported Peptide entries are combined for a specific search id when there are
+					  more than 1 reported peptides for a search id, unified reported peptide id pair.
+					  See the code for more info.
+				 --%>
+				  <div id="anyReportedPeptideEntriesWereCombined" style=" display: none;"   >
+				  	Note: scores noted with a 
+				  	<%= ReportedPeptideCombined_IdentifierFlag_Constants.REPORTED_PEPTIDE_COMBINED__IDENTIFIER_FLAG %> 
+				  	represent the best of multiple scores for this peptide in the search.
+				  </div>
+	
+		</div> <%--  END: <div id="main_items_below_filter_criteria_table_above_main_display_table">  --%>
+		
+		<%--  Main Table of Peptide Data will be placed here --%>
+		<div id="peptides_from_webservice_container" style="display: none;"></div>
  			
-						
-			<%--  Block for user choosing which annotation types to display  --%>
-			<%@ include file="/WEB-INF/jsp-includes/annotationDisplayManagementBlock.jsp" %>
-
-
-			<%--  Show this when any of the reported Peptide entries were combined.
-				  Reported Peptide entries are combined for a specific search id when there are
-				  more than 1 reported peptides for a search id, unified reported peptide id pair.
-				  See the code for more info.
-			 --%>
-			<c:if test="${ anyReportedPeptideEntriesWereCombined }">
-			  <div style="">
-			  	Note: scores noted with a 
-			  	<%= ReportedPeptideCombined_IdentifierFlag_Constants.REPORTED_PEPTIDE_COMBINED__IDENTIFIER_FLAG %> 
-			  	represent the best of multiple scores for this peptide in the search.
-			  </div>
-			</c:if>
-
-
-			<%--  Create via javascript the parts that will be above the main table --%>
-			<script type="text/javascript">
-			
-				viewMergedPeptidePageCode.createPartsAboveMainTable();
-				
-			</script>
-			
-			
-				<table style="" id="crosslink-table" class="tablesorter top_data_table_jq ">
-				
-					<thead>
-					<tr>
-
-						<c:forEach items="${ searches }" var="search"  varStatus="searchVarStatus">
-		
-							<th id="search_header_${ search.projectSearchId }" style="text-align:left;font-weight:bold;width:25px;"
-								><bean:write name="search" property="searchId" /></th>
-								
-							<script >
-								$("#search_header_${ search.projectSearchId }").qtip( {
-							        content: {
-							            text: '<bean:write name="search" property="name" />&nbsp;(<bean:write name="search" property="searchId" />)'
-							        },
-							        position: {
-							            my: 'bottom left',
-							            at: 'top center',
-							            viewport: $(window)
-							         }
-							    });								
-								
-							</script>
-								
-						</c:forEach>
-
-						<th data-tooltip="Number of selected searches containing peptide" 
-								class="tool_tip_attached_jq integer-number-column-header" 
-								style="width:5%;font-weight:bold;padding-right: 15px;">
-							Searches
-						</th>
-						<th data-tooltip="Type of peptide (e.g., crosslink, looplink, or unlinked)" 
-								class="tool_tip_attached_jq" 
-								style="text-align:left;width:10%;font-weight:bold;">
-							Type
-						</th>
-						<th data-tooltip="Sequence of matched peptide (or first peptide in case of crosslinks)" 
-								class="tool_tip_attached_jq" 
-								style="text-align:left;width:10%;font-weight:bold;">
-							Peptide 1
-						</th>
-						<th data-tooltip="Linked position in first peptide (or starting position of looplink)" 
-								class="tool_tip_attached_jq" 
-								style="width:5%;font-weight:bold;">
-							Pos
-						</th>
-						<th data-tooltip="Dynamic modifications in first peptide" 
-								class="tool_tip_attached_jq" 
-								style="width:5%;font-weight:bold;">
-							Mods
-						</th>
-						<c:if test="${ anyResultsHaveIsotopeLabels  }">
-							<th data-tooltip="Isotope Labels for first peptide" 
-									class="tool_tip_attached_jq" 
-									style="width:5%;font-weight:bold;">
-								Isotope Labels
-							</th>
-						</c:if>
-						<th data-tooltip="Sequenced of second matched peptide in crosslink" 
-								class="tool_tip_attached_jq" 
-								style="text-align:left;width:10%;font-weight:bold;">
-							Peptide 2
-						</th>
-						<th data-tooltip="Linked position in second peptide (or ending position of looplink)" 
-								class="tool_tip_attached_jq" 
-								style="width:5%;font-weight:bold;">
-							Pos
-						</th>
-						<th data-tooltip="Dynamic modifications in second peptide" 
-								class="tool_tip_attached_jq" 
-								style="width:5%;font-weight:bold;">
-							Mods
-						</th>
-						<c:if test="${ anyResultsHaveIsotopeLabels  }">
-							<th data-tooltip="Isotope Labels for second peptide" 
-									class="tool_tip_attached_jq" 
-									style="width:5%;font-weight:bold;">
-								Isotope Labels
-							</th>
-						</c:if>
-						<th data-tooltip="Proteins (and positions) matched by first peptide and position" 
-								class="tool_tip_attached_jq" 
-								style="text-align:left;width:5%;font-weight:bold;">
-							Protein 1
-						</th>
-						<th data-tooltip="Proteins (and positions) matched by second peptide and position" 
-								class="tool_tip_attached_jq" 
-								style="text-align:left;width:5%;font-weight:bold;">
-							Protein 2
-						</th>
-						
-						<th data-tooltip="Number of PSMs matched to this peptide (or linked pair) in all selected searches" 
-								class="tool_tip_attached_jq integer-number-column-header" 
-								style="width:5%;font-weight:bold;">
-							Psms
-						</th>
-						
-						
-						<%--  Set to true to show color block before search for key --%>
-						<c:set var="showSearchColorBlock" value="${ true }" />
-						
-						<c:forEach var="peptidePsmAnnotationNameDescListsForASearch"
-										items="${ peptidePsmAnnotationNameDescListsForEachSearch }" 
-									 	varStatus="searchVarStatus">
-
-							<%--  Include file is dependent on containing loop having varStatus="searchVarStatus"  --%>
-							<%@ include file="/WEB-INF/jsp-includes/mergedSearch_SearchIndexToSearchColorCSSClassName.jsp" %>
-							
-
-<%-- 							
-							  <c:set var="outputBackgroundColorClassName" value="" />
-
-							  <c:choose>
-								<c:when test="${ isMarked.contained }">
-									<c:set var="outputBackgroundColorClassName" value="${ backgroundColorClassName }" />
-									<td class="${ backgroundColorClassName }">*</td>
-								</c:when>
-								<c:otherwise>
-									<td>&nbsp;</td>
-								</c:otherwise>
-							  </c:choose>
---%>
-							
-		
-							<c:forEach var="annotationDisplayNameDescription" 
-									items="${ peptidePsmAnnotationNameDescListsForASearch.peptideAnnotationNameDescriptionList }">
-
-										
-									<%--  Consider displaying the description somewhere   annotationDisplayNameDescription.description --%>
-								<th data-tooltip="Peptide-level <c:out value="${ annotationDisplayNameDescription.displayName }"></c:out> for this peptide (or linked pair)" 
-										class=" ${ backgroundColorClassName }  tool_tip_attached_jq  " 
-										style="width:10%;font-weight:bold;">
-									<span style="white-space: nowrap">Peptide</span>
-									<span style="white-space: nowrap"><c:out value="${ annotationDisplayNameDescription.displayName }"></c:out></span>
-								</th>
-								
-							</c:forEach>
-							
-
-							<c:forEach var="annotationDisplayNameDescription" 
-									items="${ peptidePsmAnnotationNameDescListsForASearch.psmAnnotationNameDescriptionList }">
-
-										
-									<%--  Consider displaying the description somewhere   annotationDisplayNameDescription.description --%>
-								<th data-tooltip="Best PSM-level <c:out value="${ annotationDisplayNameDescription.displayName }"></c:out> for this peptide (or linked pair)" 
-										class=" ${ backgroundColorClassName }  tool_tip_attached_jq  " 
-										style="width:10%;font-weight:bold;">
-									<span style="white-space: nowrap">Best PSM</span>
-									<span style="white-space: nowrap"><c:out value="${ annotationDisplayNameDescription.displayName }"></c:out></span>
-								</th>
-
-							</c:forEach>
-														
-						</c:forEach>
-
-					</tr>
-					</thead>
-						
-					<logic:iterate id="peptideEntry" name="peptideList">
-
-							<tr id="unified-reported-peptide-<bean:write name="peptideEntry" property="unifiedReportedPeptideId"/>"
-								style="cursor: pointer; "
-								onclick="viewMergedPeptidePerSearchDataFromWebServiceTemplate.showHideReportedPeptidesPerSearch( { clickedElement : this } )"
-								data-unified_reported_peptide_id="<bean:write name="peptideEntry" property="unifiedReportedPeptideId"/>"
-							>
-
-								<c:forEach items="${ peptideEntry.searchContainsPeptide }" var="isMarked"  varStatus="searchVarStatus">
-								
-									<%--  Include file is dependent on containing loop having varStatus="searchVarStatus"  --%>
-									<%@ include file="/WEB-INF/jsp-includes/mergedSearch_SearchIndexToSearchColorCSSClassName.jsp" %>
-									
-									<c:choose>
-										<c:when test="${ isMarked.contained }">
-											<td class="${ backgroundColorClassName }">*</td>
-										</c:when>
-										<c:otherwise>
-											<td>&nbsp;</td>
-										</c:otherwise>
-									</c:choose>
-
-								</c:forEach>								
-
-								<td class="integer-number-column"><a class="show-child-data-link   " 
-										href="javascript:"
-										><bean:write name="peptideEntry" property="numSearches" 
-											/><span class="toggle_visibility_expansion_span_jq" 
-												><img src="images/icon-expand-small.png" 
-													class=" icon-expand-contract-in-data-table "
-													></span><span class="toggle_visibility_contraction_span_jq" 
-														style="display: none;" 
-														><img src="images/icon-collapse-small.png"
-															class=" icon-expand-contract-in-data-table "
-															></span>
-									</a>
-								</td>
-								
-								<td>
-									<c:choose>
-										<c:when test="${ not empty peptideEntry.mergedSearchPeptideCrosslink }">Crosslink</c:when>
-										<c:when test="${ not empty peptideEntry.mergedSearchPeptideLooplink }">Looplink</c:when>
-										
-										<c:when test="${ not empty peptideEntry.mergedSearchPeptideUnlinked }"
-											>Unlinked</c:when>
-										<c:when test="${ not empty peptideEntry.mergedSearchPeptideDimer }"
-											>Dimer</c:when>
-										<c:otherwise>Unknown</c:otherwise>
-									</c:choose>
-								
-								</td>								
-																
-								<td><bean:write name="peptideEntry" property="peptide1.sequence" /></td>
-								
-								<td class="integer-number-column">
-									<bean:write name="peptideEntry" property="peptide1Position" />
-								</td>
-								<td class="">
-								<%-- 	peptide1DynamicMods
-									--%>
-									<bean:write name="peptideEntry" property="modsStringPeptide1" />
-								</td>
-
-								<c:if test="${ anyResultsHaveIsotopeLabels  }">
-									<td class="">
-										<bean:write name="peptideEntry" property="isotopeLabelsStringPeptide1" />
-									</td>
-								</c:if>
-								
-								<td>
-								  <c:if test="${ not empty peptideEntry.peptide2 }">
-									<bean:write name="peptideEntry" property="peptide2.sequence" />
-								  </c:if>
-								</td>
-								<td class="integer-number-column">
-									<bean:write name="peptideEntry" property="peptide2Position" />
-								</td>
-								<td class="">
-								<%-- 	peptide2DynamicMods
-									--%>
-									<bean:write name="peptideEntry" property="modsStringPeptide2" />
-								</td>
-
-								<c:if test="${ anyResultsHaveIsotopeLabels  }">
-									<td class="">
-										<bean:write name="peptideEntry" property="isotopeLabelsStringPeptide2" />
-									</td>
-								</c:if>
-								
-								
-								<td>
-								  <c:if test="${ not empty peptideEntry.peptide1ProteinPositions }">
-									<logic:iterate id="pp" name="peptideEntry" property="peptide1ProteinPositions">
-										<span class="proteinName" id="protein-id-<bean:write name="pp" property="protein.proteinSequenceVersionObject.proteinSequenceVersionId" />">
-											<bean:write name="pp" property="protein.name" 
-												/><c:if test="${ not empty pp.position1 }"
-														>(<bean:write name="pp" property="position1" 
-													/><c:if test="${ not empty pp.position2 }"
-														>, <bean:write name="pp" property="position2" 
-														/></c:if>)</c:if><br>
-										</span>
-									</logic:iterate>
-								  </c:if>
-								</td>
-								<td>
-								  <c:if test="${ not empty peptideEntry.peptide2ProteinPositions }">
-									<logic:iterate id="pp" name="peptideEntry" property="peptide2ProteinPositions">
-										<span class="proteinName" id="protein-id-<bean:write name="pp" property="protein.proteinSequenceVersionObject.proteinSequenceVersionId" />">
-											<bean:write name="pp" property="protein.name" 
-												/><c:if test="${ not empty pp.position1 }"
-														>(<bean:write name="pp" property="position1" 
-													/><c:if test="${ not empty pp.position2 }"
-														>, <bean:write name="pp" property="position2" 
-														/></c:if>)</c:if><br>
-										</span>
-									</logic:iterate>
-								  </c:if>
-								</td>								
-								
-								<td class="integer-number-column"><bean:write name="peptideEntry" property="numPsms" /></td>
-								
-<%-- 
-For the details below:									
-peptidePsmAnnotationValueListsForEachSearch
-								
-private int searchId;
-
-	private List<String> psmAnnotationValueList;
-	private List<String> peptideAnnotationValueList;
-
-private List<String> psmAnnotationValueList;
-private List<String> peptideAnnotationValueList;
---%>								
-
-						
-						<%--  Adjust colspan of <td> of child row that displays the PSMs for number of columns in current table --%>
-								
-							<%--  Page variable for the number of columns added to display 
-									Peptide and PSM annotations for the searches --%>
-							<%--   Init to zero --%>
-						<c:set var="columnsAddedForAnnotationData" value="${ 0 }" />
-
-
-
-						<c:forEach var="peptidePsmAnnotationValueListsForASearch"
-										items="${ peptideEntry.peptidePsmAnnotationValueListsForEachSearch }" 
-									 	varStatus="searchVarStatus">
-
-							<%--  Include file is dependent on containing loop having varStatus="searchVarStatus"  --%>
-							<%@ include file="/WEB-INF/jsp-includes/mergedSearch_SearchIndexToSearchColorCSSClassName.jsp" %>
-							
-
-<%-- 							
-							  <c:set var="outputBackgroundColorClassName" value="" />
-
-							  <c:choose>
-								<c:when test="${ isMarked.contained }">
-									<c:set var="outputBackgroundColorClassName" value="${ backgroundColorClassName }" />
-									<td class="${ backgroundColorClassName }">*</td>
-								</c:when>
-								<c:otherwise>
-									<td>&nbsp;</td>
-								</c:otherwise>
-							  </c:choose>
---%>
-							<c:set var="peptidesLength" value="${ fn:length(  peptidePsmAnnotationValueListsForASearch.peptideAnnotationValueList ) }" />
-							
-							<c:set var="psmsLength" value="${ fn:length(  peptidePsmAnnotationValueListsForASearch.psmAnnotationValueList ) }" />
-
-							<%--  Add to value for length of Peptide and PSM value lists --%>
-							<c:set var="columnsAddedForAnnotationData" 
-								value="${ columnsAddedForAnnotationData + peptidesLength + psmsLength }" />
-							
-							<%-- Display Peptide Annotation values --%>							
-		
-							<c:forEach var="annotationDisplayValue" 
-									items="${ peptidePsmAnnotationValueListsForASearch.peptideAnnotationValueList }">
-								<td  class=" ${ backgroundColorClassName }    " 
-										style="width:10%;font-weight:bold;">
-									<span style="white-space: nowrap"><c:out value="${ annotationDisplayValue }"></c:out></span>
-								</td>
-							</c:forEach>
-							
-							<%-- Display Psm Annotation values --%>							
-
-							<c:forEach var="annotationDisplayValue" 
-									items="${ peptidePsmAnnotationValueListsForASearch.psmAnnotationValueList }">
-								<td class=" ${ backgroundColorClassName }  tool_tip_attached_jq  " 
-										style="width:10%;font-weight:bold;">
-									<span style="white-space: nowrap"><c:out value="${ annotationDisplayValue }"></c:out></span>
-								</td>
-							</c:forEach>
-							
-
-
-						</c:forEach>						
-														
-							</tr>
-
-							<tr class="expand-child" style="display:none;">
-														
-								<%--  colspan set to the number of searches plus the number of other columns --%>
-								<td colspan="<c:out value="${ fn:length( searches ) + 11 + columnsAddedForAnnotationData }"
-									></c:out>" align="center"
-									class=" child_data_container_jq ">
-								
-									<div style="color: green; font-size: 16px; padding-top: 10px; padding-bottom: 10px;" >
-										Loading...
-									</div>
-								
-									
-								</td>
-							</tr>
-							
-					</logic:iterate>
-				</table>
 	
-
-
-		</div>
+		<script type="text/javascript" src="static/js_generated_bundles/data_pages/peptideMergedView-bundle.js?x=${cacheBustValue}"></script>
 	
-	
+		
 
 <%@ include file="/WEB-INF/jsp-includes/footer_main.jsp" %>
 

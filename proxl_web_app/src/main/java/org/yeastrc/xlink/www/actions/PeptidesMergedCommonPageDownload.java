@@ -120,7 +120,10 @@ public class PeptidesMergedCommonPageDownload {
 	}
 	
 	/**
-	 * @param form
+	 * One and only 1 of 'form' or mergedPeptideQueryJSONRoot_Param can be populated
+	 * 
+	 * @param form - type MergedSearchViewPeptidesForm
+	 * @param mergedPeptideQueryJSONRoot_Param - type MergedPeptideQueryJSONRoot
 	 * @param projectSearchIdsListDeduppedSorted
 	 * @param searches
 	 * @param searchesMapOnSearchId
@@ -131,11 +134,23 @@ public class PeptidesMergedCommonPageDownload {
 	 */
 	public PeptidesMergedCommonPageDownloadResult getWebMergedPeptideRecords(
 			MergedSearchViewPeptidesForm form,
+			MergedPeptideQueryJSONRoot mergedPeptideQueryJSONRoot_Param,
 			List<Integer> projectSearchIdsListDeduppedSorted,
 			List<SearchDTO> searches, 
 			Map<Integer, SearchDTO> searchesMapOnSearchId,
 			FlagCombinedReportedPeptideEntries flagCombinedReportedPeptideEntries
 			) throws Exception, ProxlWebappDataException {
+		
+		if ( form != null && mergedPeptideQueryJSONRoot_Param != null ) {
+			String msg = "getWebMergedPeptideRecords(...): parameters form and mergedPeptideQueryJSONRoot_Param cannot both be populated";
+			log.error( msg );
+			throw new IllegalArgumentException(msg);
+		}
+		if ( form == null && mergedPeptideQueryJSONRoot_Param == null ) {
+			String msg = "getWebMergedPeptideRecords(...): parameters form and mergedPeptideQueryJSONRoot_Param cannot both be NOT populated";
+			log.error( msg );
+			throw new IllegalArgumentException(msg);
+		}
 		
 		Collection<Integer> searchIds = new HashSet<>();
 		Map<Integer,Integer> mapProjectSearchIdToSearchId = new HashMap<>();
@@ -146,42 +161,55 @@ public class PeptidesMergedCommonPageDownload {
 			searchIdsListDeduppedSorted.add( search.getSearchId() );
 			mapProjectSearchIdToSearchId.put( search.getProjectSearchId(), search.getSearchId() );
 		}
-
-		//  Jackson JSON Mapper object for JSON deserialization and serialization
-		ObjectMapper jacksonJSON_Mapper = new ObjectMapper();  //  Jackson JSON library object
-		//   Get Query JSON from the form and if not empty, deserialize it
-		String queryJSONFromForm = form.getQueryJSON();
+		
 		MergedPeptideQueryJSONRoot mergedPeptideQueryJSONRoot = null;
-		if ( StringUtils.isNotEmpty( queryJSONFromForm ) ) {
-			try {
-				mergedPeptideQueryJSONRoot = jacksonJSON_Mapper.readValue( queryJSONFromForm, MergedPeptideQueryJSONRoot.class );
-			} catch ( JsonParseException e ) {
-				String msg = "Failed to parse 'queryJSONFromForm', JsonParseException.  queryJSONFromForm: " + queryJSONFromForm;
-				log.error( msg, e );
-				throw e;
-			} catch ( JsonMappingException e ) {
-				String msg = "Failed to parse 'queryJSONFromForm', JsonMappingException.  queryJSONFromForm: " + queryJSONFromForm;
-				log.error( msg, e );
-				throw e;
-			} catch ( IOException e ) {
-				String msg = "Failed to parse 'queryJSONFromForm', IOException.  queryJSONFromForm: " + queryJSONFromForm;
-				log.error( msg, e );
-				throw e;
-			}
+
+		if ( mergedPeptideQueryJSONRoot_Param != null  ) {
+
+			mergedPeptideQueryJSONRoot = mergedPeptideQueryJSONRoot_Param;
 
 			//  Update mergedPeptideQueryJSONRoot for current search ids and project search ids
 			Update__A_QueryBase_JSONRoot__ForCurrentSearchIds.getInstance()
 			.update__A_QueryBase_JSONRoot__ForCurrentSearchIds( mergedPeptideQueryJSONRoot, mapProjectSearchIdToSearchId );
-			
+
 		} else {
-			//  Query JSON in the form is empty so create an empty object that will be populated.
-			mergedPeptideQueryJSONRoot = new MergedPeptideQueryJSONRoot();
-			//  Create cutoffs for default values
-			CutoffValuesRootLevel cutoffValuesRootLevelDefaults =
-					GetDefaultPsmPeptideCutoffs.getInstance()
-					.getDefaultPsmPeptideCutoffs( projectSearchIdsListDeduppedSorted, searchIds, mapProjectSearchIdToSearchId );
-			mergedPeptideQueryJSONRoot.setCutoffs( cutoffValuesRootLevelDefaults );
+
+			//  Jackson JSON Mapper object for JSON deserialization and serialization
+			ObjectMapper jacksonJSON_Mapper = new ObjectMapper();  //  Jackson JSON library object
+			//   Get Query JSON from the form and if not empty, deserialize it
+			String queryJSONFromForm = form.getQueryJSON();
+			if ( StringUtils.isNotEmpty( queryJSONFromForm ) ) {
+				try {
+					mergedPeptideQueryJSONRoot = jacksonJSON_Mapper.readValue( queryJSONFromForm, MergedPeptideQueryJSONRoot.class );
+				} catch ( JsonParseException e ) {
+					String msg = "Failed to parse 'queryJSONFromForm', JsonParseException.  queryJSONFromForm: " + queryJSONFromForm;
+					log.error( msg, e );
+					throw e;
+				} catch ( JsonMappingException e ) {
+					String msg = "Failed to parse 'queryJSONFromForm', JsonMappingException.  queryJSONFromForm: " + queryJSONFromForm;
+					log.error( msg, e );
+					throw e;
+				} catch ( IOException e ) {
+					String msg = "Failed to parse 'queryJSONFromForm', IOException.  queryJSONFromForm: " + queryJSONFromForm;
+					log.error( msg, e );
+					throw e;
+				}
+
+				//  Update mergedPeptideQueryJSONRoot for current search ids and project search ids
+				Update__A_QueryBase_JSONRoot__ForCurrentSearchIds.getInstance()
+				.update__A_QueryBase_JSONRoot__ForCurrentSearchIds( mergedPeptideQueryJSONRoot, mapProjectSearchIdToSearchId );
+
+			} else {
+				//  Query JSON in the form is empty so create an empty object that will be populated.
+				mergedPeptideQueryJSONRoot = new MergedPeptideQueryJSONRoot();
+				//  Create cutoffs for default values
+				CutoffValuesRootLevel cutoffValuesRootLevelDefaults =
+						GetDefaultPsmPeptideCutoffs.getInstance()
+						.getDefaultPsmPeptideCutoffs( projectSearchIdsListDeduppedSorted, searchIds, mapProjectSearchIdToSearchId );
+				mergedPeptideQueryJSONRoot.setCutoffs( cutoffValuesRootLevelDefaults );
+			}
 		}
+		
 		//   Update Link Type to default to Crosslink if no value was set
 		String[] linkTypesInForm = mergedPeptideQueryJSONRoot.getLinkTypes();
 		if ( linkTypesInForm == null || linkTypesInForm.length == 0 ) {

@@ -24,6 +24,10 @@ public class GenerateVennDiagramDataToJSON {
 	 * @return null if not generating venn diagram data for provided parameters
 	 */
 	public static VennDiagramDataToJSON createVennDiagramDataToJSON( List<? extends IMergedSearchLink> links, List<SearchDTO> searches ) {
+		
+		if ( links.isEmpty() ) { // No Venn Diagram if no data
+			return null;
+		}
 		if ( searches.size() > 3 ) { // Only create the VENN diagram for 3 or fewer searches
 			return null;
 		}

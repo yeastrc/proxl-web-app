@@ -139,6 +139,7 @@ public class DownloadMergedSearchProteinsAllAction extends Action {
 						ProteinsAllMergedCommonPageDownload.getInstance()
 						.getAllProteinsWrapped(
 								form,
+								null, // ProteinQueryJSONRoot proteinQueryJSONRoot_Param
 								projectSearchIdsListDeduppedSorted,
 								searches,
 								searchesMapOnSearchId  );

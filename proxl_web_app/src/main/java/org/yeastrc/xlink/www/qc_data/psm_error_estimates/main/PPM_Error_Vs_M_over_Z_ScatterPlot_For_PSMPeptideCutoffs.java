@@ -46,8 +46,6 @@ import org.yeastrc.xlink.www.qc_data.utils.QC_Cached_WebReportedPeptideWrapperLi
 import org.yeastrc.xlink.www.searcher.IsotopeLabelSearcher;
 import org.yeastrc.xlink.www.searcher.PsmWebDisplaySearcher;
 import org.yeastrc.xlink.www.searcher.SrchRepPeptPeptDynamicModSearcher;
-import org.yeastrc.xlink.www.searcher_utils.DefaultCutoffsExactlyMatchAnnTypeDataToSearchData;
-import org.yeastrc.xlink.www.searcher_utils.DefaultCutoffsExactlyMatchAnnTypeDataToSearchData.DefaultCutoffsExactlyMatchAnnTypeDataToSearchDataResult;
 import org.yeastrc.xlink.www.searcher_via_cached_data.a_return_data_from_searchers.PeptideWebPageSearcherCacheOptimized;
 import org.yeastrc.xlink.www.searcher_via_cached_data.cached_data_holders.Cached_SrchRepPeptPeptideDTO_ForSrchIdRepPeptId;
 import org.yeastrc.xlink.www.searcher_via_cached_data.request_objects_for_searchers_for_cached_data.SrchRepPeptPeptideDTO_ForSrchIdRepPeptId_ReqParams;
@@ -164,12 +162,9 @@ public class PPM_Error_Vs_M_over_Z_ScatterPlot_For_PSMPeptideCutoffs {
 		SearcherCutoffValuesRootLevel searcherCutoffValuesRootLevel =
 				cutoffValuesObjectsToOtherObjects_RootResult.getSearcherCutoffValuesRootLevel();
 		
-		//  Only applicable if search cutoffs are defaults
-		boolean searchOnlyHasDefaultCutoffs = get_searchOnlyHasDefaultCutoffs( search, searcherCutoffValuesRootLevel );
-
 		if ( forDownload != ForDownload_Enum.YES ) {
 			//  Only if not for download
-			if ( searchOnlyHasDefaultCutoffs ) {
+			{
 				byte[] resultsAsBytes = 
 						retrieveDataFromCacheAndMatchCutoffs( search, requestJSONBytes );
 
@@ -216,7 +211,7 @@ public class PPM_Error_Vs_M_over_Z_ScatterPlot_For_PSMPeptideCutoffs {
 		
 		byte[] resultAsJSONBytes = getResultsByteArray( ppm_Error_Vs_M_over_Z_ScatterPlot_For_PSMPeptideCutoffs_Result, search.getSearchId() );
 		
-		if ( searchOnlyHasDefaultCutoffs ) {
+		{
 			cacheResult( resultAsJSONBytes, search, requestJSONBytes );
 		}
 		
@@ -295,28 +290,7 @@ public class PPM_Error_Vs_M_over_Z_ScatterPlot_For_PSMPeptideCutoffs {
 		byte[] chartJSONAsBytes = cachedDataResult.getChartJSONAsBytes();
 		return chartJSONAsBytes;
 	}
-	
-	/**
-	 * @param search
-	 * @param qcPageQueryJSONRoot_SearcherCutoffValuesRootLevel_Holder
-	 * @return
-	 * @throws Exception
-	 */
-	private boolean get_searchOnlyHasDefaultCutoffs( SearchDTO search, SearcherCutoffValuesRootLevel searcherCutoffValuesRootLevel ) throws Exception {
-		
-		boolean searchOnlyHasDefaultCutoffs = false;
-
-		SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel = searcherCutoffValuesRootLevel.getPerSearchCutoffs( search.getProjectSearchId() );
-		DefaultCutoffsExactlyMatchAnnTypeDataToSearchDataResult result =
-				DefaultCutoffsExactlyMatchAnnTypeDataToSearchData.getInstance()
-				.defaultCutoffsExactlyMatchAnnTypeDataToSearchData( search.getSearchId(), searcherCutoffValuesSearchLevel );
-		if ( result.isDefaultCutoffsExactlyMatchAnnTypeDataToSearchData() ) {
-			searchOnlyHasDefaultCutoffs = true;
-		}
-		
-		return searchOnlyHasDefaultCutoffs;
-	}
-		
+			
 	/**
 	 * @param ppmErrorListForLinkType_ByLinkType
 	 * @return

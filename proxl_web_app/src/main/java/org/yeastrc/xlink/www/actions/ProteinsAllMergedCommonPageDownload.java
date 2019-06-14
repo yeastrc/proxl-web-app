@@ -30,6 +30,7 @@ import org.yeastrc.xlink.www.form_query_json_objects.ProteinQueryJSONRoot;
 import org.yeastrc.xlink.www.form_query_json_objects.Z_CutoffValuesObjectsToOtherObjectsFactory;
 import org.yeastrc.xlink.www.form_query_json_objects.Z_CutoffValuesObjectsToOtherObjectsFactory.Z_CutoffValuesObjectsToOtherObjects_RootResult;
 import org.yeastrc.xlink.www.form_utils.GetProteinQueryJSONRootFromFormData;
+import org.yeastrc.xlink.www.form_utils.Update__A_QueryBase_JSONRoot__ForCurrentSearchIds;
 import org.yeastrc.xlink.www.forms.MergedSearchViewProteinsForm;
 import org.yeastrc.xlink.www.objects.AnnDisplayNameDescPeptPsmListsPair;
 import org.yeastrc.xlink.www.objects.AnnValuePeptPsmListsPair;
@@ -52,7 +53,10 @@ public class ProteinsAllMergedCommonPageDownload {
 	}
 
 	/**
+	 * One and only 1 of 'form' or proteinQueryJSONRoot_Param can be populated
+	 * 
 	 * @param form
+	 * @param proteinQueryJSONRoot_Param
 	 * @param projectSearchIdsListDeduppedSorted
 	 * @param searches
 	 * @param searchesMapOnSearchId
@@ -62,10 +66,22 @@ public class ProteinsAllMergedCommonPageDownload {
 	 */
 	public AllProteinsMergedCommonPageDownloadResult getAllProteinsWrapped(
 			MergedSearchViewProteinsForm form,
+			ProteinQueryJSONRoot proteinQueryJSONRoot_Param,
 			List<Integer> projectSearchIdsListDeduppedSorted,
 			List<SearchDTO> searches, 
 			Map<Integer, SearchDTO> searchesMapOnSearchId
 			) throws Exception, ProxlWebappDataException {
+
+		if ( form != null && proteinQueryJSONRoot_Param != null ) {
+			String msg = "getAllProteinsWrapped(...): parameters form and proteinQueryJSONRoot_Param cannot both be populated";
+			log.error( msg );
+			throw new IllegalArgumentException(msg);
+		}
+		if ( form == null && proteinQueryJSONRoot_Param == null ) {
+			String msg = "getAllProteinsWrapped(...): parameters form and proteinQueryJSONRoot_Param cannot both be NOT populated";
+			log.error( msg );
+			throw new IllegalArgumentException(msg);
+		}
 		
 		AllProteinsMergedCommonPageDownloadResult allProteinsMergedCommonPageDownloadResult = new AllProteinsMergedCommonPageDownloadResult();
 		
@@ -83,14 +99,29 @@ public class ProteinsAllMergedCommonPageDownload {
 		Map<Integer,Set<Integer>> allProteinsExcludeProteinSelectOnWebPageKeyProteinIdValueSearchIds = new HashMap<>();
 		allProteinsMergedCommonPageDownloadResult.allProteinsExcludeProteinSelectOnWebPageKeyProteinIdValueSearchIds =
 				allProteinsExcludeProteinSelectOnWebPageKeyProteinIdValueSearchIds;
-		//   Get Query JSON from the form and if not empty, deserialize it
-		ProteinQueryJSONRoot proteinQueryJSONRoot = 
-				GetProteinQueryJSONRootFromFormData.getInstance()
-				.getProteinQueryJSONRootFromFormData( 
-						form, 
-						projectSearchIdsListDeduppedSorted,
-						searchIds,
-						mapProjectSearchIdToSearchId );
+		
+		ProteinQueryJSONRoot proteinQueryJSONRoot = null;
+
+		if ( proteinQueryJSONRoot_Param != null  ) {
+
+			proteinQueryJSONRoot = proteinQueryJSONRoot_Param;
+
+			//  Update proteinQueryJSONRoot for current search ids and project search ids
+			Update__A_QueryBase_JSONRoot__ForCurrentSearchIds.getInstance()
+			.update__A_QueryBase_JSONRoot__ForCurrentSearchIds( proteinQueryJSONRoot, mapProjectSearchIdToSearchId );
+			
+		} else {
+			//   Get Query JSON from the form and if not empty, deserialize it
+			proteinQueryJSONRoot = 
+					GetProteinQueryJSONRootFromFormData.getInstance()
+					.getProteinQueryJSONRootFromFormData( 
+							form, 
+							projectSearchIdsListDeduppedSorted,
+							searchIds,
+							mapProjectSearchIdToSearchId );
+			
+		}
+		
 		allProteinsMergedCommonPageDownloadResult.proteinQueryJSONRoot = proteinQueryJSONRoot;
 		
 		////////////

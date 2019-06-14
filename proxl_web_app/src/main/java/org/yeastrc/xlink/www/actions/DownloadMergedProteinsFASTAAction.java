@@ -139,6 +139,7 @@ public class DownloadMergedProteinsFASTAAction extends Action {
 						ProteinsMergedCommonPageDownload.getInstance()
 						.getCrosslinksAndLooplinkWrapped(
 								form,
+								null, // ProteinQueryJSONRoot proteinQueryJSONRoot_Param
 								ProteinsMergedCommonPageDownload.ForCrosslinksOrLooplinkOrBoth.BOTH_CROSSLINKS_AND_LOOPLINKS,
 								projectSearchIdsListDeduppedSorted,
 								searches,

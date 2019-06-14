@@ -1,15 +1,11 @@
 package org.yeastrc.xlink.www.actions;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
@@ -20,50 +16,29 @@ import org.apache.struts.action.ActionMapping;
 import org.yeastrc.xlink.www.dao.SearchDAO;
 import org.yeastrc.xlink.utils.XLinkUtils;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
-import org.yeastrc.xlink.www.annotation.sort_display_records_on_annotation_values.SrtOnBestAnnValsPopAnnValListsRetnTblHeadrsSinglSrchId;
-import org.yeastrc.xlink.www.annotation.sort_display_records_on_annotation_values.SrtOnBestAnnValsPopAnnValListsRetnTblHeadrsSinglSrchIdReslt;
-import org.yeastrc.xlink.www.annotation_utils.GetAnnotationTypeData;
-import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesAnnotationLevel;
-import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
 import org.yeastrc.xlink.www.dto.SearchDTO;
-import org.yeastrc.xlink.dto.AnnotationTypeDTO;
-import org.yeastrc.xlink.www.linked_positions.CrosslinkLinkedPositions;
-import org.yeastrc.xlink.www.linked_positions.LinkedPositions_FilterExcludeLinksWith_Param;
-import org.yeastrc.xlink.www.linked_positions.LooplinkLinkedPositions;
 import org.yeastrc.xlink.www.nav_links_image_structure.PopulateRequestDataForImageAndStructureAndQC_NavLinks;
-import org.yeastrc.xlink.www.no_data_validation.ThrowExceptionOnNoDataConfig;
 import org.yeastrc.xlink.www.access_control.result_objects.WebSessionAuthAccessLevel;
 import org.yeastrc.xlink.www.objects.SearchProtein;
-import org.yeastrc.xlink.www.objects.SearchProteinCrosslink;
-import org.yeastrc.xlink.www.objects.SearchProteinCrosslinkWrapper;
-import org.yeastrc.xlink.www.objects.SearchProteinLooplink;
-import org.yeastrc.xlink.www.objects.SearchProteinLooplinkWrapper;
-import org.yeastrc.xlink.www.constants.MinimumPSMsConstants;
 import org.yeastrc.xlink.www.constants.StrutsGlobalForwardNames;
 import org.yeastrc.xlink.www.constants.Struts_Config_Parameter_Values_Constants;
 import org.yeastrc.xlink.www.constants.WebConstants;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
-import org.yeastrc.xlink.www.exceptions.ProxlWebappNoDataException;
-import org.yeastrc.xlink.www.form_query_json_objects.CutoffValuesSearchLevel;
 import org.yeastrc.xlink.www.form_query_json_objects.PeptideQueryJSONRoot;
 import org.yeastrc.xlink.www.form_query_json_objects.ProteinQueryJSONRoot;
-import org.yeastrc.xlink.www.form_query_json_objects.Z_CutoffValuesObjectsToOtherObjectsFactory;
-import org.yeastrc.xlink.www.form_query_json_objects.Z_CutoffValuesObjectsToOtherObjectsFactory.Z_CutoffValuesObjectsToOtherObjects_PerSearchResult;
 import org.yeastrc.xlink.www.form_utils.GetProteinQueryJSONRootFromFormData;
 import org.yeastrc.xlink.www.forms.PeptideProteinCommonForm;
 import org.yeastrc.xlink.www.forms.SearchViewProteinsForm;
 import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result;
 import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId;
 import org.yeastrc.xlink.www.web_utils.ExcludeLinksWith_Remove_NonUniquePSMs_Checkbox_PopRequestItems;
-import org.yeastrc.xlink.www.web_utils.ExcludeOnTaxonomyForProteinSequenceVersionIdSearchId;
 import org.yeastrc.xlink.www.web_utils.GetAnnotationDisplayUserSelectionDetailsData;
 import org.yeastrc.xlink.www.web_utils.GetPageHeaderData;
 import org.yeastrc.xlink.www.web_utils.GetSearchDetailsData;
 import org.yeastrc.xlink.www.web_utils.IsShowDownloadLinks_Skyline_SetRequestParameters;
+import org.yeastrc.xlink.www.web_utils.ProjectSearchIdsSearchIds_SetRequestParameter;
 import org.yeastrc.xlink.www.web_utils.ProteinListingTooltipConfigUtil;
-import org.yeastrc.xlink.www.web_utils.TaxonomiesForSearchOrSearches;
 import org.yeastrc.xlink.www.web_utils.URLEncodeDecodeAURL;
-import org.yeastrc.xlink.www.web_utils.XLinkWebAppUtils;
 import org.yeastrc.xlink.www.webapp_timing.WebappTiming;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -156,67 +131,32 @@ public class ViewSearchProteinsAction extends Action {
 			Map<Integer,Integer> mapProjectSearchIdToSearchId = new HashMap<>();
 			mapProjectSearchIdToSearchId.put( projectSearchId, searchId );
 			
-			// build list of taxonomies to show in exclusion list
-			Map<Integer, String> taxonomies = 
-					TaxonomiesForSearchOrSearches.getInstance().getTaxonomiesForSearchId( search.getSearchId() );
-			request.setAttribute("taxonomies", taxonomies );
-			if ( webappTiming != null ) {
-				webappTiming.markPoint( "After Taxonomy Searcher:  SearchTaxonomySearcher.getInstance().getTaxonomies( search )" );
-			}
-			
 			//   Get Query JSON from the form and if not empty, deserialize it
 			ProteinQueryJSONRoot proteinQueryJSONRoot = 
 					GetProteinQueryJSONRootFromFormData.getInstance()
 					.getProteinQueryJSONRootFromFormData( form, projectSearchIdsSet, searchIdsSet, mapProjectSearchIdToSearchId );
-			////////////
-			//  Copy Exclude Taxonomy and Exclude Protein Sets for lookup
-			Set<Integer> excludeTaxonomy_Ids_Set_UserInput = new HashSet<>();
-			Set<Integer> excludeproteinSequenceVersionIds_Set_UserInput = new HashSet<>();
-			if ( proteinQueryJSONRoot.getExcludeTaxonomy() != null ) {
-				for ( Integer taxonomyId : proteinQueryJSONRoot.getExcludeTaxonomy() ) {
-					excludeTaxonomy_Ids_Set_UserInput.add( taxonomyId );
-				}
-			}
-			//  First convert the protein sequence ids that come from the JS code to standard integers and put
-			//   in the property excludeproteinSequenceVersionIds
-			ProteinsMergedProteinsCommon.getInstance().processExcludeproteinSequenceVersionIdsFromJS( proteinQueryJSONRoot );
-			if ( proteinQueryJSONRoot.getExcludeproteinSequenceVersionIds() != null ) {
-				for ( Integer proteinId : proteinQueryJSONRoot.getExcludeproteinSequenceVersionIds() ) {
-					excludeproteinSequenceVersionIds_Set_UserInput.add( proteinId );
-				}
-			}
-			/////////////////////////////////////////////////////////////////////////////
-			/////////////////////////////////////////////////////////////////////////////
-			////////   Generic Param processing
-			//  Get Annotation Type records for PSM and Peptide
-			//  Get  Annotation Type records for PSM
-			Map<Integer, Map<Integer, AnnotationTypeDTO>> 
-			srchPgm_Filterable_Psm_AnnotationType_DTOListPerSearchIdMap =
-					GetAnnotationTypeData.getInstance().getAll_Psm_Filterable_ForSearchIds( searchIdsSet );
-			Map<Integer, AnnotationTypeDTO> srchPgm_Filterable_Psm_AnnotationType_DTOMap = 
-					srchPgm_Filterable_Psm_AnnotationType_DTOListPerSearchIdMap.get( searchId );
-			if ( srchPgm_Filterable_Psm_AnnotationType_DTOMap == null ) {
-				//  No records were found, probably an error   TODO
-				srchPgm_Filterable_Psm_AnnotationType_DTOMap = new HashMap<>();
-			}
-			//  Get  Annotation Type records for Reported Peptides
-			Map<Integer, Map<Integer, AnnotationTypeDTO>> 
-			srchPgm_Filterable_ReportedPeptide_AnnotationType_DTOListPerSearchIdMap =
-					GetAnnotationTypeData.getInstance().getAll_Peptide_Filterable_ForSearchIds( searchIdsSet );
-			Map<Integer, AnnotationTypeDTO> srchPgmFilterableReportedPeptideAnnotationTypeDTOMap = 
-					srchPgm_Filterable_ReportedPeptide_AnnotationType_DTOListPerSearchIdMap.get( searchId );
-			if ( srchPgmFilterableReportedPeptideAnnotationTypeDTOMap == null ) {
-				//  No records were found, allowable for Reported Peptides
-				srchPgmFilterableReportedPeptideAnnotationTypeDTOMap = new HashMap<>();
-			}
 			
-
-			GetSearchDetailsData.SearchesAreUserSorted searchesAreUserSorted  = GetSearchDetailsData.SearchesAreUserSorted.NO;
-			if ( PeptideProteinCommonForm.DO_NOT_SORT_PROJECT_SEARCH_IDS_YES.equals( form.getDs() ) ) {
-				searchesAreUserSorted  = GetSearchDetailsData.SearchesAreUserSorted.YES;
+			//  Convert the protein sequence ids that come from the JS code to standard integers and put
+			//   in the property excludeproteinSequenceVersionIds.
+			//      Do this here since may have to convert old NRSeqProteinIds.
+			ProteinsMergedProteinsCommon.getInstance().processExcludeproteinSequenceVersionIdsFromJS( proteinQueryJSONRoot );
+			
+			{
+				ProjectSearchIdsSearchIds_SetRequestParameter.SearchesAreUserSorted searchesAreUserSorted  = ProjectSearchIdsSearchIds_SetRequestParameter.SearchesAreUserSorted.NO;
+				if ( PeptideProteinCommonForm.DO_NOT_SORT_PROJECT_SEARCH_IDS_YES.equals( form.getDs() ) ) {
+					searchesAreUserSorted  = ProjectSearchIdsSearchIds_SetRequestParameter.SearchesAreUserSorted.YES;
+				}
+				//  Populate request objects for Project Search Id / Search Id pairs in display order in JSON on Page for Javascript
+				ProjectSearchIdsSearchIds_SetRequestParameter.getSingletonInstance().populateProjectSearchIdsSearchIds_SetRequestParameter( search, searchesAreUserSorted, request );
 			}
-			//  Populate request objects for Standard Search Display
-			GetSearchDetailsData.getInstance().getSearchDetailsData( search, searchesAreUserSorted, request );
+			{
+				GetSearchDetailsData.SearchesAreUserSorted searchesAreUserSorted  = GetSearchDetailsData.SearchesAreUserSorted.NO;
+				if ( PeptideProteinCommonForm.DO_NOT_SORT_PROJECT_SEARCH_IDS_YES.equals( form.getDs() ) ) {
+					searchesAreUserSorted  = GetSearchDetailsData.SearchesAreUserSorted.YES;
+				}
+				//  Populate request objects for Standard Search Display
+				GetSearchDetailsData.getInstance().getSearchDetailsData( search, searchesAreUserSorted, request );
+			}
 			
 			//  Populate request objects for User Selection of Annotation Data Display
 			GetAnnotationDisplayUserSelectionDetailsData.getInstance().getSearchDetailsData( search, request );
@@ -226,367 +166,6 @@ public class ViewSearchProteinsAction extends Action {
 			//  Populates request attribute
 			IsShowDownloadLinks_Skyline_SetRequestParameters.getInstance().isShowDownloadLinks_Skyline_SetRequestParameters( searchIdsSet, request );
 			
-			String projectSearchIdAsString = Integer.toString( projectSearchId );
-			CutoffValuesSearchLevel cutoffValuesSearchLevel = proteinQueryJSONRoot.getCutoffs().getSearches().get( projectSearchIdAsString );
-			SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel = null;
-			if ( cutoffValuesSearchLevel == null ) {
-				//  Create empty object for default values
-				searcherCutoffValuesSearchLevel = new SearcherCutoffValuesSearchLevel();
-			} else {
-				Z_CutoffValuesObjectsToOtherObjects_PerSearchResult z_CutoffValuesObjectsToOtherObjects_PerSearchResult = 
-						Z_CutoffValuesObjectsToOtherObjectsFactory.createSearcherCutoffValuesSearchLevel( searchIdsSet, cutoffValuesSearchLevel );
-				searcherCutoffValuesSearchLevel = z_CutoffValuesObjectsToOtherObjects_PerSearchResult.getSearcherCutoffValuesSearchLevel();
-				if ( searcherCutoffValuesSearchLevel == null ) {
-					//  Create empty object for default values
-					searcherCutoffValuesSearchLevel = new SearcherCutoffValuesSearchLevel();
-				}
-			}
-			////////////////////////////////////////////////
-			//////     Code common to Crosslinks and Looplinks
-			//  Create list of Peptide and Best PSM annotation names to display as column headers
-			List<SearcherCutoffValuesAnnotationLevel> peptideCutoffValuesList = 
-					searcherCutoffValuesSearchLevel.getPeptidePerAnnotationCutoffsList();
-			List<SearcherCutoffValuesAnnotationLevel> psmCutoffValuesList = 
-					searcherCutoffValuesSearchLevel.getPsmPerAnnotationCutoffsList();
-			List<AnnotationTypeDTO> peptideCutoffsAnnotationTypeDTOList = new ArrayList<>( peptideCutoffValuesList.size() );
-			List<AnnotationTypeDTO> psmCutoffsAnnotationTypeDTOList = new ArrayList<>( psmCutoffValuesList.size() );
-			for ( SearcherCutoffValuesAnnotationLevel searcherCutoffValuesAnnotationLevel : peptideCutoffValuesList ) {
-				peptideCutoffsAnnotationTypeDTOList.add( searcherCutoffValuesAnnotationLevel.getAnnotationTypeDTO() );
-			}
-			for ( SearcherCutoffValuesAnnotationLevel searcherCutoffValuesAnnotationLevel : psmCutoffValuesList ) {
-				psmCutoffsAnnotationTypeDTOList.add( searcherCutoffValuesAnnotationLevel.getAnnotationTypeDTO() );
-			}
-			
-			/////////////////////////////////////////////////////////////
-			//////////////////   Get Crosslinks data from DATABASE  from database
-			
-			//  auto populate param object from proteinQueryJSONRoot
-			LinkedPositions_FilterExcludeLinksWith_Param linkedPositions_FilterExcludeLinksWith_Param = new LinkedPositions_FilterExcludeLinksWith_Param( proteinQueryJSONRoot );
-			
-			List<SearchProteinCrosslinkWrapper> wrappedCrosslinks = 
-					CrosslinkLinkedPositions.getInstance()
-					.getSearchProteinCrosslinkWrapperList( search, searcherCutoffValuesSearchLevel, linkedPositions_FilterExcludeLinksWith_Param );
-			
-			//  If configured, throw exception if no peptides found
-			if ( ThrowExceptionOnNoDataConfig.getInstance().isThrowExceptionNoData() ) {
-				if ( wrappedCrosslinks.isEmpty() ) {
-					String msg = "No Crosslinks found and config set for ThrowExceptionNoData";
-					log.error( msg );
-					throw new ProxlWebappNoDataException( msg );
-				}
-			}
-			/////////////////////////////////////////////////////////////
-			//////////////////   Get Looplinks data from DATABASE   from database
-			List<SearchProteinLooplinkWrapper> wrappedLooplinks = 
-					LooplinkLinkedPositions.getInstance()
-					.getSearchProteinLooplinkWrapperList( search, searcherCutoffValuesSearchLevel, linkedPositions_FilterExcludeLinksWith_Param );
-
-			//  If configured, throw exception if no peptides found
-			if ( ThrowExceptionOnNoDataConfig.getInstance().isThrowExceptionNoData() ) {
-				if ( wrappedLooplinks.isEmpty() ) {
-					String msg = "No Looplinks found and config set for ThrowExceptionNoData";
-					log.error( msg );
-					throw new ProxlWebappNoDataException( msg );
-				}
-			}
-			// all possible proteins included in this search for this type
-			Collection<SearchProtein> prProteins = new HashSet<SearchProtein>();
-			for ( SearchProteinCrosslinkWrapper  searchProteinCrosslinkWrapper : wrappedCrosslinks ) {
-				SearchProteinCrosslink searchProteinCrosslink = searchProteinCrosslinkWrapper.getSearchProteinCrosslink();
-				prProteins.add( searchProteinCrosslink.getProtein1() );
-				prProteins.add( searchProteinCrosslink.getProtein2() );
-			}
-			for ( SearchProteinLooplinkWrapper searchProteinLooplinkWrapper : wrappedLooplinks ) {
-				SearchProteinLooplink searchProteinLooplink = searchProteinLooplinkWrapper.getSearchProteinLooplink();
-				prProteins.add( searchProteinLooplink.getProtein() );
-			}
-			//////////////////////////////////////////////////////////////////
-			// Filter out links if requested  ---  Filtering for proteinQueryJSONRoot.isRemoveNonUniquePSMs() is performed in CrosslinkLinkedPositions and TODO
-			if( proteinQueryJSONRoot.isFilterNonUniquePeptides() 
-					|| proteinQueryJSONRoot.getMinPSMs() != MinimumPSMsConstants.MINIMUM_PSMS_DEFAULT
-					|| proteinQueryJSONRoot.isFilterOnlyOnePeptide()
-					|| ( proteinQueryJSONRoot.getExcludeTaxonomy() != null && proteinQueryJSONRoot.getExcludeTaxonomy().length > 0 ) ||
-					( ! excludeproteinSequenceVersionIds_Set_UserInput.isEmpty() ) ) {
-				
-				///////  Output Lists, Results After Filtering
-				List<SearchProteinCrosslinkWrapper> wrappedCrosslinksAfterFilter = new ArrayList<>( wrappedCrosslinks.size() );
-				List<SearchProteinLooplinkWrapper> wrappedLooplinksAfterFilter = new ArrayList<>( wrappedLooplinks.size() );
-				
-				///  Filter CROSSLINKS
-				for ( SearchProteinCrosslinkWrapper searchProteinCrosslinkWrapper : wrappedCrosslinks ) {
-					SearchProteinCrosslink link = searchProteinCrosslinkWrapper.getSearchProteinCrosslink();
-					// did they request to removal of non unique peptides?
-					if( proteinQueryJSONRoot.isFilterNonUniquePeptides()  ) {
-						if( link.getNumUniqueLinkedPeptides() < 1 ) {
-							//  Skip to next entry in list, dropping this entry from output list
-							continue;  // EARLY CONTINUE
-						}
-					}
-				
-					// did they request to removal of links with less than a specified number of PSMs?
-					if( proteinQueryJSONRoot.getMinPSMs() != MinimumPSMsConstants.MINIMUM_PSMS_DEFAULT ) {
-						int psmCountForSearchId = link.getNumPsms();
-						if ( psmCountForSearchId < proteinQueryJSONRoot.getMinPSMs() ) {
-							//  Skip to next entry in list, dropping this entry from output list
-							continue;  // EARLY CONTINUE
-						}
-					}
-					// did they request to removal of links with only one Reported Peptide?
-					if( proteinQueryJSONRoot.isFilterOnlyOnePeptide() ) {
-						int peptideCountForSearchId = link.getNumLinkedPeptides();
-						if ( peptideCountForSearchId <= 1 ) {
-							//  Skip to next entry in list, dropping this entry from output list
-							continue;  // EARLY CONTINUE
-						}
-					}
-					// did user request removal of certain taxonomy IDs?
-					if( ! excludeTaxonomy_Ids_Set_UserInput.isEmpty() ) {
-						boolean excludeOnProtein_1 =
-								ExcludeOnTaxonomyForProteinSequenceVersionIdSearchId.getInstance()
-								.excludeOnTaxonomyForProteinSequenceVersionIdSearchId( 
-										excludeTaxonomy_Ids_Set_UserInput, 
-										link.getProtein1().getProteinSequenceVersionObject(), 
-										searchId );
-						boolean excludeOnProtein_2 =
-								ExcludeOnTaxonomyForProteinSequenceVersionIdSearchId.getInstance()
-								.excludeOnTaxonomyForProteinSequenceVersionIdSearchId( 
-										excludeTaxonomy_Ids_Set_UserInput, 
-										link.getProtein2().getProteinSequenceVersionObject(), 
-										searchId );
-						if ( excludeOnProtein_1 || excludeOnProtein_2 ) {
-							//  Skip to next entry in list, dropping this entry from output list
-							continue;  // EARLY CONTINUE
-						}
-					}
-					// did user request removal of certain protein IDs?
-					if( ! excludeproteinSequenceVersionIds_Set_UserInput.isEmpty() ) {
-						int proteinId_1 = link.getProtein1().getProteinSequenceVersionObject().getProteinSequenceVersionId();
-						int proteinId_2 = link.getProtein2().getProteinSequenceVersionObject().getProteinSequenceVersionId();
-						if ( excludeproteinSequenceVersionIds_Set_UserInput.contains( proteinId_1 ) 
-								|| excludeproteinSequenceVersionIds_Set_UserInput.contains( proteinId_2 ) ) {
-							//  Skip to next entry in list, dropping this entry from output list
-							continue;  // EARLY CONTINUE
-						}
-					}		
-					wrappedCrosslinksAfterFilter.add( searchProteinCrosslinkWrapper );
-				}
-				
-				///  Filter LOOPLINKS
-				for ( SearchProteinLooplinkWrapper searchProteinLooplinkWrapper : wrappedLooplinks ) {
-					SearchProteinLooplink link = searchProteinLooplinkWrapper.getSearchProteinLooplink();
-					// did they request to removal of non unique peptides?
-					if( proteinQueryJSONRoot.isFilterNonUniquePeptides()  ) {
-						if( link.getNumUniquePeptides() < 1 ) {
-							//  Skip to next entry in list, dropping this entry from output list
-							continue;  // EARLY CONTINUE
-						}
-					}
-					// did they request to removal of links with only one PSM?
-					if( proteinQueryJSONRoot.getMinPSMs() != MinimumPSMsConstants.MINIMUM_PSMS_DEFAULT  ) {
-						int psmCountForSearchId = link.getNumPsms();
-						if ( psmCountForSearchId < proteinQueryJSONRoot.getMinPSMs() ) {
-							//  Skip to next entry in list, dropping this entry from output list
-							continue;  // EARLY CONTINUE
-						}
-					}
-					// did they request to removal of links with only one Reported Peptide?
-					if( proteinQueryJSONRoot.isFilterOnlyOnePeptide() ) {
-						int peptideCountForSearchId = link.getNumPeptides();
-						if ( peptideCountForSearchId <= 1 ) {
-							//  Skip to next entry in list, dropping this entry from output list
-							continue;  // EARLY CONTINUE
-						}
-					}
-					// did user request removal of certain taxonomy IDs?
-					if( ! excludeTaxonomy_Ids_Set_UserInput.isEmpty() ) {
-						boolean excludeOnProtein =
-								ExcludeOnTaxonomyForProteinSequenceVersionIdSearchId.getInstance()
-								.excludeOnTaxonomyForProteinSequenceVersionIdSearchId( 
-										excludeTaxonomy_Ids_Set_UserInput, 
-										link.getProtein().getProteinSequenceVersionObject(), 
-										searchId );
-						if ( excludeOnProtein ) {
-							//  Skip to next entry in list, dropping this entry from output list
-							continue;  // EARLY CONTINUE
-						}
-					}
-					// did user request removal of certain protein IDs?
-					if( ! excludeproteinSequenceVersionIds_Set_UserInput.isEmpty() ) {
-						int proteinId = link.getProtein().getProteinSequenceVersionObject().getProteinSequenceVersionId();
-						if ( excludeproteinSequenceVersionIds_Set_UserInput.contains( proteinId ) ) {
-							//  Skip to next entry in list, dropping this entry from output list
-							continue;  // EARLY CONTINUE
-						}
-					}									
-					wrappedLooplinksAfterFilter.add( searchProteinLooplinkWrapper );
-				}
-				
-				//  Copy new filtered lists to original input variable names to overlay them
-				wrappedCrosslinks = wrappedCrosslinksAfterFilter;
-				wrappedLooplinks = wrappedLooplinksAfterFilter;
-			}
-			
-			//////////////////////////////////////////////////////////////////
-			///////////////////////////
-			///   Process Crosslinks and Looplinks to get annotations and sort.
-			
-			//              Process Crosslinks or Looplinks, depending on which page is being displayed
-			
-			List<SearchProteinCrosslink> crosslinks = null;
-			if ( ! Struts_Config_Parameter_Values_Constants.STRUTS__PARAMETER__CROSSLINK.equals( strutsActionMappingParameter ) ) {
-				//  NOT Crosslink page:    Struts config action mapping:    NOT parameter="crosslink"
-				//  Simply unwrap the crosslinks  
-				crosslinks = new ArrayList<>( wrappedCrosslinks.size() );
-				for ( SearchProteinCrosslinkWrapper searchProteinCrosslinkWrapper : wrappedCrosslinks ) {
-					crosslinks.add( searchProteinCrosslinkWrapper.getSearchProteinCrosslink() );
-				}
-			} else {
-				//	For  Struts config action mapping:     parameter="crosslink"
-				//  Order so:  ( protein_1 name < protein_2 name) or ( protein_1 name == protein_2 name and pos1 <= pos2 )
-				for ( SearchProteinCrosslinkWrapper searchProteinCrosslinkWrapper : wrappedCrosslinks ) {
-					SearchProteinCrosslink searchProteinCrosslink = searchProteinCrosslinkWrapper.getSearchProteinCrosslink();
-					int protein1CompareProtein2 = searchProteinCrosslink.getProtein1().getName().compareToIgnoreCase( searchProteinCrosslink.getProtein2().getName() );
-					if ( protein1CompareProtein2 > 0 
-							|| ( protein1CompareProtein2 == 0
-								&& searchProteinCrosslink.getProtein1Position() > searchProteinCrosslink.getProtein2Position() ) ) {
-						//  Protein_1 name > protein_2 name or ( Protein_1 name == protein_2 name and pos1 > pos2 )
-						//  so re-order
-						SearchProtein searchProteinTemp = searchProteinCrosslink.getProtein1();
-						searchProteinCrosslink.setProtein1( searchProteinCrosslink.getProtein2() );
-						searchProteinCrosslink.setProtein2( searchProteinTemp );
-						int linkPositionTemp = searchProteinCrosslink.getProtein1Position();
-						searchProteinCrosslink.setProtein1Position( searchProteinCrosslink.getProtein2Position() );
-						searchProteinCrosslink.setProtein2Position( linkPositionTemp );
-					}
-				}
-				//  Sort "wrappedCrosslinks" since removed ORDER BY from SQL
-				Collections.sort( wrappedCrosslinks, new Comparator<SearchProteinCrosslinkWrapper>() {
-					@Override
-					public int compare(SearchProteinCrosslinkWrapper o1,
-							SearchProteinCrosslinkWrapper o2) {
-						if ( o1.getSearchProteinCrosslink().getProtein1().getProteinSequenceVersionObject().getProteinSequenceVersionId()
-								!= o2.getSearchProteinCrosslink().getProtein1().getProteinSequenceVersionObject().getProteinSequenceVersionId() ) {
-							return o1.getSearchProteinCrosslink().getProtein1().getProteinSequenceVersionObject().getProteinSequenceVersionId() 
-									- o2.getSearchProteinCrosslink().getProtein1().getProteinSequenceVersionObject().getProteinSequenceVersionId();
-						}
-						if ( o1.getSearchProteinCrosslink().getProtein2().getProteinSequenceVersionObject().getProteinSequenceVersionId()
-								!= o2.getSearchProteinCrosslink().getProtein2().getProteinSequenceVersionObject().getProteinSequenceVersionId() ) {
-							return o1.getSearchProteinCrosslink().getProtein2().getProteinSequenceVersionObject().getProteinSequenceVersionId() 
-									- o2.getSearchProteinCrosslink().getProtein2().getProteinSequenceVersionObject().getProteinSequenceVersionId();
-						}
-						if ( o1.getSearchProteinCrosslink().getProtein1Position()
-								!= o2.getSearchProteinCrosslink().getProtein1Position() ) {
-							return o1.getSearchProteinCrosslink().getProtein1Position() 
-									- o2.getSearchProteinCrosslink().getProtein1Position();
-						}
-						return o1.getSearchProteinCrosslink().getProtein2Position() 
-								- o2.getSearchProteinCrosslink().getProtein2Position();
-					}
-				} );
-				////   Crosslinks  - Prepare for Web display
-				//      Get Annotation data and Sort by Annotation data
-				SrtOnBestAnnValsPopAnnValListsRetnTblHeadrsSinglSrchIdReslt sortCrosslinksResult =
-						SrtOnBestAnnValsPopAnnValListsRetnTblHeadrsSinglSrchId.getInstance()
-						.sortOnBestPeptideBestPSMAnnValuesPopulateAnnValueListsReturnTableHeadersSingleSearchId(
-								searchId, 
-								wrappedCrosslinks, 
-								peptideCutoffsAnnotationTypeDTOList, 
-								psmCutoffsAnnotationTypeDTOList );
-				request.setAttribute( "peptideAnnotationDisplayNameDescriptionList", sortCrosslinksResult.getPeptideAnnotationDisplayNameDescriptionList() );
-				request.setAttribute( "psmAnnotationDisplayNameDescriptionList", sortCrosslinksResult.getPsmAnnotationDisplayNameDescriptionList() );
-				crosslinks = new ArrayList<>( wrappedCrosslinks.size() );
-				//  Copy of out wrapper for processing below
-				for ( SearchProteinCrosslinkWrapper searchProteinCrosslinkWrapper : wrappedCrosslinks ) {
-					SearchProteinCrosslink searchProteinCrosslink = searchProteinCrosslinkWrapper.getSearchProteinCrosslink();
-					crosslinks.add( searchProteinCrosslink );
-				}
-			}
-			/////////////////////////////////////////////////////////////
-			//////////////////   Get Looplinks data
-			List<SearchProteinLooplink> looplinks = null;
-			if ( ! Struts_Config_Parameter_Values_Constants.STRUTS__PARAMETER__LOOPLINK.equals( strutsActionMappingParameter ) ) {
-				//  NOT Looplink page:    Struts config action mapping:    NOT parameter="looplink"
-				//  Simply unwrap the looplinks  
-				looplinks = new ArrayList<>( wrappedLooplinks.size() );
-				for ( SearchProteinLooplinkWrapper searchProteinLooplinkWrapper : wrappedLooplinks ) {
-					looplinks.add( searchProteinLooplinkWrapper.getSearchProteinLooplink() );
-				}
-			} else {
-				//	For  Struts config action mapping:     parameter="looplink"
-				////   Looplinks  - Prepare for Web display
-				//      Get Annotation data and Sort by Annotation data
-				looplinks = new ArrayList<>( wrappedLooplinks.size() );
-				Collections.sort( wrappedLooplinks, new Comparator<SearchProteinLooplinkWrapper>() {
-					@Override
-					public int compare(SearchProteinLooplinkWrapper o1,
-							SearchProteinLooplinkWrapper o2) {
-						if ( o1.getSearchProteinLooplink().getProtein().getProteinSequenceVersionObject().getProteinSequenceVersionId()
-								!= o2.getSearchProteinLooplink().getProtein().getProteinSequenceVersionObject().getProteinSequenceVersionId() ) {
-							return o1.getSearchProteinLooplink().getProtein().getProteinSequenceVersionObject().getProteinSequenceVersionId() 
-									- o2.getSearchProteinLooplink().getProtein().getProteinSequenceVersionObject().getProteinSequenceVersionId();
-						}
-						if ( o1.getSearchProteinLooplink().getProteinPosition1()
-								!= o2.getSearchProteinLooplink().getProteinPosition1() ) {
-							return o1.getSearchProteinLooplink().getProteinPosition1() 
-									- o2.getSearchProteinLooplink().getProteinPosition1();
-						}
-						return o1.getSearchProteinLooplink().getProteinPosition2() 
-								- o2.getSearchProteinLooplink().getProteinPosition2();
-					}
-				} );
-				//      Get Annotation data and Sort by Annotation data
-				SrtOnBestAnnValsPopAnnValListsRetnTblHeadrsSinglSrchIdReslt sortLooplinksResult =
-						SrtOnBestAnnValsPopAnnValListsRetnTblHeadrsSinglSrchId.getInstance()
-						.sortOnBestPeptideBestPSMAnnValuesPopulateAnnValueListsReturnTableHeadersSingleSearchId(
-								searchId, 
-								wrappedLooplinks, 
-								peptideCutoffsAnnotationTypeDTOList, 
-								psmCutoffsAnnotationTypeDTOList );
-				request.setAttribute( "peptideAnnotationDisplayNameDescriptionList", sortLooplinksResult.getPeptideAnnotationDisplayNameDescriptionList() );
-				request.setAttribute( "psmAnnotationDisplayNameDescriptionList", sortLooplinksResult.getPsmAnnotationDisplayNameDescriptionList() );
-				/////////////////////////////////
-				//  Copy of out wrapper for output
-				for ( SearchProteinLooplinkWrapper searchProteinLooplinkWrapper : wrappedLooplinks ) {
-					SearchProteinLooplink searchProteinLooplink = searchProteinLooplinkWrapper.getSearchProteinLooplink();
-					looplinks.add( searchProteinLooplink );
-				}
-			}			
-			///////////////////////////////////////////////////////
-			Collection<SearchProtein> prProteins2 = new HashSet<SearchProtein>();
-			prProteins2.addAll( prProteins );
-			// build a collection of protein IDs to include
-			for( SearchProtein prp : prProteins2 ) {
-				// did they request removal of certain taxonomy IDs?
-				if( proteinQueryJSONRoot.getExcludeTaxonomy() != null && proteinQueryJSONRoot.getExcludeTaxonomy().length > 0 ) {
-					boolean excludeOnProtein =
-							ExcludeOnTaxonomyForProteinSequenceVersionIdSearchId.getInstance()
-							.excludeOnTaxonomyForProteinSequenceVersionIdSearchId( 
-									excludeTaxonomy_Ids_Set_UserInput, 
-									prp.getProteinSequenceVersionObject(), 
-									searchId );
-					if ( excludeOnProtein ) {
-						prProteins.remove( prp );
-					}
-//					for( int taxonomyIdToExclude : proteinQueryJSONRoot.getExcludeTaxonomy() ) {
-//						
-//						if( taxonomyIdToExclude == prp.getProteinSequenceVersionObject().getTaxonomyId() ) {
-//							prProteins.remove( prp );
-//							break;
-//						}
-//					}
-				}
-			}
-			List<SearchProtein> sortedProteins = new ArrayList<SearchProtein>();
-			sortedProteins.addAll( prProteins );
-			Collections.sort( sortedProteins, new SortSearchProtein() );
-			request.setAttribute( "proteins", sortedProteins );
-			request.setAttribute( "numCrosslinks", crosslinks.size() );
-			int numDistinctLinks =  XLinkWebAppUtils.getNumUDRs( crosslinks, looplinks );
-			request.setAttribute( "numLooplinks", looplinks.size() );
-			request.setAttribute( "numLinks", looplinks.size() + crosslinks.size() );
-			request.setAttribute( "numDistinctLinks", numDistinctLinks );
-			request.setAttribute( "crosslinks", crosslinks );
-			request.setAttribute( "looplinks", looplinks );
 			/////////////////////
 			//  clear out form so value doesn't go back on the page in the form
 			form.setQueryJSON( "" );

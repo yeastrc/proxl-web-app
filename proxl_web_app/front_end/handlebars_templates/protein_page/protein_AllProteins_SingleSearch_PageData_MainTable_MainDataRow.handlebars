@@ -1,0 +1,43 @@
+{{!-- protein_AllProteins_SingleSearch_PageData_MainTable_MainDataRow.handlebars in 'protein_page' 
+
+	Protein AllProteins Page Single Search - Main Table - Main Data Row
+	
+    The actual peptide entry is in the property 'proteinEntry'.
+
+    The Root of data returned from webservice is in the property 'viewSearchProteinsPageDataRoot'.
+--}}
+
+<tr id="{{ proteinEntry.proteinSequenceVersionId }}"
+    style="cursor: pointer; "
+    
+    onclick="viewReportedPeptidesForProteinAllLoadedFromWebServiceTemplate.showHideReportedPeptides( { clickedElement : this })"
+    data-project_search_id="{{ viewSearchProteinsPageDataRoot.projectSearchId }}"
+    data-protein_id="{{ proteinEntry.proteinSequenceVersionId }}"
+    >
+    <td><span class="proteinName" id="{{ proteinEntry.proteinSequenceVersionId }}">{{ proteinEntry.proteinName }}</span></td>
+    <td class="integer-number-column">{{ proteinEntry.numPsms }}</td>
+						
+    <td class="integer-number-column"><a class="show-child-data-link   " 
+            href="javascript:"
+            >{{ proteinEntry.numPeptides }}<span class="toggle_visibility_expansion_span_jq" 
+                    ><img src="images/icon-expand-small.png" 
+                        class=" icon-expand-contract-in-data-table "
+                        ></span><span class="toggle_visibility_contraction_span_jq" 
+                            style="display: none;" 
+                            ><img src="images/icon-collapse-small.png"
+                                class=" icon-expand-contract-in-data-table "
+                                ></span>
+        </a>
+    </td>								
+    
+    <td class="integer-number-column">{{ proteinEntry.numUniquePeptides }}</td>
+			
+    {{#each proteinEntry.peptideAnnotationValueList as |annotationValue| }}
+
+        <td style="white-space: nowrap">{{ annotationValue }}</td>
+    {{/each}}								
+    
+    {{#each proteinEntry.psmAnnotationValueList as |annotationValue| }}
+        <td>{{ annotationValue }}</td>
+    {{/each}}
+</tr>

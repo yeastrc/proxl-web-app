@@ -1,0 +1,21 @@
+{{!-- mergedPages_SearchesList_NO_VennDiagram_AboveMainDataTable.handlebars in 'merged_pages_shared' 
+
+	Merged Pages:  Searches (search ids and counts) list and NO Venn Diagram above Main Data Table
+	
+--}}
+
+
+<div style="margin-top: 5px;">	
+
+    {{#each searchCounts as |searchCount| }}
+		<span class=" searches_sort_list_item_jq " style="white-space: nowrap;  padding-right: 20px;"
+	  	    data-project_search_id="${ searchCount.projectSearchId }">
+				<span style="margin-right: 10px; padding-left: 10px; padding-right: 10px;" 
+					class=" merged-search-search-background-color-{{ searchCount.colorIndex_OneBased }} "
+					></span>
+			    (Search {{ searchCount.searchId }}: {{ searchCount.count }})
+		 </span>
+
+    {{/each}}
+
+</div>

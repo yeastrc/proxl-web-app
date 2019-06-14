@@ -20,8 +20,10 @@ import { viewPsmsLoadedFromWebServiceTemplate } from 'page_js/data_pages/project
 import { searchesChangeDisplayOrder } from 'page_js/data_pages/project_search_ids_driven_pages/common/searchesChangeDisplayOrder.js';
 import { searchesForPageChooser } from 'page_js/data_pages/project_search_ids_driven_pages/common/searchesForPageChooser.js';
 import { sharePageURLShortener  } from 'page_js/data_pages/project_search_ids_driven_pages/common/sharePageURLShortener.js';
-import { addSingleTooltipForProteinName } from 'page_js/data_pages/project_search_ids_driven_pages/common/createTooltipForProteinNames.js';
+import { createTooltipForProteinNames } from 'page_js/data_pages/project_search_ids_driven_pages/common/createTooltipForProteinNames.js';
 import { defaultPageView } from 'page_js/data_pages/project_search_ids_driven_pages/common/defaultPageView.js';
+
+import { getProjectSearchIdSearchIdPairsInDisplayOrder, getProjectSearchIdsInDisplayOrder } from 'page_js/data_pages/project_search_ids_driven_pages/common/getProjectSearchIdSearchIdPairsInDisplayOrder.js';
 
 import { DataPages_LoggedInUser_CommonObjectsFactory } from 'page_js/data_pages/data_pages_common/dataPages_LoggedInUser_CommonObjectsFactory.js';
 
@@ -33,13 +35,10 @@ import { cutoffProcessingCommonCode } from 'page_js/data_pages/project_search_id
 import { webserviceDataParamsDistributionCommonCode } from 'page_js/data_pages/project_search_ids_driven_pages/common/webserviceDataParamsDistribution.js';
 
 
+import { PeptidePageData_SingleSearch_FromWebservice } from './peptidePageData_SingleSearch_FromWebservice.js';
 
-///////
-$(document).ready(function() { 
-	setTimeout( function() { // put in setTimeout so if it fails it doesn't kill anything else
-		$("#crosslink-table").tablesorter(); // gets exception if there are no data rows
-	},10);
-} ); // end $(document).ready(function() 
+//   Code in peptidePageDataFromWebservice.js handles loading and displaying of main data table
+
 
 //  Constructor
 var ViewSearchPeptidePageCode = function() {
@@ -52,12 +51,20 @@ var ViewSearchPeptidePageCode = function() {
 	var _query_json_field_String = null;
 
 	//////////////
-	//  function called after all HTML above main table is generated, called from inline script on page
-	this.createPartsAboveMainTable = function() {
+	//  function called from $(document).ready(function() { ... }
+	this.initialize = function() {
 		var objectThis = this;
+
+		//  External Function:
+		const projectSearchIdsInDisplayOrder_FromPage = getProjectSearchIdsInDisplayOrder();
+
+		const projectSearchId = projectSearchIdsInDisplayOrder_FromPage[ 0 ];
+
+		this._peptidePageData_SingleSearch_FromWebservice = new PeptidePageData_SingleSearch_FromWebservice();
+		
 		setTimeout( function() { // put in setTimeout so if it fails it doesn't kill anything else
 			try {
-				objectThis.get_query_json_field_ContentsFromHiddenField();
+				objectThis.process_query_json_field_ContentsFromHiddenField({ projectSearchId });
 			} catch( e ) {
 				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
 				throw e;
@@ -71,6 +78,7 @@ var ViewSearchPeptidePageCode = function() {
 				throw e;
 			}
 		},11);
+
 	};
 
 	//////////////
@@ -85,7 +93,7 @@ var ViewSearchPeptidePageCode = function() {
 	};
 
 	//////////////
-	this.get_query_json_field_ContentsFromHiddenField = function() {
+	this.process_query_json_field_ContentsFromHiddenField = function({ projectSearchId }) {
 		var query_json_field_outside_form_id = "query_json_field_outside_form";
 		var $query_json_field =  $( "#" + query_json_field_outside_form_id );
 		if ( $query_json_field.length === 0 ) {
@@ -97,6 +105,11 @@ var ViewSearchPeptidePageCode = function() {
 		} catch( e ) {
 			throw Error( "Failed to parse JSON from HTML field with id 'query_json_field'.  JSON String: " + _query_json_field_String );
 		}
+
+		//  Initialize code that will populate the main Table of data on the page
+		
+		this._peptidePageData_SingleSearch_FromWebservice.initialize({ projectSearchId, peptideQueryJSONRoot : _query_json_field_Contents });
+
 		
 		cutoffProcessingCommonCode.putCutoffsOnThePage(  { cutoffs : _query_json_field_Contents.cutoffs } );
 		
@@ -284,7 +297,19 @@ var ViewSearchPeptidePageCode = function() {
 };
 
 // Instance of class
-window.viewSearchPeptidePageCode = new ViewSearchPeptidePageCode();
+const viewSearchPeptidePageCode = new ViewSearchPeptidePageCode();
+
+
+window.viewSearchPeptidePageCode = viewSearchPeptidePageCode;
 
 // Copy to standard page level JS Code Object
 window.standardFullPageCode = window.viewSearchPeptidePageCode;
+
+
+
+///////
+$(document).ready(function() { 
+	setTimeout( function() { // put in setTimeout so if it fails it doesn't kill anything else
+		viewSearchPeptidePageCode.initialize();
+	},10);
+} ); // end $(document).ready(function() 

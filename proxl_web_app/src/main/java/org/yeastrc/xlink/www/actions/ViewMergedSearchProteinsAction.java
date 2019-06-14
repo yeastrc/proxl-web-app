@@ -9,46 +9,34 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.apache.commons.lang.mutable.MutableInt;
 import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.yeastrc.xlink.www.dao.SearchDAO;
-import org.yeastrc.xlink.www.objects.ProteinSequenceVersionObject;
 import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.www.nav_links_image_structure.PopulateRequestDataForImageAndStructureAndQC_NavLinks;
 import org.yeastrc.xlink.www.access_control.result_objects.WebSessionAuthAccessLevel;
-import org.yeastrc.xlink.www.objects.IMergedSearchLink;
-import org.yeastrc.xlink.www.objects.MergedSearchProtein;
-import org.yeastrc.xlink.www.objects.MergedSearchProteinCrosslink;
-import org.yeastrc.xlink.www.objects.MergedSearchProteinLooplink;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
-import org.yeastrc.xlink.www.actions.ProteinsMergedCommonPageDownload.ProteinsMergedCommonPageDownloadResult;
 import org.yeastrc.xlink.www.constants.StrutsGlobalForwardNames;
-import org.yeastrc.xlink.www.constants.Struts_Config_Parameter_Values_Constants;
 import org.yeastrc.xlink.www.constants.WebConstants;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
+import org.yeastrc.xlink.www.form_query_json_objects.ProteinQueryJSONRoot;
+import org.yeastrc.xlink.www.form_utils.GetProteinQueryJSONRootFromFormData;
 import org.yeastrc.xlink.www.forms.MergedSearchViewProteinsForm;
 import org.yeastrc.xlink.www.forms.PeptideProteinCommonForm;
-import org.yeastrc.xlink.www.objects.SearchCount;
-import org.yeastrc.xlink.www.objects.VennDiagramDataToJSON;
 import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result;
 import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId;
 import org.yeastrc.xlink.www.web_utils.ExcludeLinksWith_Remove_NonUniquePSMs_Checkbox_PopRequestItems;
-import org.yeastrc.xlink.www.web_utils.ExcludeOnTaxonomyForProteinSequenceVersionIdSearchId;
-import org.yeastrc.xlink.www.web_utils.GenerateVennDiagramDataToJSON;
 import org.yeastrc.xlink.www.web_utils.GetAnnotationDisplayUserSelectionDetailsData;
 import org.yeastrc.xlink.www.web_utils.GetPageHeaderData;
 import org.yeastrc.xlink.www.web_utils.GetSearchDetailsData;
 import org.yeastrc.xlink.www.web_utils.IsShowDownloadLinks_Skyline_SetRequestParameters;
+import org.yeastrc.xlink.www.web_utils.ProjectSearchIdsSearchIds_SetRequestParameter;
 import org.yeastrc.xlink.www.web_utils.ProteinListingTooltipConfigUtil;
-import org.yeastrc.xlink.www.web_utils.TaxonomiesForSearchOrSearches;
-import org.yeastrc.xlink.www.web_utils.XLinkWebAppUtils;
 import org.yeastrc.xlink.www.webapp_timing.WebappTiming;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -70,9 +58,13 @@ public class ViewMergedSearchProteinsAction extends Action {
 			HttpServletRequest request,
 			HttpServletResponse response )	throws Exception {
 		
+		//  NO LONGER USED
 		//  Detect which Struts action mapping was called by examining the value of the "parameter" attribute
 		//     accessed by calling mapping.getParameter()
-		String strutsActionMappingParameter = mapping.getParameter();
+		// String strutsActionMappingParameter = mapping.getParameter();
+		
+		request.setAttribute( "queryString", request.getQueryString() );
+		
 		WebappTiming webappTiming = null;
 		if ( log.isDebugEnabled() ) {
 			webappTiming = WebappTiming.getInstance( log );
@@ -142,7 +134,8 @@ public class ViewMergedSearchProteinsAction extends Action {
 
 			List<SearchDTO> searches = new ArrayList<SearchDTO>( projectSearchIdsListDeduppedSorted.size() );
 			Map<Integer, SearchDTO> searchesMapOnSearchId = new HashMap<>();
-			Collection<Integer> searchIds = new HashSet<>();
+			Collection<Integer> searchIdsSet = new HashSet<>();
+			Map<Integer,Integer> mapProjectSearchIdToSearchId = new HashMap<>();
 			int[] searchIdsArray = new int[ projectSearchIdsListDeduppedSorted.size() ];
 			int searchIdsArrayIndex = 0;
 			for ( int projectSearchId : projectSearchIdsFromForm ) {
@@ -159,7 +152,8 @@ public class ViewMergedSearchProteinsAction extends Action {
 					}
 					searches.add( search );
 					searchesMapOnSearchId.put( search.getSearchId(), search );
-					searchIds.add( search.getSearchId() );
+					searchIdsSet.add( search.getSearchId() );
+					mapProjectSearchIdToSearchId.put( projectSearchId, search.getSearchId() );
 					searchIdsArray[ searchIdsArrayIndex ] = search.getSearchId();
 					searchIdsArrayIndex++;
 				}
@@ -176,178 +170,51 @@ public class ViewMergedSearchProteinsAction extends Action {
 				});
 			}
 			
+			request.setAttribute( "searches", searches );
+
 			//  Populate request objects for Standard Header Display
 			GetPageHeaderData.getInstance().getPageHeaderDataWithProjectId( projectId, request );
 			//  Populate request objects for Protein Name Tooltip JS
 			ProteinListingTooltipConfigUtil.getInstance().putProteinListingTooltipConfigForPage( projectSearchIdsSet, request );
 
-			GetSearchDetailsData.SearchesAreUserSorted searchesAreUserSorted  = GetSearchDetailsData.SearchesAreUserSorted.NO;
-			if ( PeptideProteinCommonForm.DO_NOT_SORT_PROJECT_SEARCH_IDS_YES.equals( form.getDs() ) ) {
-				searchesAreUserSorted  = GetSearchDetailsData.SearchesAreUserSorted.YES;
+			{
+				ProjectSearchIdsSearchIds_SetRequestParameter.SearchesAreUserSorted searchesAreUserSorted  = ProjectSearchIdsSearchIds_SetRequestParameter.SearchesAreUserSorted.NO;
+				if ( PeptideProteinCommonForm.DO_NOT_SORT_PROJECT_SEARCH_IDS_YES.equals( form.getDs() ) ) {
+					searchesAreUserSorted  = ProjectSearchIdsSearchIds_SetRequestParameter.SearchesAreUserSorted.YES;
+				}
+				//  Populate request objects for Project Search Id / Search Id pairs in display order in JSON on Page for Javascript
+				ProjectSearchIdsSearchIds_SetRequestParameter.getSingletonInstance().populateProjectSearchIdsSearchIds_SetRequestParameter( searches, searchesAreUserSorted, request );
 			}
-			//  Populate request objects for Standard Search Display
-			GetSearchDetailsData.getInstance().getSearchDetailsData( searches, searchesAreUserSorted, request );
-
+			{
+				GetSearchDetailsData.SearchesAreUserSorted searchesAreUserSorted  = GetSearchDetailsData.SearchesAreUserSorted.NO;
+				if ( PeptideProteinCommonForm.DO_NOT_SORT_PROJECT_SEARCH_IDS_YES.equals( form.getDs() ) ) {
+					searchesAreUserSorted  = GetSearchDetailsData.SearchesAreUserSorted.YES;
+				}
+				//  Populate request objects for Standard Search Display
+				GetSearchDetailsData.getInstance().getSearchDetailsData( searches, searchesAreUserSorted, request );
+			}
+			
 			//  Populate request objects for User Selection of Annotation Data Display
 			GetAnnotationDisplayUserSelectionDetailsData.getInstance().getSearchDetailsData( searches, request );
 			//  Populate request objects for excludeLinksWith_Remove_NonUniquePSMs_Checkbox_Fragment.jsp
 			ExcludeLinksWith_Remove_NonUniquePSMs_Checkbox_PopRequestItems.getInstance().excludeLinksWith_Remove_NonUniquePSMs_Checkbox_PopRequestItems( searches, request );
 
 			//  Populates request attribute
-			IsShowDownloadLinks_Skyline_SetRequestParameters.getInstance().isShowDownloadLinks_Skyline_SetRequestParameters( searchIds, request );
+			IsShowDownloadLinks_Skyline_SetRequestParameters.getInstance().isShowDownloadLinks_Skyline_SetRequestParameters( searchIdsSet, request );
 			
-			///////////////
-			// build list of taxonomies to show in exclusion list
-			//    puts Map<Integer, String> into request attribute where key is taxonomy id, value is taxonomy name
-			Map<Integer, String> taxonomies = 
-					TaxonomiesForSearchOrSearches.getInstance().getTaxonomiesForSearchIds( searchIds );
-			request.setAttribute("taxonomies", taxonomies );
-			if ( webappTiming != null ) {
-				webappTiming.markPoint( "After Taxonomy Searcher:  SearchTaxonomySearcher.getInstance().getTaxonomies( search )" );
-			}
-			ProteinsMergedCommonPageDownload.ForCrosslinksOrLooplinkOrBoth forCrosslinksOrLooplinkOrBoth = null;
-			if ( Struts_Config_Parameter_Values_Constants.STRUTS__PARAMETER__CROSSLINK.equals( strutsActionMappingParameter ) ) {
-				forCrosslinksOrLooplinkOrBoth = ProteinsMergedCommonPageDownload.ForCrosslinksOrLooplinkOrBoth.CROSSLINKS;
-			} else if ( Struts_Config_Parameter_Values_Constants.STRUTS__PARAMETER__LOOPLINK.equals( strutsActionMappingParameter ) ) {
-				forCrosslinksOrLooplinkOrBoth = ProteinsMergedCommonPageDownload.ForCrosslinksOrLooplinkOrBoth.LOOPLINKS;
-			} else {
-				String msg = "Struts Config Parameter value is not valid: " + strutsActionMappingParameter;
-				log.error( msg );
-				throw new Exception( msg );
-			}
 			
-			//  Get Merged Proteins, crosslink and looplink
-			ProteinsMergedCommonPageDownloadResult proteinsMergedCommonPageDownloadResult =
-					ProteinsMergedCommonPageDownload.getInstance()
-					.getCrosslinksAndLooplinkWrapped(
-							form,
-							forCrosslinksOrLooplinkOrBoth,
-							projectSearchIdsListDeduppedSorted,
-							searches,
-							searchesMapOnSearchId  );
-			if ( webappTiming != null ) {
-				webappTiming.markPoint( "ProteinsMergedCommonPageDownload.getCrosslinksAndLooplinkWrapped()" );
-			}
-			request.setAttribute( "peptidePsmAnnotationNameDescListsForEachSearch", proteinsMergedCommonPageDownloadResult.getPeptidePsmAnnotationNameDescListsForEachSearch() );
-			request.setAttribute( "looplinks", proteinsMergedCommonPageDownloadResult.getWrappedLoopLinks() );
-			request.setAttribute( "crosslinks", proteinsMergedCommonPageDownloadResult.getWrappedCrossLinks() );
-			List<MergedSearchProteinCrosslink> crosslinks = proteinsMergedCommonPageDownloadResult.getCrosslinks();
-			List<MergedSearchProteinLooplink> looplinks = proteinsMergedCommonPageDownloadResult.getLooplinks();
-			/////////////////////
-			// all possible proteins for Crosslinks and Looplinks across all searches (for "Exclude Protein" list on web page)
-			Map<Integer,Set<Integer>> allProteinsExcludeProteinSelectOnWebPageKeyProteinIdValueSearchIds = 
-					proteinsMergedCommonPageDownloadResult.getAllProteinsExcludeProteinSelectOnWebPageKeyProteinIdValueSearchIds();
-			//////////////////////////////
-			//////    Process list of all proteins for Crosslinks and Looplinks (before filtering)
-			/////                 List used for "Exclude Protein" list on web page
-			List<MergedSearchProtein> allProteinsForCrosslinksAndLooplinksUnfilteredList = new ArrayList<>( allProteinsExcludeProteinSelectOnWebPageKeyProteinIdValueSearchIds.size() );
-			for ( Map.Entry<Integer, Set<Integer>> entry : allProteinsExcludeProteinSelectOnWebPageKeyProteinIdValueSearchIds.entrySet() ) {
-				Integer proteinId = entry.getKey();
-				Set<Integer> searchIdsForProtein = entry.getValue();
-				List<SearchDTO> searchesForProtein = new ArrayList<>( searchIdsForProtein.size() );
-				for ( Integer searchIdForProtein : searchIdsForProtein ) {
-					SearchDTO searchForProtein = searchesMapOnSearchId.get( searchIdForProtein );
-					if ( searchForProtein == null ) {
-						String msg = "Processing searchIdsForProtein, no search found in searchesMapOnId for searchIdForProtein : " + searchIdForProtein;
-						log.error( msg );
-						throw new ProxlWebappDataException( msg );
-					}
-					searchesForProtein.add(searchForProtein);
-				}
-				ProteinSequenceVersionObject ProteinSequenceObject = new ProteinSequenceVersionObject();
-				ProteinSequenceObject.setProteinSequenceVersionId( proteinId );
-				MergedSearchProtein mergedSearchProtein = new MergedSearchProtein( searchesForProtein, ProteinSequenceObject );
-				//  Exclude protein if excluded for all searches
-				boolean excludeTaxonomyIdAllSearches = true;
-				for ( SearchDTO searchDTO : searchesForProtein ) {
-					boolean excludeOnProtein =
-							ExcludeOnTaxonomyForProteinSequenceVersionIdSearchId.getInstance()
-							.excludeOnTaxonomyForProteinSequenceVersionIdSearchId( 
-									proteinsMergedCommonPageDownloadResult.getExcludeTaxonomy_Ids_Set_UserInput(), 
-									mergedSearchProtein.getProteinSequenceVersionObject(), 
-									searchDTO.getSearchId() );
-					if ( ! excludeOnProtein ) {
-						excludeTaxonomyIdAllSearches = false;
-						break;
-					}
-				}
-				if ( excludeTaxonomyIdAllSearches ) {
-					//////////  Taxonomy Id in list of excluded taxonomy ids so drop the record
-					continue;  //   EARLY Continue
-				}
-//				int mergedSearchProteinTaxonomyId = mergedSearchProtein.getProteinSequenceVersionObject().getTaxonomyId(); 
-//
-//				if ( proteinsMergedCommonPageDownloadResult.getExcludeTaxonomy_Ids_Set_UserInput().contains( mergedSearchProteinTaxonomyId ) ) {
-//					
-//					//////////  Taxonomy Id in list of excluded taxonomy ids so drop the record
-//					
-//					continue;  //   EARLY Continue
-//				}
-				allProteinsForCrosslinksAndLooplinksUnfilteredList.add( mergedSearchProtein );
-			}
-			Collections.sort( allProteinsForCrosslinksAndLooplinksUnfilteredList, new SortMergedSearchProtein() );
-			request.setAttribute( "allProteinsForCrosslinksAndLooplinksUnfilteredList", allProteinsForCrosslinksAndLooplinksUnfilteredList );
-			request.setAttribute( "numCrosslinks", crosslinks.size() );
-			request.setAttribute( "numLooplinks", looplinks.size() );
-			request.setAttribute( "numLinks", looplinks.size() + crosslinks.size() );
-			request.setAttribute( "queryString", request.getQueryString() );
-			request.setAttribute( "searches", searches );
-			request.setAttribute( "numDistinctLinks",  XLinkWebAppUtils.getNumUDRs( crosslinks, looplinks ) );
-			///////////////////////////
-			//   These next parts ... as specified by whether crosslinks or looplinks is copied into linksCrosslinksOrLoopLinks
-			List<? extends IMergedSearchLink> linksCrosslinksOrLoopLinks = null;
-			// For  Struts config action mapping:     parameter="crosslink"
-			if ( Struts_Config_Parameter_Values_Constants.STRUTS__PARAMETER__CROSSLINK.equals( strutsActionMappingParameter ) ) {
-				linksCrosslinksOrLoopLinks = crosslinks;
-			} else 
-				//  Struts config action mapping:     parameter="looplink"
-				if ( Struts_Config_Parameter_Values_Constants.STRUTS__PARAMETER__LOOPLINK.equals( strutsActionMappingParameter ) ) {
-					linksCrosslinksOrLoopLinks = looplinks;
-				} else {
-					String msg = "Value for Struts Action 'parameter' attribute is not recognized. Value is: " + strutsActionMappingParameter;
-					log.error( msg );
-					throw new Exception(msg);
-				}
-			VennDiagramDataToJSON vennDiagramDataToJSON =
-					GenerateVennDiagramDataToJSON.createVennDiagramDataToJSON( linksCrosslinksOrLoopLinks, searches );
-			if ( vennDiagramDataToJSON != null ) {
-				String vennDiagramDataToJSONString = jacksonJSON_Mapper.writeValueAsString( vennDiagramDataToJSON );
-				request.setAttribute( "vennDiagramDataToJSON", vennDiagramDataToJSONString );
-			}
-			//////////////////////////////////////////////
-			// get the counts for the number of links for each search, save to map, save to request
-			//  Temp Map searchCounts to use in next step
-			Map<Integer, MutableInt> searchCounts = new TreeMap<Integer, MutableInt>();
-			//  Populate Temp Map  searchCounts
-			for( IMergedSearchLink link : linksCrosslinksOrLoopLinks ) {
-				for( SearchDTO search : link.getSearches() ) {
-					Integer searchId = search.getSearchId();
-					MutableInt searchCount = searchCounts.get( searchId );
-					if ( searchCount == null ) {
-						searchCount = new MutableInt( 1 );
-						searchCounts.put( searchId, searchCount );
-					} else {
-						searchCount.increment();
-					}
-				}
-			}
-			//   Take values in Temp Map searchCounts and put them in a list in Search Id order with Search Data
-			List<SearchCount> SearchCountList = new ArrayList<>();
-			for ( SearchDTO search : searches  ) {
-				Integer searchId = search.getSearchId();
-				MutableInt searchCountMapValue = searchCounts.get( searchId );
-				SearchCount searchCount = new SearchCount();
-				SearchCountList.add(searchCount);
-				searchCount.setSearchId( searchId );
-				searchCount.setProjectSearchId( search.getProjectSearchId() );
-				if ( searchCountMapValue != null ) {
-					searchCount.setCount( searchCountMapValue.intValue() );
-				} else {
-					searchCount.setCount( 0 );
-				}
-			}
-			request.setAttribute( "searchCounts", SearchCountList );
-			// get the counts for the number of links for each search, save to map, save to request
+
+			//   Get Query JSON from the form and if not empty, deserialize it
+			ProteinQueryJSONRoot proteinQueryJSONRoot = 
+					GetProteinQueryJSONRootFromFormData.getInstance()
+					.getProteinQueryJSONRootFromFormData( form, projectSearchIdsSet, searchIdsSet, mapProjectSearchIdToSearchId );
+			
+			//  Convert the protein sequence ids that come from the JS code to standard integers and put
+			//   in the property excludeproteinSequenceVersionIds.
+			//      Do this here since may have to convert old NRSeqProteinIds.
+			ProteinsMergedProteinsCommon.getInstance().processExcludeproteinSequenceVersionIdsFromJS( proteinQueryJSONRoot );
+			
+			
 			//////////////////////////////////////////////
 			/////////////////////
 			//  clear out form so value doesn't go back on the page in the form
@@ -356,7 +223,7 @@ public class ViewMergedSearchProteinsAction extends Action {
 			////  Put Updated queryJSON on the page
 			{
 				try {
-					String queryJSONToPage = jacksonJSON_Mapper.writeValueAsString( proteinsMergedCommonPageDownloadResult.getProteinQueryJSONRoot() );
+					String queryJSONToPage = jacksonJSON_Mapper.writeValueAsString( proteinQueryJSONRoot );
 					//  Set queryJSON in request attribute to put on page outside of form
 					request.setAttribute( "queryJSONToForm", queryJSONToPage );
 				} catch ( JsonProcessingException e ) {
@@ -371,11 +238,13 @@ public class ViewMergedSearchProteinsAction extends Action {
 			}
 			//  Create data for Links for Image and Structure pages and put in request
 			PopulateRequestDataForImageAndStructureAndQC_NavLinks.getInstance()
-			.populateRequestDataForImageAndStructureNavLinksForProtein( proteinsMergedCommonPageDownloadResult.getProteinQueryJSONRoot(), projectId, authAccessLevel, form, request );
+			.populateRequestDataForImageAndStructureNavLinksForProtein( proteinQueryJSONRoot, projectId, authAccessLevel, form, request );
 			if ( webappTiming != null ) {
 				webappTiming.markPoint( "Before send to JSP" );
 			}
+			
 			return mapping.findForward( "Success" );
+			
 		} catch ( ProxlWebappDataException e ) {
 			String msg = "Exception processing request data";
 			log.error( msg, e );
@@ -386,16 +255,5 @@ public class ViewMergedSearchProteinsAction extends Action {
 			throw e;
 		}
 	}
-	/////////////////////////////////////////////////
-	private class SortMergedSearchProtein implements Comparator<MergedSearchProtein> {
-		@Override
-		public int compare(MergedSearchProtein o1, MergedSearchProtein o2) {
-			try { 
-				return o1.getNameLowerCase().compareTo(o2.getNameLowerCase()); 
-			}
-			catch( Exception e ) { 
-				return 0; 
-			}
-		}
-	}
+
 }

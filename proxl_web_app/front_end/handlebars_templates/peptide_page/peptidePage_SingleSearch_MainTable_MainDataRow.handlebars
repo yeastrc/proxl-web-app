@@ -1,0 +1,78 @@
+{{!-- peptidePage_SingleSearch_MainTable_MainDataRow.handlebars in 'peptide_page' 
+
+	Peptide Page Single Search - Main Table - Main Data Row
+	
+    The actual peptide entry is in the property 'peptideEntry'.
+
+    The Root of data returned from webservice is in the property 'viewSearchPeptidesPageDataRoot'.
+--}}
+
+<tr id="reported-peptide-{{ peptideEntry.reportedPeptide.id }}"
+    style="cursor: pointer; "
+    onclick="viewPsmsLoadedFromWebServiceTemplate.showHidePsms( { clickedElement : this } )"
+    data-reported_peptide_id="{{ peptideEntry.reportedPeptide.id }}"
+    data-project_search_id="{{ viewSearchPeptidesPageDataRoot.projectSearchId }}"
+    >
+
+    <td>{{ peptideEntry.linkType }}</td>
+    <td>{{ peptideEntry.reportedPeptide.sequence }}</td>
+    <td>{{ peptideEntry.peptide1.sequence }}</td>
+    <td class="integer-number-column" >{{ peptideEntry.peptide1Position }}</td>
+    <td>{{#if  peptideEntry.peptide2 }}{{ peptideEntry.peptide2.sequence }}{{/if}}</td>
+    <td class="integer-number-column" >{{ peptideEntry.peptide2Position }}</td>
+    <td>
+        {{#if peptideEntry.peptide1ProteinPositions }}
+        {{#each peptideEntry.peptide1ProteinPositions as |pp| }}
+            <span class="proteinName" id="protein-id-{{ pp.proteinSequenceVersionId }}">
+                {{ pp.proteinName 
+                    }}({{#if  pp.position1 }}{{ pp.position1 
+                        }}{{#if pp.position2 
+                        }}, {{ pp.position2 }}{{/if}}){{/if}}<br>
+            </span>
+        {{/each}}
+        {{/if}}
+    </td>
+    <td>
+        {{#if peptideEntry.peptide2ProteinPositions }}
+        {{#each peptideEntry.peptide2ProteinPositions as |pp| }}
+            <span class="proteinName" id="protein-id-{{ pp.proteinSequenceVersionId }}">
+                {{ pp.proteinName 
+                    }}({{#if  pp.position1 }}{{ pp.position1 
+                        }}{{#if pp.position2 
+                        }}, {{ pp.position2 }}{{/if}}){{/if}}<br>
+            </span>
+        {{/each}}
+        {{/if}}
+    </td>
+
+    {{#each peptideEntry.peptideAnnotationValueList as |annotationValue| }}
+
+        <td style="white-space: nowrap">{{ annotationValue }}</td>
+    {{/each}}								
+    
+
+    <td class="integer-number-column" ><a class="show-child-data-link  " 
+            href="javascript:"
+
+            >{{ peptideEntry.numPsms 
+            }}<span class="toggle_visibility_expansion_span_jq" 
+                    ><img src="images/icon-expand-small.png" 
+                        class=" icon-expand-contract-in-data-table "
+                        ></span><span class="toggle_visibility_contraction_span_jq" 
+                            style="display: none;" 
+                            ><img src="images/icon-collapse-small.png"
+                                class=" icon-expand-contract-in-data-table "
+                                ></span>
+        </a>
+    </td>
+
+    {{#if viewSearchPeptidesPageDataRoot.showNumberUniquePSMs }}
+        <td class="integer-number-column {{#if numNonUniquePsmsNotZero }} highlight-cell {{/if}}" 
+            >{{ peptideEntry.numNonUniquePsms }}
+        </td>
+    {{/if}}
+
+    {{#each peptideEntry.psmAnnotationValueList as |annotationValue| }}
+        <td>{{ annotationValue }}</td>
+    {{/each}}
+</tr>

@@ -37,6 +37,7 @@ import org.yeastrc.xlink.www.web_utils.GetAnnotationDisplayUserSelectionDetailsD
 import org.yeastrc.xlink.www.web_utils.GetPageHeaderData;
 import org.yeastrc.xlink.www.web_utils.GetSearchDetailsData;
 import org.yeastrc.xlink.www.web_utils.IsShowDownloadLinks_Skyline_SetRequestParameters;
+import org.yeastrc.xlink.www.web_utils.ProjectSearchIdsSearchIds_SetRequestParameter;
 import org.yeastrc.xlink.www.web_utils.ProteinListingTooltipConfigUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -176,13 +177,23 @@ public class ViewMergedSearchImageAction extends Action {
 			GetPageHeaderData.getInstance().getPageHeaderDataWithProjectId( projectId, request );
 			//  Populate request objects for Protein Name Tooltip JS
 			ProteinListingTooltipConfigUtil.getInstance().putProteinListingTooltipConfigForPage( projectSearchIdsSet, request );
-
-			GetSearchDetailsData.SearchesAreUserSorted searchesAreUserSorted  = GetSearchDetailsData.SearchesAreUserSorted.NO;
-			if ( PeptideProteinCommonForm.DO_NOT_SORT_PROJECT_SEARCH_IDS_YES.equals( form.getDs() ) ) {
-				searchesAreUserSorted  = GetSearchDetailsData.SearchesAreUserSorted.YES;
+			
+			{
+				ProjectSearchIdsSearchIds_SetRequestParameter.SearchesAreUserSorted searchesAreUserSorted  = ProjectSearchIdsSearchIds_SetRequestParameter.SearchesAreUserSorted.NO;
+				if ( PeptideProteinCommonForm.DO_NOT_SORT_PROJECT_SEARCH_IDS_YES.equals( form.getDs() ) ) {
+					searchesAreUserSorted  = ProjectSearchIdsSearchIds_SetRequestParameter.SearchesAreUserSorted.YES;
+				}
+				//  Populate request objects for Project Search Id / Search Id pairs in display order in JSON on Page for Javascript
+				ProjectSearchIdsSearchIds_SetRequestParameter.getSingletonInstance().populateProjectSearchIdsSearchIds_SetRequestParameter( searches, searchesAreUserSorted, request );
 			}
-			//  Populate request objects for Standard Search Display
-			GetSearchDetailsData.getInstance().getSearchDetailsData( searches, searchesAreUserSorted, request );
+			{
+				GetSearchDetailsData.SearchesAreUserSorted searchesAreUserSorted  = GetSearchDetailsData.SearchesAreUserSorted.NO;
+				if ( PeptideProteinCommonForm.DO_NOT_SORT_PROJECT_SEARCH_IDS_YES.equals( form.getDs() ) ) {
+					searchesAreUserSorted  = GetSearchDetailsData.SearchesAreUserSorted.YES;
+				}
+				//  Populate request objects for Standard Search Display
+				GetSearchDetailsData.getInstance().getSearchDetailsData( searches, searchesAreUserSorted, request );
+			}
 			
 			//  Populate request objects for User Selection of Annotation Data Display
 			GetAnnotationDisplayUserSelectionDetailsData.getInstance().getSearchDetailsData( searches, request );

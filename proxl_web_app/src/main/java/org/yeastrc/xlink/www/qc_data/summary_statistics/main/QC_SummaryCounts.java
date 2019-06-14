@@ -28,8 +28,6 @@ import org.yeastrc.xlink.www.qc_data.summary_statistics.main.QC_SummaryCounts_Ca
 import org.yeastrc.xlink.www.qc_data.summary_statistics.objects.QC_SummaryCountsResults;
 import org.yeastrc.xlink.www.qc_data.summary_statistics.objects.QC_SummaryCountsResults.QC_SummaryCountsResultsPerLinkType;
 import org.yeastrc.xlink.www.qc_data.utils.QC_Cached_WebReportedPeptideWrapperList_FilteredOnIncludeProtSeqVIds;
-import org.yeastrc.xlink.www.searcher_utils.DefaultCutoffsExactlyMatchAnnTypeDataToSearchData;
-import org.yeastrc.xlink.www.searcher_utils.DefaultCutoffsExactlyMatchAnnTypeDataToSearchData.DefaultCutoffsExactlyMatchAnnTypeDataToSearchDataResult;
 import org.yeastrc.xlink.www.searcher_via_cached_data.a_return_data_from_searchers.PeptideWebPageSearcherCacheOptimized;
 import org.yeastrc.xlink.www.web_utils.GetLinkTypesForSearchers;
 
@@ -118,12 +116,9 @@ public class QC_SummaryCounts {
 		//   Mods for DB Query
 		String[] modsForDBQuery = qcPageQueryJSONRoot.getMods();
 
-		//  Only applicable if search cutoffs are defaults
-		boolean searchOnlyHasDefaultCutoffs = get_searchOnlyHasDefaultCutoffs( search, searcherCutoffValuesRootLevel );
-
 		if ( forDownload != ForDownload_Enum.YES ) {
 			//  Only if not for download
-			if ( searchOnlyHasDefaultCutoffs ) {
+			{
 				byte[] resultsAsBytes = 
 						retrieveDataFromCacheAndMatchCutoffs( search, requestJSONBytes );
 
@@ -272,7 +267,7 @@ public class QC_SummaryCounts {
 
 		byte[] resultAsJSONBytes = getResultsByteArray( qc_SummaryCountsResults, search.getSearchId() );
 		
-		if ( searchOnlyHasDefaultCutoffs ) {
+		{
 			cacheResult( resultAsJSONBytes, search, requestJSONBytes );
 		}
 		
@@ -357,30 +352,6 @@ public class QC_SummaryCounts {
 		return chartJSONAsBytes;
 	}
 
-	/**
-	 * @param search
-	 * @param mergedPeptideQueryJSONRoot_SearcherCutoffValuesRootLevel_Holder
-	 * @return
-	 * @throws Exception
-	 */
-	private boolean get_searchOnlyHasDefaultCutoffs( SearchDTO search,
-			SearcherCutoffValuesRootLevel searcherCutoffValuesRootLevel)
-			throws Exception {
-		
-
-		boolean searchOnlyHasDefaultCutoffs = false;
-
-		SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel = searcherCutoffValuesRootLevel.getPerSearchCutoffs( search.getProjectSearchId() );
-		DefaultCutoffsExactlyMatchAnnTypeDataToSearchDataResult result =
-				DefaultCutoffsExactlyMatchAnnTypeDataToSearchData.getInstance()
-				.defaultCutoffsExactlyMatchAnnTypeDataToSearchData( search.getSearchId(), searcherCutoffValuesSearchLevel );
-		if ( result.isDefaultCutoffsExactlyMatchAnnTypeDataToSearchData() ) {
-			searchOnlyHasDefaultCutoffs = true;
-		}
-		
-		return searchOnlyHasDefaultCutoffs;
-	}
-		
 	/**
 	 * @param linkType
 	 * @param resultsPerLinkTypeList

@@ -3,6 +3,10 @@
 
 //   Process and load data into the file crosslink_protein_block_template.jsp
 
+//   Show the data for a single Crosslink Protein (protein 1 / position 1 to protein 2 / position 2) for specified project search ids and other criteria
+
+//   Used on Crosslink Merged Protein Page, and Image and Structure Pages
+
 //////////////////////////////////
 // JavaScript directive:   all variables have to be declared with "var", maybe other things
 "use strict";

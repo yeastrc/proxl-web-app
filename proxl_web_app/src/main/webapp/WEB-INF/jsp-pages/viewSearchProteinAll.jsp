@@ -36,6 +36,7 @@
 		
 		<script type="text/javascript" src="js/libs/snap.svg-min.js"></script> <%--  Used by lorikeetPageProcessing.js --%>
 
+		<script type="text/javascript" src="js/libs/spin.min.js"></script> 
 		
 				
 				<%-- 
@@ -44,10 +45,6 @@
 					/WEB-INF/jsp-includes/proteinNameTooltipDataForJSCode.jsp
 				  --%>
 
-
-		<script type="text/javascript" src="static/js_generated_bundles/data_pages/proteinsAllView-bundle.js?x=${cacheBustValue}"></script>
-	
-		
 	
 		<link rel="stylesheet" href="css/tablesorter.css" type="text/css" media="print, projection, screen" />
 		<link type="text/css" rel="stylesheet" href="css/jquery.qtip.min.css" />
@@ -66,13 +63,17 @@
 
 <%@ include file="/WEB-INF/jsp-includes/header_main.jsp" %>
 		
+	<%@ include file="/WEB-INF/jsp-includes/body_section_data_pages_after_header_main.jsp" %>
+		
 
 	<input type="hidden" id="project_id" value="<c:out value="${ project_id }"></c:out>"> 
 	
 	<%--  Put Project_Search_Id on the page for the JS code --%>
 	<input type="hidden" class=" project_search_id_jq " value="<c:out value="${ projectSearchId }"></c:out>">
 		
-		
+		<%--  loading spinner location --%>
+	<div style="opacity:1.0;position:absolute;left:50%;top:50%; z-index: 20001" id="coverage-map-loading-spinner" style="" ></div>
+			
 	<%--  used by createTooltipForProteinNames.js --%>
 	<%@ include file="/WEB-INF/jsp-includes/proteinNameTooltipDataForJSCode.jsp" %>
 	
@@ -159,8 +160,8 @@
 			
 			
 			
-			<table style="border-width:0px;">
-					
+			<table id="search_details_and_main_filter_criteria_main_page_root" style=" border-width: 0px; display: none; ">
+				
 				<%--  Set to false to not show color block before search for key --%>
 				<c:set var="showSearchColorBlock" value="${ false }" />
 				
@@ -208,14 +209,7 @@
 
 				<tr>
 					<td>Exclude organisms:</td>
-					<td>
-						<logic:iterate id="taxonomy" name="taxonomies">
-						 <label style="white-space: nowrap" >
-						  <input type="checkbox" name="excludeTaxonomy" value="<bean:write name="taxonomy" property="key"/>" class=" excludeTaxonomy_jq " onchange=" if ( window.defaultPageView ) { window.defaultPageView.searchFormChanged_ForDefaultPageView(); } ; if ( window.saveView_dataPages ) { window.saveView_dataPages.searchFormChanged_ForSaveView(); }" >  
-						  
-						   <span style="font-style:italic;"><bean:write name="taxonomy" property="value"/></span>
-						 </label> 						 
-						</logic:iterate>				
+					<td id="excludeTaxonomies"> <%--  Populated in JS --%>
 					</td>
 				</tr>
 
@@ -226,10 +220,7 @@
 						All <option> values must be parsable as integers:
 						--%>
 						<select name="excludedProteins" multiple="multiple" id="excludeProtein" onchange=" if ( window.defaultPageView ) { window.defaultPageView.searchFormChanged_ForDefaultPageView(); } ; if ( window.saveView_dataPages ) { window.saveView_dataPages.searchFormChanged_ForSaveView(); }" >  
-						  
-	  						<logic:iterate id="protein" name="proteins">
-	  						  <option value="<c:out value="${ protein.proteinSequenceVersionObject.proteinSequenceVersionId }"></c:out>"><c:out value="${ protein.name }"></c:out></option>
-	  						</logic:iterate>
+							<%-- Populated in JS --%>
 	  					</select>
 					</td>
 				</tr>
@@ -255,147 +246,38 @@
 				</tr>
 			</table>
 			
-			<div style="height: 10px;">&nbsp;</div>
-						
-			<h3 style="display:inline;">Proteins (<bean:write name="numProteins" />):</h3>
-			<div style="display:inline;">
-				[<a class="tool_tip_attached_jq" data-tooltip="View crosslinks" 
-						href="<proxl:defaultPageUrl pageName="/crosslinkProtein" projectSearchId="${ search.projectSearchId }">crosslinkProtein.do?<bean:write name="queryString" /></proxl:defaultPageUrl>"
-						>View Crosslinks</a>]
-				[<a class="tool_tip_attached_jq" data-tooltip="View looplinks" 
-						href="<proxl:defaultPageUrl pageName="/looplinkProtein" projectSearchId="${ search.projectSearchId }">looplinkProtein.do?<bean:write name="queryString" /></proxl:defaultPageUrl>"
-						>View Looplinks</a>]
-				[<a class="tool_tip_attached_jq" data-tooltip="Download all proteins as tab-delimited text" 
-					href="downloadMergedProteinsAll.do?<bean:write name="queryString" />"
-					>Download Data (<bean:write name="numProteins" />)</a>]
-			</div>
-			
-			<%--  Block for user choosing which annotation types to display  --%>
-			<%@ include file="/WEB-INF/jsp-includes/annotationDisplayManagementBlock.jsp" %>
-
-
-			<%--  Create via javascript the parts that will be above the main table --%>
-			<script type="text/javascript">
+			<%--  <div> to contain all the remaining items above the main data display table --%>
+			<div id="main_items_below_filter_criteria_table_above_main_display_table" style="display: none;"> 
+							
+				<div style="height: 10px;">&nbsp;</div>
+							
+				<h3 style="display:inline;">Proteins (<span id="numProteins_copy1" ></span>):</h3>
+				<div style="display:inline;">
+					[<a class="tool_tip_attached_jq" data-tooltip="View crosslinks" 
+							href="<proxl:defaultPageUrl pageName="/crosslinkProtein" projectSearchId="${ search.projectSearchId }">crosslinkProtein.do?<bean:write name="queryString" /></proxl:defaultPageUrl>"
+							>View Crosslinks</a>]
+					[<a class="tool_tip_attached_jq" data-tooltip="View looplinks" 
+							href="<proxl:defaultPageUrl pageName="/looplinkProtein" projectSearchId="${ search.projectSearchId }">looplinkProtein.do?<bean:write name="queryString" /></proxl:defaultPageUrl>"
+							>View Looplinks</a>]
+					[<a class="tool_tip_attached_jq" data-tooltip="Download all proteins as tab-delimited text" 
+						href="downloadMergedProteinsAll.do?<bean:write name="queryString" />"
+						>Download Data (<span id="numProteins_copy2" ></span>)</a>]
+				</div>
 				
-				//  If object exists, call function on it now, otherwise call the function on document ready
-				if ( window.viewSearchProteinAllPageCode ) {
-					window.viewSearchProteinAllPageCode.createPartsAboveMainTable();
-				} else {
-	
-					$(document).ready(function() 
-					    { 
-						   setTimeout( function() { // put in setTimeout so if it fails it doesn't kill anything else
-							  
-							   window.viewSearchProteinAllPageCode.createPartsAboveMainTable();
-						   },10);
-					    } 
-					); // end $(document).ready(function() 
-				}
-							
-			</script>
-			
+				<%--  Block for user choosing which annotation types to display  --%>
+				<%@ include file="/WEB-INF/jsp-includes/annotationDisplayManagementBlock.jsp" %>
 
-			
-				<table style="" id="main_page_data_table" class="tablesorter top_data_table_jq ">
 				
-					<thead>
-					<tr>
-						<th data-tooltip="Name of protein" class="tool_tip_attached_jq" style="text-align:left;width:10%;font-weight:bold;">Protein</th>
-						<th data-tooltip="Number of peptide spectrum matches showing this link" class="tool_tip_attached_jq integer-number-column-header" style="width:10%;font-weight:bold;">PSMs</th>
-						<th data-tooltip="Number of distinct pairs of peptides showing link" class="tool_tip_attached_jq integer-number-column-header" style="width:10%;font-weight:bold;">#&nbsp;Peptides</th>
-						<th data-tooltip="Number of found peptide pairs that uniquely map to these two proteins from the FASTA file" class="tool_tip_attached_jq integer-number-column-header" style="width:10%;font-weight:bold;">#&nbsp;Unique Peptides</th>
-						
-
-						<c:forEach var="peptideAnnotationDisplayNameDescription" items="${ peptideAnnotationDisplayNameDescriptionList }">
-
-								<%--  Consider displaying the description somewhere   peptideAnnotationDisplayNameDescription.description --%>
-							<th data-tooltip="Best Peptide-level <c:out value="${ peptideAnnotationDisplayNameDescription.displayName }"></c:out> for this peptide (or linked pair)" 
-									class="tool_tip_attached_jq" 
-									style="width:10%;font-weight:bold;">
-								<span style="white-space: nowrap">Best Peptide</span>
-								<span style="white-space: nowrap"><c:out value="${ peptideAnnotationDisplayNameDescription.displayName }"></c:out></span>
-							</th>
-							
-						</c:forEach>
-										
-
-						<c:forEach var="psmAnnotationDisplayNameDescription" items="${ psmAnnotationDisplayNameDescriptionList }">
-
-								<%--  Consider displaying the description somewhere   psmAnnotationDisplayNameDescription.description --%>
-						  <th data-tooltip="Best PSM-level <c:out value="${ psmAnnotationDisplayNameDescription.displayName }"></c:out> for PSMs matched to peptides that show this link" class="tool_tip_attached_jq" style="width:10%;font-weight:bold;"
-							><span style="white-space: nowrap">Best PSM</span> 
-								<span style="white-space: nowrap"><c:out value="${ psmAnnotationDisplayNameDescription.displayName }"></c:out></span></th>
-
-						</c:forEach>
-							
-					</tr>
-					</thead>
-						
-					<logic:iterate id="proteinMain" name="proteinsMainList">
-							<tr id="${ proteinMain.proteinSequenceVersionId }"
-								style="cursor: pointer; "
-								
-								onclick="viewReportedPeptidesForProteinAllLoadedFromWebServiceTemplate.showHideReportedPeptides( { clickedElement : this })"
-								data-project_search_id="${ search.projectSearchId }"
-								data-protein_id="${ proteinMain.proteinSequenceVersionId }"
-							>
-								<td><span class="proteinName" id="protein-id-<bean:write name="proteinMain" property="searchProtein.proteinSequenceVersionObject.proteinSequenceVersionId" />"
-									><bean:write name="proteinMain" property="searchProtein.name" /></span></td>
-
-								<td class="integer-number-column"><bean:write name="proteinMain" property="numPsms" /></td>
-								
-								<td class="integer-number-column"><a class="show-child-data-link   " 
-										href="javascript:"
-										><bean:write name="proteinMain" property="numPeptides" 
-											/><span class="toggle_visibility_expansion_span_jq" 
-												><img src="images/icon-expand-small.png" 
-													class=" icon-expand-contract-in-data-table "
-													></span><span class="toggle_visibility_contraction_span_jq" 
-														style="display: none;" 
-														><img src="images/icon-collapse-small.png"
-															class=" icon-expand-contract-in-data-table "
-															></span>
-									</a>
-								</td>								
-								
-								<td class="integer-number-column"><bean:write name="proteinMain" property="numUniquePeptides" /></td>
-								
-						
-								<c:forEach var="annotationValue" items="${ proteinMain.peptideAnnotationValueList }">
+			</div> <%--  END: <div id="main_items_below_filter_criteria_table_above_main_display_table">  --%>
 			
-									<td style="white-space: nowrap"><c:out  value="${ annotationValue }" /></td>
-								</c:forEach>	
-
-								<c:forEach var="annotationValue" items="${ proteinMain.psmAnnotationValueList }">
-			
-									<td><c:out  value="${ annotationValue }" /></td>
-								</c:forEach>															
-								
-							</tr>
-							
-							<tr class="expand-child" style="display:none;">
-							
-	
-									<%--  Adjust colspan for number of columns in current table --%>
-									
-								<%--  Add to value for length of Peptide and PSM value lists --%>
-								<c:set var="columnsAddedForAnnotationData" 
-									value="${ fn:length( proteinMain.peptideAnnotationValueList ) + fn:length( proteinMain.psmAnnotationValueList ) }" />
-																								
-															
-								<td colspan="${ 8 + columnsAddedForAnnotationData }" align="center" class=" child_data_container_jq ">
-								
-									<div style="color: green; font-size: 16px; padding-top: 10px; padding-bottom: 10px;" >
-										Loading...
-									</div>
-								</td>
-							</tr>
-
-						
-					</logic:iterate>
-				</table>
+				<%--  Main Table of Protein Data will be placed here --%>
+			<div id="proteins_from_webservice_container" style="display: none;"></div>
 
 		</div>
 	
 
+
+		<script type="text/javascript" src="static/js_generated_bundles/data_pages/proteinsAllView-bundle.js?x=${cacheBustValue}"></script>
+	
+		
 <%@ include file="/WEB-INF/jsp-includes/footer_main.jsp" %>

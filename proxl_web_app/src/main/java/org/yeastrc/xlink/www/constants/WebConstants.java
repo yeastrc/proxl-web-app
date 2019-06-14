@@ -73,6 +73,10 @@ public class WebConstants {
 	public static final String PARAMETER_REDIRECT_AFTER_PROCESS_PROJECT_READ_CODE_TRUE = "true";
 	
 
+
+	public static final String PARAMETER_PROJECT_SEARCH_ID_SEARCH_ID_PAIRS_DISPLAY_ORDER_LIST_JSON_REQUEST_KEY = "project_search_id_search_id_pairs_display_order_list_json";
+	
+
 	public static final String PARAMETER_SEARCH_ID_COMMA_DELIM_LIST_REQUEST_KEY = "search_id_comma_delim_list";
 	
 	public static final String PARAMETER_SEARCHES_DETAILS_LIST_REQUEST_KEY = "searches_details_list";

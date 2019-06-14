@@ -65,6 +65,8 @@
 
 <%@ include file="/WEB-INF/jsp-includes/header_main.jsp" %>
 	
+	<%@ include file="/WEB-INF/jsp-includes/body_section_data_pages_after_header_main.jsp" %>
+	
 	<div class="overall-enclosing-block">
 	
 	<input type="hidden" id="annotation_data_webservice_base_url" value="<c:out value="${ annotation_data_webservice_base_url }"></c:out>"> 

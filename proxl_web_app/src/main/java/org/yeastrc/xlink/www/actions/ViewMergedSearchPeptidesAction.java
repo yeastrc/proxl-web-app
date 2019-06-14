@@ -1,5 +1,6 @@
 package org.yeastrc.xlink.www.actions;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -9,10 +10,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.apache.commons.lang.mutable.MutableInt;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
@@ -22,30 +22,32 @@ import org.yeastrc.xlink.www.dao.SearchDAO;
 import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.www.nav_links_image_structure.PopulateRequestDataForImageAndStructureAndQC_NavLinks;
 import org.yeastrc.xlink.www.access_control.result_objects.WebSessionAuthAccessLevel;
-import org.yeastrc.xlink.www.objects.IMergedSearchLink;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
 import org.yeastrc.xlink.www.searcher.SearchModMassDistinctSearcher;
-import org.yeastrc.xlink.www.actions.PeptidesMergedCommonPageDownload.PeptidesMergedCommonPageDownloadResult;
+import org.yeastrc.xlink.www.constants.PeptideViewLinkTypesConstants;
 import org.yeastrc.xlink.www.constants.StrutsGlobalForwardNames;
 import org.yeastrc.xlink.www.constants.WebConstants;
+import org.yeastrc.xlink.www.cutoff_processing_web.GetDefaultPsmPeptideCutoffs;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
+import org.yeastrc.xlink.www.form_query_json_objects.CutoffValuesRootLevel;
+import org.yeastrc.xlink.www.form_query_json_objects.MergedPeptideQueryJSONRoot;
+import org.yeastrc.xlink.www.form_utils.Update__A_QueryBase_JSONRoot__ForCurrentSearchIds;
 import org.yeastrc.xlink.www.forms.MergedSearchViewPeptidesForm;
 import org.yeastrc.xlink.www.forms.PeptideProteinCommonForm;
-import org.yeastrc.xlink.www.objects.SearchBooleanWrapper;
-import org.yeastrc.xlink.www.objects.SearchCount;
-import org.yeastrc.xlink.www.objects.VennDiagramDataToJSON;
-import org.yeastrc.xlink.www.objects.WebMergedReportedPeptide;
 import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result;
 import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId;
 import org.yeastrc.xlink.www.web_utils.ExcludeLinksWith_Remove_NonUniquePSMs_Checkbox_PopRequestItems;
-import org.yeastrc.xlink.www.web_utils.GenerateVennDiagramDataToJSON;
 import org.yeastrc.xlink.www.web_utils.GetAnnotationDisplayUserSelectionDetailsData;
 import org.yeastrc.xlink.www.web_utils.GetPageHeaderData;
 import org.yeastrc.xlink.www.web_utils.GetSearchDetailsData;
 import org.yeastrc.xlink.www.web_utils.IsShowDownloadLinks_Skyline_SetRequestParameters;
+import org.yeastrc.xlink.www.web_utils.ProjectSearchIdsSearchIds_SetRequestParameter;
 import org.yeastrc.xlink.www.web_utils.ProteinListingTooltipConfigUtil;
 import org.yeastrc.xlink.www.webapp_timing.WebappTiming;
+
+import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
@@ -62,6 +64,9 @@ public class ViewMergedSearchPeptidesAction extends Action {
 			HttpServletRequest request,
 			HttpServletResponse response )
 					throws Exception {
+		
+		request.setAttribute( "queryString", request.getQueryString() );
+		
 		WebappTiming webappTiming = null;
 		if ( log.isDebugEnabled() ) {
 			webappTiming = WebappTiming.getInstance( log );
@@ -128,6 +133,7 @@ public class ViewMergedSearchPeptidesAction extends Action {
 			List<SearchDTO> searches = new ArrayList<SearchDTO>( projectSearchIdsListDeduppedSorted.size() );
 			Map<Integer, SearchDTO> searchesMapOnSearchId = new HashMap<>();
 			Collection<Integer> searchIds = new HashSet<>();
+			Map<Integer,Integer> mapProjectSearchIdToSearchId = new HashMap<>();
 			int[] searchIdsArray = new int[ projectSearchIdsListDeduppedSorted.size() ];
 			int searchIdsArrayIndex = 0;
 			for ( int projectSearchId : projectSearchIdsFromForm ) {
@@ -147,12 +153,13 @@ public class ViewMergedSearchPeptidesAction extends Action {
 					searchIds.add( search.getSearchId() );
 					searchIdsArray[ searchIdsArrayIndex ] = search.getSearchId();
 					searchIdsArrayIndex++;
+					mapProjectSearchIdToSearchId.put( search.getProjectSearchId(), search.getSearchId() );
 				}
 			}
 			
 			if ( ! PeptideProteinCommonForm.DO_NOT_SORT_PROJECT_SEARCH_IDS_YES.equals( form.getDs() ) ) {
 
-				// Sort searches list
+				// Sort searches list on Search Id
 				Collections.sort( searches, new Comparator<SearchDTO>() {
 					@Override
 					public int compare(SearchDTO o1, SearchDTO o2) {
@@ -171,12 +178,22 @@ public class ViewMergedSearchPeptidesAction extends Action {
 			//  Search Ids already sorted
 			request.setAttribute( "searches", searches );
 			
-			GetSearchDetailsData.SearchesAreUserSorted searchesAreUserSorted  = GetSearchDetailsData.SearchesAreUserSorted.NO;
-			if ( PeptideProteinCommonForm.DO_NOT_SORT_PROJECT_SEARCH_IDS_YES.equals( form.getDs() ) ) {
-				searchesAreUserSorted  = GetSearchDetailsData.SearchesAreUserSorted.YES;
+			{
+				ProjectSearchIdsSearchIds_SetRequestParameter.SearchesAreUserSorted searchesAreUserSorted  = ProjectSearchIdsSearchIds_SetRequestParameter.SearchesAreUserSorted.NO;
+				if ( PeptideProteinCommonForm.DO_NOT_SORT_PROJECT_SEARCH_IDS_YES.equals( form.getDs() ) ) {
+					searchesAreUserSorted  = ProjectSearchIdsSearchIds_SetRequestParameter.SearchesAreUserSorted.YES;
+				}
+				//  Populate request objects for Project Search Id / Search Id pairs in display order in JSON on Page for Javascript
+				ProjectSearchIdsSearchIds_SetRequestParameter.getSingletonInstance().populateProjectSearchIdsSearchIds_SetRequestParameter( searches, searchesAreUserSorted, request );
 			}
-			//  Populate request objects for Standard Search Display
-			GetSearchDetailsData.getInstance().getSearchDetailsData( searches, searchesAreUserSorted, request );
+			{
+				GetSearchDetailsData.SearchesAreUserSorted searchesAreUserSorted  = GetSearchDetailsData.SearchesAreUserSorted.NO;
+				if ( PeptideProteinCommonForm.DO_NOT_SORT_PROJECT_SEARCH_IDS_YES.equals( form.getDs() ) ) {
+					searchesAreUserSorted  = GetSearchDetailsData.SearchesAreUserSorted.YES;
+				}
+				//  Populate request objects for Standard Search Display
+				GetSearchDetailsData.getInstance().getSearchDetailsData( searches, searchesAreUserSorted, request );
+			}
 			
 			//  Populate request objects for User Selection of Annotation Data Display
 			GetAnnotationDisplayUserSelectionDetailsData.getInstance().getSearchDetailsData( searches, request );
@@ -197,74 +214,49 @@ public class ViewMergedSearchPeptidesAction extends Action {
 			}
 			request.setAttribute( "modMassFilterList", modMassStringsList );
 			
-			////////     Get Merged Peptides
-			PeptidesMergedCommonPageDownloadResult peptidesMergedCommonPageDownloadResult =
-					PeptidesMergedCommonPageDownload.getInstance()
-					.getWebMergedPeptideRecords(
-							form,
-							projectSearchIdsListDeduppedSorted,
-							searches,
-							searchesMapOnSearchId,
-							PeptidesMergedCommonPageDownload.FlagCombinedReportedPeptideEntries.YES );
+			//   Get Query JSON from the form and if not empty, deserialize it
 			
-			boolean anyResultsHaveIsotopeLabels = peptidesMergedCommonPageDownloadResult.isAnyResultsHaveIsotopeLabels();
+			MergedPeptideQueryJSONRoot mergedPeptideQueryJSONRoot = null;
+			String queryJSONFromForm = form.getQueryJSON();
+			if ( StringUtils.isNotEmpty( queryJSONFromForm ) ) {
+				try {
+					mergedPeptideQueryJSONRoot = jacksonJSON_Mapper.readValue( queryJSONFromForm, MergedPeptideQueryJSONRoot.class );
+				} catch ( JsonParseException e ) {
+					String msg = "Failed to parse 'queryJSONFromForm', JsonParseException.  queryJSONFromForm: " + queryJSONFromForm;
+					log.error( msg, e );
+					throw e;
+				} catch ( JsonMappingException e ) {
+					String msg = "Failed to parse 'queryJSONFromForm', JsonMappingException.  queryJSONFromForm: " + queryJSONFromForm;
+					log.error( msg, e );
+					throw e;
+				} catch ( IOException e ) {
+					String msg = "Failed to parse 'queryJSONFromForm', IOException.  queryJSONFromForm: " + queryJSONFromForm;
+					log.error( msg, e );
+					throw e;
+				}
+
+				//  Update mergedPeptideQueryJSONRoot for current search ids and project search ids
+				Update__A_QueryBase_JSONRoot__ForCurrentSearchIds.getInstance()
+				.update__A_QueryBase_JSONRoot__ForCurrentSearchIds( mergedPeptideQueryJSONRoot, mapProjectSearchIdToSearchId );
+
+			} else {
+				//  Query JSON in the form is empty so create an empty object that will be populated.
+				mergedPeptideQueryJSONRoot = new MergedPeptideQueryJSONRoot();
+				//  Create cutoffs for default values
+				CutoffValuesRootLevel cutoffValuesRootLevelDefaults =
+						GetDefaultPsmPeptideCutoffs.getInstance()
+						.getDefaultPsmPeptideCutoffs( projectSearchIdsListDeduppedSorted, searchIds, mapProjectSearchIdToSearchId );
+				mergedPeptideQueryJSONRoot.setCutoffs( cutoffValuesRootLevelDefaults );
+			}
 			
-			request.setAttribute( "peptidePsmAnnotationNameDescListsForEachSearch", peptidesMergedCommonPageDownloadResult.getPeptidePsmAnnotationNameDescListsForEachSearch() );
-			request.setAttribute( "anyReportedPeptideEntriesWereCombined", peptidesMergedCommonPageDownloadResult.isAnyReportedPeptideEntriesWereCombined() );
-			request.setAttribute( "anyResultsHaveIsotopeLabels", anyResultsHaveIsotopeLabels );
+			//   Update Link Type to default to Crosslink if no value was set
+			String[] linkTypesInForm = mergedPeptideQueryJSONRoot.getLinkTypes();
+			if ( linkTypesInForm == null || linkTypesInForm.length == 0 ) {
+				String[] linkTypesCrosslink = { PeptideViewLinkTypesConstants.CROSSLINK_PSM };
+				linkTypesInForm = linkTypesCrosslink;
+				mergedPeptideQueryJSONRoot.setLinkTypes( linkTypesInForm );
+			}
 			
-			List<WebMergedReportedPeptide> webMergedReportedPeptideList = peptidesMergedCommonPageDownloadResult.getWebMergedReportedPeptideList();
-			for ( WebMergedReportedPeptide link : webMergedReportedPeptideList ) {
-				List<SearchBooleanWrapper> searchContainsPeptide = new ArrayList<SearchBooleanWrapper>( searches.size() );
-				for( SearchDTO search : searches ) {
-					if( link.getSearches().contains( search ) ) {
-						searchContainsPeptide.add( new SearchBooleanWrapper( search, true ) );
-					} else {
-						searchContainsPeptide.add( new SearchBooleanWrapper( search, false ) );
-					}					
-				}
-				link.setSearchContainsPeptide( searchContainsPeptide );
-			}
-			request.setAttribute( "peptideListSize", webMergedReportedPeptideList.size() );
-			request.setAttribute( "peptideList", webMergedReportedPeptideList );
-			request.setAttribute( "queryString", request.getQueryString() );
-			// build the JSON data structure for searches
-			ObjectMapper mapper = new ObjectMapper();  //  Jackson JSON library object
-			VennDiagramDataToJSON vennDiagramDataToJSON =
-					GenerateVennDiagramDataToJSON.createVennDiagramDataToJSON( webMergedReportedPeptideList, searches );
-			if ( vennDiagramDataToJSON != null ) {
-				String vennDiagramDataJSON = mapper.writeValueAsString( vennDiagramDataToJSON );
-				request.setAttribute( "vennDiagramDataToJSON", vennDiagramDataJSON );
-			}
-			// get the counts for the number of links for each search, save to map, save to request
-			Map<Integer, MutableInt> searchCounts = new TreeMap<Integer, MutableInt>();
-			for( IMergedSearchLink link : webMergedReportedPeptideList ) {
-				for( SearchDTO search : link.getSearches() ) {
-					Integer projectSearchId = search.getSearchId();
-					MutableInt searchCount = searchCounts.get( projectSearchId );
-					if ( searchCount == null ) {
-						searchCount = new MutableInt( 1 );
-						searchCounts.put( projectSearchId, searchCount );
-					} else {
-						searchCount.increment();
-					}
-				}
-			}
-			List<SearchCount> SearchCountList = new ArrayList<>();
-			for ( SearchDTO search : searches  ) {
-				Integer searchId = search.getSearchId();
-				MutableInt searchCountMapValue = searchCounts.get( searchId );
-				SearchCount searchCount = new SearchCount();
-				SearchCountList.add(searchCount);
-				searchCount.setSearchId( searchId );
-				searchCount.setProjectSearchId( search.getProjectSearchId() );
-				if ( searchCountMapValue != null ) {
-					searchCount.setCount( searchCountMapValue.intValue() );
-				} else {
-					searchCount.setCount( 0 );
-				}
-			}
-			request.setAttribute( "searchCounts", SearchCountList );
 			/////////////////////
 			//  clear out form so value doesn't go back on the page in the form
 			form.setQueryJSON( "" );
@@ -272,7 +264,7 @@ public class ViewMergedSearchPeptidesAction extends Action {
 			////  Put Updated queryJSON on the page
 			{
 				try {
-					String queryJSONToForm = jacksonJSON_Mapper.writeValueAsString( peptidesMergedCommonPageDownloadResult.getMergedPeptideQueryJSONRoot() );
+					String queryJSONToForm = jacksonJSON_Mapper.writeValueAsString( mergedPeptideQueryJSONRoot );
 					//  Set queryJSON in request attribute to put on page outside of form
 					request.setAttribute( "queryJSONToForm", queryJSONToForm );
 				} catch ( JsonProcessingException e ) {
@@ -287,7 +279,7 @@ public class ViewMergedSearchPeptidesAction extends Action {
 			}
 			//  Create data for Links for Image and Structure pages and put in request
 			PopulateRequestDataForImageAndStructureAndQC_NavLinks.getInstance()
-			.populateRequestDataForImageAndStructureAndQC_NavLinksForPeptide( peptidesMergedCommonPageDownloadResult.getMergedPeptideQueryJSONRoot(), projectId, authAccessLevel, form, request );
+			.populateRequestDataForImageAndStructureAndQC_NavLinksForPeptide( mergedPeptideQueryJSONRoot, projectId, authAccessLevel, form, request );
 			if ( webappTiming != null ) {
 				webappTiming.markPoint( "Before send to JSP" );
 			}

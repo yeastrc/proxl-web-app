@@ -20,7 +20,7 @@ var SPINNER_OPTIONS = {
 
 var loadingSpinner;
 
-var createSpinner = function () {
+const createSpinner = function () {
 
 	var $spinnerContainer = $( "div#coverage-map-loading-spinner-block" );
 
@@ -37,7 +37,7 @@ var createSpinner = function () {
 window.createSpinner = createSpinner;
 
 
-window.destroySpinner = function() {
+ const destroySpinner = function() {
 	
 	if ( loadingSpinner ) {
 		loadingSpinner.stop();
@@ -51,7 +51,9 @@ window.destroySpinner = function() {
 
 };
 
-window.incrementSpinner = function() {
+window.destroySpinner = destroySpinner;
+
+const incrementSpinner = function() {
 	if( !loadingSpinner || !loadingSpinner.numSpinners ) {
 		createSpinner();
 		loadingSpinner.numSpinners = 1;
@@ -60,7 +62,9 @@ window.incrementSpinner = function() {
 	}	
 };
 
-window.decrementSpinner = function() {
+window.incrementSpinner = incrementSpinner;
+
+const decrementSpinner = function() {
 	if ( ! loadingSpinner ) { return; }
 	var numSpinners = loadingSpinner.numSpinners;
 	if( !numSpinners ) { return; }
@@ -73,7 +77,9 @@ window.decrementSpinner = function() {
 	if( numSpinners ) {
 		loadingSpinner.numSpinners = numSpinners;
 	}
-	
 };
 
-export { createSpinner } // export something for import to get onto page
+window.decrementSpinner = decrementSpinner;
+
+
+export { createSpinner, destroySpinner, incrementSpinner, decrementSpinner } // export something for import to get onto page

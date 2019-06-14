@@ -61,6 +61,7 @@ import org.yeastrc.xlink.www.web_utils.ExcludeOnTaxonomyForProteinSequenceVersio
 import org.yeastrc.xlink.www.web_utils.GetAnnotationDisplayUserSelectionDetailsData;
 import org.yeastrc.xlink.www.web_utils.GetPageHeaderData;
 import org.yeastrc.xlink.www.web_utils.GetSearchDetailsData;
+import org.yeastrc.xlink.www.web_utils.ProjectSearchIdsSearchIds_SetRequestParameter;
 import org.yeastrc.xlink.www.web_utils.ProteinListingTooltipConfigUtil;
 import org.yeastrc.xlink.www.web_utils.TaxonomiesForSearchOrSearches;
 import org.yeastrc.xlink.www.web_utils.URLEncodeDecodeAURL;
@@ -144,8 +145,6 @@ public class ViewMergedSearchCoverageReportAction extends Action {
 			//  Jackson JSON Mapper object for JSON deserialization and serialization
 			ObjectMapper jacksonJSON_Mapper = new ObjectMapper();  //  Jackson JSON library object
 			
-			request.setAttribute( "searchIds", projectSearchIdsListDeduppedSorted );
-			
 			List<SearchDTO> searches = new ArrayList<SearchDTO>();
 			Map<Integer, SearchDTO> searchesMapOnSearchId = new HashMap<>();
 
@@ -186,12 +185,23 @@ public class ViewMergedSearchCoverageReportAction extends Action {
 			ProteinListingTooltipConfigUtil.getInstance().putProteinListingTooltipConfigForPage( projectSearchIdsSet, request );
 			
 
-			GetSearchDetailsData.SearchesAreUserSorted searchesAreUserSorted  = GetSearchDetailsData.SearchesAreUserSorted.NO;
-			if ( PeptideProteinCommonForm.DO_NOT_SORT_PROJECT_SEARCH_IDS_YES.equals( form.getDs() ) ) {
-				searchesAreUserSorted  = GetSearchDetailsData.SearchesAreUserSorted.YES;
+			{
+				ProjectSearchIdsSearchIds_SetRequestParameter.SearchesAreUserSorted searchesAreUserSorted  = ProjectSearchIdsSearchIds_SetRequestParameter.SearchesAreUserSorted.NO;
+				if ( PeptideProteinCommonForm.DO_NOT_SORT_PROJECT_SEARCH_IDS_YES.equals( form.getDs() ) ) {
+					searchesAreUserSorted  = ProjectSearchIdsSearchIds_SetRequestParameter.SearchesAreUserSorted.YES;
+				}
+				//  Populate request objects for Project Search Id / Search Id pairs in display order in JSON on Page for Javascript
+				ProjectSearchIdsSearchIds_SetRequestParameter.getSingletonInstance().populateProjectSearchIdsSearchIds_SetRequestParameter( searches, searchesAreUserSorted, request );
 			}
-			//  Populate request objects for Standard Search Display
-			GetSearchDetailsData.getInstance().getSearchDetailsData( searches, searchesAreUserSorted, request );
+			{
+				GetSearchDetailsData.SearchesAreUserSorted searchesAreUserSorted  = GetSearchDetailsData.SearchesAreUserSorted.NO;
+				if ( PeptideProteinCommonForm.DO_NOT_SORT_PROJECT_SEARCH_IDS_YES.equals( form.getDs() ) ) {
+					searchesAreUserSorted  = GetSearchDetailsData.SearchesAreUserSorted.YES;
+				}
+				//  Populate request objects for Standard Search Display
+				GetSearchDetailsData.getInstance().getSearchDetailsData( searches, searchesAreUserSorted, request );
+			}
+			
 			
 			//  Populate request objects for User Selection of Annotation Data Display
 			GetAnnotationDisplayUserSelectionDetailsData.getInstance().getSearchDetailsData( searches, request );
@@ -209,6 +219,7 @@ public class ViewMergedSearchCoverageReportAction extends Action {
 			// Set values for general page functionality
 			request.setAttribute( "queryString", request.getQueryString() );
 			request.setAttribute( "searches", searches );
+			
 
 			//   Get Query JSON from the form and if not empty, deserialize it
 			ProteinQueryJSONRoot proteinQueryJSONRoot = 
@@ -219,210 +230,11 @@ public class ViewMergedSearchCoverageReportAction extends Action {
 							searchIds,
 							mapProjectSearchIdToSearchId );
 
-			/////////////////////////////////////////////////////////////////////////////
-			/////////////////////////////////////////////////////////////////////////////
-			////////   Generic Param processing
-			////////////
-			//  Copy Exclude Taxonomy and Exclude Protein Sets for lookup
-			Set<Integer> excludeTaxonomy_Ids_Set_UserInput = new HashSet<>();
-			Set<Integer> excludeProtein_Ids_Set_UserInput = new HashSet<>();
-			if ( proteinQueryJSONRoot.getExcludeTaxonomy() != null ) {
-				for ( Integer taxonomyId : proteinQueryJSONRoot.getExcludeTaxonomy() ) {
-					excludeTaxonomy_Ids_Set_UserInput.add( taxonomyId );
-				}
-			}
-			//  First convert the protein sequence ids that come from the JS code to standard integers and put
-			//   in the property excludeproteinSequenceVersionIds
+			//  Convert the protein sequence ids that come from the JS code to standard integers and put
+			//   in the property excludeproteinSequenceVersionIds.
+			//      Do this here since may have to convert old NRSeqProteinIds.
 			ProteinsMergedProteinsCommon.getInstance().processExcludeproteinSequenceVersionIdsFromJS( proteinQueryJSONRoot );
-			if ( proteinQueryJSONRoot.getExcludeproteinSequenceVersionIds() != null ) {
-				for ( Integer proteinId : proteinQueryJSONRoot.getExcludeproteinSequenceVersionIds() ) {
-					excludeProtein_Ids_Set_UserInput.add( proteinId );
-				}
-			}
-			CutoffValuesRootLevel cutoffValuesRootLevel = proteinQueryJSONRoot.getCutoffs();
-			Z_CutoffValuesObjectsToOtherObjects_RootResult cutoffValuesObjectsToOtherObjects_RootResult =
-					Z_CutoffValuesObjectsToOtherObjectsFactory.createSearcherCutoffValuesRootLevel( searchIds, cutoffValuesRootLevel );
-			SearcherCutoffValuesRootLevel searcherCutoffValuesRootLevel = cutoffValuesObjectsToOtherObjects_RootResult.getSearcherCutoffValuesRootLevel();
 			
-			LinkedPositions_FilterExcludeLinksWith_Param linkedPositions_FilterExcludeLinksWith_Param = new LinkedPositions_FilterExcludeLinksWith_Param( proteinQueryJSONRoot );
-			
-			//   Get the Protein Coverage Data
-			ProteinCoverageCompute pcs = new ProteinCoverageCompute();
-			pcs.setExcludedproteinSequenceVersionIds( proteinQueryJSONRoot.getExcludeproteinSequenceVersionIds() );
-			pcs.setExcludedTaxonomyIds( proteinQueryJSONRoot.getExcludeTaxonomy() );
-			pcs.setMinPSMs( proteinQueryJSONRoot.getMinPSMs() );
-			pcs.setFilterNonUniquePeptides( proteinQueryJSONRoot.isFilterNonUniquePeptides() );
-			pcs.setFilterOnlyOnePeptide( proteinQueryJSONRoot.isFilterOnlyOnePeptide() );
-			pcs.setSearcherCutoffValuesRootLevel( searcherCutoffValuesRootLevel );
-			pcs.setLinkedPositions_FilterExcludeLinksWith_Param( linkedPositions_FilterExcludeLinksWith_Param );
-			pcs.setSearches( searches );
-			List<ProteinCoverageData> pcd = pcs.getProteinCoverageData();
-			request.setAttribute( "proteinCoverageData", pcd );
-			//   Build list of proteins for the protein Exclusion list
-			{
-				// all possible proteins across all searches (for "Exclude Protein" list on web page)
-				Map<Integer,Set<Integer>> allProteinsExcludeProteinSelectOnWebPageKeyProteinIdValueSearchIds = new HashMap<>();
-				for ( SearchDTO search : searches ) {
-					Integer projectSearchId = search.getProjectSearchId();
-//					Integer searchId = search.getSearchId();
-					SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel = 
-							searcherCutoffValuesRootLevel.getPerSearchCutoffs( projectSearchId );
-					if ( searcherCutoffValuesSearchLevel == null ) {
-						String msg = "searcherCutoffValuesRootLevel.getPerSearchCutoffs(projectSearchId) returned null for:  " + projectSearchId;
-						log.error( msg );
-						throw new ProxlWebappDataException( msg );
-					}
-					{
-						List<SearchProteinCrosslinkWrapper> wrappedCrosslinks = 
-								CrosslinkLinkedPositions.getInstance()
-								.getSearchProteinCrosslinkWrapperList( search, searcherCutoffValuesSearchLevel, linkedPositions_FilterExcludeLinksWith_Param );
-						for ( SearchProteinCrosslinkWrapper wrappedCrosslink : wrappedCrosslinks ) {
-							SearchProteinCrosslink crosslink = wrappedCrosslink.getSearchProteinCrosslink();
-							SearchProtein searchProtein_1 = crosslink.getProtein1();
-							SearchProtein searchProtein_2 = crosslink.getProtein2();
-							Integer searchProtein_id_1 = searchProtein_1.getProteinSequenceVersionObject().getProteinSequenceVersionId();
-							Integer searchProtein_id_2 = searchProtein_2.getProteinSequenceVersionObject().getProteinSequenceVersionId();
-							{
-								Set<Integer> searchIdsForProtein_1 =
-										allProteinsExcludeProteinSelectOnWebPageKeyProteinIdValueSearchIds.get( searchProtein_id_1 );
-								if ( searchIdsForProtein_1 == null ) {
-									searchIdsForProtein_1 = new HashSet<>();
-									allProteinsExcludeProteinSelectOnWebPageKeyProteinIdValueSearchIds.put( searchProtein_id_1, searchIdsForProtein_1 );
-								}
-								searchIdsForProtein_1.add( search.getSearchId() );
-							}
-							{
-								Set<Integer> searchIdsForProtein_2 =
-										allProteinsExcludeProteinSelectOnWebPageKeyProteinIdValueSearchIds.get( searchProtein_id_2 );
-								if ( searchIdsForProtein_2 == null ) {
-									searchIdsForProtein_2 = new HashSet<>();
-									allProteinsExcludeProteinSelectOnWebPageKeyProteinIdValueSearchIds.put( searchProtein_id_2, searchIdsForProtein_2 );
-								}
-								searchIdsForProtein_2.add( search.getSearchId() );
-							}
-						}
-					}
-					{
-						List<SearchProteinLooplinkWrapper> wrappedLooplinkLinks = 
-								LooplinkLinkedPositions.getInstance()
-								.getSearchProteinLooplinkWrapperList( search, searcherCutoffValuesSearchLevel, linkedPositions_FilterExcludeLinksWith_Param );
-						for ( SearchProteinLooplinkWrapper wrappedLooplink : wrappedLooplinkLinks ) {
-							SearchProteinLooplink looplink = wrappedLooplink.getSearchProteinLooplink();
-							SearchProtein searchProtein = looplink.getProtein();
-							Integer searchProtein_id = searchProtein.getProteinSequenceVersionObject().getProteinSequenceVersionId();
-							{
-								Set<Integer> searchIdsForProtein =
-										allProteinsExcludeProteinSelectOnWebPageKeyProteinIdValueSearchIds.get( searchProtein_id );
-								if ( searchIdsForProtein == null ) {
-									searchIdsForProtein = new HashSet<>();
-									allProteinsExcludeProteinSelectOnWebPageKeyProteinIdValueSearchIds.put( searchProtein_id, searchIdsForProtein );
-								}
-								searchIdsForProtein.add( search.getSearchId() );
-							}
-						}
-					}
-					{
-						UnlinkedDimerPeptideProteinMappingResult unlinkedDimerPeptideProteinMappingResult =
-								UnlinkedDimerPeptideProteinMapping.getInstance()
-								.getSearchProteinUnlinkedAndDimerWrapperLists( search, searcherCutoffValuesSearchLevel, linkedPositions_FilterExcludeLinksWith_Param );
-						List<SearchProteinDimerWrapper> wrappedDimerLinks = 
-								unlinkedDimerPeptideProteinMappingResult.getSearchProteinDimerWrapperList();
-						for ( SearchProteinDimerWrapper wrappedDimer : wrappedDimerLinks ) {
-							SearchProteinDimer dimer = wrappedDimer.getSearchProteinDimer();
-							SearchProtein searchProtein_1 = dimer.getProtein1();
-							SearchProtein searchProtein_2 = dimer.getProtein2();
-							Integer searchProtein_id_1 = searchProtein_1.getProteinSequenceVersionObject().getProteinSequenceVersionId();
-							Integer searchProtein_id_2 = searchProtein_2.getProteinSequenceVersionObject().getProteinSequenceVersionId();
-							{
-								Set<Integer> searchIdsForProtein_1 =
-										allProteinsExcludeProteinSelectOnWebPageKeyProteinIdValueSearchIds.get( searchProtein_id_1 );
-								if ( searchIdsForProtein_1 == null ) {
-									searchIdsForProtein_1 = new HashSet<>();
-									allProteinsExcludeProteinSelectOnWebPageKeyProteinIdValueSearchIds.put( searchProtein_id_1, searchIdsForProtein_1 );
-								}
-								searchIdsForProtein_1.add( search.getSearchId() );
-							}
-							{
-								Set<Integer> searchIdsForProtein_2 =
-										allProteinsExcludeProteinSelectOnWebPageKeyProteinIdValueSearchIds.get( searchProtein_id_2 );
-								if ( searchIdsForProtein_2 == null ) {
-									searchIdsForProtein_2 = new HashSet<>();
-									allProteinsExcludeProteinSelectOnWebPageKeyProteinIdValueSearchIds.put( searchProtein_id_2, searchIdsForProtein_2 );
-								}
-								searchIdsForProtein_2.add( search.getSearchId() );
-							}
-						}
-						List<SearchProteinUnlinkedWrapper> wrappedUnlinkedLinks = 
-								unlinkedDimerPeptideProteinMappingResult.getSearchProteinUnlinkedWrapperList();
-						for ( SearchProteinUnlinkedWrapper wrappedUnlinked : wrappedUnlinkedLinks ) {
-							SearchProteinUnlinked unlinked = wrappedUnlinked.getSearchProteinUnlinked();
-							SearchProtein searchProtein = unlinked.getProtein();
-							Integer searchProtein_id = searchProtein.getProteinSequenceVersionObject().getProteinSequenceVersionId();
-							{
-								Set<Integer> searchIdsForProtein =
-										allProteinsExcludeProteinSelectOnWebPageKeyProteinIdValueSearchIds.get( searchProtein_id );
-								if ( searchIdsForProtein == null ) {
-									searchIdsForProtein = new HashSet<>();
-									allProteinsExcludeProteinSelectOnWebPageKeyProteinIdValueSearchIds.put( searchProtein_id, searchIdsForProtein );
-								}
-								searchIdsForProtein.add( search.getSearchId() );
-							}
-						}
-					}
-				}
-				List<MergedSearchProtein> allProteinsUnfilteredList = new ArrayList<>( allProteinsExcludeProteinSelectOnWebPageKeyProteinIdValueSearchIds.size() );
-				for ( Map.Entry<Integer, Set<Integer>> entry : allProteinsExcludeProteinSelectOnWebPageKeyProteinIdValueSearchIds.entrySet() ) {
-					Integer proteinId = entry.getKey();
-					Set<Integer> searchIdsForProtein = entry.getValue();
-					List<SearchDTO> searchesForProtein = new ArrayList<>( searchIdsForProtein.size() );
-					for ( Integer searchIdForProtein : searchIdsForProtein ) {
-						SearchDTO searchForProtein = searchesMapOnSearchId.get( searchIdForProtein );
-						if ( searchForProtein == null ) {
-							String msg = "Processing searchIdsForProtein, no search found in searchesMapOnId for searchIdForProtein : " + searchIdForProtein;
-							log.error( msg );
-							throw new ProxlWebappDataException( msg );
-						}
-						searchesForProtein.add(searchForProtein);
-					}
-					ProteinSequenceVersionObject ProteinSequenceObject = new ProteinSequenceVersionObject();
-					ProteinSequenceObject.setProteinSequenceVersionId( proteinId );
-					MergedSearchProtein mergedSearchProtein = new MergedSearchProtein( searchesForProtein, ProteinSequenceObject );
-					//  Exclude protein if excluded for all searches
-					boolean excludeTaxonomyIdAllSearches = true;
-					for ( SearchDTO searchDTO : searchesForProtein ) {
-						boolean excludeOnProtein =
-								ExcludeOnTaxonomyForProteinSequenceVersionIdSearchId.getInstance()
-								.excludeOnTaxonomyForProteinSequenceVersionIdSearchId( 
-										excludeTaxonomy_Ids_Set_UserInput, 
-										mergedSearchProtein.getProteinSequenceVersionObject(), 
-										searchDTO.getSearchId() );
-						if ( ! excludeOnProtein ) {
-							excludeTaxonomyIdAllSearches = false;
-							break;
-						}
-					}
-					if ( excludeTaxonomyIdAllSearches ) {
-						//////////  Taxonomy Id in list of excluded taxonomy ids so drop the record
-						continue;  //   EARLY Continue
-					}
-//					int mergedSearchProteinTaxonomyId = mergedSearchProtein.getProteinSequenceVersionObject().getTaxonomyId(); 
-//
-//					if ( excludeTaxonomy_Ids_Set_UserInput.contains( mergedSearchProteinTaxonomyId ) ) {
-//						
-//						//////////  Taxonomy Id in list of excluded taxonomy ids so drop the record
-//						
-//						continue;  //   EARLY Continue
-//					}
-					allProteinsUnfilteredList.add( mergedSearchProtein );
-				}
-				Collections.sort( allProteinsUnfilteredList, new SortMergedSearchProtein() );
-				request.setAttribute( "proteins", allProteinsUnfilteredList );
-			}
-			// build list of taxonomies to show in exclusion list
-			//    puts Map<Integer, String> into request attribute where key is taxonomy id, value is taxonomy name
-			Map<Integer, String> taxonomies = 
-					TaxonomiesForSearchOrSearches.getInstance().getTaxonomiesForSearchIds( searchIds );
-			request.setAttribute("taxonomies", taxonomies );
 			//////////////////////////////////////////////
 			/////////////////////
 			//  clear out form so value doesn't go back on the page in the form

@@ -101,7 +101,7 @@ public class ProteinNameDescriptionForProtSeqVIdSrchId_Searcher {
 				if ( resultsSB.length() > 0 ) {
 					resultsSB.append( ", " );
 				}
-				resultsSB.append( rs.getString( "name" ) );
+				resultsSB.append( rs.getString( "description" ) );
 			}
 			if ( resultsSB.length() > 0 ) {
 				result = resultsSB.toString();

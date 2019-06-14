@@ -1,9 +1,6 @@
 
 //mergedSearchesVennDiagramCreator.js
 
-//Dependent on the variable "searchesVennDiagramData" on the page.
-
-
 //JavaScript directive:   all variables have to be declared with "var", maybe other things
 "use strict";
 
@@ -26,45 +23,9 @@ var CreateMergedSearchesLinkCountsVennDiagram = function() {
 
 	///////////////////////////////////////////
 	//	This function is called on the page to create the Venn diagram
-	this.createMergedSearchesLinkCountsVennDiagram = function() {
+	this.createMergedSearchesLinkCountsVennDiagram = function({ vennDiagramDataToJSON }) {
 		try {
-			if ( typeof Modernizr === 'undefined' || ! Modernizr.svg ) {
-				console.log( "CreateMergedSearchesLinkCountsVennDiagram: SVG not supported." );
-				return;
-			}
-			var $venn_diagram_data_JSON = $("#venn_diagram_data_JSON");
-			if ( $venn_diagram_data_JSON.length === 0 ) {
-				//  No DOM element so exit
-				// console.log( "CreateMergedSearchesLinkCountsVennDiagram: No data for venn diagram." );
-				return; // EARLY EXIT
-				// throw Error( 'element with id "venn_diagram_data_JSON" not found ' );
-			}
-			var venn_diagram_data_JSONString = $venn_diagram_data_JSON.text();
-			if ( venn_diagram_data_JSONString === undefined ) {
-				//  No DOM element so exit
-				// console.log( "CreateMergedSearchesLinkCountsVennDiagram: No data for venn diagram." );
-				return; // EARLY EXIT
-				// throw Error( 'element with id "venn_diagram_data_JSON" returned .text() undefined  ' );
-			}
-			if ( venn_diagram_data_JSONString === null ) {
-				//  No DOM element so exit
-				// console.log( "CreateMergedSearchesLinkCountsVennDiagram: No data for venn diagram." );
-				return; // EARLY EXIT
-				// throw Error( 'element with id "venn_diagram_data_JSON" returned .text() null ' );
-			}
-			if ( venn_diagram_data_JSONString === "" ) {
-				//  DOM element has empty string
-				// console.log( "CreateMergedSearchesLinkCountsVennDiagram: No data for venn diagram." );
-				return; // EARLY EXIT
-				// throw Error( 'element with id "venn_diagram_data_JSON" returned .text() empty string "" ' );
-			}
-			var venn_diagram_data = null;
-			try {
-				venn_diagram_data = JSON.parse( venn_diagram_data_JSONString );
-			} catch( e ) {
-				console.log( 'element with id "venn_diagram_data_JSON" does not contain valid JSON, failed to parse as JSON ' );
-				throw Error( 'element with id "venn_diagram_data_JSON" does not contain valid JSON, failed to parse as JSON ' );
-			}
+			var venn_diagram_data = vennDiagramDataToJSON;
 
 			var width = 300;
 			var height = 150;

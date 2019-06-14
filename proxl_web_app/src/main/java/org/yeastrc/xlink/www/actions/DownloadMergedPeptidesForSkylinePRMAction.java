@@ -152,6 +152,7 @@ public class DownloadMergedPeptidesForSkylinePRMAction extends Action {
 						PeptidesMergedCommonPageDownload.getInstance()
 						.getWebMergedPeptideRecords(
 								form,
+								null, // MergedPeptideQueryJSONRoot mergedPeptideQueryJSONRoot_Param
 								projectSearchIdsListDeduppedSorted,
 								searches,
 								searchesMapOnSearchId,

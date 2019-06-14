@@ -1,0 +1,31 @@
+{{!-- protein_Coverage_Entry.handlebars in 'protein_page' 
+
+	Protein Coverage Page Single Search AND Multiple Searches - Main Table - Main Data Row
+--}}
+
+
+    <tr>
+        <td>{{ coverage.name }}</td>
+        <td>{{ coverage.numResidues }}</td>
+        <td>
+            {{ coverage.sequenceCoverage }}
+        </td>
+        <td>{{ coverage.numLinkableResidues }}</td>
+        <td>{{ coverage.numLinkableResiduesCovered }}</td>
+        <td>{{ coverage.linkableResiduesCoverageFmt }}</td>
+
+        <td>{{ coverage.numMLCResidues }}</td>
+        <td>{{ coverage.mlcsequenceCoverage }}</td>
+        
+        <td>{{ coverage.numLCResidues }}</td>
+        <td>{{ coverage.lcsequenceCoverage }}</td>
+        
+        <td>{{ coverage.monolinkedResidues }}</td>
+        <td>{{ coverage.msequenceCoverage }}</td>
+        
+        <td>{{ coverage.looplinkedResidues }}</td>
+        <td>{{ coverage.lsequenceCoverage }}</td>
+        
+        <td>{{ coverage.crosslinkedResidues }}</td>
+        <td>{{ coverage.csequenceCoverage }}</td>
+    </tr>

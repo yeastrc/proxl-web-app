@@ -35,14 +35,13 @@
 
 		<script type="text/javascript" src="js/libs/snap.svg-min.js"></script> <%--  Used by lorikeetPageProcessing.js --%>
 
+		<script type="text/javascript" src="js/libs/spin.min.js"></script> 
+
 				<%-- 
 					The Struts Action for this page must call GetProteinNamesTooltipConfigData
 					This include is required on this page:
 					/WEB-INF/jsp-includes/proteinNameTooltipDataForJSCode.jsp
 				  --%>
-
-		<script type="text/javascript" src="static/js_generated_bundles/data_pages/crosslinkProteinView-bundle.js?x=${cacheBustValue}"></script>
-	
 	
 		<link rel="stylesheet" href="css/tablesorter.css" type="text/css" media="print, projection, screen" />
 		<link type="text/css" rel="stylesheet" href="css/jquery.qtip.min.css" />
@@ -61,13 +60,17 @@
 
 <%@ include file="/WEB-INF/jsp-includes/header_main.jsp" %>
 		
+	<%@ include file="/WEB-INF/jsp-includes/body_section_data_pages_after_header_main.jsp" %>
+		
 
 	<input type="hidden" id="project_id" value="<c:out value="${ project_id }"></c:out>"> 
 	
 	<%--  Put Project_Search_Id on the page for the JS code --%>
 	<input type="hidden" class=" project_search_id_jq " value="<c:out value="${ projectSearchId }"></c:out>">
 		
-		
+		<%--  loading spinner location --%>
+	<div style="opacity:1.0;position:absolute;left:50%;top:50%; z-index: 20001" id="coverage-map-loading-spinner" style="" ></div>
+	
 	<%--  used by createTooltipForProteinNames.js --%>
 	<%@ include file="/WEB-INF/jsp-includes/proteinNameTooltipDataForJSCode.jsp" %>
 	
@@ -144,17 +147,7 @@
 			</html:form>
 				
 			
-			
-<%--
-		Moved JS call to the "Update" button
-		 						
-			<form action="javascript:viewSearchCrosslinkProteinPageCode.updatePageForFormParams()" method="get" > 
-			
-				--%>	 <%-- id="form_get_for_updated_parameters" --%>
-			
-			
-			
-			<table style="border-width:0px;">
+			<table id="search_details_and_main_filter_criteria_main_page_root" style=" border-width: 0px; display: none; ">
 					
 				<%--  Set to false to not show color block before search for key --%>
 				<c:set var="showSearchColorBlock" value="${ false }" />
@@ -175,16 +168,7 @@
 
 				<tr>
 					<td>Exclude organisms:</td>
-					<td>
-						<logic:iterate id="taxonomy" name="taxonomies">
-						
-						 <label style="white-space: nowrap" >
-						  <input type="checkbox" name="excludeTaxonomy" value="<bean:write name="taxonomy" property="key"/>" class=" excludeTaxonomy_jq " 
-						  		onchange=" if ( window.defaultPageView ) { window.defaultPageView.searchFormChanged_ForDefaultPageView(); } ; if ( window.saveView_dataPages ) { window.saveView_dataPages.searchFormChanged_ForSaveView(); }" >  
-						  
-						   <span style="font-style:italic;"><bean:write name="taxonomy" property="value"/></span>
-						 </label> 						 
-						</logic:iterate>				
+					<td id="excludeTaxonomies"> <%--  Populated in JS --%>
 					</td>
 				</tr>
 
@@ -196,9 +180,7 @@
 						--%>
 						<select name="excludedProteins" multiple="multiple" id="excludeProtein" 
 							onchange=" if ( window.defaultPageView ) { window.defaultPageView.searchFormChanged_ForDefaultPageView(); } ; if ( window.saveView_dataPages ) { window.saveView_dataPages.searchFormChanged_ForSaveView(); }" >
-	  						<logic:iterate id="protein" name="proteins">
-	  						  <option value="<c:out value="${ protein.proteinSequenceVersionObject.proteinSequenceVersionId }"></c:out>"><c:out value="${ protein.name }"></c:out></option>
-	  						</logic:iterate>
+							<%-- Populated in JS --%>
 	  					</select>
 					</td>
 				</tr>
@@ -224,184 +206,67 @@
 				</tr>
 			</table>
 			
-			<div style="height: 10px;">&nbsp;</div>
-						
-			<h3 style="display:inline;">Crosslinks (<bean:write name="numCrosslinks" />):</h3>
-			<div style="display:inline;">
-				[<a class="tool_tip_attached_jq" data-tooltip="View looplinks (instead of crosslinks)" 
-						href="<proxl:defaultPageUrl pageName="/looplinkProtein" projectSearchId="${ search.projectSearchId }">looplinkProtein.do?<bean:write name="queryString" /></proxl:defaultPageUrl>"
-						>View Looplinks (<bean:write name="numLooplinks" />)</a>]
-				[<a class="tool_tip_attached_jq" data-tooltip="View Protein List" 
-						href="<proxl:defaultPageUrl pageName="/allProtein" projectSearchId="${ search.projectSearchId }">allProtein.do?<bean:write name="queryString" /></proxl:defaultPageUrl>"
-						>Protein List</a>]
+			<%--  <div> to contain all the remaining items above the main data display table --%>
+			<div id="main_items_below_filter_criteria_table_above_main_display_table" style="display: none;"> 
 				
-				
-				
-						<span id="data-download">
-							<a
-								data-tooltip="Download data" style="font-size:10pt;white-space:nowrap;" 
-								href="#" class="tool_tip_attached_jq download-link">[Download Data]</a>
-								
-							<span id="data-download-options">
-								Choose file format:
-								<a data-tooltip="Download all cross-links and mono-links as a tab-delimited file." id="download-protein-data" class="download-option tool_tip_attached_jq" href="downloadMergedProteins.do?<bean:write name="queryString" />" style="margin-top:5px;">Download all cross-links and mono-links (<bean:write name="numLinks" />)</a>
-								<a data-tooltip="Download all distinct unique distance restraints (cross-links and loop-links) as tab-delimited text." id="download-protein-udrs" class="download-option tool_tip_attached_jq" href="downloadMergedProteinUDRs.do?<bean:write name="queryString" />">Download distinct UDRs (<bean:write name="numDistinctLinks" />)</a>
-								
-								<c:if test="${ showDownloadLinks_Skyline}">
-									<br><span style="font-size:15px;">Skyline export</span><br>
-									<c:if test="${ showDownloadLink_SkylineShulman }">
-										<a data-tooltip="Export peptides for listed proteins for import into Skyline quant. tool. (Shulman et al)" id="download-protein-shulman" class="download-option tool_tip_attached_jq" href="downloadMergedProteinsPeptidesSkylineShulman.do?<bean:write name="queryString" />">Export peptides for Skyline quant (Shulman et al)</a>
-									</c:if>
-									<a data-tooltip="Export peptides for listed proteins for Skyline PRM analysis. (Chavez et al)" id="download-protein-shulman" class="download-option tool_tip_attached_jq" href="downloadMergedProteinsPeptidesSkylineEng.do?<bean:write name="queryString" />">Export peptides for Skyline PRM (Chavez et al)</a>
-								</c:if>
-								
-								<br><span style="font-size:15px;">xiNET export</span><br>
-								<a data-tooltip="Download FASTA file for proteins found in cross-links or loop-links." id="download-protein-udrs" class="download-option tool_tip_attached_jq" href="downloadMergedProteinsFASTA.do?<bean:write name="queryString" />">Download FASTA file</a>
-								<a data-tooltip="View CLMS-CSV formatted data for use in xiNET (http://crosslinkviewer.org/)" id="download-protein-xinet" class="download-option tool_tip_attached_jq" href="downloadMergedProteinsCLMS_CSV.do?<bean:write name="queryString" />">Export data for xiNET visualization</a>
-								
-								<br><span style="font-size:15px;">xVis export</span><br>
-								<a data-tooltip="Export protein lengths file for cross-links and loop-links. For use in xVis (https://xvis.genzentrum.lmu.de/)" id="download-protein-lengths" class="download-option tool_tip_attached_jq" href="downloadMergedProteinsLengths.do?<bean:write name="queryString" />">Export protein lengths for use in xVis.</a>
-								<a data-tooltip="Export cross-links and loop-links for use in xVis (https://xvis.genzentrum.lmu.de/)" id="download-links-for-xvis" class="download-option tool_tip_attached_jq" href="downloadMergedProteinsXvis.do?<bean:write name="queryString" />">Download cross-links and loop-links for use in xVis.</a>
-							</span>
-						</span>
-			</div>
-			
-			<%--  Block for user choosing which annotation types to display  --%>
-			<%@ include file="/WEB-INF/jsp-includes/annotationDisplayManagementBlock.jsp" %>
-
-
-			<%--  Create via javascript the parts that will be above the main table --%>
-			<script type="text/javascript">
-				
-				//  If object exists, call function on it now, otherwise call the function on document ready
-				if ( window.viewSearchCrosslinkProteinPageCode ) {
-					window.viewSearchCrosslinkProteinPageCode.createPartsAboveMainTable();
-				} else {
-	
-					$(document).ready(function() 
-					    { 
-						   setTimeout( function() { // put in setTimeout so if it fails it doesn't kill anything else
-							  
-							   window.viewSearchCrosslinkProteinPageCode.createPartsAboveMainTable();
-						   },10);
-					    } 
-					); // end $(document).ready(function() 
-				}
+				<div style="height: 10px;">&nbsp;</div>
 							
-			</script>
-			
-
-			
-				<table style="" id="main_page_data_table" class="tablesorter top_data_table_jq ">
-				
-					<thead>
-					<tr>
-						<th data-tooltip="Name of first protein" class="tool_tip_attached_jq" style="text-align:left;width:10%;font-weight:bold;">Protein 1</th>
-						<th data-tooltip="Linked position in first protein" class="tool_tip_attached_jq integer-number-column-header" style="width:10%;font-weight:bold;">Position</th>
-						<th data-tooltip="Name of second protein" class="tool_tip_attached_jq" style="width:10%;font-weight:bold;">Protein 2</th>
-						<th data-tooltip="Linked position in second protein" class="tool_tip_attached_jq integer-number-column-header" style="width:10%;font-weight:bold;">Position</th>
-						<th data-tooltip="Number of peptide spectrum matches showing this link" class="tool_tip_attached_jq integer-number-column-header" style="width:10%;font-weight:bold;">PSMs</th>
-						<th data-tooltip="Number of distinct pairs of peptides showing link" class="tool_tip_attached_jq integer-number-column-header" style="width:10%;font-weight:bold;">#&nbsp;Peptides</th>
-						<th data-tooltip="Number of found peptide pairs that uniquely map to these two proteins from the FASTA file" class="tool_tip_attached_jq integer-number-column-header" style="width:10%;font-weight:bold;">#&nbsp;Unique Peptides</th>
-						
-
-						<c:forEach var="peptideAnnotationDisplayNameDescription" items="${ peptideAnnotationDisplayNameDescriptionList }">
-
-								<%--  Consider displaying the description somewhere   peptideAnnotationDisplayNameDescription.description --%>
-							<th data-tooltip="Best Peptide-level <c:out value="${ peptideAnnotationDisplayNameDescription.displayName }"></c:out> for this peptide (or linked pair)" 
-									class="tool_tip_attached_jq" 
-									style="width:10%;font-weight:bold;">
-								<span style="white-space: nowrap">Best Peptide</span>
-								<span style="white-space: nowrap"><c:out value="${ peptideAnnotationDisplayNameDescription.displayName }"></c:out></span>
-							</th>
-							
-						</c:forEach>
-										
-
-						<c:forEach var="psmAnnotationDisplayNameDescription" items="${ psmAnnotationDisplayNameDescriptionList }">
-
-								<%--  Consider displaying the description somewhere   psmAnnotationDisplayNameDescription.description --%>
-						  <th data-tooltip="Best PSM-level <c:out value="${ psmAnnotationDisplayNameDescription.displayName }"></c:out> for PSMs matched to peptides that show this link" class="tool_tip_attached_jq" style="width:10%;font-weight:bold;"
-							><span style="white-space: nowrap">Best PSM</span> 
-								<span style="white-space: nowrap"><c:out value="${ psmAnnotationDisplayNameDescription.displayName }"></c:out></span></th>
-
-						</c:forEach>
-							
-					</tr>
-					</thead>
-						
-					<logic:iterate id="crosslink" name="crosslinks">
-							<tr id="<bean:write name="crosslink" property="protein1.proteinSequenceVersionObject.proteinSequenceVersionId" />-<bean:write name="crosslink" property="protein1Position" />-<bean:write name="crosslink" property="protein2.proteinSequenceVersionObject.proteinSequenceVersionId" />-<bean:write name="crosslink" property="protein2Position" />"
-								style="cursor: pointer; "
-								
-								onclick="viewCrosslinkReportedPeptidesLoadedFromWebServiceTemplate.showHideCrosslinkReportedPeptides( { clickedElement : this })"
-								data-project_search_id="${ search.projectSearchId }"
-								data-protein_1_id="<bean:write name="crosslink" property="protein1.proteinSequenceVersionObject.proteinSequenceVersionId" />"
-								data-protein_2_id="<bean:write name="crosslink" property="protein2.proteinSequenceVersionObject.proteinSequenceVersionId" />"
-								data-protein_1_position="<bean:write name="crosslink" property="protein1Position" />"
-								data-protein_2_position="<bean:write name="crosslink" property="protein2Position" />"
-							>
-								<td><span class="proteinName" id="protein-id-<bean:write name="crosslink" property="protein1.proteinSequenceVersionObject.proteinSequenceVersionId" />"><bean:write name="crosslink" property="protein1.name" /></span></td>
-								<td class="integer-number-column"><bean:write name="crosslink" property="protein1Position" /></td>
-								<td><span class="proteinName" id="protein-id-<bean:write name="crosslink" property="protein2.proteinSequenceVersionObject.proteinSequenceVersionId" />"><bean:write name="crosslink" property="protein2.name" /></span></td>
-								<td class="integer-number-column"><bean:write name="crosslink" property="protein2Position" /></td>
-								<td class="integer-number-column"><bean:write name="crosslink" property="numPsms" /></td>
-								
-								<td class="integer-number-column"><a class="show-child-data-link   " 
-										href="javascript:"
-										><bean:write name="crosslink" property="numLinkedPeptides" 
-											/><span class="toggle_visibility_expansion_span_jq" 
-												><img src="images/icon-expand-small.png" 
-													class=" icon-expand-contract-in-data-table "
-													></span><span class="toggle_visibility_contraction_span_jq" 
-														style="display: none;" 
-														><img src="images/icon-collapse-small.png"
-															class=" icon-expand-contract-in-data-table "
-															></span>
-									</a>
-								</td>								
-								
-								<td class="integer-number-column"><bean:write name="crosslink" property="numUniqueLinkedPeptides" /></td>
-								
-						
-
-								<c:forEach var="annotationValue" items="${ crosslink.peptideAnnotationValueList }">
-			
-									<td style="white-space: nowrap"><c:out  value="${ annotationValue }" /></td>
-								</c:forEach>	
-
-								<c:forEach var="annotationValue" items="${ crosslink.psmAnnotationValueList }">
-			
-									<td><c:out  value="${ annotationValue }" /></td>
-								</c:forEach>															
-								
-							</tr>
-							
-							<tr class="expand-child" style="display:none;">
-							
-	
-									<%--  Adjust colspan for number of columns in current table --%>
+				<h3 style="display:inline;">Crosslinks (<span id="numCrosslinks"></span>):</h3>
+				<div style="display:inline;">
+					[<a class="tool_tip_attached_jq" data-tooltip="View looplinks (instead of crosslinks)" 
+							href="<proxl:defaultPageUrl pageName="/looplinkProtein" projectSearchId="${ search.projectSearchId }">looplinkProtein.do?<bean:write name="queryString" /></proxl:defaultPageUrl>"
+							>View Looplinks (<span id="numLooplinks"></span>)</a>]
+					[<a class="tool_tip_attached_jq" data-tooltip="View Protein List" 
+							href="<proxl:defaultPageUrl pageName="/allProtein" projectSearchId="${ search.projectSearchId }">allProtein.do?<bean:write name="queryString" /></proxl:defaultPageUrl>"
+							>Protein List</a>]
+					
+					
+					
+							<span id="data-download">
+								<a
+									data-tooltip="Download data" style="font-size:10pt;white-space:nowrap;" 
+									href="#" class="tool_tip_attached_jq download-link">[Download Data]</a>
 									
-								<%--  Add to value for length of Peptide and PSM value lists --%>
-								<c:set var="columnsAddedForAnnotationData" 
-									value="${ fn:length( crosslink.peptideAnnotationValueList ) + fn:length( crosslink.psmAnnotationValueList ) }" />
-																								
-															
-								<td colspan="${ 8 + columnsAddedForAnnotationData }" align="center" class=" child_data_container_jq ">
-								
-									<div style="color: green; font-size: 16px; padding-top: 10px; padding-bottom: 10px;" >
-										Loading...
-									</div>
-								</td>
-							</tr>
-
-						
-					</logic:iterate>
-				</table>
+								<span id="data-download-options">
+									Choose file format:
+									<a data-tooltip="Download all cross-links and mono-links as a tab-delimited file." id="download-protein-data" class="download-option tool_tip_attached_jq" href="downloadMergedProteins.do?<bean:write name="queryString" />" style="margin-top:5px;"
+										>Download all cross-links and mono-links (<span id="numLinks"></span>)</a>
+									<a data-tooltip="Download all distinct unique distance restraints (cross-links and loop-links) as tab-delimited text." id="download-protein-udrs" class="download-option tool_tip_attached_jq" href="downloadMergedProteinUDRs.do?<bean:write name="queryString" />"
+										>Download distinct UDRs (<span id="numDistinctLinks"></span>)</a>
+									
+									<c:if test="${ showDownloadLinks_Skyline}">
+										<br><span style="font-size:15px;">Skyline export</span><br>
+										<c:if test="${ showDownloadLink_SkylineShulman }">
+											<a data-tooltip="Export peptides for listed proteins for import into Skyline quant. tool. (Shulman et al)" id="download-protein-shulman" class="download-option tool_tip_attached_jq" href="downloadMergedProteinsPeptidesSkylineShulman.do?<bean:write name="queryString" />">Export peptides for Skyline quant (Shulman et al)</a>
+										</c:if>
+										<a data-tooltip="Export peptides for listed proteins for Skyline PRM analysis. (Chavez et al)" id="download-protein-shulman" class="download-option tool_tip_attached_jq" href="downloadMergedProteinsPeptidesSkylineEng.do?<bean:write name="queryString" />">Export peptides for Skyline PRM (Chavez et al)</a>
+									</c:if>
+									
+									<br><span style="font-size:15px;">xiNET export</span><br>
+									<a data-tooltip="Download FASTA file for proteins found in cross-links or loop-links." id="download-protein-udrs" class="download-option tool_tip_attached_jq" href="downloadMergedProteinsFASTA.do?<bean:write name="queryString" />">Download FASTA file</a>
+									<a data-tooltip="View CLMS-CSV formatted data for use in xiNET (http://crosslinkviewer.org/)" id="download-protein-xinet" class="download-option tool_tip_attached_jq" href="downloadMergedProteinsCLMS_CSV.do?<bean:write name="queryString" />">Export data for xiNET visualization</a>
+									
+									<br><span style="font-size:15px;">xVis export</span><br>
+									<a data-tooltip="Export protein lengths file for cross-links and loop-links. For use in xVis (https://xvis.genzentrum.lmu.de/)" id="download-protein-lengths" class="download-option tool_tip_attached_jq" href="downloadMergedProteinsLengths.do?<bean:write name="queryString" />">Export protein lengths for use in xVis.</a>
+									<a data-tooltip="Export cross-links and loop-links for use in xVis (https://xvis.genzentrum.lmu.de/)" id="download-links-for-xvis" class="download-option tool_tip_attached_jq" href="downloadMergedProteinsXvis.do?<bean:write name="queryString" />">Download cross-links and loop-links for use in xVis.</a>
+								</span>
+							</span>
+				</div>
+				
+				<%--  Block for user choosing which annotation types to display  --%>
+				<%@ include file="/WEB-INF/jsp-includes/annotationDisplayManagementBlock.jsp" %>
+				
+			</div> <%--  END: <div id="main_items_below_filter_criteria_table_above_main_display_table">  --%>
+			
+				<%--  Main Table of Protein Data will be placed here --%>
+			<div id="proteins_from_webservice_container" style="display: none;"></div>
 
 		</div>
 	
 
+		<script type="text/javascript" src="static/js_generated_bundles/data_pages/crosslinkProteinView-bundle.js?x=${cacheBustValue}"></script>
+	
+	
 <%@ include file="/WEB-INF/jsp-includes/footer_main.jsp" %>
 
 

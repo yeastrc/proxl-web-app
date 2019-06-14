@@ -40,6 +40,8 @@
 					
 		<script type="text/javascript" src="js/libs/snap.svg-min.js"></script> <%--  Used by lorikeetPageProcessing.js --%>
 
+		<script type="text/javascript" src="js/libs/spin.min.js"></script> 
+
 				<%-- 
 					The Struts Action for this page must call GetProteinNamesTooltipConfigData
 					This include is required on this page:
@@ -47,9 +49,6 @@
 				  --%>
 
 
-		<script type="text/javascript" src="static/js_generated_bundles/data_pages/peptideView-bundle.js?x=${cacheBustValue}"></script>
-	
-		
 		<link rel="stylesheet" href="css/tablesorter.css" type="text/css" media="print, projection, screen" />
 		<link type="text/css" rel="stylesheet" href="css/jquery.qtip.min.css" />
 
@@ -69,11 +68,15 @@
 
 <%@ include file="/WEB-INF/jsp-includes/header_main.jsp" %>
 
+	<%@ include file="/WEB-INF/jsp-includes/body_section_data_pages_after_header_main.jsp" %>
+
 	<input type="hidden" id="project_id" value="<c:out value="${ project_id }"></c:out>"> 
 	
 	<%--  Put Project_Search_Id on the page for the JS code --%>
 	<input type="hidden" class=" project_search_id_jq " value="<c:out value="${ projectSearchId }"></c:out>">
 		
+	<%--  loading spinner location --%>
+	<div style="opacity:1.0;position:absolute;left:50%;top:50%; z-index: 20001" id="coverage-map-loading-spinner" style="" ></div>
 
 	<%--  used by createTooltipForProteinNames.js --%>
 	<%@ include file="/WEB-INF/jsp-includes/proteinNameTooltipDataForJSCode.jsp" %>
@@ -146,7 +149,8 @@
 			</html:form>
 					
 
-			<table style="border-width:0px;">
+			<table id="search_details_and_main_filter_criteria_main_page_root" 
+				style=" border-width: 0px; display: none; ">
 
 					
 				<%--  Set to false to not show color block before search for key --%>
@@ -244,11 +248,14 @@
 			
 			</table>
 			
-			<div style="height: 10px;">&nbsp;</div>
-	
-			<h3 style="display:inline;">Peptides (<c:out value="${ viewSearchPeptidesPageDataRoot.peptideListSize }"></c:out>):</h3>
-			
-			<div style="display:inline;">
+			<%--  <div> to contain all the remaining items above the main data display table --%>
+			<div id="main_items_below_filter_criteria_table_above_main_display_table" style="display: none;"> 
+				
+				<div style="height: 10px;">&nbsp;</div>
+		
+				<h3 style="display:inline;">Peptides (<span id="peptide_count_display"></span>):</h3>
+				
+				<div style="display:inline;">
 			
 						<span id="data-download">
 							<a
@@ -267,213 +274,23 @@
 								</c:if>
 							</span>
 						</span>
-			</div>
-
-						
-			<%--  Block for user choosing which annotation types to display  --%>
-			<%@ include file="/WEB-INF/jsp-includes/annotationDisplayManagementBlock.jsp" %>
-
-
-
-			<%--  Create via javascript the parts that will be above the main table --%>
-			<script type="text/javascript">
-			
-			//  If object exists, call function on it now, otherwise call the function on document ready
-			if ( window.viewSearchPeptidePageCode ) {
-				window.viewSearchPeptidePageCode.createPartsAboveMainTable();
-			} else {
-
-				$(document).ready(function() 
-				    { 
-					   setTimeout( function() { // put in setTimeout so if it fails it doesn't kill anything else
-						  
-						   window.viewSearchPeptidePageCode.createPartsAboveMainTable();
-					   },10);
-				    } 
-				); // end $(document).ready(function() 
-			}
-				
-			</script>
-			
-  
-			  
-				<table style="" id="crosslink-table" class="tablesorter  top_data_table_jq ">
-				
-					<thead>
-					<tr>
-						<th data-tooltip="Type of peptide (e.g., crosslink, looplink, or unlinked)" class="tool_tip_attached_jq" style="text-align:left;width:10%;font-weight:bold;">Type</th>
-						<th data-tooltip="The peptide as reported by search program (e.g., Kojak or XQuest)" class="tool_tip_attached_jq" style="text-align:left;width:10%;font-weight:bold;">Reported peptide</th>
-						<th data-tooltip="Sequence of matched peptide (or first peptide in case of crosslinks)" class="tool_tip_attached_jq" style="text-align:left;width:10%;font-weight:bold;">Peptide 1</th>
-						<th data-tooltip="Linked position in first peptide (or starting position of looplink)" class="tool_tip_attached_jq integer-number-column-header" style="width:5%;font-weight:bold;">Pos</th>
-						<th data-tooltip="Sequenced of second matched peptide in crosslink" class="tool_tip_attached_jq" style="text-align:left;width:10%;font-weight:bold;">Peptide 2</th>
-						<th data-tooltip="Linked position in second peptide (or ending position of looplink)" class="tool_tip_attached_jq integer-number-column-header" style="width:5%;font-weight:bold;">Pos</th>
-						<th data-tooltip="Proteins (and positions) matched by first peptide and position" class="tool_tip_attached_jq" style="text-align:left;width:5%;font-weight:bold;">Protein 1</th>
-						<th data-tooltip="Proteins (and positions) matched by second peptide and position" class="tool_tip_attached_jq" style="text-align:left;width:5%;font-weight:bold;">Protein 2</th>
-
-						<c:forEach var="peptideAnnotationDisplayNameDescription" items="${ viewSearchPeptidesPageDataRoot.peptideAnnotationDisplayNameDescriptionList }">
-
-								<%--  Consider displaying the description somewhere   peptideAnnotationDisplayNameDescription.description --%>
-							<th data-tooltip="Peptide-level <c:out value="${ peptideAnnotationDisplayNameDescription.displayName }"></c:out> for this peptide (or linked pair)" 
-									class="tool_tip_attached_jq" 
-									style="width:10%;font-weight:bold;">
-								<span style="white-space: nowrap"><c:out value="${ peptideAnnotationDisplayNameDescription.displayName }"></c:out></span>
-							</th>
-							
-						</c:forEach>
-															
-						
-						<th data-tooltip="Number of PSMs matched to this peptide (or linked pair)" class="tool_tip_attached_jq integer-number-column-header" style="width:10%;font-weight:bold; white-space: nowrap;"># PSMs</th>
-						
-						<c:if test="${ viewSearchPeptidesPageDataRoot.showNumberUniquePSMs }">
-							<th data-tooltip="Number of scans that do not uniquely match to this reported peptide" class="tool_tip_attached_jq integer-number-column-header" style="width:10%;font-weight:bold; white-space: nowrap;"># Non-unique</th>
-						</c:if>
-						
-						<c:forEach var="psmAnnotationDisplayNameDescription" items="${ viewSearchPeptidesPageDataRoot.psmAnnotationDisplayNameDescriptionList }">
-
-								<%--  Consider displaying the description somewhere   psmAnnotationDisplayNameDescription.description --%>
-						  <th data-tooltip="Best PSM-level <c:out value="${ psmAnnotationDisplayNameDescription.displayName }"></c:out> for PSMs matched to peptides that show this link" class="tool_tip_attached_jq" style="width:10%;font-weight:bold;"
-							><span style="white-space: nowrap">Best PSM</span> 
-								<span style="white-space: nowrap"><c:out value="${ psmAnnotationDisplayNameDescription.displayName }"></c:out></span></th>
-
-						</c:forEach>
-									
-					</tr>
-					</thead>
-						
-					<c:forEach var="peptideEntry" items="${ viewSearchPeptidesPageDataRoot.peptideList }">
-
-							<tr id="reported-peptide-<bean:write name="peptideEntry" property="reportedPeptide.id"/>"
-								style="cursor: pointer; "
-								onclick="viewPsmsLoadedFromWebServiceTemplate.showHidePsms( { clickedElement : this } )"
-								data-reported_peptide_id="${ peptideEntry.reportedPeptide.id }"
-								data-project_search_id="${ viewSearchPeptidesPageDataRoot.projectSearchId }"
-								>
-								
-								<td>
-									<c:choose>
-										<c:when test="${ not empty peptideEntry.searchPeptideCrosslink }">Crosslink</c:when>
-										<c:when test="${ not empty peptideEntry.searchPeptideLooplink }">Looplink</c:when>
-<%-- 										
-										<c:when test="${ not empty peptideEntry.searchPeptideUnlinked or not empty peptideEntry.searchPeptideDimer }"
-											>Unlinked</c:when>
---%>											
-										<c:when test="${ not empty peptideEntry.searchPeptideUnlinked }"
-											>Unlinked</c:when>
-										<c:when test="${ not empty peptideEntry.searchPeptideDimer }"
-											>Dimer</c:when>
-										<c:otherwise>Unknown</c:otherwise>
-									</c:choose>
-								
-								</td>
-								
-								<td><bean:write name="peptideEntry" property="reportedPeptide.sequence" /></td>
-								<td><bean:write name="peptideEntry" property="peptide1.sequence" /></td>
-								<td class="integer-number-column" ><bean:write name="peptideEntry" property="peptide1Position" /></td>
-								<td><c:if test="${ not empty peptideEntry.peptide2 }" ><bean:write name="peptideEntry" property="peptide2.sequence" /></c:if></td>
-								<td class="integer-number-column" ><bean:write name="peptideEntry" property="peptide2Position" /></td>
-								<td>
-								  <c:if test="${ not empty peptideEntry.peptide1ProteinPositions }">
-									<logic:iterate id="pp" name="peptideEntry" property="peptide1ProteinPositions">
-										<span class="proteinName" id="protein-id-<bean:write name="pp" property="protein.proteinSequenceVersionObject.proteinSequenceVersionId" />">
-											<bean:write name="pp" property="protein.name" 
-												/><c:if test="${ not empty pp.position1 }"
-														>(<bean:write name="pp" property="position1" 
-													/><c:if test="${ not empty pp.position2 }"
-														>, <bean:write name="pp" property="position2" 
-														/></c:if>)</c:if><br>
-										</span>
-									</logic:iterate>
-								  </c:if>
-								</td>
-								<td>
-								  <c:if test="${ not empty peptideEntry.peptide2ProteinPositions }">
-									<logic:iterate id="pp" name="peptideEntry" property="peptide2ProteinPositions">
-										<span class="proteinName" id="protein-id-<bean:write name="pp" property="protein.proteinSequenceVersionObject.proteinSequenceVersionId" />">
-											<bean:write name="pp" property="protein.name" 
-												/><c:if test="${ not empty pp.position1 }"
-														>(<bean:write name="pp" property="position1" 
-													/><c:if test="${ not empty pp.position2 }"
-														>, <bean:write name="pp" property="position2" 
-														/></c:if>)</c:if><br>
-										</span>
-									</logic:iterate>
-								  </c:if>
-								</td>
-
-								<c:forEach var="annotationValue" items="${ peptideEntry.peptideAnnotationValueList }">
-			
-									<td style="white-space: nowrap"><c:out  value="${ annotationValue }" /></td>
-								</c:forEach>								
-								
-
-								<td class="integer-number-column" ><a class="show-child-data-link  " 
-										href="javascript:"
-
-										><bean:write name="peptideEntry" property="numPsms" 
-											/><span class="toggle_visibility_expansion_span_jq" 
-												><img src="images/icon-expand-small.png" 
-													class=" icon-expand-contract-in-data-table "
-													></span><span class="toggle_visibility_contraction_span_jq" 
-														style="display: none;" 
-														><img src="images/icon-collapse-small.png"
-															class=" icon-expand-contract-in-data-table "
-															></span>
-									</a>
-								</td>
-
-								<c:if test="${ viewSearchPeptidesPageDataRoot.showNumberUniquePSMs }">
-									<c:set var="highlightCellClass" value="" />
-									<c:if test="${ peptideEntry.numNonUniquePsms ne 0 }">
-										<c:set var="highlightCellClass" value=" highlight-cell " />
-									</c:if>
-									<td class="integer-number-column ${ highlightCellClass }" 
-										><bean:write name="peptideEntry" property="numNonUniquePsms" />
-									</td>
-								</c:if>					
-			
-								<c:forEach var="annotationValue" items="${ peptideEntry.psmAnnotationValueList }">
-			
-									<td><c:out  value="${ annotationValue }" /></td>
-								</c:forEach>
-								
-							</tr>
-
-							<tr class="expand-child" style="display:none;">
-							 
-								<%--  Adjust colspan for number of columns in current table --%>
-								
-								
-								<%--  Init to zero --%>
-								<c:set var="colspanPeptidesAdded" value="${ 0 }" />
-								
-								<%--   Now add 1 for each column being displayed --%>
-								
-								<c:forEach var="annotationValue" items="${ peptideEntry.peptideAnnotationValueList }">
-			
-									<c:set var="colspanPeptidesAdded" value="${ colspanPeptidesAdded + 1 }" />
-								</c:forEach>								
-													
-								<c:forEach var="annotationValue" items="${ peptideEntry.psmAnnotationValueList }">
-			
-									<c:set var="colspanPeptidesAdded" value="${ colspanPeptidesAdded + 1 }" />
-								</c:forEach>
-											
-															 
-							 <td colspan="<c:out value="${ 10 + colspanPeptidesAdded }"></c:out>" align="center" class=" child_data_container_jq ">
-									
-									<div style="color: green; font-size: 16px; padding-top: 10px; padding-bottom: 10px;" >
-										Loading...
-									</div>
-							 </td>
-							</tr>
-
-					</c:forEach>
-				</table>
+				</div>
 	
+							
+				<%--  Block for user choosing which annotation types to display  --%>
+				<%@ include file="/WEB-INF/jsp-includes/annotationDisplayManagementBlock.jsp" %>
 			
+			</div> <%--  END: <div id="main_items_below_filter_criteria_table_above_main_display_table">  --%>
 
+			<%--  Main Table of Peptide Data will be placed here --%>
+  			<div id="peptides_from_webservice_container" style="display: none;"></div>
+  			
 		</div>
 	
+	
+	<script type="text/javascript" src="static/js_generated_bundles/data_pages/peptideView-bundle.js?x=${cacheBustValue}"></script>
+	
+		
 
 <%@ include file="/WEB-INF/jsp-includes/footer_main.jsp" %>
 

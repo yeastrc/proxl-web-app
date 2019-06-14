@@ -33,16 +33,12 @@ import { cutoffProcessingCommonCode } from 'page_js/data_pages/project_search_id
 import { webserviceDataParamsDistributionCommonCode } from 'page_js/data_pages/project_search_ids_driven_pages/common/webserviceDataParamsDistribution.js';
 
 
-$(document).ready(function() { 
-}); // end $(document).ready(function()
-
-//  Called when $(document).ready fires
 
 var onDocumentReady = function() {
 
-	setTimeout( function() { // put in setTimeout so if it fails it doesn't kill anything else
-		$("#main_page_data_table").tablesorter(); // gets exception if there are no data rows
-	},10);
+	// setTimeout( function() { // put in setTimeout so if it fails it doesn't kill anything else
+	// 	$("#main_page_data_table").tablesorter(); // gets exception if there are no data rows
+	// },10);
 
 
 }
@@ -65,22 +61,22 @@ var ViewSearchProteinPageCommonCrosslinkLooplinkCoverage = function() {
 	//  function called after all HTML above main table is generated
 	this.createPartsAboveMainTableSearchProteinPageCommon = function( params ) {
 		var objectThis = this;
-		setTimeout( function() { // put in setTimeout so if it fails it doesn't kill anything else
+		// setTimeout( function() { // put in setTimeout so if it fails it doesn't kill anything else
 			try {
 				objectThis.updateUserInputFieldsWithDataIn_query_json_field_ContentsInHiddenField( params );
 			} catch( e ) {
 				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
 				throw e;
 			}
-		},10);
-		setTimeout( () => { // put in setTimeout so if it fails it doesn't kill anything else
+		// },10);
+		// setTimeout( () => { // put in setTimeout so if it fails it doesn't kill anything else
 			try {
 				this.initialize_saveView_dataPages();
 			} catch( e ) {
 				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
 				throw e;
 			}
-		},11);
+		// },11);
 	};
 	
 	//////////////
@@ -93,10 +89,14 @@ var ViewSearchProteinPageCommonCrosslinkLooplinkCoverage = function() {
 	this.getQueryJSONString = function() {
 		return _query_json_field_String;
 	};
-	
-	/////////////////
-	this.updateUserInputFieldsWithDataIn_query_json_field_ContentsInHiddenField = function( params) {
-		
+
+
+	this.getQueryJSONObject = function() {
+
+		if ( _query_json_field_Contents ) {
+			return _query_json_field_Contents;
+		}
+
 		var $query_json_field =  $("#query_json_field_outside_form");
 		if ( $query_json_field.length === 0 ) {
 			throw Error( "No HTML field with id 'query_json_field'" );
@@ -108,6 +108,13 @@ var ViewSearchProteinPageCommonCrosslinkLooplinkCoverage = function() {
 		} catch( e ) {
 			throw Error( "Failed to parse JSON from HTML field with id 'query_json_field'.  JSON String: " + _query_json_field_String );
 		}
+		return _query_json_field_Contents;
+	};
+	
+	/////////////////
+	this.updateUserInputFieldsWithDataIn_query_json_field_ContentsInHiddenField = function( params) {
+		
+		this.getQueryJSONObject(); //  Populate createPartsAboveMainTableSearchProteinPageCommon if not populated
 		
 		if ( window.cutoffProcessingCommonCode ) {
 			cutoffProcessingCommonCode.putCutoffsOnThePage( { cutoffs : _query_json_field_Contents.cutoffs } );
@@ -230,6 +237,7 @@ var ViewSearchProteinPageCommonCrosslinkLooplinkCoverage = function() {
 		}
 		
 		//  Mark Multi <select> for chosen Proteins to exclude
+		//   (_query_json_field_Contents.excludeproteinSequenceVersionIds populated in Struts Action since may have convert from old NRSEQ Protein Id)
 		var excludeProtein = _query_json_field_Contents.excludeproteinSequenceVersionIds;
 		$("#excludeProtein").val( excludeProtein );
 	};

@@ -1,0 +1,129 @@
+{{!-- peptidePage_MultipleSearches_MainTable_header_row.handlebars in 'peptide_page' 
+
+	Peptide Page Multiple Searches - Main Table - Header Row
+	
+    The Root of data returned from webservice is in the property 'viewSearchPeptidesPageDataRoot'.
+--}}
+
+<tr>
+
+    {{#each viewSearchPeptidesPageDataRoot.searchesList as |searchesEntry| }}
+
+        <th id="search_header_{{ searchesEntry.projectSearchId }}" style="text-align:left;font-weight:bold;width:25px;"
+            >{{ searchesEntry.searchId }}</th>
+      
+    {{/each}}
+
+    <th data-tooltip="Number of selected searches containing peptide" 
+            class="tool_tip_attached_jq integer-number-column-header" 
+            style="width:5%;font-weight:bold;padding-right: 15px;">
+        Searches
+    </th>
+    <th data-tooltip="Type of peptide (e.g., crosslink, looplink, or unlinked)" 
+            class="tool_tip_attached_jq" 
+            style="text-align:left;width:10%;font-weight:bold;">
+        Type
+    </th>
+    <th data-tooltip="Sequence of matched peptide (or first peptide in case of crosslinks)" 
+            class="tool_tip_attached_jq" 
+            style="text-align:left;width:10%;font-weight:bold;">
+        Peptide 1
+    </th>
+    <th data-tooltip="Linked position in first peptide (or starting position of looplink)" 
+            class="tool_tip_attached_jq" 
+            style="width:5%;font-weight:bold;">
+        Pos
+    </th>
+    <th data-tooltip="Dynamic modifications in first peptide" 
+            class="tool_tip_attached_jq" 
+            style="width:5%;font-weight:bold;">
+        Mods
+    </th>
+    {{#if viewSearchPeptidesPageDataRoot.anyResultsHaveIsotopeLabels }}
+        <th data-tooltip="Isotope Labels for first peptide" 
+                class="tool_tip_attached_jq" 
+                style="width:5%;font-weight:bold;">
+            Isotope Labels
+        </th>
+    {{/if}}
+    <th data-tooltip="Sequenced of second matched peptide in crosslink" 
+            class="tool_tip_attached_jq" 
+            style="text-align:left;width:10%;font-weight:bold;">
+        Peptide 2
+    </th>
+    <th data-tooltip="Linked position in second peptide (or ending position of looplink)" 
+            class="tool_tip_attached_jq" 
+            style="width:5%;font-weight:bold;">
+        Pos
+    </th>
+    <th data-tooltip="Dynamic modifications in second peptide" 
+            class="tool_tip_attached_jq" 
+            style="width:5%;font-weight:bold;">
+        Mods
+    </th>
+    {{#if viewSearchPeptidesPageDataRoot.anyResultsHaveIsotopeLabels }}
+        <th data-tooltip="Isotope Labels for second peptide" 
+                class="tool_tip_attached_jq" 
+                style="width:5%;font-weight:bold;">
+            Isotope Labels
+        </th>
+    {{/if}}
+    <th data-tooltip="Proteins (and positions) matched by first peptide and position" 
+            class="tool_tip_attached_jq" 
+            style="text-align:left;width:5%;font-weight:bold;">
+        Protein 1
+    </th>
+    <th data-tooltip="Proteins (and positions) matched by second peptide and position" 
+            class="tool_tip_attached_jq" 
+            style="text-align:left;width:5%;font-weight:bold;">
+        Protein 2
+    </th>
+    
+    <th data-tooltip="Number of PSMs matched to this peptide (or linked pair) in all selected searches" 
+            class="tool_tip_attached_jq integer-number-column-header" 
+            style="width:5%;font-weight:bold;">
+        Psms
+    </th>
+    
+{{!-- 						
+This Loops over the annotation headers per search
+--}}
+    {{#each viewSearchPeptidesPageDataRoot.peptidePsmAnnotationNameDescListsForEachSearch as |peptidePsmAnnotationNameDescListsForASearch| }}
+
+{{!-- 						
+Different from Single Search is that 
+the background color of each cell is set using a CSS class
+with the search index being in the CSS class name.						
+			
+This outputs the Reported Peptide annotation headers for a specific search
+--}}
+
+        {{#each peptidePsmAnnotationNameDescListsForASearch.peptideAnnotationNameDescriptionList as |annotationDisplayNameDescription| }}
+
+                {{!--  Consider displaying the description somewhere   annotationDisplayNameDescription.description --}}
+            <th data-tooltip="Peptide-level {{ annotationDisplayNameDescription.displayName }} for this peptide (or linked pair)" 
+                    class=" merged-search-search-background-color-{{ peptidePsmAnnotationNameDescListsForASearch.colorIndex_OneBased }} tool_tip_attached_jq  " 
+                    style="width:10%;font-weight:bold;">
+                <span style="white-space: nowrap">Peptide</span>
+                <span style="white-space: nowrap">{{ annotationDisplayNameDescription.displayName }}</span>
+            </th>
+								
+        {{/each}}
+{{!--                      
+This outputs the PSM annotation headers for a specific search
+--}}
+        {{#each peptidePsmAnnotationNameDescListsForASearch.psmAnnotationNameDescriptionList as |annotationDisplayNameDescription| }}
+										
+                {{!--  Consider displaying the description somewhere   annotationDisplayNameDescription.description --}}
+            <th data-tooltip="Best PSM-level {{ annotationDisplayNameDescription.displayName }} for this peptide (or linked pair)" 
+                    class=" merged-search-search-background-color-{{ peptidePsmAnnotationNameDescListsForASearch.colorIndex_OneBased }}  tool_tip_attached_jq  " 
+                    style="width:10%;font-weight:bold;">
+                <span style="white-space: nowrap">Best PSM</span>
+                <span style="white-space: nowrap">{{ annotationDisplayNameDescription.displayName }}</span>
+            </th>
+
+        {{/each}}
+                     
+    {{/each}}
+                
+</tr>

@@ -32,7 +32,7 @@
 	<c:set var="singleSearch" value="${ false }" />
 </c:if>
 
-	<tr>
+	<tr class=" selector_search_details_searches_list_root_row ">
 	 <td style="vertical-align: top;" >
 		<div >
 	 		Search<c:if test="${ not singleSearch }" >es</c:if>:

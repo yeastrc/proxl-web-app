@@ -1,0 +1,49 @@
+{{!-- protein_Crosslink_SingleSearch_PageData_MainTable_header_row.handlebars in 'protein_page' 
+
+	Protein Crosslink Page Single Search - Main Table - Main Data Row
+	
+    The actual peptide entry is in the property 'proteinEntry'.
+
+    The Root of data returned from webservice is in the property 'viewSearchProteinsPageDataRoot'.
+--}}
+
+<tr id="{{ proteinEntry.proteinSequenceVersionId_1 }}-{{ proteinEntry.linkPosition_1 }}-{{ proteinEntry.proteinSequenceVersionId_2 }}-{{ proteinEntry.linkPosition_2 }}"
+                            style="cursor: pointer; "
+                            
+                            onclick="viewCrosslinkReportedPeptidesLoadedFromWebServiceTemplate.showHideCrosslinkReportedPeptides( { clickedElement : this })"
+                            data-project_search_id="{{ viewSearchProteinsPageDataRoot.projectSearchId }}"
+                            data-protein_1_id="{{ proteinEntry.proteinSequenceVersionId_1 }}"
+                            data-protein_2_id="{{ proteinEntry.proteinSequenceVersionId_2 }}"
+                            data-protein_1_position="{{ proteinEntry.linkPosition_1 }}"
+                            data-protein_2_position="{{ proteinEntry.linkPosition_2 }}"
+                        >
+    <td><span class="proteinName" id="protein-id-{{ proteinEntry.proteinSequenceVersionId_1 }}">{{ proteinEntry.proteinName_1 }}</span></td>
+    <td class="integer-number-column">{{ proteinEntry.linkPosition_1 }}</td>
+    <td><span class="proteinName" id="protein-id-{{ proteinEntry.proteinSequenceVersionId_2 }}">{{ proteinEntry.proteinName_2 }}</span></td>
+    <td class="integer-number-column">{{ proteinEntry.linkPosition_2 }}</td>
+    <td class="integer-number-column">{{ proteinEntry.numPsms }}</td>
+						
+    <td class="integer-number-column"><a class="show-child-data-link   " 
+            href="javascript:"
+            >{{ proteinEntry.numLinkedPeptides }}<span class="toggle_visibility_expansion_span_jq" 
+                    ><img src="images/icon-expand-small.png" 
+                        class=" icon-expand-contract-in-data-table "
+                        ></span><span class="toggle_visibility_contraction_span_jq" 
+                            style="display: none;" 
+                            ><img src="images/icon-collapse-small.png"
+                                class=" icon-expand-contract-in-data-table "
+                                ></span>
+        </a>
+    </td>								
+    
+    <td class="integer-number-column">{{ proteinEntry.numUniqueLinkedPeptides }}</td>
+			
+    {{#each proteinEntry.peptideAnnotationValueList as |annotationValue| }}
+
+        <td style="white-space: nowrap">{{ annotationValue }}</td>
+    {{/each}}								
+    
+    {{#each proteinEntry.psmAnnotationValueList as |annotationValue| }}
+        <td>{{ annotationValue }}</td>
+    {{/each}}
+</tr>

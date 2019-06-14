@@ -1,0 +1,11 @@
+{{!-- exclude_taxonomy_checkbox_entry.handlebars   <checkbox> for excluding taxonomy/organism
+
+	Protein, Coverage, Image, Structure Pages
+--}}
+<label style="white-space: nowrap" >
+    <input type="checkbox" name="excludeTaxonomy" value="{{ taxonomyId }}" class=" excludeTaxonomy_jq " 
+    onchange=" if ( window.defaultPageView ) { window.defaultPageView.searchFormChanged_ForDefaultPageView(); } ; if ( window.saveView_dataPages ) { window.saveView_dataPages.searchFormChanged_ForSaveView(); }" 
+        >
+						  
+    <span style="font-style:italic;">{{ taxonomyName }}</span>
+</label>
