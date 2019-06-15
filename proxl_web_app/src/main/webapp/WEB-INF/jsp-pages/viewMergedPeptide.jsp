@@ -19,8 +19,9 @@
  		<script type="text/javascript" src="js/libs/jquery.tablesorter_Modified.js"></script> 
 		<script type="text/javascript" src="js/libs/jquery.qtip.min.js"></script>
 		
-		<script type="text/javascript" src="js/libs/d3.min.js"></script>
-		<script type="text/javascript" src="js/libs/venn.js"></script>
+			<%--  Old version of d3 used in venn.js and mergedSearchesVennDiagramCreator.js
+						to create the Venn Diagram --%>
+		<script type="text/javascript" src="js/libs/d3_OLD_VERSION.min.js"></script>
 	
 		
 <%--  Start of Lorikeet Core Parts --%>		

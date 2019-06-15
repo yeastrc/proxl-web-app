@@ -6552,11 +6552,6 @@ var StructurePagePrimaryRootCodeClass = function() {
 		
 		console.log( "Initializing the page." );
 		
-		if ( Modernizr && ! Modernizr.svg ) {  //  Modernizr.svg is false if SVG not supported
-			console.log( "SVG not supported." );
-			throw Error( "SVG not supported" );
-		}
-		
 		_projectSearchIds = [];
 		
 		var $project_search_id_jq = $(".project_search_id_jq");

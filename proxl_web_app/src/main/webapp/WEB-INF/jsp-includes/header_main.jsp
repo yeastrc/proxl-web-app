@@ -51,7 +51,7 @@ response.addHeader("Cache-control", "max-age=0"); // stale right away
 
 <!DOCTYPE html>
 
-<html class="no-js"> <!--  Modernizr will change "no-js" to "js" if Javascript is enabled -->
+<html > 
 
 
 <head>

@@ -1,4 +1,5 @@
 /*
+ * venn.js
  * 
  * Copyright (C) 2013 Ben Frederickson
  * 
@@ -15,6 +16,10 @@
  * 
  * Changes made for Proxl web app:
  * 
+ * Update for ES6 Imports ( Add export )
+ * 
+ * add import * as d3 from "d3";
+ * 
  *  In function:   venn.drawD3Diagram 
  *
  *  After:   var colours = d3.scale.category10();
@@ -30,8 +35,21 @@
  * 
  */
 
+//  import of d3 does not work.    Likely this code does not work with current d3 considering how old this code is.
 
-(function(venn) {
+//   import * as d3 from "d3";
+
+//  This fails:  var colours = d3.scale.category10();
+
+//     Cannot read property 'category10' of undefined
+
+
+
+//(function(venn) {
+
+	const venn = {};
+	
+	
     "use strict";
     /** given a list of set objects, and their corresponding overlaps.
     updates the (x, y, radius) attribute on each set such that their positions
@@ -608,7 +626,6 @@
 
     venn.drawD3Diagram = function(element, dataset, width, height, parameters) {
     	
-    	
         parameters = parameters || {};
 
         var colours = d3.scale.category10();
@@ -910,4 +927,6 @@
         center.y /= points.length;
         return center;
     };
-}(window.venn = window.venn || {}));
+//}(window.venn = window.venn || {}));
+    
+export { venn }

@@ -318,7 +318,7 @@ function addOpenLorikeetViewerClickHandlers( $openLorkeetLinks ) {
 			
 			var svgSupportedSnapLoaded = false;
 			
-			if ( typeof Modernizr !== 'undefined' && Modernizr.svg && typeof Snap !== 'undefined' ) {
+			if ( typeof Snap !== 'undefined' ) {
 				
 				svgSupportedSnapLoaded = true;
 			}
@@ -666,7 +666,7 @@ function addOpenLorikeetViewerClickHandlers( $openLorkeetLinks ) {
 				
 				//  END:  Create Text representation of Looplink
 				
-			} //  else of if ( Modernizr && Modernizr.svg && Snap ) {
+			} //  else of if ( Snap ) {
 				
 		}
 		

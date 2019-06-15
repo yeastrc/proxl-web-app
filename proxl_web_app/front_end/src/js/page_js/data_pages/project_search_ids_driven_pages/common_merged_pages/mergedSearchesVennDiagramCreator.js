@@ -1,15 +1,17 @@
 
-//mergedSearchesVennDiagramCreator.js
+//  mergedSearchesVennDiagramCreator.js
 
 //JavaScript directive:   all variables have to be declared with "var", maybe other things
 "use strict";
 
-
+import { venn } from 'libs/venn.js';
 
 /**
  * Constructor 
  */
 var CreateMergedSearchesLinkCountsVennDiagram = function() {
+
+	let retryCountOnMissing_d3_Object = 0;
 
 	///////////////////////////////////////////
 	//	This is a copy of colors in CSS classes altered to compensate for fill-opacity: 0.3 in the venn diagram
@@ -24,6 +26,22 @@ var CreateMergedSearchesLinkCountsVennDiagram = function() {
 	///////////////////////////////////////////
 	//	This function is called on the page to create the Venn diagram
 	this.createMergedSearchesLinkCountsVennDiagram = function({ vennDiagramDataToJSON }) {
+
+		if ( ! window.d3 ) {
+			retryCountOnMissing_d3_Object++;
+			//  d3 object not on page yet so try again in 1 second
+			if ( retryCountOnMissing_d3_Object > 1 ) {
+				throw Error("window.d3 not exist");
+			}
+			window.setTimeout( () => {
+				try {
+					this.createMergedSearchesLinkCountsVennDiagram({ vennDiagramDataToJSON });
+				} catch( e ) {
+					reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+					throw e;
+				}
+			}, 1000);
+		}
 		try {
 			var venn_diagram_data = vennDiagramDataToJSON;
 
@@ -51,7 +69,7 @@ var CreateMergedSearchesLinkCountsVennDiagram = function() {
 			//  Apply a stroke width
 			$circle_All.attr("stroke-width","1");
 
-			this.addDownloadClickHandlers();
+			this._addDownloadClickHandlers();
 
 			var $searches_intersection_venn_diagram_outer_container = $("#searches_intersection_venn_diagram_outer_container");
 			$searches_intersection_venn_diagram_outer_container.show();
@@ -69,7 +87,7 @@ var CreateMergedSearchesLinkCountsVennDiagram = function() {
 	 * If the element $chart_outer_container_for_download_jq was dynamically added, need to run to add tool tips on download links: 
 	 *			addToolTips( $chartOuterContainer );
 	 */
-	this.addDownloadClickHandlers = function( params ) {
+	this._addDownloadClickHandlers = function( params ) {
 		var objectThis = this;
 		var $searches_intersection_venn_diagram_outer_container = $("#searches_intersection_venn_diagram_outer_container");
 		var $venn_diagram_download_link_jq_All = $searches_intersection_venn_diagram_outer_container.find(".venn_diagram_download_link_jq");
