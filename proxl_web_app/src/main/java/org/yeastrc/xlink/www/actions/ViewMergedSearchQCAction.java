@@ -186,6 +186,11 @@ public class ViewMergedSearchQCAction extends Action {
 				request.setAttribute( "userOrderedProjectSearchIds", PeptideProteinCommonForm.DO_NOT_SORT_PROJECT_SEARCH_IDS_YES );
 			}
 			
+			//  Populate request objects for Standard Header Display
+			GetPageHeaderData.getInstance().getPageHeaderDataWithProjectId( projectId, request );
+			//  Populate request objects for Protein Name Tooltip JS
+			ProteinListingTooltipConfigUtil.getInstance().putProteinListingTooltipConfigForPage( projectSearchIdsSet, request );
+
 			
 			{
 				ProjectSearchIdsSearchIds_SetRequestParameter.SearchesAreUserSorted searchesAreUserSorted  = ProjectSearchIdsSearchIds_SetRequestParameter.SearchesAreUserSorted.NO;
@@ -203,7 +208,7 @@ public class ViewMergedSearchQCAction extends Action {
 				//  Populate request objects for Standard Search Display
 				GetSearchDetailsData.getInstance().getSearchDetailsData( searches, searchesAreUserSorted, request );
 			}
-			
+
 			//  Populate request objects for User Selection of Annotation Data Display
 			GetAnnotationDisplayUserSelectionDetailsData.getInstance().getSearchDetailsData( searches, request );
 			
