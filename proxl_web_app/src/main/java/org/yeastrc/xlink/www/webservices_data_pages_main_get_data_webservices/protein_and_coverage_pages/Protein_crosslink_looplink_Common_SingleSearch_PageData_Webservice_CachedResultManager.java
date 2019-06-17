@@ -16,6 +16,8 @@ import org.yeastrc.xlink.www.webservices_data_pages_main_get_data_webservices.pr
  * 
  * Manage Cached results for Protein_crosslink_looplink_Common_SingleSearch_PageData_Webservice
  * 
+ * Cache bytes to Disk File using CachedDataInFileMgmt
+ * 
  * Interfaces with the CachedDataInFileMgmt for saving and retrieving the result JSON for caching
  * 
  * Added to CachedDataInFileMgmtRegistration to register it

@@ -58,6 +58,8 @@ import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
 import org.yeastrc.xlink.www.web_utils.ExcludeOnTaxonomyForProteinSequenceVersionIdSearchId;
 import org.yeastrc.xlink.www.web_utils.MarshalObjectToJSON;
 import org.yeastrc.xlink.www.web_utils.TaxonomiesForSearchOrSearches;
+import org.yeastrc.xlink.www.webservices_data_pages_main_get_data_webservices.cache_results_in_memory.DataPagesMain_GetDataWebservices_CacheResults_InMemory;
+import org.yeastrc.xlink.www.webservices_data_pages_main_get_data_webservices.cache_results_in_memory.DataPagesMain_GetDataWebservices_CacheResults_InMemory.DataType;
 import org.yeastrc.xlink.www.webservices_data_pages_main_get_data_webservices.protein_and_coverage_pages.Protein_Coverage_SingleSearch_MultipleSearches_PageData_Webservice_CachedResultManager.Protein_Coverage_SingleSearch_MultipleSearches_PageData_Webservice_CachedResultManager_Result;
 import org.yeastrc.xlink.www.webservices_utils.Unmarshal_RestRequest_JSON_ToObject;
 
@@ -177,8 +179,17 @@ public class Protein_Coverage_SingleSearch_MultipleSearches_PageData_Webservice 
 			////////   Auth complete
 			//////////////////////////////////////////
 
+			{  //  Check Cached response in RAM
+				byte[] cachedWebserviceResponseJSONAsBytes = 
+						DataPagesMain_GetDataWebservices_CacheResults_InMemory.getInstance()
+						.getData( DataType.PROTEIN_COVERAGE_SINGLE_SEARCH_MULTIPLE_SEARCHES, requestJSONBytes );
+				if ( cachedWebserviceResponseJSONAsBytes != null ) {
+					//  Have Cached response so just return it
+					return cachedWebserviceResponseJSONAsBytes;  // EARLY RETURN !!!!!!!!!!!!!!
+				}
+			}
 			{
-				//  First check Cached response on disk
+				//  Next check Cached response on disk
 				Protein_Coverage_SingleSearch_MultipleSearches_PageData_Webservice_CachedResultManager_Result result = 
 						Protein_Coverage_SingleSearch_MultipleSearches_PageData_Webservice_CachedResultManager.getSingletonInstance()
 						.retrieveDataFromCache( projectSearchIdsList, requestJSONBytes );
@@ -186,6 +197,12 @@ public class Protein_Coverage_SingleSearch_MultipleSearches_PageData_Webservice 
 				byte[] cachedWebserviceResponseJSONAsBytes = result.getWebserviceResponseJSONAsBytes();
 				if ( cachedWebserviceResponseJSONAsBytes != null ) {
 					//  Have Cached response so just return it
+
+					{  //  Cache response to RAM
+						DataPagesMain_GetDataWebservices_CacheResults_InMemory.getInstance()
+						.putData( DataType.PROTEIN_COVERAGE_SINGLE_SEARCH_MULTIPLE_SEARCHES, requestJSONBytes, cachedWebserviceResponseJSONAsBytes );
+					}
+					
 					return cachedWebserviceResponseJSONAsBytes;  // EARLY RETURN !!!!!!!!!!!!!!
 				}
 			}
@@ -472,6 +489,11 @@ public class Protein_Coverage_SingleSearch_MultipleSearches_PageData_Webservice 
 
 			byte[] webserviceResultByteArray = MarshalObjectToJSON.getInstance().getJSONByteArray( webserviceResult );
 
+
+			{  //  Cache response to RAM
+				DataPagesMain_GetDataWebservices_CacheResults_InMemory.getInstance()
+				.putData( DataType.PROTEIN_COVERAGE_SINGLE_SEARCH_MULTIPLE_SEARCHES, requestJSONBytes, webserviceResultByteArray );
+			}
 			{
 				//  Cache response to disk
 				Protein_Coverage_SingleSearch_MultipleSearches_PageData_Webservice_CachedResultManager.getSingletonInstance()

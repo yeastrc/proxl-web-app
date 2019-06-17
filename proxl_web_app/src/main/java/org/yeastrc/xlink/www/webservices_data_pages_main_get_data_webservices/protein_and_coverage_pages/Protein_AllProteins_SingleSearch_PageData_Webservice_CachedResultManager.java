@@ -14,6 +14,8 @@ import org.yeastrc.xlink.www.cached_data_in_file.CachedDataInFileMgmt.ReplaceExi
  * 
  * Manage Cached results for Protein_AllProteins_SingleSearch_PageData_Webservice
  * 
+ * Cache bytes to Disk File using CachedDataInFileMgmt
+ * 
  * Interfaces with the CachedDataInFileMgmt for saving and retrieving the result JSON for caching
  * 
  * Added to CachedDataInFileMgmtRegistration to register it

@@ -28,6 +28,8 @@ import org.yeastrc.xlink.www.web_utils.GetLinkTypesForSearchers;
 import org.yeastrc.xlink.www.web_utils.MarshalObjectToJSON;
 import org.yeastrc.xlink.www.web_utils.SearchPeptideWebserviceCommonCode;
 import org.yeastrc.xlink.www.web_utils.SearchPeptideWebserviceCommonCode.SearchPeptideWebserviceCommonCodeGetDataResult;
+import org.yeastrc.xlink.www.webservices_data_pages_main_get_data_webservices.cache_results_in_memory.DataPagesMain_GetDataWebservices_CacheResults_InMemory;
+import org.yeastrc.xlink.www.webservices_data_pages_main_get_data_webservices.cache_results_in_memory.DataPagesMain_GetDataWebservices_CacheResults_InMemory.DataType;
 import org.yeastrc.xlink.www.webservices_data_pages_main_get_data_webservices.peptide_page.PeptidePage_SingleSearch_MainDisplayService_CachedResultManager.PeptidePage_SingleSearch_MainDisplayService_CachedResultManager_Result;
 import org.yeastrc.xlink.www.webservices_utils.Unmarshal_RestRequest_JSON_ToObject;
 import org.yeastrc.xlink.www.constants.MinimumPSMsConstants;
@@ -183,8 +185,17 @@ public class PeptidePage_SingleSearch_MainDisplayService {
 			////////   Auth complete
 			//////////////////////////////////////////
 			
+			{  //  Check Cached response in RAM
+				byte[] cachedWebserviceResponseJSONAsBytes = 
+						DataPagesMain_GetDataWebservices_CacheResults_InMemory.getInstance()
+						.getData( DataType.PEPTIDE_SINGLE_SEARCH, requestJSONBytes );
+				if ( cachedWebserviceResponseJSONAsBytes != null ) {
+					//  Have Cached response so just return it
+					return cachedWebserviceResponseJSONAsBytes;  // EARLY RETURN !!!!!!!!!!!!!!
+				}
+			}
 			{
-				//  First check Cached response on disk
+				//  Next check Cached response on disk
 				PeptidePage_SingleSearch_MainDisplayService_CachedResultManager_Result result = 
 						PeptidePage_SingleSearch_MainDisplayService_CachedResultManager.getSingletonInstance()
 						.retrieveDataFromCache( projectSearchIdList, requestJSONBytes );
@@ -192,6 +203,12 @@ public class PeptidePage_SingleSearch_MainDisplayService {
 				byte[] cachedWebserviceResponseJSONAsBytes = result.getWebserviceResponseJSONAsBytes();
 				if ( cachedWebserviceResponseJSONAsBytes != null ) {
 					//  Have Cached response so just return it
+
+					{  //  Cache response to RAM
+						DataPagesMain_GetDataWebservices_CacheResults_InMemory.getInstance()
+						.putData( DataType.PEPTIDE_SINGLE_SEARCH, requestJSONBytes, cachedWebserviceResponseJSONAsBytes );
+					}
+					
 					return cachedWebserviceResponseJSONAsBytes;  // EARLY RETURN !!!!!!!!!!!!!!
 				}
 			}
@@ -444,6 +461,10 @@ public class PeptidePage_SingleSearch_MainDisplayService {
 
 			byte[] webserviceResultByteArray = MarshalObjectToJSON.getInstance().getJSONByteArray( webserviceResult );
 
+			{  //  Cache response to RAM
+				DataPagesMain_GetDataWebservices_CacheResults_InMemory.getInstance()
+				.putData( DataType.PEPTIDE_SINGLE_SEARCH, requestJSONBytes, webserviceResultByteArray );
+			}
 			{
 				//  Cache response to disk
 				PeptidePage_SingleSearch_MainDisplayService_CachedResultManager.getSingletonInstance()

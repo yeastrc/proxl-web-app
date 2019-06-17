@@ -52,6 +52,8 @@ import org.yeastrc.xlink.www.web_utils.ExcludeOnTaxonomyForProteinSequenceVersio
 import org.yeastrc.xlink.www.web_utils.MarshalObjectToJSON;
 import org.yeastrc.xlink.www.web_utils.TaxonomiesForSearchOrSearches;
 import org.yeastrc.xlink.www.web_utils.XLinkWebAppUtils;
+import org.yeastrc.xlink.www.webservices_data_pages_main_get_data_webservices.cache_results_in_memory.DataPagesMain_GetDataWebservices_CacheResults_InMemory;
+import org.yeastrc.xlink.www.webservices_data_pages_main_get_data_webservices.cache_results_in_memory.DataPagesMain_GetDataWebservices_CacheResults_InMemory.DataType;
 import org.yeastrc.xlink.www.webservices_data_pages_main_get_data_webservices.protein_and_coverage_pages.Protein_crosslink_looplink_Common_SingleSearch_PageData_Webservice_CachedResultManager.Protein_crosslink_looplink_Common_SingleSearch_PageData_Webservice_CachedResultManager_Result;
 import org.yeastrc.xlink.www.webservices_utils.Unmarshal_RestRequest_JSON_ToObject;
 
@@ -195,8 +197,29 @@ class Protein_crosslink_looplink_Common_SingleSearch_PageData_Webservice {
 			
 			
 
+			{  //  Check Cached response in RAM
+				if ( crosslinkLooplink == CrosslinkLooplink.CROSSLINK ) {
+					byte[] cachedWebserviceResponseJSONAsBytes = 
+							DataPagesMain_GetDataWebservices_CacheResults_InMemory.getInstance()
+							.getData( DataType.PROTEINS_CROSSLINKS_SINGLE_SEARCH, requestJSONBytes );
+					if ( cachedWebserviceResponseJSONAsBytes != null ) {
+						//  Have Cached response so just return it
+						return cachedWebserviceResponseJSONAsBytes;  // EARLY RETURN !!!!!!!!!!!!!!
+					}
+				}
+				if ( crosslinkLooplink == CrosslinkLooplink.LOOPLINK ) {
+					byte[] cachedWebserviceResponseJSONAsBytes = 
+							DataPagesMain_GetDataWebservices_CacheResults_InMemory.getInstance()
+							.getData( DataType.PROTEINS_LOOPLINKS_SINGLE_SEARCH, requestJSONBytes );
+					if ( cachedWebserviceResponseJSONAsBytes != null ) {
+						//  Have Cached response so just return it
+						return cachedWebserviceResponseJSONAsBytes;  // EARLY RETURN !!!!!!!!!!!!!!
+					}
+				}
+			}
+			
 			{
-				//  First check Cached response on disk
+				//  Next check Cached response on disk
 				Protein_crosslink_looplink_Common_SingleSearch_PageData_Webservice_CachedResultManager_Result result = 
 						Protein_crosslink_looplink_Common_SingleSearch_PageData_Webservice_CachedResultManager.getSingletonInstance()
 						.retrieveDataFromCache( crosslinkLooplink, projectSearchIdList, requestJSONBytes );
@@ -204,6 +227,20 @@ class Protein_crosslink_looplink_Common_SingleSearch_PageData_Webservice {
 				byte[] cachedWebserviceResponseJSONAsBytes = result.getWebserviceResponseJSONAsBytes();
 				if ( cachedWebserviceResponseJSONAsBytes != null ) {
 					//  Have Cached response so just return it
+
+					if ( crosslinkLooplink == CrosslinkLooplink.CROSSLINK ) {
+						{  //  Cache response to RAM
+							DataPagesMain_GetDataWebservices_CacheResults_InMemory.getInstance()
+							.putData( DataType.PROTEINS_CROSSLINKS_SINGLE_SEARCH, requestJSONBytes, cachedWebserviceResponseJSONAsBytes );
+						}
+					}
+					if ( crosslinkLooplink == CrosslinkLooplink.LOOPLINK ) {
+						{  //  Cache response to RAM
+							DataPagesMain_GetDataWebservices_CacheResults_InMemory.getInstance()
+							.putData( DataType.PROTEINS_LOOPLINKS_SINGLE_SEARCH, requestJSONBytes, cachedWebserviceResponseJSONAsBytes );
+						}
+					}
+					
 					return cachedWebserviceResponseJSONAsBytes;  // EARLY RETURN !!!!!!!!!!!!!!
 				}
 			}
@@ -761,12 +798,22 @@ class Protein_crosslink_looplink_Common_SingleSearch_PageData_Webservice {
 
 			byte[] webserviceResultByteArray = MarshalObjectToJSON.getInstance().getJSONByteArray( webserviceResult );
 
+			{  //  Cache response to RAM
+				if ( crosslinkLooplink == CrosslinkLooplink.CROSSLINK ) {
+					DataPagesMain_GetDataWebservices_CacheResults_InMemory.getInstance()
+					.putData( DataType.PROTEINS_CROSSLINKS_SINGLE_SEARCH, requestJSONBytes, webserviceResultByteArray );
+				}
+				if ( crosslinkLooplink == CrosslinkLooplink.LOOPLINK ) {
+					DataPagesMain_GetDataWebservices_CacheResults_InMemory.getInstance()
+					.putData( DataType.PROTEINS_LOOPLINKS_SINGLE_SEARCH, requestJSONBytes, webserviceResultByteArray );
+				}
+			}
 			{
 				//  Cache response to disk
 				Protein_crosslink_looplink_Common_SingleSearch_PageData_Webservice_CachedResultManager.getSingletonInstance()
 				.saveDataToCache( crosslinkLooplink, projectSearchIdList, webserviceResultByteArray, requestJSONBytes );
 			}
-			
+
 			return webserviceResultByteArray;
 
 		} catch ( WebApplicationException e ) {
