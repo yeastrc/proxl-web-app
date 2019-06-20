@@ -399,6 +399,12 @@ public class GetDefaultPsmPeptideCutoffs {
 			Set<Integer> searchProgramsPerSearchId_ThatMatch_ProjectLevelCutoffs // Add to this Set in this method
 			) throws Exception {
 		
+		if ( annotationType_DTOMap == null ) {
+			//  No data in annotationType_DTOMap so exit
+			
+			return; // EARLY RETURN
+		}
+		
 		for ( Map.Entry<Integer, AnnotationTypeDTO> entry :  annotationType_DTOMap.entrySet() ) {
 			
 			AnnotationTypeDTO annotationTypeDTO = entry.getValue();
