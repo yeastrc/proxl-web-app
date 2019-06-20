@@ -5,6 +5,7 @@ import org.yeastrc.auth.dao.AuthUserDAO;
 import org.yeastrc.xlink.base.config_system_table_common_access.ConfigSystemsKeysSharedConstants;
 import org.yeastrc.xlink.base.file_import_proxl_xml_scans.dto.ProxlXMLFileImportTrackingDTO;
 import org.yeastrc.xlink.base.file_import_proxl_xml_scans.dto.ProxlXMLFileImportTrackingRunDTO;
+import org.yeastrc.xlink.base.file_import_proxl_xml_scans.enum_classes.ProxlXMLFileImportRunSubStatus;
 import org.yeastrc.xlink.base.file_import_proxl_xml_scans.enum_classes.ProxlXMLFileImportStatus;
 import org.yeastrc.xlink.www.config_system_table.ConfigSystemCaching;
 import org.yeastrc.xlink.www.constants.ConfigSystemsKeysConstants;
@@ -155,6 +156,15 @@ public class SendEmailForRunImportFinishInternalService {
 					+ "  tracking status : " + status.toString() );
 			return null;  // EARLY RETURN
 		}
+
+		if ( email_Contents_Control == Email_Contents_Control.FOR_OTHER
+				&& status == ProxlXMLFileImportStatus.FAILED ) {
+			ProxlXMLFileImportRunSubStatus proxlXMLFileImportRunSubStatus = proxlXMLFileImportTrackingRunDTO.getRunSubStatus();
+			if ( proxlXMLFileImportRunSubStatus == ProxlXMLFileImportRunSubStatus.SYSTEM_ERROR ) {
+				statusText = "failed with System Error";
+			}
+		}
+		
 		String searchPathWithLabel = "";
 		if ( StringUtils.isNotEmpty( proxlXMLFileImportTrackingDTO.getSearchPath() ) ) {
 			searchPathWithLabel = "\n\n"

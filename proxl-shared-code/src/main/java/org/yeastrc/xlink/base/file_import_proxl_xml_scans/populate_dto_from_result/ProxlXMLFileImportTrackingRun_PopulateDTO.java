@@ -10,6 +10,7 @@ import org.yeastrc.xlink.base.constants.Database_OneTrueZeroFalse_Constants;
 //import org.slf4j.Logger;
 
 import org.yeastrc.xlink.base.file_import_proxl_xml_scans.dto.ProxlXMLFileImportTrackingRunDTO;
+import org.yeastrc.xlink.base.file_import_proxl_xml_scans.enum_classes.ProxlXMLFileImportRunSubStatus;
 import org.yeastrc.xlink.base.file_import_proxl_xml_scans.enum_classes.ProxlXMLFileImportStatus;
 
 /**
@@ -54,6 +55,13 @@ public class ProxlXMLFileImportTrackingRun_PopulateDTO {
 		returnItem.setProxlXmlFileImportTrackingId( rs.getInt( "proxl_xml_file_import_tracking_id" ) );
 		
 		returnItem.setRunStatus( ProxlXMLFileImportStatus.fromValue( rs.getInt( "status_id" ) ) );
+
+		{
+			int importer_sub_status_id = rs.getInt( "importer_sub_status_id" );
+			if ( ! rs.wasNull() ) {
+				returnItem.setRunSubStatus( ProxlXMLFileImportRunSubStatus.fromValue( importer_sub_status_id ) );
+			}
+		}
 		
 		int insertedSearchId = rs.getInt( "inserted_search_id" );
 		if ( ! rs.wasNull() ) {
