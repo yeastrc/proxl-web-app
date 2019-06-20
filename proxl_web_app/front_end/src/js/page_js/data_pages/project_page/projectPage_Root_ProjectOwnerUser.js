@@ -32,6 +32,7 @@ import { organizeSearches } from './viewProject_OrganizeSearchesAndFoldersAdmin.
 import { viewProject_ProjectLockAdmin } from './viewProject_ProjectLockAdmin.js';
 import { viewProject_SearchMaint } from './viewProject_SearchMaint.js';
 
+import { ProjectPg_setAnnotationCutoffsDefaults_ProjectLevel } from './projectPg_setAnnotationCutoffsDefaults_ProjectLevel.js';
 
 import { ProjectPage_UserCustomProjectLabel_ProjectOwnerInteraction } from './projectPage_UserCustomProjectLabel.js';
 import { ProjectPage_SavedViews_Section_AllUsersInteraction } from './projectPage_SavedViews_Section_AllUsersInteraction.js';
@@ -49,6 +50,10 @@ $(document).ready(function() {
         const projectIdString = $project_id.val();
 		if ( projectIdString === undefined || projectIdString === "" ) {
 			throw Error("projectPage_Root_ProjectOwnerUser.js: Value in DOM element with id 'project_id' is undefined or empty string");
+        }
+        const projectId = Number.parseInt( projectIdString );
+        if ( Number.isNaN( projectId ) ) {
+            throw Error("projectPage_Root_ProjectOwnerUser.js: Value in DOM element with id 'project_id' is not a number: " + projectIdString );
         }
 
         const userIsProjectOwner = true;
@@ -71,6 +76,9 @@ $(document).ready(function() {
         projectPage_SavedViews_Section_LoggedInUsersInteraction.initialize({ projectPage_SavedViews_Section_AllUsersInteraction });
 
         projectPage_SavedViews_Section_AllUsersInteraction.initialize();
+
+        const projectPg_setAnnotationCutoffsDefaults_ProjectLevel = new ProjectPg_setAnnotationCutoffsDefaults_ProjectLevel({ projectId });
+        projectPg_setAnnotationCutoffsDefaults_ProjectLevel.initialize();
 
         projectPage_SavedViews_Section_AllUsersInteraction.getSavedViewsData();
 

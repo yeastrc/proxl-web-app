@@ -123,7 +123,7 @@ public class ViewSearchProteinsAllAction extends Action {
 			//   Get Query JSON from the form and if not empty, deserialize it
 			ProteinQueryJSONRoot proteinQueryJSONRoot = 
 					GetProteinQueryJSONRootFromFormData.getInstance()
-					.getProteinQueryJSONRootFromFormData( form, projectSearchIdsSet, searchIdsSet, mapProjectSearchIdToSearchId );
+					.getProteinQueryJSONRootFromFormData( form, projectId, projectSearchIdsSet, searchIdsSet, mapProjectSearchIdToSearchId );
 		
 			
 			//  Convert the protein sequence ids that come from the JS code to standard integers and put

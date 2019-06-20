@@ -140,9 +140,9 @@ public class DownloadMergedSearchProteinsAllAction extends Action {
 						.getAllProteinsWrapped(
 								form,
 								null, // ProteinQueryJSONRoot proteinQueryJSONRoot_Param
+								projectId,
 								projectSearchIdsListDeduppedSorted,
-								searches,
-								searchesMapOnSearchId  );
+								searches, searchesMapOnSearchId  );
 				
 				// generate file name
 				String filename = "xlinks-proteins-all-search-";

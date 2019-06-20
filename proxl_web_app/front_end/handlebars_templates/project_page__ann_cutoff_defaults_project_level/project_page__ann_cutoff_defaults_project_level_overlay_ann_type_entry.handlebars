@@ -1,0 +1,30 @@
+{{!-- project_page__ann_cutoff_defaults_project_level_overlay_ann_type_entry.handlebars in 'project_page__ann_cutoff_defaults_project_level'
+
+	Project Page - Set Annotation Defaults at Project Level Overlay Root
+
+    Annotation Type Entry
+	
+--}}
+
+<tr class=" selector_ann_type_containing_row ">
+    <td  style="padding-left: 20px;">{{ annType_Entry.annTypeName }}</td>
+    <td style="padding-right: 10px;">
+        <input type="text" maxlength="30" style="width: 150px;"
+            data-peptide_psm="{{ peptidePSM }}"
+            data-index_per_type="{{ annType_Entry.indexPerType }}" 
+            data-index_overall="{{ annType_Entry.indexOverall }}"
+            class=" {{ cssSelectorClasses }} "
+            value="{{ annType_Entry.existingCutoffValue  }}">
+    </td>
+    <td>
+        <div class=" selector_found_values ">
+            {{#if annType_Entry.foundValuesString }}
+                Found: 
+                {{ annType_Entry.foundValuesString }}
+            {{/if}}
+        </div>
+        <div class=" error-text selector_invalid_entry " style=" display: none;" >
+            value has to be a decimal number
+        </div>
+    </td>
+</tr>

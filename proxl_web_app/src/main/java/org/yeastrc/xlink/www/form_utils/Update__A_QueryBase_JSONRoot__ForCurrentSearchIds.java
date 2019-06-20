@@ -40,26 +40,28 @@ public class Update__A_QueryBase_JSONRoot__ForCurrentSearchIds {
 	 * 
 	 * @param a_QueryBase_JSONRoot
 	 * @param mapProjectSearchIdToSearchId
+	 * @param projectId TODO
 	 * @throws Exception
 	 */
 	public void update__A_QueryBase_JSONRoot__ForCurrentSearchIds( 
 			A_QueryBase_JSONRoot a_QueryBase_JSONRoot,
-			Map<Integer,Integer> mapProjectSearchIdToSearchId ) throws Exception {
+			Map<Integer,Integer> mapProjectSearchIdToSearchId, int projectId ) throws Exception {
 		
 		CutoffValuesRootLevel cutoffs = a_QueryBase_JSONRoot.getCutoffs();
 //		a_QueryBase_JSONRoot.getAnnTypeIdDisplay();
 		
-		updateCutoffs(mapProjectSearchIdToSearchId, cutoffs);
+		updateCutoffs(projectId, mapProjectSearchIdToSearchId, cutoffs);
 		
 	}
 	
 	/**
+	 * @param projectId TODO
 	 * @param mapProjectSearchIdToSearchId
 	 * @param cutoffs
 	 * @throws ProxlWebappDataException
 	 * @throws Exception
 	 */
-	private void updateCutoffs( Map<Integer, Integer> mapProjectSearchIdToSearchId, CutoffValuesRootLevel cutoffs )	throws ProxlWebappDataException, Exception {
+	private void updateCutoffs( int projectId, Map<Integer, Integer> mapProjectSearchIdToSearchId, CutoffValuesRootLevel cutoffs )	throws ProxlWebappDataException, Exception {
 		
 		/**
 		 * Key is Project Search Id
@@ -107,7 +109,7 @@ public class Update__A_QueryBase_JSONRoot__ForCurrentSearchIds {
 				projectSearchIds.add( entry.getKey() );
 				searchIds.add( entry.getValue() );
 			}
-			CutoffValuesRootLevel cutoffValuesRootLevel_defaults = GetDefaultPsmPeptideCutoffs.getInstance().getDefaultPsmPeptideCutoffs( projectSearchIds, searchIds, mapProjectSearchIdToSearchId_Subset );
+			CutoffValuesRootLevel cutoffValuesRootLevel_defaults = GetDefaultPsmPeptideCutoffs.getInstance().getDefaultPsmPeptideCutoffs( projectId, projectSearchIds, searchIds, mapProjectSearchIdToSearchId_Subset );
 			// copy cutoffValuesRootLevel_defaults to cutoffs
 			Map<String,CutoffValuesSearchLevel> cutoffsForSearches_defaults = cutoffValuesRootLevel_defaults.getSearches();
 			for ( Map.Entry<String,CutoffValuesSearchLevel> entryDefaults : cutoffsForSearches_defaults.entrySet() ) {

@@ -1,0 +1,75 @@
+
+--  2019_06_Update_1__add__project_level_default_fltr_ann_cutoffs.txt
+
+CREATE TABLE  project_level_default_fltr_ann_cutoffs_tbl (
+  id INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  project_id INT(10) UNSIGNED NOT NULL,
+  search_program_name VARCHAR(200) NOT NULL,
+  psm_peptide_type ENUM('psm', 'peptide', 'psm_per_peptide') NOT NULL,
+  annotation_type_name VARCHAR(255) NOT NULL,
+  annotation_cutoff_value DOUBLE NOT NULL,
+  created_auth_user_id INT UNSIGNED NOT NULL,
+  created_date_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  last_updated_auth_user_id INT NOT NULL,
+  last_updated_date_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  UNIQUE INDEX unique_record_index (project_id ASC, search_program_name ASC, psm_peptide_type ASC, annotation_type_name ASC),
+  CONSTRAINT prj_lvl_dfltfltr_ann_ctffs
+    FOREIGN KEY (project_id)
+    REFERENCES project (id)
+    ON DELETE CASCADE
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+COMMENT = 'User Entered Annotation Cutoffs that apply to all searches i' /* comment truncated */ /*n the project*/;
+
+
+CREATE TABLE  project_level_default_fltr_ann_cutoffs_cutoff_as_string_tbl (
+  project_level_default_fltr_ann_cutoffs_id INT(10) UNSIGNED NOT NULL,
+  annotation_cutoff_value_string VARCHAR(45) NOT NULL,
+  PRIMARY KEY (project_level_default_fltr_ann_cutoffs_id),
+  CONSTRAINT prj_lvl_dfltfltr_ann_ctffs_as_str_fk
+    FOREIGN KEY (project_level_default_fltr_ann_cutoffs_id)
+    REFERENCES project_level_default_fltr_ann_cutoffs_tbl (id)
+    ON DELETE CASCADE
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+CREATE TABLE  project_level_default_fltr_ann_cutoffs_prev_tbl (
+  id INT(10) UNSIGNED NOT NULL,
+  project_id INT(10) UNSIGNED NOT NULL,
+  psm_peptide_type ENUM('psm', 'peptide', 'psm_per_peptide') NOT NULL,
+  search_program_name VARCHAR(200) NOT NULL,
+  annotation_type_name VARCHAR(255) NOT NULL,
+  annotation_cutoff_value DOUBLE NOT NULL,
+  created_auth_user_id INT UNSIGNED NOT NULL,
+  created_date_time DATETIME NOT NULL,
+  last_updated_auth_user_id INT NOT NULL,
+  last_updated_date_time DATETIME NOT NULL,
+  id_prev_record INT NOT NULL AUTO_INCREMENT,
+  copy_create_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id_prev_record),
+  INDEX id_idex (id ASC),
+  CONSTRAINT prj_lvl_dfltfltr_ann_ctffs_prv
+    FOREIGN KEY (project_id)
+    REFERENCES project (id)
+    ON DELETE CASCADE
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+COMMENT = 'Prev data - User Entered Annotation Cutoffs that apply to al' /* comment truncated */ /*l searches in the project*/;
+
+CREATE TABLE project_level_default_fltr_ann_cutoffs_cutoff_as_string_prev_tbl (
+  project_level_default_fltr_ann_cutoffs_id INT(10) UNSIGNED NOT NULL,
+  annotation_cutoff_value_string VARCHAR(45) NOT NULL,
+  id_prev_record INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  project_id INT(10) UNSIGNED NOT NULL,
+  PRIMARY KEY (id_prev_record),
+  INDEX prj_lvl_dfltfltr_ann_ctffs_as_str_prev_fk_idx (project_id ASC),
+  CONSTRAINT prj_lvl_dfltfltr_ann_ctffs_as_str_prev_fk
+    FOREIGN KEY (project_id)
+    REFERENCES project (id)
+    ON DELETE CASCADE
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+

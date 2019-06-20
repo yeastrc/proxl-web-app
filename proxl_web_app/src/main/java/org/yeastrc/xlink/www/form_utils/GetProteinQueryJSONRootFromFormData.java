@@ -33,17 +33,18 @@ public class GetProteinQueryJSONRootFromFormData {
 	
 	/**
 	 * Get ProteinQueryJSONRoot object with data in form proteinCommonForm
-	 * 
-	 * @param proteinQueryJSONRoot
 	 * @param proteinCommonForm
+	 * @param projectId TODO
+	 * @param proteinQueryJSONRoot
+	 * 
 	 * @throws ProxlWebappDataException
 	 * @throws Exception 
 	 */
 	public ProteinQueryJSONRoot getProteinQueryJSONRootFromFormData( 
 			ProteinCommonForm proteinCommonForm,
+			int projectId,
 			Collection<Integer> projectSearchIds,
-			Collection<Integer> searchIds,
-			Map<Integer,Integer> mapProjectSearchIdToSearchId
+			Collection<Integer> searchIds, Map<Integer,Integer> mapProjectSearchIdToSearchId
 			) throws ProxlWebappDataException, Exception {
 		//  Jackson JSON Mapper object for JSON deserialization and serialization
 		ObjectMapper jacksonJSON_Mapper = new ObjectMapper();  //  Jackson JSON library object
@@ -68,14 +69,14 @@ public class GetProteinQueryJSONRootFromFormData {
 
 			//  Update proteinQueryJSONRoot for current search ids and project search ids
 			Update__A_QueryBase_JSONRoot__ForCurrentSearchIds.getInstance()
-			.update__A_QueryBase_JSONRoot__ForCurrentSearchIds( proteinQueryJSONRoot, mapProjectSearchIdToSearchId );
+			.update__A_QueryBase_JSONRoot__ForCurrentSearchIds( proteinQueryJSONRoot, mapProjectSearchIdToSearchId, projectId );
 			
 		} else {
 			//  Query JSON in the form is empty so create an empty object that will be populated.
 			proteinQueryJSONRoot = new ProteinQueryJSONRoot();
 			CutoffValuesRootLevel cutoffValuesRootLevel =
 					GetDefaultPsmPeptideCutoffs.getInstance()
-					.getDefaultPsmPeptideCutoffs( projectSearchIds,searchIds, mapProjectSearchIdToSearchId );
+					.getDefaultPsmPeptideCutoffs( projectId,projectSearchIds, searchIds, mapProjectSearchIdToSearchId );
 			proteinQueryJSONRoot.setCutoffs( cutoffValuesRootLevel );
 		}
 ////////////  An experiment that goes with the function getEncodedExcludeProteins in the JS

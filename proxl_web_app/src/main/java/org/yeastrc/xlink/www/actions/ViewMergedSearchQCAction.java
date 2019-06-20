@@ -279,7 +279,7 @@ public class ViewMergedSearchQCAction extends Action {
 			////////   Generic Param processing
 			CutoffValuesRootLevel cutoffValuesRootLevelCutoffDefaults =
 					GetDefaultPsmPeptideCutoffs.getInstance()
-					.getDefaultPsmPeptideCutoffs( projectSearchIdsListDeduppedSorted, searchIds, mapProjectSearchIdToSearchId );
+					.getDefaultPsmPeptideCutoffs( projectId, projectSearchIdsListDeduppedSorted, searchIds, mapProjectSearchIdToSearchId );
 			String cutoffValuesRootLevelCutoffDefaultsJSONString = jacksonJSON_Mapper.writeValueAsString( cutoffValuesRootLevelCutoffDefaults );
 			request.setAttribute( "cutoffValuesRootLevelCutoffDefaults", cutoffValuesRootLevelCutoffDefaultsJSONString );
 			//  This builds an object for the cutoff selection block on the page

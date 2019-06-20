@@ -237,7 +237,7 @@ public class ViewMergedSearchPeptidesAction extends Action {
 
 				//  Update mergedPeptideQueryJSONRoot for current search ids and project search ids
 				Update__A_QueryBase_JSONRoot__ForCurrentSearchIds.getInstance()
-				.update__A_QueryBase_JSONRoot__ForCurrentSearchIds( mergedPeptideQueryJSONRoot, mapProjectSearchIdToSearchId );
+				.update__A_QueryBase_JSONRoot__ForCurrentSearchIds( mergedPeptideQueryJSONRoot, mapProjectSearchIdToSearchId, projectId );
 
 			} else {
 				//  Query JSON in the form is empty so create an empty object that will be populated.
@@ -245,7 +245,7 @@ public class ViewMergedSearchPeptidesAction extends Action {
 				//  Create cutoffs for default values
 				CutoffValuesRootLevel cutoffValuesRootLevelDefaults =
 						GetDefaultPsmPeptideCutoffs.getInstance()
-						.getDefaultPsmPeptideCutoffs( projectSearchIdsListDeduppedSorted, searchIds, mapProjectSearchIdToSearchId );
+						.getDefaultPsmPeptideCutoffs( projectId, projectSearchIdsListDeduppedSorted, searchIds, mapProjectSearchIdToSearchId );
 				mergedPeptideQueryJSONRoot.setCutoffs( cutoffValuesRootLevelDefaults );
 			}
 			

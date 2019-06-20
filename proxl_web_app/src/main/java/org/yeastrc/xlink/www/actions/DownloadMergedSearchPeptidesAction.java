@@ -138,10 +138,10 @@ public class DownloadMergedSearchPeptidesAction extends Action {
 						.getWebMergedPeptideRecords(
 								form,
 								null, // MergedPeptideQueryJSONRoot mergedPeptideQueryJSONRoot_Param
+								projectId,
 								projectSearchIdsListDeduppedSorted,
 								searches,
-								searchesMapOnSearchId,
-								PeptidesMergedCommonPageDownload.FlagCombinedReportedPeptideEntries.NO );
+								searchesMapOnSearchId, PeptidesMergedCommonPageDownload.FlagCombinedReportedPeptideEntries.NO );
 
 				// generate file name
 				String filename = "xlinks-peptides-search-";

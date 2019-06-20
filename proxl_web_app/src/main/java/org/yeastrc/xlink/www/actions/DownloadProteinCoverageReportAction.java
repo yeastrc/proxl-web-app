@@ -181,9 +181,9 @@ public class DownloadProteinCoverageReportAction extends Action {
 						GetProteinQueryJSONRootFromFormData.getInstance()
 						.getProteinQueryJSONRootFromFormData( 
 								form, 
+								projectId,
 								projectSearchIdsListDeduppedSorted,
-								searchIds,
-								mapProjectSearchIdToSearchId );
+								searchIds, mapProjectSearchIdToSearchId );
 
 				////////////
 				//  Copy Exclude Taxonomy and Exclude Protein Sets for lookup

@@ -30,6 +30,8 @@ public class SearchSearcher {
 			+ " INNER JOIN project ON project_search.project_id = project.id   "
 			+ " WHERE project.id = ? AND project_search.status_id = " + SearchRecordStatus.IMPORT_COMPLETE_VIEW.value()
 			+ " ORDER BY project_search.search_display_order , project_search.search_id DESC";
+	
+
 	/**
 	 * Return a list of all searches for the project, ordered by upload date
 	 * @param projectId
@@ -37,7 +39,26 @@ public class SearchSearcher {
 	 * @throws Exception
 	 */
 	public List<SearchDTO> getSearchsForProjectId( int projectId ) throws Exception {
-		List<SearchDTO> searches = new ArrayList<SearchDTO>();
+		
+		List<Integer> projectSearchIds = getProjectSearchIdsForProjectId( projectId );
+		
+		List<SearchDTO> searches = new ArrayList<SearchDTO>( projectSearchIds.size() );
+		
+		for ( Integer projectSearchId : projectSearchIds ) {
+			searches.add( SearchDAO.getInstance().getSearchFromProjectSearchId( projectSearchId ) );
+		}
+
+		return searches;
+	}
+	
+	/**
+	 * Return a list of all project search ids for the project, ordered by upload date
+	 * @param projectId
+	 * @return
+	 * @throws Exception
+	 */
+	public List<Integer> getProjectSearchIdsForProjectId( int projectId ) throws Exception {
+		List<Integer> projectSearchIds = new ArrayList<>();
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
@@ -48,7 +69,7 @@ public class SearchSearcher {
 			pstmt.setInt( 1, projectId );
 			rs = pstmt.executeQuery();
 			while( rs.next() ) {
-				searches.add( SearchDAO.getInstance().getSearchFromProjectSearchId( rs.getInt( 1 ) ) );
+				projectSearchIds.add( rs.getInt( 1 ) );
 			}
 		} catch ( Exception e ) {
 			String msg = "getSearchsForProjectId(), sql: " + sql;
@@ -69,6 +90,6 @@ public class SearchSearcher {
 				conn = null;
 			}
 		}
-		return searches;
+		return projectSearchIds;
 	}
 }

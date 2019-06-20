@@ -328,10 +328,10 @@ public class DownloadMergedPeptidesSkylineShulman extends Action {
 						.getWebMergedPeptideRecords(
 								form,
 								null, // MergedPeptideQueryJSONRoot mergedPeptideQueryJSONRoot_Param
+								projectId,
 								projectSearchIdsListDeduppedSorted,
 								searches,
-								searchesMapOnSearchId,
-								PeptidesMergedCommonPageDownload.FlagCombinedReportedPeptideEntries.NO );
+								searchesMapOnSearchId, PeptidesMergedCommonPageDownload.FlagCombinedReportedPeptideEntries.NO );
 
 				MergedPeptideQueryJSONRoot mergedPeptideQueryJSONRoot = peptidesMergedCommonPageDownloadResult.getMergedPeptideQueryJSONRoot();
 				

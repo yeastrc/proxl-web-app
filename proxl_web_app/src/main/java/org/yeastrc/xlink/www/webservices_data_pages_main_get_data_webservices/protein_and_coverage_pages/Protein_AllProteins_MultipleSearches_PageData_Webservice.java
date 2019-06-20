@@ -239,9 +239,9 @@ public class Protein_AllProteins_MultipleSearches_PageData_Webservice {
 					.getAllProteinsWrapped(
 							null, // form,
 							proteinQueryJSONRoot,
+							projectId,
 							projectSearchIdsListDeduppedSorted,
-							searches,
-							searchesMapOnSearchId  );
+							searches, searchesMapOnSearchId  );
 
 			List<MergedProteinSingleEntry> proteins = allProteinsMergedCommonPageDownloadResult.getProteins();
 

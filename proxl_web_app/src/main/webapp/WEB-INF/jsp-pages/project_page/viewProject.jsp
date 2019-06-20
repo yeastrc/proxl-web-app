@@ -1822,7 +1822,8 @@
 									  
 				  	<c:if test="${authAccessLevel.assistantProjectOwnerAllowed or authAccessLevel.assistantProjectOwnerIfProjectNotLockedAllowed }" >
 					  
-					  <div style="margin-bottom:10px;">
+					  <div style="margin-bottom:10px; position: relative;"> <%--  container div for success-message-container which is position absolute --%>
+					  
 						<input class="submit-button" type="button" value="Expand All" onClick="javascript:expandAll()">
 						<input class="submit-button" type="button" value="Collapse All" onClick="javascript:collapseAll()">
 
@@ -1860,6 +1861,32 @@
 											value="Organize Searches" >
 							</c:if>
 							
+							<c:if test="${authAccessLevel.projectOwnerAllowed }" >
+							
+								<div style=" display:inline-block;position:relative; " >
+	
+									<input class="submit-button tool_tip_attached_jq " type="button" 
+												id="set_project_level_default_cutoffs_button"
+												data-tooltip="Click here to set custom cutoffs for all searches.."
+												value="Filter Overrides" >
+												
+								 	<%-- Values successfully saved message --%>
+								
+									<%-- <div style="position: relative;"> --%> <%--  container div for success-message-container which is position absolute --%>
+									  <div style="position: absolute; top: -6px;">
+										<div id="set_project_level_default_cutoffs_button_success_message_values_updated"
+												class="success-message-container error_message_container_jq" 
+												style="text-align: left; margin-left: 0px;width: 200px;">
+											<div class="success-message-inner-container"  style="text-align: center;">
+												<div class="success-message-close-x error_message_close_x_jq">X</div>
+												<div class="success-message-text" >Values Saved</div>
+											</div>
+									 	</div>	  
+									  </div>
+									<%-- </div> --%>
+								</div>
+								
+							</c:if>
 						</c:if>
 				
 					  </div>

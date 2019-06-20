@@ -226,9 +226,9 @@ public class ViewMergedSearchCoverageReportAction extends Action {
 					GetProteinQueryJSONRootFromFormData.getInstance()
 					.getProteinQueryJSONRootFromFormData( 
 							form, 
+							projectId,
 							projectSearchIdsListDeduppedSorted,
-							searchIds,
-							mapProjectSearchIdToSearchId );
+							searchIds, mapProjectSearchIdToSearchId );
 
 			//  Convert the protein sequence ids that come from the JS code to standard integers and put
 			//   in the property excludeproteinSequenceVersionIds.

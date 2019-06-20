@@ -202,14 +202,14 @@ public class ViewSearchPeptidesAction extends Action {
 
 				//  Update peptideQueryJSONRoot for current search ids and project search ids
 				Update__A_QueryBase_JSONRoot__ForCurrentSearchIds.getInstance()
-				.update__A_QueryBase_JSONRoot__ForCurrentSearchIds( peptideQueryJSONRoot, mapProjectSearchIdToSearchId );
+				.update__A_QueryBase_JSONRoot__ForCurrentSearchIds( peptideQueryJSONRoot, mapProjectSearchIdToSearchId, projectId );
 				
 			} else {
 				//  Query JSON in the form is empty so create an empty object that will be populated.
 				peptideQueryJSONRoot = new PeptideQueryJSONRoot();
 				CutoffValuesRootLevel cutoffValuesRootLevel =
 						GetDefaultPsmPeptideCutoffs.getInstance()
-						.getDefaultPsmPeptideCutoffs( projectSearchIdsSet, searchIdsSet, mapProjectSearchIdToSearchId );
+						.getDefaultPsmPeptideCutoffs( projectId, projectSearchIdsSet, searchIdsSet, mapProjectSearchIdToSearchId );
 				peptideQueryJSONRoot.setCutoffs( cutoffValuesRootLevel );
 			}   //   END  ELSE of  if ( StringUtils.isNotEmpty( queryJSONFromForm ) ) {
 			

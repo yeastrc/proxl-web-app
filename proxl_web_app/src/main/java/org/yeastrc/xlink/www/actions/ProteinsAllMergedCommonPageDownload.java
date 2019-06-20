@@ -57,6 +57,7 @@ public class ProteinsAllMergedCommonPageDownload {
 	 * 
 	 * @param form
 	 * @param proteinQueryJSONRoot_Param
+	 * @param projectId TODO
 	 * @param projectSearchIdsListDeduppedSorted
 	 * @param searches
 	 * @param searchesMapOnSearchId
@@ -67,9 +68,9 @@ public class ProteinsAllMergedCommonPageDownload {
 	public AllProteinsMergedCommonPageDownloadResult getAllProteinsWrapped(
 			MergedSearchViewProteinsForm form,
 			ProteinQueryJSONRoot proteinQueryJSONRoot_Param,
-			List<Integer> projectSearchIdsListDeduppedSorted,
-			List<SearchDTO> searches, 
-			Map<Integer, SearchDTO> searchesMapOnSearchId
+			int projectId,
+			List<Integer> projectSearchIdsListDeduppedSorted, 
+			List<SearchDTO> searches, Map<Integer, SearchDTO> searchesMapOnSearchId
 			) throws Exception, ProxlWebappDataException {
 
 		if ( form != null && proteinQueryJSONRoot_Param != null ) {
@@ -108,7 +109,7 @@ public class ProteinsAllMergedCommonPageDownload {
 
 			//  Update proteinQueryJSONRoot for current search ids and project search ids
 			Update__A_QueryBase_JSONRoot__ForCurrentSearchIds.getInstance()
-			.update__A_QueryBase_JSONRoot__ForCurrentSearchIds( proteinQueryJSONRoot, mapProjectSearchIdToSearchId );
+			.update__A_QueryBase_JSONRoot__ForCurrentSearchIds( proteinQueryJSONRoot, mapProjectSearchIdToSearchId, projectId );
 			
 		} else {
 			//   Get Query JSON from the form and if not empty, deserialize it
@@ -116,9 +117,9 @@ public class ProteinsAllMergedCommonPageDownload {
 					GetProteinQueryJSONRootFromFormData.getInstance()
 					.getProteinQueryJSONRootFromFormData( 
 							form, 
+							projectId,
 							projectSearchIdsListDeduppedSorted,
-							searchIds,
-							mapProjectSearchIdToSearchId );
+							searchIds, mapProjectSearchIdToSearchId );
 			
 		}
 		

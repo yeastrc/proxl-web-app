@@ -124,6 +124,7 @@ public class PeptidesMergedCommonPageDownload {
 	 * 
 	 * @param form - type MergedSearchViewPeptidesForm
 	 * @param mergedPeptideQueryJSONRoot_Param - type MergedPeptideQueryJSONRoot
+	 * @param projectId TODO
 	 * @param projectSearchIdsListDeduppedSorted
 	 * @param searches
 	 * @param searchesMapOnSearchId
@@ -135,10 +136,10 @@ public class PeptidesMergedCommonPageDownload {
 	public PeptidesMergedCommonPageDownloadResult getWebMergedPeptideRecords(
 			MergedSearchViewPeptidesForm form,
 			MergedPeptideQueryJSONRoot mergedPeptideQueryJSONRoot_Param,
-			List<Integer> projectSearchIdsListDeduppedSorted,
-			List<SearchDTO> searches, 
-			Map<Integer, SearchDTO> searchesMapOnSearchId,
-			FlagCombinedReportedPeptideEntries flagCombinedReportedPeptideEntries
+			int projectId,
+			List<Integer> projectSearchIdsListDeduppedSorted, 
+			List<SearchDTO> searches,
+			Map<Integer, SearchDTO> searchesMapOnSearchId, FlagCombinedReportedPeptideEntries flagCombinedReportedPeptideEntries
 			) throws Exception, ProxlWebappDataException {
 		
 		if ( form != null && mergedPeptideQueryJSONRoot_Param != null ) {
@@ -170,7 +171,7 @@ public class PeptidesMergedCommonPageDownload {
 
 			//  Update mergedPeptideQueryJSONRoot for current search ids and project search ids
 			Update__A_QueryBase_JSONRoot__ForCurrentSearchIds.getInstance()
-			.update__A_QueryBase_JSONRoot__ForCurrentSearchIds( mergedPeptideQueryJSONRoot, mapProjectSearchIdToSearchId );
+			.update__A_QueryBase_JSONRoot__ForCurrentSearchIds( mergedPeptideQueryJSONRoot, mapProjectSearchIdToSearchId, projectId );
 
 		} else {
 
@@ -197,7 +198,7 @@ public class PeptidesMergedCommonPageDownload {
 
 				//  Update mergedPeptideQueryJSONRoot for current search ids and project search ids
 				Update__A_QueryBase_JSONRoot__ForCurrentSearchIds.getInstance()
-				.update__A_QueryBase_JSONRoot__ForCurrentSearchIds( mergedPeptideQueryJSONRoot, mapProjectSearchIdToSearchId );
+				.update__A_QueryBase_JSONRoot__ForCurrentSearchIds( mergedPeptideQueryJSONRoot, mapProjectSearchIdToSearchId, projectId );
 
 			} else {
 				//  Query JSON in the form is empty so create an empty object that will be populated.
@@ -205,7 +206,7 @@ public class PeptidesMergedCommonPageDownload {
 				//  Create cutoffs for default values
 				CutoffValuesRootLevel cutoffValuesRootLevelDefaults =
 						GetDefaultPsmPeptideCutoffs.getInstance()
-						.getDefaultPsmPeptideCutoffs( projectSearchIdsListDeduppedSorted, searchIds, mapProjectSearchIdToSearchId );
+						.getDefaultPsmPeptideCutoffs( projectId, projectSearchIdsListDeduppedSorted, searchIds, mapProjectSearchIdToSearchId );
 				mergedPeptideQueryJSONRoot.setCutoffs( cutoffValuesRootLevelDefaults );
 			}
 		}

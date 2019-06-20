@@ -215,7 +215,7 @@ public class ViewMergedStructureAction extends Action {
 			////////   Generic Param processing
 			CutoffValuesRootLevel cutoffValuesRootLevelCutoffDefaults =
 					GetDefaultPsmPeptideCutoffs.getInstance()
-					.getDefaultPsmPeptideCutoffs( projectSearchIdsListDedupped_SortedIfNeeded, searchIds, mapProjectSearchIdToSearchId );
+					.getDefaultPsmPeptideCutoffs( projectId, projectSearchIdsListDedupped_SortedIfNeeded, searchIds, mapProjectSearchIdToSearchId );
 			String cutoffValuesRootLevelCutoffDefaultsJSONString = jacksonJSON_Mapper.writeValueAsString( cutoffValuesRootLevelCutoffDefaults );
 			request.setAttribute( "cutoffValuesRootLevelCutoffDefaults", cutoffValuesRootLevelCutoffDefaultsJSONString );
 

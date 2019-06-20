@@ -2559,9 +2559,101 @@ CREATE TABLE  proxl_xml_file_import_submit_import_program_key_per_user_history (
 ENGINE = InnoDB;
 
 
-SET SQL_MODE=@OLD_SQL_MODE;
-SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
-SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
+-- -----------------------------------------------------
+-- Table project_level_default_fltr_ann_cutoffs_tbl
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS project_level_default_fltr_ann_cutoffs_tbl ;
+
+CREATE TABLE  project_level_default_fltr_ann_cutoffs_tbl (
+  id INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  project_id INT(10) UNSIGNED NOT NULL,
+  search_program_name VARCHAR(200) NOT NULL,
+  psm_peptide_type ENUM('psm', 'peptide', 'psm_per_peptide') NOT NULL,
+  annotation_type_name VARCHAR(255) NOT NULL,
+  annotation_cutoff_value DOUBLE NOT NULL,
+  created_auth_user_id INT UNSIGNED NOT NULL,
+  created_date_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  last_updated_auth_user_id INT NOT NULL,
+  last_updated_date_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  CONSTRAINT prj_lvl_dfltfltr_ann_ctffs
+    FOREIGN KEY (project_id)
+    REFERENCES project (id)
+    ON DELETE CASCADE
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+COMMENT = 'User Entered Annotation Cutoffs that apply to all searches in the project';
+
+CREATE UNIQUE INDEX unique_record_index ON project_level_default_fltr_ann_cutoffs_tbl (project_id ASC, search_program_name ASC, psm_peptide_type ASC, annotation_type_name ASC);
+
+
+-- -----------------------------------------------------
+-- Table project_level_default_fltr_ann_cutoffs_cutoff_as_string_tbl
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS project_level_default_fltr_ann_cutoffs_cutoff_as_string_tbl ;
+
+CREATE TABLE  project_level_default_fltr_ann_cutoffs_cutoff_as_string_tbl (
+  project_level_default_fltr_ann_cutoffs_id INT(10) UNSIGNED NOT NULL,
+  annotation_cutoff_value_string VARCHAR(45) NOT NULL,
+  PRIMARY KEY (project_level_default_fltr_ann_cutoffs_id),
+  CONSTRAINT prj_lvl_dfltfltr_ann_ctffs_as_str_fk
+    FOREIGN KEY (project_level_default_fltr_ann_cutoffs_id)
+    REFERENCES project_level_default_fltr_ann_cutoffs_tbl (id)
+    ON DELETE CASCADE
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table project_level_default_fltr_ann_cutoffs_prev_tbl
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS project_level_default_fltr_ann_cutoffs_prev_tbl ;
+
+CREATE TABLE  project_level_default_fltr_ann_cutoffs_prev_tbl (
+  id INT(10) UNSIGNED NOT NULL,
+  project_id INT(10) UNSIGNED NOT NULL,
+  psm_peptide_type ENUM('psm', 'peptide', 'psm_per_peptide') NOT NULL,
+  search_program_name VARCHAR(200) NOT NULL,
+  annotation_type_name VARCHAR(255) NOT NULL,
+  annotation_cutoff_value DOUBLE NOT NULL,
+  created_auth_user_id INT UNSIGNED NOT NULL,
+  created_date_time DATETIME NOT NULL,
+  last_updated_auth_user_id INT NOT NULL,
+  last_updated_date_time DATETIME NOT NULL,
+  id_prev_record INT NOT NULL AUTO_INCREMENT,
+  copy_create_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id_prev_record),
+  CONSTRAINT prj_lvl_dfltfltr_ann_ctffs_prv
+    FOREIGN KEY (project_id)
+    REFERENCES project (id)
+    ON DELETE CASCADE
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+COMMENT = 'Prev data - User Entered Annotation Cutoffs that apply to all searches in the project';
+
+CREATE INDEX id_idex ON project_level_default_fltr_ann_cutoffs_prev_tbl (id ASC);
+
+
+-- -----------------------------------------------------
+-- Table project_level_default_fltr_ann_cutoffs_cutoff_as_string_prev_tbl
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS project_level_default_fltr_ann_cutoffs_cutoff_as_string_prev_tbl ;
+
+CREATE TABLE  project_level_default_fltr_ann_cutoffs_cutoff_as_string_prev_tbl (
+  project_level_default_fltr_ann_cutoffs_id INT(10) UNSIGNED NOT NULL,
+  annotation_cutoff_value_string VARCHAR(45) NOT NULL,
+  id_prev_record INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  project_id INT(10) UNSIGNED NOT NULL,
+  PRIMARY KEY (id_prev_record),
+  CONSTRAINT prj_lvl_dfltfltr_ann_ctffs_as_str_prev_fk
+    FOREIGN KEY (project_id)
+    REFERENCES project (id)
+    ON DELETE CASCADE
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+CREATE INDEX prj_lvl_dfltfltr_ann_ctffs_as_str_prev_fk_idx ON project_level_default_fltr_ann_cutoffs_cutoff_as_string_prev_tbl (project_id ASC);
+
 
 
 DELIMITER $$
@@ -2582,4 +2674,8 @@ END$$
 
 
 DELIMITER ;
+
+SET SQL_MODE=@OLD_SQL_MODE;
+SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
+SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
 

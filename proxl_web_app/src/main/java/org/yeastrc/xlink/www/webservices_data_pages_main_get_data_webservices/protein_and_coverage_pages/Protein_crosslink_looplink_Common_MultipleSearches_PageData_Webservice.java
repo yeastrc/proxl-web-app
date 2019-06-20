@@ -260,9 +260,9 @@ class Protein_crosslink_looplink_Common_MultipleSearches_PageData_Webservice {
 							null, // form,
 							proteinQueryJSONRoot,
 							forCrosslinksOrLooplinkOrBoth,
+							projectId,
 							projectSearchIdsListDeduppedSorted,
-							searches,
-							searchesMapOnSearchId  );
+							searches, searchesMapOnSearchId  );
 			
 			List<MergedSearchProteinCrosslink> crosslinks = proteinsMergedCommonPageDownloadResult.getCrosslinks();
 			List<MergedSearchProteinLooplink> looplinks = proteinsMergedCommonPageDownloadResult.getLooplinks();

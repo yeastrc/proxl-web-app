@@ -143,9 +143,9 @@ public class DownloadMergedSearchProteinsAction extends Action {
 								form,
 								null, // ProteinQueryJSONRoot proteinQueryJSONRoot_Param
 								ProteinsMergedCommonPageDownload.ForCrosslinksOrLooplinkOrBoth.BOTH_CROSSLINKS_AND_LOOPLINKS,
+								projectId,
 								projectSearchIdsListDeduppedSorted,
-								searches,
-								searchesMapOnSearchId  );
+								searches, searchesMapOnSearchId  );
 				
 				if ( StringUtils.isNoneEmpty( form.getSelectedCrosslinksLooplinksMonolinksJSON() ) ) {
 					FilterProteinsOnSelectedLinks.getInstance()

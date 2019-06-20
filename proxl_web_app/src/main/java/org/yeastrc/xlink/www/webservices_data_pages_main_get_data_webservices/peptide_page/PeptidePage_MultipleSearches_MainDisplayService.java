@@ -235,10 +235,10 @@ public class PeptidePage_MultipleSearches_MainDisplayService {
 					.getWebMergedPeptideRecords(
 							null, // form
 							mergedPeptideQueryJSONRoot,
+							projectId,
 							projectSearchIdsListDeduppedSorted,
 							searches,
-							searchesMapOnSearchId,
-							PeptidesMergedCommonPageDownload.FlagCombinedReportedPeptideEntries.YES );
+							searchesMapOnSearchId, PeptidesMergedCommonPageDownload.FlagCombinedReportedPeptideEntries.YES );
 			
 			boolean anyResultsHaveIsotopeLabels = peptidesMergedCommonPageDownloadResult.isAnyResultsHaveIsotopeLabels();
 			
