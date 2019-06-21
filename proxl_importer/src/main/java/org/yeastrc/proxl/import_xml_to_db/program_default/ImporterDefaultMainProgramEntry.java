@@ -31,7 +31,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.config.Configuration;
 import org.apache.logging.log4j.core.config.LoggerConfig;
-
+import org.yeastrc.proxl.import_xml_to_db.config.Process_ConfigFileData_OtherThanDBConfig;
 import org.yeastrc.proxl.import_xml_to_db.constants.DataErrorsFileConstants;
 import org.yeastrc.proxl.import_xml_to_db.constants.ImporterProgramExitCodes;
 import org.yeastrc.proxl.import_xml_to_db.constants.ScanFilenameConstants;
@@ -308,6 +308,9 @@ public class ImporterDefaultMainProgramEntry {
 					importResults.setProgramExitCode( ImporterProgramExitCodes.PROGRAM_EXIT_CODE_INVALID_COMMAND_LINE_PARAMETER_VALUES );
 					return importResults;  //  EARLY EXIT
 				}
+
+				Process_ConfigFileData_OtherThanDBConfig.getInstance().processConfigFile( dbConfigFile );
+
 			}			
 			//  TODO  Not currently used
 //			outputImportResultFileName = (String)cmdLineParser.getOptionValue( outputImportResultFileCommandLineOpt );

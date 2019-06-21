@@ -1,9 +1,11 @@
 package org.yeastrc.proxl.import_xml_to_db.spectrum.spectral_storage_service_interface;
 
 import java.io.File;
+import java.math.BigInteger;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;import org.slf4j.Logger;
+import org.yeastrc.proxl.import_xml_to_db.config.ImporterConfigFileData_OtherThanDBConfig;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterConfigException;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterDataException;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterSpectralStorageServiceErrorException;
@@ -11,6 +13,8 @@ import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterSpectralStorag
 import org.yeastrc.spectral_storage.accept_import_web_app.shared_server_client.constants_enums.WebserviceSpectralStorageAcceptImport_ProcessStatusEnum;
 import org.yeastrc.spectral_storage.accept_import_web_app.shared_server_client.webservice_request_response.main.Get_UploadedScanFileInfo_Request;
 import org.yeastrc.spectral_storage.accept_import_web_app.shared_server_client.webservice_request_response.main.Get_UploadedScanFileInfo_Response;
+import org.yeastrc.spectral_storage.accept_import_web_app.shared_server_client.webservice_request_response.main.UploadScanFile_AddScanFileFromFilenameAndPath_Request;
+import org.yeastrc.spectral_storage.accept_import_web_app.shared_server_client.webservice_request_response.main.UploadScanFile_AddScanFileFromFilenameAndPath_Response;
 import org.yeastrc.spectral_storage.accept_import_web_app.shared_server_client.webservice_request_response.main.UploadScanFile_Delete_For_ScanProcessStatusKey_Request;
 import org.yeastrc.spectral_storage.accept_import_web_app.shared_server_client.webservice_request_response.main.UploadScanFile_Delete_For_ScanProcessStatusKey_Response;
 import org.yeastrc.spectral_storage.accept_import_web_app.shared_server_client.webservice_request_response.main.UploadScanFile_Init_Request;
@@ -101,13 +105,120 @@ public class ScanFileToSpectralStorageService_Processing {
 			
 			UploadScanFile_Init_Response uploadScanFile_Init_Response =
 					spectralStorageService_InitUploadScanFileProcess( scanFileWithPath, scanFileDTO, callSpectralStorageWebservice );
+
+			Thread.sleep( 2000 ); // 2 second sleep
 			
-			log.warn( "Calling sendScanFileToSpectralStorageService(...) scanFileWithPath: " + scanFileWithPath.getAbsolutePath() );
+			boolean sendScanFileLocationCompleteSuccessful = false;
 			
-			UploadScanFile_UploadScanFile_Response uploadScanFile_UploadScanFile_Response = 
-					sendScanFileToSpectralStorageService( uploadScanFile_Init_Response, scanFileWithPath, scanFileDTO, callSpectralStorageWebservice );
-			
-			log.warn( "Calling submitScanFileToSpectralStorageService(...) scanFileWithPath: " + scanFileWithPath.getAbsolutePath() );
+			if ( ImporterConfigFileData_OtherThanDBConfig.isSpectralStorageService_sendScanFileLocation() ) {
+				
+				boolean sendScanFileLocation = true;
+				if ( ImporterConfigFileData_OtherThanDBConfig.getSpectralStorageService_sendScanFileLocation_IfPathStartsWith() != null ) {
+					String ifPathStartsWith = ImporterConfigFileData_OtherThanDBConfig.getSpectralStorageService_sendScanFileLocation_IfPathStartsWith();
+					String scanFileWithPath_CanonicalPathString = scanFileWithPath.getCanonicalPath();
+					if ( ! scanFileWithPath_CanonicalPathString.startsWith( ifPathStartsWith ) ) {
+						sendScanFileLocation = false;
+					}
+				}
+
+				if ( sendScanFileLocation ) {
+
+					if ( log.isInfoEnabled() ) {
+						log.info( "INFO: Calling sendScanFilenameWithPathToSpectralStorageService(...) scanFileWithPath: " + scanFileWithPath.getAbsolutePath() );
+					}
+
+					UploadScanFile_AddScanFileFromFilenameAndPath_Response uploadScanFile_AddScanFileFromFilenameAndPath_Response =
+							sendScanFilenameWithPathToSpectralStorageService( uploadScanFile_Init_Response, scanFileWithPath, callSpectralStorageWebservice );
+
+					if ( log.isInfoEnabled() ) {
+						log.info( "INFO: After sendScanFilenameWithPathToSpectralStorageService(...) scanFileWithPath: " + scanFileWithPath.getAbsolutePath() );
+					}
+
+					if ( uploadScanFile_AddScanFileFromFilenameAndPath_Response.isStatusSuccess() ) {
+
+						sendScanFileLocationCompleteSuccessful = true;
+
+					} else {
+
+						//  Check in this order since if isUploadScanFileWithPath_FilePathsAllowedNotConfigured is true, isUploadScanFileWithPath_FilePathNotAllowed is also set to true
+						if ( uploadScanFile_AddScanFileFromFilenameAndPath_Response.isUploadScanFileWithPath_FilePathsAllowedNotConfigured() ) {
+
+							//  Already reported in called method
+//							log.warn( "Send of Scan file with path to Spectral Storage Service rejected.  Will next send scan file contents" );
+//							log.warn( "  ... addnl info: Proxl Importer configured to send Scan file path to Spectral Storage Service but Spectral Storage Service not configured to accept Scan File Locations." );
+//							log.warn( "  ... addnl info: call sendScanFilenameWithPathToSpectralStorageService(...) returned statusSuccess False" );
+
+						} else if ( uploadScanFile_AddScanFileFromFilenameAndPath_Response.isUploadScanFileWithPath_FilePathNotAllowed() ) {
+
+							//  Already reported in called method
+//							log.warn( "Send of Scan file with path to Spectral Storage Service rejected.  Will next send scan file contents" );
+//							log.warn( "  ... addnl info: Proxl Importer configured to send Scan file path to Spectral Storage Service but for this specific scan file, the Scan file path was not allowed.  Scan File with path (Java Get Canonical file with Path): "
+//									+ scanFileWithPath.getCanonicalPath() );
+//							log.warn( "  ... addnl info: call sendScanFilenameWithPathToSpectralStorageService(...) returned statusSuccess False" );
+
+						} else {
+							String msg = "Send of Scan file with path to Spectral Storage Service Failed.";
+							log.warn( msg );
+							log.warn( "  ... addnl info: call sendScanFilenameWithPathToSpectralStorageService(...) returned statusSuccess False" );
+							if ( uploadScanFile_AddScanFileFromFilenameAndPath_Response.isUploadScanFileTempKey_NotFound() ) {
+								log.warn( "  ... addnl info: For some reason the key returned by the init call is no longer in the system at Spectral Storage Service.  submitScanFileToSpectralStorageService(...) returned 'UploadScanFileTempKey_NotFound' true. UploadScanFileTempKey: " 
+										+ uploadScanFile_Init_Response.getUploadScanFileTempKey() );
+							}
+							if ( uploadScanFile_AddScanFileFromFilenameAndPath_Response.isUploadScanFileTempKey_Expired() ) {
+								log.warn( "  ... addnl info: Too much time has elapsed since the call to the start of this submit scan file to spectral storage service (too much time since call to init). submitScanFileToSpectralStorageService(...) returned 'UploadScanFileTempKey_Expired' true. UploadScanFileTempKey: " 
+										+ uploadScanFile_Init_Response.getUploadScanFileTempKey() );
+							}
+							if ( uploadScanFile_AddScanFileFromFilenameAndPath_Response.isUploadScanFileTempKey_NotFound() ) {
+								log.warn( "  ... addnl info: sendScanFilenameWithPathToSpectralStorageService(...) returned 'UploadScanFileTempKey_NotFound' true. UploadScanFileTempKey: " + uploadScanFile_Init_Response.getUploadScanFileTempKey() );
+							}
+							if ( uploadScanFile_AddScanFileFromFilenameAndPath_Response.isUploadScanFileTempKey_Expired() ) {
+								log.warn( "  ... addnl info: sendScanFilenameWithPathToSpectralStorageService(...) returned 'UploadScanFileTempKey_Expired' true. UploadScanFileTempKey: " + uploadScanFile_Init_Response.getUploadScanFileTempKey() );
+							}
+							throw new ProxlImporterSpectralStorageServiceErrorException( msg );
+						}
+					}
+				}
+			}
+
+			if ( ! sendScanFileLocationCompleteSuccessful ) {
+
+				//  Sending Scan File with Path not done or not accepted, so sending the file contents
+
+				if ( log.isInfoEnabled() ) {
+					log.info( "INFO: Calling sendScanFileToSpectralStorageService_ActuallySendScanFile(...) scanFileWithPath: " + scanFileWithPath.getAbsolutePath() );
+				}
+				
+				UploadScanFile_UploadScanFile_Response uploadScanFile_UploadScanFile_Response = 
+						sendScanFileToSpectralStorageService_ActuallySendScanFile( uploadScanFile_Init_Response, scanFileWithPath, scanFileDTO, callSpectralStorageWebservice );
+
+				if ( log.isInfoEnabled() ) {
+					log.info( "INFO: After sendScanFileToSpectralStorageService(...) (will next sleep for X seconds) scanFileWithPath: " + scanFileWithPath.getAbsolutePath() );
+				}
+
+				if ( ! uploadScanFile_UploadScanFile_Response.isStatusSuccess() ) {
+					String msg = "Send of Scan file Contents to Spectral Storage Service Failed.";
+					log.warn( msg );
+					log.warn( "  ... addnl info: call sendScanFileToSpectralStorageService_ActuallySendScanFile(...) returned statusSuccess False" );
+					if ( uploadScanFile_UploadScanFile_Response.isUploadScanFileTempKey_NotFound() ) {
+						log.warn( "  ... addnl info: For some reason the key returned by the init call is no longer in the system at Spectral Storage Service.  submitScanFileToSpectralStorageService(...) returned 'UploadScanFileTempKey_NotFound' true. UploadScanFileTempKey: " 
+								+ uploadScanFile_Init_Response.getUploadScanFileTempKey() );
+					}
+					if ( uploadScanFile_UploadScanFile_Response.isUploadScanFileTempKey_Expired() ) {
+						log.warn( "  ... addnl info: Too much time has elapsed since the call to the start of this submit scan file to spectral storage service (too much time since call to init). submitScanFileToSpectralStorageService(...) returned 'UploadScanFileTempKey_Expired' true. UploadScanFileTempKey: " 
+								+ uploadScanFile_Init_Response.getUploadScanFileTempKey() );
+					}
+					if ( uploadScanFile_UploadScanFile_Response.isUploadScanFileTempKey_NotFound() ) {
+						log.warn( "  ... addnl info: sendScanFileToSpectralStorageService_ActuallySendScanFile(...) returned 'UploadScanFileTempKey_NotFound' true. UploadScanFileTempKey: " + uploadScanFile_Init_Response.getUploadScanFileTempKey() );
+					}
+					if ( uploadScanFile_UploadScanFile_Response.isUploadScanFileTempKey_Expired() ) {
+						log.warn( "  ... addnl info: sendScanFileToSpectralStorageService_ActuallySendScanFile(...) returned 'UploadScanFileTempKey_Expired' true. UploadScanFileTempKey: " + uploadScanFile_Init_Response.getUploadScanFileTempKey() );
+					}
+
+					throw new ProxlImporterSpectralStorageServiceErrorException( msg );
+				}
+
+				Thread.sleep( 2000 ); // sleep in milliseconds
+			}
 			
 			UploadScanFile_Submit_Response uploadScanFile_Submit_Response =
 					submitScanFileToSpectralStorageService( 
@@ -126,6 +237,11 @@ public class ScanFileToSpectralStorageService_Processing {
 			
 			UploadScanFile_Delete_For_ScanProcessStatusKey_Response uploadScanFile_Delete_For_ScanProcessStatusKey_Response =
 					callSpectralStorageWebservice.call_UploadScanFile_Delete_For_ScanProcessStatusKey_Webservice( uploadScanFile_Delete_For_ScanProcessStatusKey_Request );
+
+			if ( ! uploadScanFile_Delete_For_ScanProcessStatusKey_Response.isStatusSuccess() ) {
+				String msg2 = "Call to call_UploadScanFile_Delete_For_ScanProcessStatusKey_Webservice(...) returned status NOT SUCCESS:";
+				log.error( msg2 );
+			}
 			
 		} catch ( Exception e ) {
 			String msg = "Failed to send scan file to Spectral Storage";
@@ -157,8 +273,9 @@ public class ScanFileToSpectralStorageService_Processing {
 			retryCount++;
 
 			if ( retryCount > SEND_FILE_RETRY_COUNT_MAX ) {
-				String msg = "spectralStorageService_InitUploadScanFileProcess failed for retryCount > SEND_FILE_RETRY_COUNT.  UploadScanFileTempKey: " + response.getUploadScanFileTempKey()
-					+ ", Scan File: " + scanFileWithPath.getAbsolutePath();
+				String msg = "spectralStorageService_InitUploadScanFileProcess failed for retryCount > SEND_FILE_RETRY_COUNT. retryCount: " + retryCount 
+						+ ", SEND_FILE_RETRY_COUNT_MAX: " + SEND_FILE_RETRY_COUNT_MAX
+						+ ", Scan File: " + scanFileWithPath.getAbsolutePath();
 				log.error( msg );
 				throw new ProxlImporterSpectralStorageServiceRetryExceededException(msg);
 			}
@@ -213,7 +330,7 @@ public class ScanFileToSpectralStorageService_Processing {
 	 * @return
 	 * @throws ProxlImporterDataException
 	 */
-	private UploadScanFile_UploadScanFile_Response sendScanFileToSpectralStorageService( 
+	private UploadScanFile_UploadScanFile_Response sendScanFileToSpectralStorageService_ActuallySendScanFile( 
 			UploadScanFile_Init_Response uploadScanFile_Init_Response,
 			File scanFileWithPath, 
 			ScanFileDTO scanFileDTO,
@@ -230,9 +347,11 @@ public class ScanFileToSpectralStorageService_Processing {
 			retryCount++;
 
 			if ( retryCount > SEND_FILE_RETRY_COUNT_MAX ) {
-				String msg = "UploadSendScanFile: Send Scan File to Spectral Storage Service failed for retryCount > SEND_FILE_RETRY_COUNT.  StatusSuccess: " + response.isStatusSuccess()
-					+ ", UploadScanFileTempKey: " + uploadScanFile_Init_Response.getUploadScanFileTempKey()
-					+ ", Scan File: " + scanFileWithPath.getAbsolutePath();
+				String msg = "UploadSendScanFile: Send Scan File to Spectral Storage Service failed for retryCount > SEND_FILE_RETRY_COUNT_MAX. "
+						+ " retryCount: " + retryCount
+						+ ", SEND_FILE_RETRY_COUNT_MAX: " + SEND_FILE_RETRY_COUNT_MAX
+						+ ", UploadScanFileTempKey: " + uploadScanFile_Init_Response.getUploadScanFileTempKey()
+						+ ", Scan File: " + scanFileWithPath.getAbsolutePath();
 				log.error( msg );
 				throw new ProxlImporterSpectralStorageServiceRetryExceededException(msg);
 			}
@@ -280,7 +399,116 @@ public class ScanFileToSpectralStorageService_Processing {
 		
 		return response;
 	}
+
+	/**
+	 * @param uploadScanFile_Init_Response
+	 * @param scanFileWithPath
+	 * @param scanFileDTO
+	 * @param callSpectralStorageAcceptImportWebservice
+	 * @return
+	 * @throws ProxlImporterDataException
+	 */
+	private UploadScanFile_AddScanFileFromFilenameAndPath_Response sendScanFilenameWithPathToSpectralStorageService( 
+			UploadScanFile_Init_Response uploadScanFile_Init_Response,
+			File scanFileWithPath, 
+			CallSpectralStorageAcceptImportWebservice callSpectralStorageAcceptImportWebservice ) throws Exception {
+
+		UploadScanFile_AddScanFileFromFilenameAndPath_Response response = null;
+		
+		boolean uploadScanFileTempKey_NotFound_ErrorResponse = false;
+
+		int retryCount = 0;
+
+		while( true ) {  // use 'break;' inside loop to exit
+
+			retryCount++;
+
+			if ( retryCount > SEND_FILE_RETRY_COUNT_MAX ) {
+				String msg = "Send Scan Filename with Path to Spectral Storage Service. Actually send the filename with Path. In sendScanFilenameWithPathToSpectralStorageService():  failed for retryCount > SEND_FILE_RETRY_COUNT.  StatusSuccess: " + response.isStatusSuccess()
+					+ ", UploadScanFileTempKey: " + uploadScanFile_Init_Response.getUploadScanFileTempKey()
+					+ ", Scan File: " + scanFileWithPath.getAbsolutePath();
+				log.error( msg );
+				throw new ProxlImporterSpectralStorageServiceRetryExceededException(msg);
+			}
+			
+			if ( retryCount > 1 ) {
+				log.warn( "In sendScanFilenameWithPathToSpectralStorageService(...) retryCount: " + retryCount + ", scanFileWithPath: " + scanFileWithPath.getAbsolutePath() );
+				
+			}
+			
+
+			UploadScanFile_AddScanFileFromFilenameAndPath_Request uploadScanFile_AddScanFileFromFilenameAndPath_Request = new UploadScanFile_AddScanFileFromFilenameAndPath_Request();
+			uploadScanFile_AddScanFileFromFilenameAndPath_Request.setUploadScanFileTempKey( uploadScanFile_Init_Response.getUploadScanFileTempKey() );
+			uploadScanFile_AddScanFileFromFilenameAndPath_Request.setFilenameWithPath( scanFileWithPath.getAbsolutePath() );
+			uploadScanFile_AddScanFileFromFilenameAndPath_Request.setFileSize( BigInteger.valueOf( scanFileWithPath.length() ) );
+			
+			try {
+				//  Send scan file to Spectral Storage Service
+				response = callSpectralStorageAcceptImportWebservice.call_UploadScanFile_AddScanFileFromFilenameAndPath_Webservice( uploadScanFile_AddScanFileFromFilenameAndPath_Request );
+
+				if ( ! response.isStatusSuccess() ) {
+
+					//  Check in this order since if isUploadScanFileWithPath_FilePathsAllowedNotConfigured is true, isUploadScanFileWithPath_FilePathNotAllowed is also set to true
+
+					if ( response.isUploadScanFileWithPath_FilePathsAllowedNotConfigured() ) {
+
+						log.warn( "Send of Scan file with path to Spectral Storage Service rejected.  Will next send scan file contents" );
+						log.warn( "  ... addnl info: Proxl Importer configured to send Scan file path to Spectral Storage Service but Spectral Storage Service not configured to accept Scan File Locations." );
+						log.warn( "  ... addnl info: call sendScanFilenameWithPathToSpectralStorageService(...) returned statusSuccess False" );
+
+						return response; // EARLY EXIT
+
+					} else if ( response.isUploadScanFileWithPath_FilePathNotAllowed() ) {
+
+						log.warn( "Send of Scan file with path to Spectral Storage Service rejected.  Will next send scan file contents" );
+						log.warn( "  ... addnl info: Proxl Importer configured to send Scan file path to Spectral Storage Service but for this specific scan file, the Scan file path was not allowed.  Scan File with path (Java Get Canonical file with Path): "
+								+ scanFileWithPath.getCanonicalPath() );
+						log.warn( "  ... addnl info: call sendScanFilenameWithPathToSpectralStorageService(...) returned statusSuccess False" );
+
+						return response; // EARLY EXIT
+					}
+					
+					if ( response.isUploadScanFileTempKey_NotFound() ) {
+						uploadScanFileTempKey_NotFound_ErrorResponse = true;
+						String msg = "Send Scan File to Spectral Storage Service. Actually send the file. In sendScanFilenameWithPathToSpectralStorageService(): call_UploadScanFile_UploadScanFile_Service return UploadScanFileTempKey_NotFound true.  UploadScanFileTempKey: " 
+								 + uploadScanFile_Init_Response.getUploadScanFileTempKey()
+								 + ", Scan File: " + scanFileWithPath.getAbsolutePath();
+						log.error( msg );
+					}
+					String msg = "Send Scan File to Spectral Storage Service. Actually send the file. In sendScanFilenameWithPathToSpectralStorageService(): call_UploadScanFile_UploadScanFile_Service return StatusSuccess false.  UploadScanFileTempKey: " 
+							 + uploadScanFile_Init_Response.getUploadScanFileTempKey()
+							 + ", Scan File: " + scanFileWithPath.getAbsolutePath();
+					log.error( msg );
+					throw new ProxlImporterSpectralStorageServiceErrorException(msg);
+				}
+
+				break;  //  EXIT LOOP
+				
+			} catch ( Exception e ) {
+
+				if ( retryCount == SEND_FILE_RETRY_COUNT_MAX || uploadScanFileTempKey_NotFound_ErrorResponse ) {
+					String scanProcessStatusKeyResponsePart = ", response from Spectral Storage Service call interface is null (call may have thrown exception).";
+					if ( response != null ) {
+						scanProcessStatusKeyResponsePart = " StatusSuccess: " + response.isStatusSuccess()
+							+ ", UploadScanFileTempKey: " + uploadScanFile_Init_Response.getUploadScanFileTempKey();
+					}
+					
+					String msg = "Send Scan File to Spectral Storage Service. Actually send the file. In sendScanFilenameWithPathToSpectralStorageService(): call_UploadScanFile_UploadScanFile_Service threw exception and failed for retryCount == SEND_FILE_RETRY_COUNT or uploadScanFileTempKey_NotFound_ErrorResponse is true. uploadScanFileTempKey_NotFound_ErrorResponse: " 
+							+ uploadScanFileTempKey_NotFound_ErrorResponse
+							+ ", scanProcessStatusKeyResponsePar: " + scanProcessStatusKeyResponsePart
+							+ ", Scan File: " + scanFileWithPath.getAbsolutePath();
+					log.error( msg, e );
+					throw new ProxlImporterSpectralStorageServiceErrorException( msg, e );
+				}
+			}
+
+			Thread.sleep( SEND_FILE_RETRY_DELAY ); // Sleep wait for retry
+		}
+		
+		return response;
+	}
 	
+
 
 	/**
 	 * @param uploadScanFile_Init_Response
