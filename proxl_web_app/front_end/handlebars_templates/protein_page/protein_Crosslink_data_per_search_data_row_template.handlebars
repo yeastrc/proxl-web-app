@@ -1,14 +1,8 @@
+{{!-- protein_Crosslink_data_per_search_data_row_template.handlebars in 'protein_page' 
 
-
-		<%-- !!!   Handlebars template   !!!!!!!!!   --%>
-		
-		
+	Crosslink Protein Page Multiple Searches - Per Search Data Row 
 	
-	<%--  Protein Data Per Search Template --%>
-
-<%-- 
-	Include in <script id="crosslink_protein_data_row_entry_template"  type="text/x-handlebars-template">
---%>
+--}}
 
 <tr id=""
 	style="cursor: pointer; "
@@ -21,7 +15,11 @@
 	data-protein_2_position="{{ protein_2_position }}"
 	>
 
-	<td>{{ data.searchName }}</td>
+	<td>  {{!-- span is color block before search name --}}
+		<span class=" merged-expanded-row-single-search-color-block merged-search-search-background-color-{{ colorIndex_OneBased }} "
+			></span>
+		{{ data.searchName }} ({{ data.searchId }})
+	</td>
 
 	<td class="integer-number-column-header"
 		><a class="show-child-data-link   " 

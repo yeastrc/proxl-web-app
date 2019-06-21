@@ -87,48 +87,6 @@
 	
 	
 			<%@ include file="/WEB-INF/jsp-includes/lorikeet_overlay_section.jsp" %>	
-	
-
-		
-	
-	<%--  Looplink Protein Template --%>
-
-
-		
-		<script id="looplink_protein_block_template"  type="text/x-handlebars-template">
-
-			<%--  include the template text  --%>
-			<%@ include file="/WEB-INF/jsp_template_fragments/For_jsp_pages/viewMergedLooplinkProtein.jsp_templates/looplink_protein_block_template.jsp" %>
-
-		</script>
-	
-
-	<%--  Looplink Protein Entry Template --%>
-
-
-
-		<%-- !!!   Handlebars template:  Looplink Protein Entry Template  !!!!!!!!!   --%>
-		
-		
-		<script id="looplink_protein_data_row_entry_template"  type="text/x-handlebars-template">
-
-			<%--  include the template text  --%>
-			<%@ include file="/WEB-INF/jsp_template_fragments/For_jsp_pages/viewMergedLooplinkProtein.jsp_templates/looplink_protein_data_row_entry_template.jsp" %>
-
-		</script>
-
-
-
-	<%--  Looplink Protein Child row Entry Template --%>
-
-		
-		<script id="looplink_protein_child_row_entry_template"  type="text/x-handlebars-template">
-
-			<%--  include the template text  --%>
-			<%@ include file="/WEB-INF/jsp_template_fragments/For_jsp_pages/viewMergedLooplinkProtein.jsp_templates/looplink_protein_child_row_entry_template.jsp" %>
-
-		</script>
-
 
 	<input type="hidden" id="project_id" value="<c:out value="${ project_id }"></c:out>"> 
 	

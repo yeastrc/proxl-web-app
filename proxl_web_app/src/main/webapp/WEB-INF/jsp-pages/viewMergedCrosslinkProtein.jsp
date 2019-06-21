@@ -84,46 +84,6 @@
 
 			<%@ include file="/WEB-INF/jsp-includes/lorikeet_overlay_section.jsp" %>	
 		
-		
-	
-	<%--  Crosslink Protein Template --%>
-
-
-		
-		<script id="crosslink_protein_block_template"  type="text/x-handlebars-template">
-
-			<%--  include the template text  --%>
-			<%@ include file="/WEB-INF/jsp_template_fragments/For_jsp_pages/viewMergedCrosslinkProtein.jsp_templates/crosslink_protein_block_template.jsp" %>
-
-		</script>
-	
-
-	<%--  Crosslink Protein Entry Template --%>
-
-
-
-		<%-- !!!   Handlebars template:  Crosslink Protein Entry Template  !!!!!!!!!   --%>
-		
-		
-		<script id="crosslink_protein_data_row_entry_template"  type="text/x-handlebars-template">
-
-			<%--  include the template text  --%>
-			<%@ include file="/WEB-INF/jsp_template_fragments/For_jsp_pages/viewMergedCrosslinkProtein.jsp_templates/crosslink_protein_data_row_entry_template.jsp" %>
-
-		</script>
-
-
-
-	<%--  Crosslink Protein Child row Entry Template --%>
-
-		
-		<script id="crosslink_protein_child_row_entry_template"  type="text/x-handlebars-template">
-
-			<%--  include the template text  --%>
-			<%@ include file="/WEB-INF/jsp_template_fragments/For_jsp_pages/viewMergedCrosslinkProtein.jsp_templates/crosslink_protein_child_row_entry_template.jsp" %>
-
-		</script>
-
 
 	<input type="hidden" id="project_id" value="<c:out value="${ project_id }"></c:out>"> 
 	

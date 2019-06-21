@@ -88,43 +88,6 @@
 	
 			<%@ include file="/WEB-INF/jsp-includes/lorikeet_overlay_section.jsp" %>	
 	
-	<%--  Protein Template --%>
-		
-		<script id="all_protein_block_template"  type="text/x-handlebars-template">
-
-			<%--  include the template text  --%>
-			<%@ include file="/WEB-INF/jsp_template_fragments/For_jsp_pages/viewMergedProteinAll.jsp_templates/all_protein_block_template.jsp" %>
-
-		</script>
-	
-
-	<%--  Protein Entry Template --%>
-
-
-
-		<%-- !!!   Handlebars template:  Looplink Protein Entry Template  !!!!!!!!!   --%>
-		
-		
-		<script id="all_protein_data_row_entry_template"  type="text/x-handlebars-template">
-
-			<%--  include the template text  --%>
-			<%@ include file="/WEB-INF/jsp_template_fragments/For_jsp_pages/viewMergedProteinAll.jsp_templates/all_protein_data_row_entry_template.jsp" %>
-
-		</script>
-
-
-
-	<%--  Protein Child row Entry Template --%>
-
-		
-		<script id="all_protein_child_row_entry_template"  type="text/x-handlebars-template">
-
-			<%--  include the template text  --%>
-			<%@ include file="/WEB-INF/jsp_template_fragments/For_jsp_pages/viewMergedProteinAll.jsp_templates/all_protein_child_row_entry_template.jsp" %>
-
-		</script>
-
-
 	<input type="hidden" id="project_id" value="<c:out value="${ project_id }"></c:out>"> 
 	
 	<c:forEach var="projectSearchId" items="${ projectSearchIds }">

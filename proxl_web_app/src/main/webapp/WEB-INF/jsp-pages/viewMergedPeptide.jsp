@@ -89,42 +89,6 @@
 	<%--  used by createTooltipForProteinNames.js --%>
 	<%@ include file="/WEB-INF/jsp-includes/proteinNameTooltipDataForJSCode.jsp" %>
 
-
-
-	<div id="data_per_search_between_searches_html" >
-		
-		<div class=" data-per-search-between-searches " ></div>
-	</div>
-
-
-
-	<script id="peptide_data_per_search_block_template"  type="text/x-handlebars-template">
-
-			<%--  include the template text  --%>
-			<%@ include file="/WEB-INF/jsp_template_fragments/For_jsp_pages/viewMergedPeptide.jsp_page_templates/peptide_data_per_search_block_template.jsp" %>	
-								
-
-	</script>
-	
-	
-	<script id="peptide_data_per_search_data_row_template"  type="text/x-handlebars-template">
-
-			<%--  include the template text  --%>
-			<%@ include file="/WEB-INF/jsp_template_fragments/For_jsp_pages/viewMergedPeptide.jsp_page_templates/peptide_data_per_search_data_row_template.jsp" %>	
-								
-
-	</script>
-	
-
-	
-	<script id="peptide_data_per_search_child_row_template"  type="text/x-handlebars-template">
-
-			<%--  include the template text  --%>
-			<%@ include file="/WEB-INF/jsp_template_fragments/For_jsp_pages/viewMergedPeptide.jsp_page_templates/peptide_data_per_search_child_row_template.jsp" %>	
-								
-
-	</script>
-	
 	
 			<%@ include file="/WEB-INF/jsp-includes/lorikeet_overlay_section.jsp" %>	
 	

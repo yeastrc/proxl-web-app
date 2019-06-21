@@ -102,6 +102,9 @@ task createHandlebarsOutputDirs {
   	  
   	  dirToCreate = rootDir
   	  mkdirSuccess = project.file( dirToCreate ).mkdirs()
+
+  	  dirToCreate = rootDir + "image_structure_pages_shared"
+  	  mkdirSuccess = project.file( dirToCreate ).mkdirs()
   	  
   	  dirToCreate = rootDir + "merged_pages_shared"
   	  mkdirSuccess = project.file( dirToCreate ).mkdirs()
@@ -186,6 +189,31 @@ task createHandlebarsOutputDirs {
   	  
 	}
 }
+
+//  Handlebars Precompile for input handlebars_templates/image_structure_pages_shared
+
+task handlebarsPrecompile_image_structure_pages_shared(type: NodeTask) {
+
+  def precompile_Input_Directory = "handlebars_templates/image_structure_pages_shared"
+  def precompile_Output_File = "handlebars_templates_precompiled/image_structure_pages_shared/image_structure_pages_shared_template-bundle.js"
+  
+  // Gradle Build Avoidance information.  Must specify correct inputs and outputs.
+  inputs.dir( precompile_Input_Directory )
+  outputs.file( precompile_Output_File )
+
+  def osName = System.getProperty("os.name").toLowerCase();
+  if (osName.contains("windows")) {
+    script = project.file('node_modules/handlebars/bin/handlebars')
+  } else {
+    script = project.file('node_modules/.bin/handlebars')
+  }
+  args = [ '--amd' , // parameters must be before file list
+  '--min',
+  '-f', precompile_Output_File,
+   precompile_Input_Directory
+   ]
+}
+
 
 //  Handlebars Precompile for input handlebars_templates/merged_pages_shared
 
@@ -872,6 +900,7 @@ task frontEndBuild(type: GradleBuild) {
      'handlebarsPrecompile_project_page__saved_views_section_loggedin_users',
      'handlebarsPrecompile_project_page__ann_cutoff_defaults_project_level',
      'handlebarsPrecompile_save_view',
+     'handlebarsPrecompile_image_structure_pages_shared',
      'handlebarsPrecompile_merged_pages_shared',
      'handlebarsPrecompile_peptide_page',
      'handlebarsPrecompile_protein_page',

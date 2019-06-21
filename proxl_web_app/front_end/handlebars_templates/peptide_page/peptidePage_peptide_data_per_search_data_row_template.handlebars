@@ -1,20 +1,21 @@
-<%--
-		peptide_data_per_search_data_row_template.jsp
+{{!-- peptidePage_peptide_data_per_search_data_row_template.handlebars in 'peptide_page' 
 
-		!!!   Handlebars template   !!!!!!!!!   
-
-	Peptide Data Per Search Template 
+	Peptide Page Multiple Searches - Per Search Data Row 
 	
---%>
+--}}
 
 <tr class="" 
 	id=""
 	style="cursor: pointer; "
 	onclick="viewPsmsLoadedFromWebServiceTemplate.showHidePsms( { clickedElement : this } )"
 	data-reported_peptide_id="{{ data.reportedPeptide.id }}"
-	data-project_search_id="{{  data.searchId }}"
+	data-project_search_id="{{  data.projectSearchId }}"
 	>
-	<td>{{ data.searchName }}</td>
+	<td>  {{!-- span is color block before search name --}}
+		<span class=" merged-expanded-row-single-search-color-block merged-search-search-background-color-{{ colorIndex_OneBased }} "
+			></span>
+		{{ data.searchName }} ({{  data.searchId }})
+	</td>
 	<td>
 		{{ data.reportedPeptide.sequence }}
 	</td>
@@ -43,5 +44,3 @@
 	 			>{{this}}</td>
 	{{/each}}	
 </tr>
-
-													

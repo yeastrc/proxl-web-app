@@ -8,6 +8,8 @@ import java.util.List;
  */
 public class ProteinCommonDataForPerSearchIdsProteinIdsPositionsResultEntry {
 
+	private int projectSearchId;
+	private int searchId;
 
 	private List<AnnotationDisplayNameDescription> peptideAnnotationDisplayNameDescriptionList;
 
@@ -45,6 +47,22 @@ public class ProteinCommonDataForPerSearchIdsProteinIdsPositionsResultEntry {
 	public void setProteins(
 			List<ProteinCommonDataForPerSearchIdsProteinIdsPositionsResult> proteins) {
 		this.proteins = proteins;
+	}
+
+	public int getProjectSearchId() {
+		return projectSearchId;
+	}
+
+	public void setProjectSearchId(int projectSearchId) {
+		this.projectSearchId = projectSearchId;
+	}
+
+	public int getSearchId() {
+		return searchId;
+	}
+
+	public void setSearchId(int searchId) {
+		this.searchId = searchId;
 	}
 
 

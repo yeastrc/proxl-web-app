@@ -1,6 +1,6 @@
 package org.yeastrc.xlink.www.objects;
 
-import java.util.Map;
+import java.util.List;
 
 /**
  *  Web Service Returned Result
@@ -8,26 +8,13 @@ import java.util.Map;
  */
 public class ReportedPeptidesPerSearchForMergedPeptidePageResult {
 
-	/**
-	 * Key is project search id
-	 */
-	private Map<Integer, ReportedPeptidesPerSearchForMergedPeptidePageResultEntry> reportedPeptidesPerProjectSearchIdMap;
+	private List<ReportedPeptidesPerSearchForMergedPeptidePageResultEntry> reportedPeptidesPerProjectSearchIdList;
 
-	/**
-	 * Key is project search id
-	 * @return
-	 */
-	public Map<Integer, ReportedPeptidesPerSearchForMergedPeptidePageResultEntry> getReportedPeptidesPerProjectSearchIdMap() {
-		return reportedPeptidesPerProjectSearchIdMap;
+	public List<ReportedPeptidesPerSearchForMergedPeptidePageResultEntry> getReportedPeptidesPerProjectSearchIdList() {
+		return reportedPeptidesPerProjectSearchIdList;
 	}
-
-	/**
-	 * Key is Project search id
-	 * @param reportedPeptidesPerProjectSearchIdMap
-	 */
-	public void setReportedPeptidesPerProjectSearchIdMap(
-			Map<Integer, ReportedPeptidesPerSearchForMergedPeptidePageResultEntry> reportedPeptidesPerProjectSearchIdMap) {
-		this.reportedPeptidesPerProjectSearchIdMap = reportedPeptidesPerProjectSearchIdMap;
+	public void setReportedPeptidesPerProjectSearchIdList(
+			List<ReportedPeptidesPerSearchForMergedPeptidePageResultEntry> reportedPeptidesPerProjectSearchIdList) {
+		this.reportedPeptidesPerProjectSearchIdList = reportedPeptidesPerProjectSearchIdList;
 	}
-
 }

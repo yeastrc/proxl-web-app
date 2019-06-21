@@ -1,22 +1,24 @@
+{{!-- protein_Looplink_data_per_search_data_row_template.handlebars in 'protein_page' 
 
-
-		<%-- !!!   Handlebars template   !!!!!!!!!   --%>
-		
-	<%-- all_protein_data_row_entry_template.jsp --%>
+	Looplink Protein Page Multiple Searches - Per Search Data Row 
 	
-	<%--  Protein Data Per Search Template --%>
-
-
-
+--}}
 <tr id=""
 	style="cursor: pointer; "
 	
-	onclick="viewReportedPeptidesForProteinAllLoadedFromWebServiceTemplate.showHideReportedPeptides( { clickedElement : this })"
+	onclick="viewLooplinkReportedPeptidesLoadedFromWebServiceTemplate.showHideLooplinkReportedPeptides( { clickedElement : this })"
 	data-project_search_id="{{ data.projectSearchId }}"
 	data-protein_id="{{ protein_id }}"
+	data-protein_position_1="{{ protein_position_1 }}"
+	data-protein_position_2="{{ protein_position_2 }}"
 >
 
-	<td>{{ data.searchName }}</td>
+
+	<td>  {{!-- span is color block before search name --}}
+		<span class=" merged-expanded-row-single-search-color-block merged-search-search-background-color-{{ colorIndex_OneBased }} "
+			></span>
+		{{ data.searchName }} ({{ data.searchId }})
+	</td>
 
 	<td class="integer-number-column-header"
 		><a class="show-child-data-link   " 

@@ -318,7 +318,18 @@ class ProjectPg_setAnnotationCutoffsDefaults_ProjectLevel_Overlay {
         {
             let $overlay = undefined;
             {
-                const html = this._project_page__ann_cutoff_defaults_project_level_overlay_root_Template( displayObjects );
+                const $window = $(window);
+                const scrollTop = $window.scrollTop();
+                const topPosition = scrollTop + 10;
+                let mainBodyMaxHeight = $window.height() - 110;
+                if  ( mainBodyMaxHeight < 200 ) {
+                    mainBodyMaxHeight = 200;
+                }
+                // if  ( mainBodyMaxHeight > 630 ) {
+                //     mainBodyMaxHeight = 630;
+                // }
+                const rootContext = { topPosition, mainBodyMaxHeight };
+                const html = this._project_page__ann_cutoff_defaults_project_level_overlay_root_Template( rootContext );
                 $overlay = $( html )
                 $overlay.appendTo( $body );
             }

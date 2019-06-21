@@ -1,11 +1,9 @@
+{{!-- image_structure_pages_shared_data_per_search_data_row_template.handlebars in 'protein_page' 
 
-		<%-- !!!   Handlebars template   !!!!!!!!!   --%>
+	Image And Structure Pages Shared - Link Info Display in Overlay - Per Search Data Row 
 	
-	<%--  Protein Data Per Search Template --%>
-<%-- 
-containing div id:  protein_data_per_search_data_row_entry_template
---%>
-			
+--}}
+
 <tr class=" main_data_row_jq " 
 	style="cursor: pointer; " 
 	show_children_if_one_row="true"
@@ -38,12 +36,12 @@ containing div id:  protein_data_per_search_data_row_entry_template
   
 	>
 			
-			<td>{{ data.searchName }}</td>
+			<td>{{ data.searchName }} ({{ data.searchId }})</td>
 			
 			<td class="integer-number-column" style="" >
 				<a class="show-child-data-link   "
 					href="javascript:"
-					>{{ data.numPeptides }}<%-- << actual data in the cell --%><span class=" toggle_visibility_expansion_span_jq" 
+					>{{ data.numPeptides }}{{!-- << actual data in the cell --}}<span class=" toggle_visibility_expansion_span_jq" 
 								style="" 
 							><img src="images/icon-expand-small.png" 
 								class=" icon-expand-contract-in-data-table "
@@ -72,6 +70,3 @@ containing div id:  protein_data_per_search_data_row_entry_template
 	{{/each}}	
 				
 		</tr>
-
-		
-		

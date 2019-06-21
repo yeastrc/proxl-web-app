@@ -7,9 +7,18 @@
 // JavaScript directive:   all variables have to be declared with "var", maybe other things
 "use strict";
 
-//  require full Handlebars since compiling templates
-const Handlebars = require('handlebars');
+//  Import Handlebars templates
 
+const _protein_page_template = 
+require("../../../../../../handlebars_templates_precompiled/protein_page/protein_page_template-bundle.js");
+
+const _merged_pages_shared_template = 
+require("../../../../../../handlebars_templates_precompiled/merged_pages_shared/merged_pages_shared_template-bundle.js");
+
+
+import { getProjectSearchIdSearchIdPairsInDisplayOrder, getProjectSearchIdsInDisplayOrder } from 'page_js/data_pages/project_search_ids_driven_pages/common/getProjectSearchIdSearchIdPairsInDisplayOrder.js';
+
+import { computeMergedSearchColorIndex_OneBased } from 'page_js/data_pages/project_search_ids_driven_pages/common/computeMergedSearchColorIndex.js';
 
 //  For showing Data for links (Drilldown) (Called by HTML onclick):
 import { viewReportedPeptidesForProteinAllLoadedFromWebServiceTemplate } from 'page_js/data_pages/project_search_ids_driven_pages/protein_pages/viewReportedPeptidesForProteinAllLoadedFromWebServiceTemplate.js';
@@ -17,11 +26,23 @@ import { viewReportedPeptidesForProteinAllLoadedFromWebServiceTemplate } from 'p
 
 //   Class contructor
 var ViewProteinSingleForMergedProteinAllPageLoadedFromWebServiceTemplate = function() {
+
+	if ( ! _protein_page_template.protein_AllProteins_data_per_search_block_template ) {
+		throw Error("Missing: _protein_page_template.protein_AllProteins_data_per_search_block_template")
+	}
+	if ( ! _protein_page_template.protein_AllProteins_data_per_search_data_row_template ) {
+		throw Error("Missing: _protein_page_template.protein_AllProteins_data_per_search_data_row_template")
+	}
+	if ( ! _protein_page_template.protein_AllProteins_data_per_search_child_row_template ) {
+		throw Error("Missing: _protein_page_template.protein_AllProteins_data_per_search_block_template")
+	}
+	
+	if ( ! _merged_pages_shared_template.mergedPages_data_per_search_between_searches_html ) {
+		throw Error("Missing: _merged_pages_shared_template.mergedPages_data_per_search_between_searches_html")
+	}
+
 	var _DATA_LOADED_DATA_KEY = "dataLoaded";
-	var _handlebarsTemplate_all_protein_block_template = null;
-	var _handlebarsTemplate_all_protein_data_row_entry_template = null;
-	var _handlebarsTemplate_all_protein_child_row_entry_template = null;
-	var _data_per_search_between_searches_html = null;
+
 	var _psmPeptideCutoffsRootObject = null;
 	var _excludeLinksWith_Root =  null;
 	var _chosenLinkTypes = undefined;
@@ -154,105 +175,98 @@ var ViewProteinSingleForMergedProteinAllPageLoadedFromWebServiceTemplate = funct
 		});
 	};
 	
-	this.loadAndInsertProteinsResponse = function( params ) {
-		var ajaxResponseData = params.ajaxResponseData;
-		var ajaxRequestData = params.ajaxRequestData;
-		var proteinsPerProjectSearchIdMap = ajaxResponseData.proteinsPerProjectSearchIdMap;
-		var $topTRelement = params.$topTRelement;
-		var $data_container = $topTRelement.find(".child_data_container_jq");
+	this.loadAndInsertProteinsResponse = function({ ajaxResponseData, ajaxRequestData, $topTRelement }) {
+
+		const proteinsPerProjectSearchIdList = ajaxResponseData.proteinsPerProjectSearchIdList;
+
+		const $data_container = $topTRelement.find(".child_data_container_jq");
 		if ( $data_container.length === 0 ) {
 			throw Error( "unable to find HTML element with class 'child_data_container_jq'" );
 		}
-		var $data_containerHTML = $data_container.html();
 		$data_container.empty();
-		if ( _handlebarsTemplate_all_protein_block_template === null ) {
-			var handlebarsSource_all_protein_block_template = $( "#all_protein_block_template" ).html();
-			if ( handlebarsSource_all_protein_block_template === undefined ) {
-				throw Error( "handlebarsSource_all_protein_block_template === undefined" );
+
+		//  Create "Display List" in order that searches are displayed in search details
+
+		const proteinsPerProjectSearchIdList_DisplayOrder = [];
+		{
+			//  External Function:
+			// const projectSearchIdSearchIdPairsInDisplayOrder_FromPage = getProjectSearchIdSearchIdPairsInDisplayOrder();
+			const projectSearchIdsInDisplayOrder_FromPage = getProjectSearchIdsInDisplayOrder();
+
+			for ( let index = 0; index < projectSearchIdsInDisplayOrder_FromPage.length; index++ ) {
+				const projectSearchId_DisplayOrder = projectSearchIdsInDisplayOrder_FromPage[ index ];
+
+				// let foundEntryFor_projectSearchId_DisplayOrder = false;
+				for ( const reportedPeptidesPerProjectSearchId_Entry of proteinsPerProjectSearchIdList ) {
+					if ( reportedPeptidesPerProjectSearchId_Entry.projectSearchId === projectSearchId_DisplayOrder ) {
+						//  Found entry in proteinsPerProjectSearchIdList for projectSearchId_DisplayOrder so save to result list
+						const displayItem = { item : reportedPeptidesPerProjectSearchId_Entry, index };
+						proteinsPerProjectSearchIdList_DisplayOrder.push( displayItem );
+						// foundEntryFor_projectSearchId_DisplayOrder = true;
+						break;
+					}
+				}
 			}
-			if ( handlebarsSource_all_protein_block_template === null ) {
-				throw Error( "handlebarsSource_all_protein_block_template === null" );
+
+			if ( proteinsPerProjectSearchIdList.length !== proteinsPerProjectSearchIdList_DisplayOrder.length ) {
+				throw Error("ERROR: proteinsPerProjectSearchIdList.length !== proteinsPerProjectSearchIdList_DisplayOrder.length ");
 			}
-			_handlebarsTemplate_all_protein_block_template = Handlebars.compile( handlebarsSource_all_protein_block_template );
 		}
-		if ( _handlebarsTemplate_all_protein_data_row_entry_template === null ) {
-			var handlebarsSource_all_protein_data_row_entry_template = $( "#all_protein_data_row_entry_template" ).html();
-			if ( handlebarsSource_all_protein_data_row_entry_template === undefined ) {
-				throw Error( "handlebarsSource_all_protein_data_row_entry_template === undefined" );
-			}
-			if ( handlebarsSource_all_protein_data_row_entry_template === null ) {
-				throw Error( "handlebarsSource_all_protein_data_row_entry_template === null" );
-			}
-			_handlebarsTemplate_all_protein_data_row_entry_template = Handlebars.compile( handlebarsSource_all_protein_data_row_entry_template );
-		}
-		if ( _handlebarsTemplate_all_protein_child_row_entry_template === null ) {
-			var handlebarsSource_all_protein_child_row_entry_template = $( "#all_protein_child_row_entry_template" ).html();
-			if ( handlebarsSource_all_protein_child_row_entry_template === undefined ) {
-				throw Error( "handlebarsSource_all_protein_child_row_entry_template === undefined" );
-			}
-			if ( handlebarsSource_all_protein_child_row_entry_template === null ) {
-				throw Error( "handlebarsSource_all_protein_child_row_entry_template === null" );
-			}
-			_handlebarsTemplate_all_protein_child_row_entry_template = Handlebars.compile( handlebarsSource_all_protein_child_row_entry_template );
-		}
-		
-		////////////////////////////
-		///////   Process Per Project Search Id:
-		var projectSearchIdArray = Object.keys( proteinsPerProjectSearchIdMap );
-		//  Sort the Project Search Ids in ascending order
-		projectSearchIdArray.sort(function compareNumbers(a, b) {
-			  return a - b;
-		});
-		for ( var projectSearchIdIndex = 0; projectSearchIdIndex < projectSearchIdArray.length; projectSearchIdIndex++ ) {
+
+		//  Process Per Search List
+		for ( let dataArrayIndex = 0; dataArrayIndex < proteinsPerProjectSearchIdList_DisplayOrder.length; dataArrayIndex++ ) {
+
+		// for ( let projectSearchIdIndex = 0; projectSearchIdIndex < projectSearchIdArray.length; projectSearchIdIndex++ ) {
+
 			//  If after the first search, insert the separator
-			if ( projectSearchIdIndex > 0 ) {
-				var $data_per_search_between_searches_htmlEntry =
-					$( _data_per_search_between_searches_html ).appendTo($data_container);
-				$data_per_search_between_searches_htmlEntry.show();
+			if ( dataArrayIndex > 0 ) {
+				const html = _merged_pages_shared_template.mergedPages_data_per_search_between_searches_html();
+				$( html ).appendTo( $data_container );
 			}
-			var projectSearchId = projectSearchIdArray[ projectSearchIdIndex ];
-			var proteinsForSearchWithAnnotationNameDescList = proteinsPerProjectSearchIdMap[ projectSearchId ];
-			var peptideAnnotationDisplayNameDescriptionList =  proteinsForSearchWithAnnotationNameDescList.peptideAnnotationDisplayNameDescriptionList;
-			var psmAnnotationDisplayNameDescriptionList =  proteinsForSearchWithAnnotationNameDescList.psmAnnotationDisplayNameDescriptionList;
-			var proteinsForSearch =  proteinsForSearchWithAnnotationNameDescList.proteins;
+			
+			const displayEntry = proteinsPerProjectSearchIdList_DisplayOrder[ dataArrayIndex ];
+
+			const colorIndex_OneBased = computeMergedSearchColorIndex_OneBased({ searchIndex_ZeroBased : displayEntry.index });
+
+			const proteinsPerProjectSearchEntry = displayEntry.item;
+
+			const proteinsForSearchWithAnnotationNameDescList = proteinsPerProjectSearchEntry;
+
+			const peptideAnnotationDisplayNameDescriptionList =  proteinsForSearchWithAnnotationNameDescList.peptideAnnotationDisplayNameDescriptionList;
+			const psmAnnotationDisplayNameDescriptionList =  proteinsForSearchWithAnnotationNameDescList.psmAnnotationDisplayNameDescriptionList;
+
+			const proteinsForSearch =  proteinsForSearchWithAnnotationNameDescList.proteins;
+
 			//  create context for header row
-			var context = { 
+			const context = { 
 					peptideAnnotationDisplayNameDescriptionList : peptideAnnotationDisplayNameDescriptionList,
 					psmAnnotationDisplayNameDescriptionList : psmAnnotationDisplayNameDescriptionList
 			};
-			var html = _handlebarsTemplate_all_protein_block_template(context);
-			var $all_protein_block_template = $(html).appendTo($data_container);
-			if ( _data_per_search_between_searches_html === null ) {
-				_data_per_search_between_searches_html = $all_protein_block_template.find( ".data_per_search_between_searches_html_jq" ).html();
-				if ( _data_per_search_between_searches_html === undefined ) {
-					throw Error( "data_per_search_between_searches_html_jq === undefined" );
-				}
-				if ( _data_per_search_between_searches_html === null ) {
-					throw Error( "data_per_search_between_searches_html_jq === null" );
-				}
-			}
-			var all_protein_table_jq_ClassName = "all_protein_table_jq";
-			var $all_protein_table_jq = $all_protein_block_template.find("." + all_protein_table_jq_ClassName );
-			//			var $all_protein_table_jq = $all_protein_data_container.find(".all_protein_table_jq");
+			const protein_AllProteins_data_per_search_block_template_HTML = _protein_page_template.protein_AllProteins_data_per_search_block_template(context);
+			const $all_protein_block_template = $(protein_AllProteins_data_per_search_block_template_HTML).appendTo($data_container);
+			const all_protein_table_jq_ClassName = "all_protein_table_jq";
+			const $all_protein_table_jq = $all_protein_block_template.find("." + all_protein_table_jq_ClassName );
+			//			const $all_protein_table_jq = $all_protein_data_container.find(".all_protein_table_jq");
 			if ( $all_protein_table_jq.length === 0 ) {
 				throw Error( "unable to find HTML element with class '" + all_protein_table_jq_ClassName + "'" );
 			}
 			//  Add protein data to the page
-			for ( var proteinIndex = 0; proteinIndex < proteinsForSearch.length ; proteinIndex++ ) {
-				var proteinData = proteinsForSearch[ proteinIndex ];
-				var context = { 
+			for ( let proteinIndex = 0; proteinIndex < proteinsForSearch.length ; proteinIndex++ ) {
+				const proteinData = proteinsForSearch[ proteinIndex ];
+				const context = { 
+					colorIndex_OneBased,
 						data : proteinData,
 						protein_id : ajaxRequestData.protein_id
 				};
-				var html = _handlebarsTemplate_all_protein_data_row_entry_template(context);
-				var $all_protein_entry = $( html ).appendTo( $all_protein_table_jq );
+				const html = _protein_page_template.protein_AllProteins_data_per_search_data_row_template(context);
+				const $all_protein_entry = $( html ).appendTo( $all_protein_table_jq );
 				//  Get the number of columns of the inserted row so can set the "colspan=" in the next row
 				//       that holds the child data
-				var $all_protein_entry__columns = $all_protein_entry.find("td");
-				var all_protein_entry__numColumns = $all_protein_entry__columns.length;
+				const $all_protein_entry__columns = $all_protein_entry.find("td");
+				const all_protein_entry__numColumns = $all_protein_entry__columns.length;
 				//  colSpan is used as the value for "colspan=" in the <td>
-				var childRowHTML_Context = { colSpan : all_protein_entry__numColumns };
-				var childRowHTML = _handlebarsTemplate_all_protein_child_row_entry_template( childRowHTML_Context );
+				const childRowHTML_Context = { colSpan : all_protein_entry__numColumns };
+				const childRowHTML = _protein_page_template.protein_AllProteins_data_per_search_child_row_template( childRowHTML_Context );
 				//  Add next row for child data
 				$( childRowHTML ).appendTo($all_protein_table_jq);
 			}
@@ -261,7 +275,7 @@ var ViewProteinSingleForMergedProteinAllPageLoadedFromWebServiceTemplate = funct
 };
 
 //Static Singleton Instance of Class
-var viewProteinSingleForMergedProteinAllPageLoadedFromWebServiceTemplate = new ViewProteinSingleForMergedProteinAllPageLoadedFromWebServiceTemplate();
+const viewProteinSingleForMergedProteinAllPageLoadedFromWebServiceTemplate = new ViewProteinSingleForMergedProteinAllPageLoadedFromWebServiceTemplate();
 
 window.viewProteinSingleForMergedProteinAllPageLoadedFromWebServiceTemplate = viewProteinSingleForMergedProteinAllPageLoadedFromWebServiceTemplate;
 

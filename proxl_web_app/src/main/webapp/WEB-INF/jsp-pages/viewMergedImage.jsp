@@ -84,8 +84,6 @@
 	
 		<%@ include file="/WEB-INF/jsp-includes/defaultPageViewFragment.jsp" %>
 		
-		<%@ include file="/WEB-INF/jsp-includes/specificProteinDataPerSearchProtIdsPositionsFragment.jsp" %>
-		
 		<%@ include file="/WEB-INF/jsp-includes/viewPsmsLoadedFromWebServiceTemplateFragment.jsp" %>
 		<%@ include file="/WEB-INF/jsp-includes/viewPsmPerPeptideLoadedFromWebServiceTemplateFragment.jsp" %>
 		

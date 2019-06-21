@@ -5,6 +5,8 @@ import java.util.List;
 public class ProteinCommonDataForPerSearchIdsProteinIdsPositionsResult {
 	
 	private int projectSearchId;
+	private int searchId;
+	
 	private String searchName;
 	
 	private int numPeptides;
@@ -66,6 +68,12 @@ public class ProteinCommonDataForPerSearchIdsProteinIdsPositionsResult {
 	}
 	public void setProjectSearchId(int projectSearchId) {
 		this.projectSearchId = projectSearchId;
+	}
+	public int getSearchId() {
+		return searchId;
+	}
+	public void setSearchId(int searchId) {
+		this.searchId = searchId;
 	}
 
 }

@@ -14,6 +14,7 @@ public class ReportedPeptidesForMergedPeptidePage implements SearchPeptideCommon
 
 	private String searchName;
 	
+	private int projectSearchId;
 	private int searchId;
 	
 	//  Use WebReportedPeptide
@@ -75,13 +76,19 @@ public class ReportedPeptidesForMergedPeptidePage implements SearchPeptideCommon
 	public void setSearchName(String searchName) {
 		this.searchName = searchName;
 	}
-
+	public int getProjectSearchId() {
+		return projectSearchId;
+	}
+	public void setProjectSearchId(int projectSearchId) {
+		this.projectSearchId = projectSearchId;
+	}
 	public int getSearchId() {
 		return searchId;
 	}
 	public void setSearchId(int searchId) {
 		this.searchId = searchId;
 	}
+
 
 	
 }

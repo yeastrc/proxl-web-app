@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.dto.AnnotationDataBaseDTO;
 import org.yeastrc.xlink.dto.PsmAnnotationDTO;
-import org.yeastrc.xlink.dto.ReportedPeptideDTO;
 import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.dto.AnnotationTypeDTO;
 import org.yeastrc.xlink.enum_classes.FilterDirectionType;
@@ -328,7 +327,6 @@ public class ReportedPeptidesForUnifiedPeptIdSearchIdsSearcher {
 				}
 			}
 			rs = pstmt.executeQuery();
-			ReportedPeptideDTO reportedPeptideDTO = null;
 			while( rs.next() ) {
 				ReportedPeptidesForMergedPeptidePageWrapper wrappedReportedPeptideData = new ReportedPeptidesForMergedPeptidePageWrapper();
 				ReportedPeptidesForMergedPeptidePage reportedPeptideData = new ReportedPeptidesForMergedPeptidePage();
@@ -337,7 +335,8 @@ public class ReportedPeptidesForUnifiedPeptIdSearchIdsSearcher {
 				WebReportedPeptide webReportedPeptide = new WebReportedPeptide();
 				reportedPeptideData.setWebReportedPeptide( webReportedPeptide );
 				
-				reportedPeptideData.setSearchId( search.getProjectSearchId() );
+				reportedPeptideData.setProjectSearchId( search.getProjectSearchId() );
+				reportedPeptideData.setSearchId( search.getSearchId() );
 				reportedPeptideData.setSearchName( search.getName() );
 //				int reportedPeptideId = rs.getInt( "reported_peptide_id" );
 				

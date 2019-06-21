@@ -239,7 +239,9 @@ public class ProteinsService {
 			} else {
 				linkedPositions_FilterExcludeLinksWith_Param = new LinkedPositions_FilterExcludeLinksWith_Param();
 			}
-			
+
+			List<ProteinCommonDataForPerSearchIdsProteinIdsPositionsResultEntry> proteinsPerProjectSearchIdList = new ArrayList<>( searchList.size() );
+
 			for ( SearchDTO search : searchList ) {
 				int projectSearchId = search.getProjectSearchId();
 				int searchId = search.getSearchId();
@@ -336,7 +338,10 @@ public class ProteinsService {
 										searchProteinCrosslinkWrapperList, 
 										peptideCutoffsAnnotationTypeDTOList, 
 										psmCutoffsAnnotationTypeDTOList );
+						
 						ProteinCommonDataForPerSearchIdsProteinIdsPositionsResultEntry entry = new ProteinCommonDataForPerSearchIdsProteinIdsPositionsResultEntry();
+						entry.setProjectSearchId( projectSearchId );
+						entry.setSearchId( search.getSearchId() );
 						List<AnnotationDisplayNameDescription> peptideAnnotationDisplayNameDescriptionList = 
 								sortResultGetHeaders.getPeptideAnnotationDisplayNameDescriptionList();
 						List<AnnotationDisplayNameDescription> psmAnnotationDisplayNameDescriptionList = 
@@ -348,17 +353,23 @@ public class ProteinsService {
 						ProteinCommonDataForPerSearchIdsProteinIdsPositionsResult item = new ProteinCommonDataForPerSearchIdsProteinIdsPositionsResult();
 						proteins.add( item );
 						item.setProjectSearchId( projectSearchId );
+						item.setSearchId( search.getSearchId() );
 						item.setSearchName( search.getName() );
 						item.setNumPeptides( searchProteinCrosslink.getNumLinkedPeptides() );
 						item.setNumUniquePeptides( searchProteinCrosslink.getNumUniqueLinkedPeptides() );
 						item.setNumPsms( searchProteinCrosslink.getNumPsms() );
 						item.setPsmAnnotationValueList( searchProteinCrosslinkWrapper.getPsmAnnotationValueList() );
 						item.setPeptideAnnotationValueList( searchProteinCrosslinkWrapper.getPeptideAnnotationValueList() );
-						webserviceResult.addEntryToProteinsPerProjectSearchIdMap( projectSearchId, entry );
+						
+						proteinsPerProjectSearchIdList.add( entry );
 					}
 				}
 			}
+			
+			webserviceResult.setProteinsPerProjectSearchIdList( proteinsPerProjectSearchIdList );
+			
 			return webserviceResult;
+			
 		} catch ( WebApplicationException e ) {
 			throw e;
 		} catch ( Exception e ) {
@@ -534,7 +545,9 @@ public class ProteinsService {
 			} else {
 				linkedPositions_FilterExcludeLinksWith_Param = new LinkedPositions_FilterExcludeLinksWith_Param();
 			}
-						
+
+			List<ProteinCommonDataForPerSearchIdsProteinIdsPositionsResultEntry> proteinsPerProjectSearchIdList = new ArrayList<>( searchList.size() );
+
 			for ( SearchDTO search : searchList ) {
 				int projectSearchId = search.getProjectSearchId();
 				int searchId = search.getSearchId();
@@ -627,6 +640,8 @@ public class ProteinsService {
 										peptideCutoffsAnnotationTypeDTOList, 
 										psmCutoffsAnnotationTypeDTOList );
 						ProteinCommonDataForPerSearchIdsProteinIdsPositionsResultEntry entry = new ProteinCommonDataForPerSearchIdsProteinIdsPositionsResultEntry();
+						entry.setProjectSearchId( projectSearchId );
+						entry.setSearchId( search.getSearchId() );
 						List<AnnotationDisplayNameDescription> peptideAnnotationDisplayNameDescriptionList = 
 								sortResultGetHeaders.getPeptideAnnotationDisplayNameDescriptionList();
 						List<AnnotationDisplayNameDescription> psmAnnotationDisplayNameDescriptionList = 
@@ -638,17 +653,22 @@ public class ProteinsService {
 						ProteinCommonDataForPerSearchIdsProteinIdsPositionsResult item = new ProteinCommonDataForPerSearchIdsProteinIdsPositionsResult();
 						proteins.add( item );
 						item.setProjectSearchId( projectSearchId );
+						item.setSearchId( search.getSearchId() );
 						item.setSearchName( search.getName() );
 						item.setNumPeptides( searchProteinLooplink.getNumPeptides() );
 						item.setNumUniquePeptides( searchProteinLooplink.getNumUniquePeptides() );
 						item.setNumPsms( searchProteinLooplink.getNumPsms() );
 						item.setPsmAnnotationValueList( searchProteinLooplinkWrapper.getPsmAnnotationValueList() );
 						item.setPeptideAnnotationValueList( searchProteinLooplinkWrapper.getPeptideAnnotationValueList() );
-						webserviceResult.addEntryToProteinsPerProjectSearchIdMap( projectSearchId, entry );
+						proteinsPerProjectSearchIdList.add( entry );
 					}
 				}
 			}
+			
+			webserviceResult.setProteinsPerProjectSearchIdList( proteinsPerProjectSearchIdList );
+			
 			return webserviceResult;
+			
 		} catch ( WebApplicationException e ) {
 			throw e;
 		} catch ( ProxlWebappDataException e ) {
@@ -830,7 +850,9 @@ public class ProteinsService {
 			} else {
 				linkedPositions_FilterExcludeLinksWith_Param = new LinkedPositions_FilterExcludeLinksWith_Param();
 			}
-			
+
+			List<ProteinCommonDataForPerSearchIdsProteinIdsPositionsResultEntry> proteinsPerProjectSearchIdList = new ArrayList<>( searchList.size() );
+
 			for ( SearchDTO search : searchList ) {
 				int projectSearchId = search.getProjectSearchId();
 				int searchId = search.getSearchId();
@@ -922,6 +944,8 @@ public class ProteinsService {
 										peptideCutoffsAnnotationTypeDTOList, 
 										psmCutoffsAnnotationTypeDTOList );
 						ProteinCommonDataForPerSearchIdsProteinIdsPositionsResultEntry entry = new ProteinCommonDataForPerSearchIdsProteinIdsPositionsResultEntry();
+						entry.setProjectSearchId( projectSearchId );
+						entry.setSearchId( search.getSearchId() );
 						List<AnnotationDisplayNameDescription> peptideAnnotationDisplayNameDescriptionList = 
 								sortResultGetHeaders.getPeptideAnnotationDisplayNameDescriptionList();
 						List<AnnotationDisplayNameDescription> psmAnnotationDisplayNameDescriptionList = 
@@ -933,17 +957,22 @@ public class ProteinsService {
 						ProteinCommonDataForPerSearchIdsProteinIdsPositionsResult item = new ProteinCommonDataForPerSearchIdsProteinIdsPositionsResult();
 						proteins.add( item );
 						item.setProjectSearchId( projectSearchId );
+						item.setSearchId( search.getSearchId() );
 						item.setSearchName( search.getName() );
 						item.setNumPeptides( searchProteinMonolink.getNumPeptides() );
 						item.setNumUniquePeptides( searchProteinMonolink.getNumUniquePeptides() );
 						item.setNumPsms( searchProteinMonolink.getNumPsms() );
 						item.setPsmAnnotationValueList( searchProteinMonolinkWrapper.getPsmAnnotationValueList() );
 						item.setPeptideAnnotationValueList( searchProteinMonolinkWrapper.getPeptideAnnotationValueList() );
-						webserviceResult.addEntryToProteinsPerProjectSearchIdMap( projectSearchId, entry );
+						
+						proteinsPerProjectSearchIdList.add( entry );
 					}
 				}
 			}
+			webserviceResult.setProteinsPerProjectSearchIdList( proteinsPerProjectSearchIdList );
+			
 			return webserviceResult;
+			
 		} catch ( WebApplicationException e ) {
 			throw e;
 		} catch ( Exception e ) {
@@ -1136,6 +1165,9 @@ public class ProteinsService {
 				proteinQueryJSONRoot.setRemoveNonUniquePSMs( excludeLinksWith_JSONRoot.isRemoveNonUniquePSMs() );
 			}
 			
+
+			List<ProteinCommonDataForPerSearchIdsProteinIdsPositionsResultEntry> proteinsPerProjectSearchIdList = new ArrayList<>( searchList.size() );
+
 			for ( SearchDTO search : searchList ) {
 				int projectSearchId = search.getProjectSearchId();
 				int searchId = search.getSearchId();
@@ -1234,6 +1266,8 @@ public class ProteinsService {
 									peptideCutoffsAnnotationTypeDTOList, 
 									psmCutoffsAnnotationTypeDTOList );
 					ProteinCommonDataForPerSearchIdsProteinIdsPositionsResultEntry entry = new ProteinCommonDataForPerSearchIdsProteinIdsPositionsResultEntry();
+					entry.setProjectSearchId( projectSearchId );
+					entry.setSearchId( search.getSearchId() );
 					List<AnnotationDisplayNameDescription> peptideAnnotationDisplayNameDescriptionList = 
 							sortResultGetHeaders.getPeptideAnnotationDisplayNameDescriptionList();
 					List<AnnotationDisplayNameDescription> psmAnnotationDisplayNameDescriptionList = 
@@ -1245,15 +1279,19 @@ public class ProteinsService {
 					ProteinCommonDataForPerSearchIdsProteinIdsPositionsResult item = new ProteinCommonDataForPerSearchIdsProteinIdsPositionsResult();
 					proteins.add( item );
 					item.setProjectSearchId( projectSearchId );
+					item.setSearchId( search.getSearchId() );
 					item.setSearchName( search.getName() );
 					item.setNumPeptides( proteinSingleEntry.getNumPeptides() );
 					item.setNumUniquePeptides( proteinSingleEntry.getNumUniquePeptides() );
 					item.setNumPsms( proteinSingleEntry.getNumPsms() );
 					item.setPsmAnnotationValueList( proteinSingleEntry.getPsmAnnotationValueList() );
 					item.setPeptideAnnotationValueList( proteinSingleEntry.getPeptideAnnotationValueList() );
-					webserviceResult.addEntryToProteinsPerProjectSearchIdMap( projectSearchId, entry );
+					proteinsPerProjectSearchIdList.add( entry );
 				}
 			}
+			
+			webserviceResult.setProteinsPerProjectSearchIdList( proteinsPerProjectSearchIdList );
+			
 			return webserviceResult;
 			
 		} catch ( WebApplicationException e ) {

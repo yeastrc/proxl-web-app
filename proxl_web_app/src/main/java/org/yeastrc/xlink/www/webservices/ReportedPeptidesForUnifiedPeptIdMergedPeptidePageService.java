@@ -5,10 +5,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
@@ -252,7 +250,7 @@ public class ReportedPeptidesForUnifiedPeptIdMergedPeptidePageService {
 		});
 
 		//  Main part of returned result
-		Map<Integer, ReportedPeptidesPerSearchForMergedPeptidePageResultEntry> reportedPeptidesPerProjectSearchIdMap = new HashMap<>();
+		List<ReportedPeptidesPerSearchForMergedPeptidePageResultEntry> reportedPeptidesPerProjectSearchIdList = new ArrayList<>( searchList.size() );
 		
 		Z_CutoffValuesObjectsToOtherObjects_RootResult cutoffValuesObjectsToOtherObjects_RootResult =
 				Z_CutoffValuesObjectsToOtherObjectsFactory
@@ -393,14 +391,16 @@ public class ReportedPeptidesForUnifiedPeptIdMergedPeptidePageService {
 				serviceResultEntry.setPeptideAnnotationDisplayNameDescriptionList( searchPeptideWebserviceCommonCodeGetDataResult.getPeptideAnnotationDisplayNameDescriptionList() );
 				serviceResultEntry.setPsmAnnotationDisplayNameDescriptionList( searchPeptideWebserviceCommonCodeGetDataResult.getPsmAnnotationDisplayNameDescriptionList() );
 				serviceResultEntry.setReportedPepides( reportedPepidesListOutput );
-				reportedPeptidesPerProjectSearchIdMap.put( eachProjectSearchIdToProcess, serviceResultEntry );
+				serviceResultEntry.setProjectSearchId( search.getProjectSearchId() );
+				serviceResultEntry.setSearchId( search.getSearchId() );
+				reportedPeptidesPerProjectSearchIdList.add( serviceResultEntry );
 			}
 		}  //  END:  for each search id
 		
 		///////////
 		
 		ReportedPeptidesPerSearchForMergedPeptidePageResult serviceResult = new ReportedPeptidesPerSearchForMergedPeptidePageResult();
-		serviceResult.setReportedPeptidesPerProjectSearchIdMap( reportedPeptidesPerProjectSearchIdMap );
+		serviceResult.setReportedPeptidesPerProjectSearchIdList( reportedPeptidesPerProjectSearchIdList );
 		return serviceResult;
 	}
 	

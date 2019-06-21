@@ -7,9 +7,18 @@
 // JavaScript directive:   all variables have to be declared with "var", maybe other things
 "use strict";
 
-//  require full Handlebars since compiling templates
-const Handlebars = require('handlebars');
+//  Import Handlebars templates
 
+const _peptide_page_template = 
+require("../../../../../../handlebars_templates_precompiled/peptide_page/peptide_page_template-bundle.js");
+
+const _merged_pages_shared_template = 
+require("../../../../../../handlebars_templates_precompiled/merged_pages_shared/merged_pages_shared_template-bundle.js");
+
+
+import { getProjectSearchIdSearchIdPairsInDisplayOrder, getProjectSearchIdsInDisplayOrder } from 'page_js/data_pages/project_search_ids_driven_pages/common/getProjectSearchIdSearchIdPairsInDisplayOrder.js';
+
+import { computeMergedSearchColorIndex_OneBased } from 'page_js/data_pages/project_search_ids_driven_pages/common/computeMergedSearchColorIndex.js';
 
 
 //  For showing Data for links (Drilldown) (Called by HTML onclick):
@@ -20,11 +29,21 @@ import { viewPsmsLoadedFromWebServiceTemplate } from 'page_js/data_pages/project
 
 var ViewMergedPeptidePerSearchDataFromWebServiceTemplate = function() {
 
+	if ( ! _peptide_page_template.peptidePage_peptide_data_per_search_block_template ) {
+		throw Error("Missing: _peptide_page_template.peptidePage_peptide_data_per_search_block_template")
+	}
+	if ( ! _peptide_page_template.peptidePage_peptide_data_per_search_data_row_template ) {
+		throw Error("Missing: _peptide_page_template.peptidePage_peptide_data_per_search_data_row_template")
+	}
+	if ( ! _peptide_page_template.peptidePage_peptide_data_per_search_child_row_template ) {
+		throw Error("Missing: _peptide_page_template.peptidePage_peptide_data_per_search_child_row_template")
+	}
+
+	if ( ! _merged_pages_shared_template.mergedPages_data_per_search_between_searches_html ) {
+		throw Error("Missing: _merged_pages_shared_template.mergedPages_data_per_search_between_searches_html")
+	}
+
 	var _DATA_LOADED_DATA_KEY = "dataLoaded";
-	var _data_per_search_between_searches_html = null;
-	var _handlebarsTemplate_peptide_data_per_search_block_template = null;
-	var _handlebarsTemplate_peptide_data_per_search_data_row_template = null;
-	var _handlebarsTemplate_peptide_data_per_search_child_row_template = null;
 
 	var _excludeLinksWith_Root = null;
 	var _psmPeptideAnnTypeIdDisplay = null;
@@ -160,102 +179,96 @@ var ViewMergedPeptidePerSearchDataFromWebServiceTemplate = function() {
 		});
 	};
 	
-	this.loadAndInsertReportedPeptidesPerSearchResponse = function( params ) {
-		var ajaxResponseData = params.ajaxResponseData;
-//		var ajaxRequestData = params.ajaxRequestData;
-		var reportedPeptidesPerSearchResponse = ajaxResponseData;
+	this.loadAndInsertReportedPeptidesPerSearchResponse = function({ ajaxResponseData, $topTRelement }) {
+
+		const reportedPeptidesPerSearchResponse = ajaxResponseData;
+
 		//  Convert all attributes to empty string if null or undefined
-		var $topTRelement = params.$topTRelement;
-		var $data_container = $topTRelement.find(".child_data_container_jq");
+		const $data_container = $topTRelement.find(".child_data_container_jq");
 		if ( $data_container.length === 0 ) {
 			throw "unable to find HTML element with class 'child_data_container_jq'";
 		}
+
 		$data_container.empty();
-		if ( _data_per_search_between_searches_html === null ) {
-			_data_per_search_between_searches_html = $( "#data_per_search_between_searches_html" ).html();
-			if ( _data_per_search_between_searches_html === undefined ) {
-				throw "_data_per_search_between_searches_html === undefined";
-			}
-			if ( _data_per_search_between_searches_html === null ) {
-				throw "_data_per_search_between_searches_html === null";
-			}
-		}
-		if ( _handlebarsTemplate_peptide_data_per_search_block_template === null ) {
-			var handlebarsSource_peptide_data_per_search_block_template = $( "#peptide_data_per_search_block_template" ).html();
-			if ( handlebarsSource_peptide_data_per_search_block_template === undefined ) {
-				throw "handlebarsSource_peptide_data_per_search_block_template === undefined";
-			}
-			if ( handlebarsSource_peptide_data_per_search_block_template === null ) {
-				throw "handlebarsSource_peptide_data_per_search_block_template === null";
-			}
-			_handlebarsTemplate_peptide_data_per_search_block_template = Handlebars.compile( handlebarsSource_peptide_data_per_search_block_template );
-		}
-		if ( _handlebarsTemplate_peptide_data_per_search_data_row_template === null ) {
-			var handlebarsSource_peptide_data_per_search_data_row_template = $( "#peptide_data_per_search_data_row_template" ).html();
-			if ( handlebarsSource_peptide_data_per_search_data_row_template === undefined ) {
-				throw "handlebarsSource_peptide_data_per_search_data_row_template === undefined";
-			}
-			if ( handlebarsSource_peptide_data_per_search_data_row_template === null ) {
-				throw "handlebarsSource_peptide_data_per_search_data_row_template === null";
-			}
-			_handlebarsTemplate_peptide_data_per_search_data_row_template = Handlebars.compile( handlebarsSource_peptide_data_per_search_data_row_template );
-		}
-		if ( _handlebarsTemplate_peptide_data_per_search_child_row_template === null ) {
-			var handlebarsSource_peptide_data_per_search_child_row_template = $( "#peptide_data_per_search_child_row_template" ).html();
-			if ( handlebarsSource_peptide_data_per_search_child_row_template === undefined ) {
-				throw "handlebarsSource_peptide_data_per_search_child_row_template === undefined";
-			}
-			if ( handlebarsSource_peptide_data_per_search_child_row_template === null ) {
-				throw "handlebarsSource_peptide_data_per_search_child_row_template === null";
-			}
-			_handlebarsTemplate_peptide_data_per_search_child_row_template = Handlebars.compile( handlebarsSource_peptide_data_per_search_child_row_template );
-		}
 		
 		////////////////////////////
 		///////   Process Per Project Search Id:
-		var reportedPeptidesPerSearch =  reportedPeptidesPerSearchResponse.reportedPeptidesPerProjectSearchIdMap;
-		var projectSearchIdArray = Object.keys( reportedPeptidesPerSearch );
-		//  Sort the search ids in ascending order
-		projectSearchIdArray.sort(function compareNumbers(a, b) {
-			  return a - b;
-		});
-		for ( var projectSearchIdIndex = 0; projectSearchIdIndex < projectSearchIdArray.length; projectSearchIdIndex++ ) {
-			//  If after the first search, insert the separator
-			if ( projectSearchIdIndex > 0 ) {
-//				var $peptide_data_per_search_between_searches_html = 
-				$( _data_per_search_between_searches_html ).appendTo($data_container);
+		const reportedPeptidesPerProjectSearchIdList =  reportedPeptidesPerSearchResponse.reportedPeptidesPerProjectSearchIdList;
+
+		//  Create "Display List" in order that searches are displayed in search details
+
+		const reportedPeptidesPerProjectSearchIdList_DisplayOrder = [];
+		{
+			//  External Function:
+			// const projectSearchIdSearchIdPairsInDisplayOrder_FromPage = getProjectSearchIdSearchIdPairsInDisplayOrder();
+			const projectSearchIdsInDisplayOrder_FromPage = getProjectSearchIdsInDisplayOrder();
+
+			for ( let index = 0; index < projectSearchIdsInDisplayOrder_FromPage.length; index++ ) {
+				const projectSearchId_DisplayOrder = projectSearchIdsInDisplayOrder_FromPage[ index ];
+
+				// let foundEntryFor_projectSearchId_DisplayOrder = false;
+				for ( const reportedPeptidesPerProjectSearchId_Entry of reportedPeptidesPerProjectSearchIdList ) {
+					if ( reportedPeptidesPerProjectSearchId_Entry.projectSearchId === projectSearchId_DisplayOrder ) {
+						//  Found entry in reportedPeptidesPerProjectSearchIdList for projectSearchId_DisplayOrder so save to result list
+						const displayItem = { item : reportedPeptidesPerProjectSearchId_Entry, index };
+						reportedPeptidesPerProjectSearchIdList_DisplayOrder.push( displayItem );
+						// foundEntryFor_projectSearchId_DisplayOrder = true;
+						break;
+					}
+				}
 			}
-			var projectSearchId = projectSearchIdArray[ projectSearchIdIndex ];
-			var reportedPeptidesPerSearchEntry = reportedPeptidesPerSearch[ projectSearchId ];
-			var reportedPeptidesForSearch =  reportedPeptidesPerSearchEntry.reportedPepides;
+
+			if ( reportedPeptidesPerProjectSearchIdList.length !== reportedPeptidesPerProjectSearchIdList_DisplayOrder.length ) {
+				throw Error("ERROR: reportedPeptidesPerProjectSearchIdList.length !== reportedPeptidesPerProjectSearchIdList_DisplayOrder.length ");
+			}
+		}
+
+		//  Process Per Search List
+		for ( let dataArrayIndex = 0; dataArrayIndex < reportedPeptidesPerProjectSearchIdList_DisplayOrder.length; dataArrayIndex++ ) {
+
+			//  If after the first search, insert the separator
+			if ( dataArrayIndex > 0 ) {
+				const html = _merged_pages_shared_template.mergedPages_data_per_search_between_searches_html();
+//				const $peptide_data_per_search_between_searches_html = 
+				$( html ).appendTo( $data_container );
+			}
+			const displayEntry = reportedPeptidesPerProjectSearchIdList_DisplayOrder[ dataArrayIndex ];
+
+			const colorIndex_OneBased = computeMergedSearchColorIndex_OneBased({ searchIndex_ZeroBased : displayEntry.index });
+
+			const reportedPeptidesPerSearchEntry = displayEntry.item;
+			// const projectSearchId = reportedPeptidesPerSearchEntry.projectSearchId;
+			const reportedPeptidesForSearch =  reportedPeptidesPerSearchEntry.reportedPepides;
+
+			//  Add header row for single search
 			//  create context for header row
-			var context = { 
+			const context = { 
 					peptideAnnotationDisplayNameDescriptionList : reportedPeptidesPerSearchEntry.peptideAnnotationDisplayNameDescriptionList,
 					psmAnnotationDisplayNameDescriptionList : reportedPeptidesPerSearchEntry.psmAnnotationDisplayNameDescriptionList
 			};
-			var html = _handlebarsTemplate_peptide_data_per_search_block_template(context);
-			var $peptide_data_per_search_block_template = $(html).appendTo($data_container);
-			var peptide_table_jq_ClassName = "peptide_table_jq";
-			var $peptide_table_jq = $peptide_data_per_search_block_template.find("." + peptide_table_jq_ClassName );
+			const peptidePage_peptide_data_per_search_block_template_HTML = _peptide_page_template.peptidePage_peptide_data_per_search_block_template(context);
+			const $peptide_data_per_search_block_template = $( peptidePage_peptide_data_per_search_block_template_HTML ).appendTo($data_container);
+			const peptide_table_jq_ClassName = "peptide_table_jq";
+			const $peptide_table_jq = $peptide_data_per_search_block_template.find("." + peptide_table_jq_ClassName );
 			if ( $peptide_table_jq.length === 0 ) {
 				throw "unable to find HTML element with class '" + peptide_table_jq_ClassName + "'";
 			}
-			//  Add peptide data to the page
-			for ( var peptideIndex = 0; peptideIndex < reportedPeptidesForSearch.length ; peptideIndex++ ) {
-				var peptide = reportedPeptidesForSearch[ peptideIndex ];
+
+			//  Add peptide data to the page for a single search
+			for ( let peptideIndex = 0; peptideIndex < reportedPeptidesForSearch.length ; peptideIndex++ ) {
+				const peptide = reportedPeptidesForSearch[ peptideIndex ];
 				//  wrap data in an object to allow adding more fields
-				var context = { data : peptide
-				};
-				var html = _handlebarsTemplate_peptide_data_per_search_data_row_template(context);
-				var $peptide_entry = 
-					$(html).appendTo($peptide_table_jq);
+				const context = { data : peptide, colorIndex_OneBased };
+				const peptidePage_peptide_data_per_search_data_row_template_HTML = _peptide_page_template.peptidePage_peptide_data_per_search_data_row_template(context);
+				const $peptide_entry = 
+					$( peptidePage_peptide_data_per_search_data_row_template_HTML ).appendTo($peptide_table_jq);
 				//  Get the number of columns of the inserted row so can set the "colspan=" in the next row
 				//       that holds the child data
-				var $peptide_entry__columns = $peptide_entry.find("td");
-				var peptide_entry__numColumns = $peptide_entry__columns.length;
+				const $peptide_entry__columns = $peptide_entry.find("td");
+				const peptide_entry__numColumns = $peptide_entry__columns.length;
 				//  colSpan is used as the value for "colspan=" in the <td>
-				var childRowHTML_Context = { colSpan : peptide_entry__numColumns };
-				var childRowHTML = _handlebarsTemplate_peptide_data_per_search_child_row_template( childRowHTML_Context );
+				const childRowHTML_Context = { colSpan : peptide_entry__numColumns };
+				const childRowHTML = _peptide_page_template.peptidePage_peptide_data_per_search_child_row_template( childRowHTML_Context );
 				//  Add next row for child data
 				$( childRowHTML ).appendTo($peptide_table_jq);
 			}

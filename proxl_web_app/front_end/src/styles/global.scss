@@ -111,8 +111,8 @@ A:show-child-data-link:active  { text-decoration: underline; }
 */
 
 /* Links used for Javascript to show the search details data  */
-A.show-search-details-data-link:link  {  }
-A:show-search-details-data-link:hover  {  }
+// A.show-search-details-data-link:link  {  }
+// A:show-search-details-data-link:hover  {  }
 
 
 label { padding-right: 2px; }
@@ -135,7 +135,7 @@ input[type="button"]:disabled, input[type="submit"]:disabled, .disabled-checkbox
 /* options for the "Download As" hover dropdown menu */
 #svg-download { position: relative; display: inline-block; }
 #svg-download:hover #svg-download-options { display: block; }
-#download_as_link { }
+// #download_as_link { }
 #svg-download-options { z-index:10; padding-top:7px; display: none; position: absolute; background-color: #f9f9f9; min-width: 160px; box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2); }
 .svg-download-option { display:block; margin-left:5px; }
 
@@ -240,7 +240,7 @@ body.inset-page .error-message-inner-container { background-color: red; }
 
 body.inset-page .success-message-inner-container { background-color: green; }
 
-body.inset-page span.error-message-text, body.inset-page span.success-message-text {  }
+// body.inset-page span.error-message-text, body.inset-page span.success-message-text {  }
 	
 body.inset-page .error-message-close-x, body.inset-page .success-message-close-x { cursor: pointer; float: right; margin-left: 10px; }
 
@@ -532,7 +532,7 @@ body.crosslinks-page-main .navigation-links-block { margin-bottom: 12px; }
 .shortened-url-display-overlay-containing-outer-div, body.project-page .shortened-url-display-overlay-container { width: 600px;  }
 
 /* extends  body.crosslinks-page-main .modal-dialog-overlay-container, other values for this set just above ^^^  */
-.shortened-url-display-overlay-container {   }
+// .shortened-url-display-overlay-container {   }
 
 
 
@@ -543,7 +543,7 @@ body.crosslinks-page-main .navigation-links-block { margin-bottom: 12px; }
 body.projects-list-page .your-projects-title { margin-top: 20px; margin-bottom: 10px; font-weight: bold; }
 
 
-body.projects-list-page .new-project-container {  }
+// body.projects-list-page .new-project-container {  }
 body.projects-list-page .new-project-icon-container { float: left; padding-right: 10px;  padding-top: 0px; }
 body.projects-list-page .new-project-text-link { font-size: 14px; text-decoration: none; color: black; font-weight: bold; opacity:0.6;filter:alpha(opacity=60);  }
 
@@ -580,7 +580,7 @@ body.projects-list-page .mark-project-for-deletion-overlay-containing-outer-div 
 body.projects-list-page .mark-project-for-deletion-overlay-containing-outer-div, body.projects-list-page .mark-project-for-deletion-overlay-container { width: 600px;  }
 
 /* extends  body.crosslinks-page-main .modal-dialog-overlay-container, other values for this set just above ^^^  */
-body.projects-list-page .mark-project-for-deletion-overlay-container {   }
+// body.projects-list-page .mark-project-for-deletion-overlay-container {   }
 
 
 
@@ -887,10 +887,7 @@ body.project-page #organize_searches_folder_searches_not_in_any_folder:hover {  
 	
 		position: absolute;
 	
-		
-		/*
-		*/
-		top: 50px;
+		// top: 50px;  set in JS
 		left: 50px;
 	
 		/*
@@ -3186,3 +3183,20 @@ div.save-view-modal-dialog-overlay-div {
     display: inline-block;
     position: relative;
 }
+
+
+//////////////////////////////
+
+//   Merged Pages Common
+
+//  The color block before the search name for a single search when expand a merged row
+
+//			The Padding left and right create the width of the block.  The background color is set elsewhere
+.merged-expanded-row-single-search-color-block {
+	margin-right: 10px;
+	padding-left: 8px;
+	padding-right: 6px;
+	padding-top: 1px;
+	padding-bottom: 1px;
+}
+
