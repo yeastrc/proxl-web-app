@@ -1,15 +1,8 @@
 /**
  * qcPageMain.js
  * 
- * Javascript for the viewQC.jsp page
- * 
- * page variable qcPageMain
- * 
- * 		!!!!  Currently only works for single search.  
- * 
- * 		The page is designed to work with multiple merged searches 
- * 		but the code and SQL need to be reviewed to determine that the results returned are what the user expects,
- * 		especially for reported peptide level results. 
+ * Root Javascript file for the viewQC.jsp page - QC Single Search Page
+ * (Javascript bundle for the page starts with this file)
  * 
  * This code has been updated to cancel existing active AJAX calls when "Update from Database" button is clicked.
  *   This is done so that previous AJAX responses don't overlay new AJAX responses.
@@ -21,6 +14,8 @@
 //Import header_main.js and children to ensure on the page
 import { header_mainVariable } from 'page_js/header_section_js_all_pages_main_pages/header_section_main_pages/header_main.js';
 
+
+import { loadGoogleChart_CoreChart }  from 'page_js/data_pages/data_pages_common/googleChartLoaderForThisWebapp.js';
 
 import { copyObject_DeepCopy_Proxl } from 'page_js/common_js_includes_all_pages/copyObject_DeepCopy.js';
 
@@ -48,26 +43,6 @@ import { qcPageSectionDigestionStatistics } from './qcPageSectionDigestionStatis
 import { qcPageSectionModificationStatistics } from './qcPageSectionModificationStatistics.js';
 import { qcPageSectionScanFileStatistics } from './qcPageSectionScanFileStatistics.js';
 import { qcPageSectionSummaryStatistics } from './qcPageSectionSummaryStatistics.js';
-
-
-/**
- * 
- */
-$(document).ready(function() {
-
-	//  Delay init until Google Charts have loaded which is done in header_main.jsp
-
-	//     qcPageMain.init(); called in header_main.jsp after Google charts are initialized
-
-//	try {
-//	qcPageMain.init();
-//	} catch( e ) {
-//	reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
-//	throw e;
-//	}
-
-
-} ); // end $(document).ready(function() 
 
 
 /**
@@ -225,11 +200,30 @@ var QCPageMain = function() {
 	 * Init page.  Called after Google Charts have loaded.  Called in header_main.jsp 
 	 */
 	this.init = function() {
-		var objectThis = this;
-		setTimeout(function() {
-			objectThis.initActual();
-		}, 100 );
 
+		//  Load Google Charts API and then call this.initActual();
+
+		const loadGoogleChart_CoreChartResult = loadGoogleChart_CoreChart();
+
+		if ( ! loadGoogleChart_CoreChartResult.isLoaded ) {
+			loadGoogleChart_CoreChartResult.loadingPromise.then( (value) => { // On Fulfilled
+				try {
+					this.initActual();
+				} catch( e ) {
+					reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+					throw e;
+				}
+			}).catch(function(reason) {
+				try {
+					console.log( "loadGoogleChart_CoreChartResult.loadingPromise.catch(reason) called" );
+				} catch( e ) {
+					reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+					throw e;
+				}
+			});
+		} else {
+			this.initActual();
+		}
 	};
 	
 	/**
@@ -1325,7 +1319,7 @@ var QCPageMain = function() {
 
 const qcPageMain = new QCPageMain();
 
-window.qcPageMainPageObject = qcPageMain;
+qcPageMain.init();
 
 //  Copy to standard page level JS Code Object
 //  Not currently supported  var standardFullPageCode = qcPageMain;

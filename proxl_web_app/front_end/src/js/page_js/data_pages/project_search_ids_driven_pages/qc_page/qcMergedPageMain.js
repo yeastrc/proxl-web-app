@@ -16,6 +16,8 @@
 import { header_mainVariable } from 'page_js/header_section_js_all_pages_main_pages/header_section_main_pages/header_main.js';
 
 
+import { loadGoogleChart_CoreChart }  from 'page_js/data_pages/data_pages_common/googleChartLoaderForThisWebapp.js';
+
 import { copyObject_DeepCopy_Proxl } from 'page_js/common_js_includes_all_pages/copyObject_DeepCopy.js';
 
 
@@ -42,27 +44,6 @@ import { qcMergedPageSectionDigestionStatistics } from './qcMergedPageSectionDig
 import { qcMergedPageSectionModificationStatistics } from './qcMergedPageSectionModificationStatistics.js';
 import { qcMergedPageSectionScanFileStatistics } from './qcMergedPageSectionScanFileStatistics.js';
 import { qcMergedPageSectionSummaryStatistics } from './qcMergedPageSectionSummaryStatistics.js';
-
-
-/**
- * 
- */
-$(document).ready(function() {
-
-	//  Delay init until Google Charts have loaded which is done in header_main.jsp
-
-	//     qcPageMain.init(); called in header_main.jsp after Google charts are initialized
-
-//	try {
-//	qcPageMain.init();
-//	} catch( e ) {
-//	reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
-//	throw e;
-//	}
-
-
-} ); // end $(document).ready(function() 
-
 
 /**
  * Constructor 
@@ -223,17 +204,30 @@ var QCMergedPageMain = function() {
 	 * Init page.  Called after Google Charts have loaded.  Called in header_main.jsp 
 	 */
 	this.init = function() {
-		var objectThis = this;
-		setTimeout(function() {
-			objectThis.initActual();
-		}, 100 );
 
+		//  Load Google Charts API and then call this.initActual();
 
-		setTimeout( function() { // put in setTimeout so if it fails it doesn't kill anything else
-			if ( window.mergedPeptideProteinSearchesListVennDiagramSection ) {
-				window.mergedPeptideProteinSearchesListVennDiagramSection.init();
-			}
-		},10);
+		const loadGoogleChart_CoreChartResult = loadGoogleChart_CoreChart();
+
+		if ( ! loadGoogleChart_CoreChartResult.isLoaded ) {
+			loadGoogleChart_CoreChartResult.loadingPromise.then( (value) => { // On Fulfilled
+				try {
+					this.initActual();
+				} catch( e ) {
+					reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+					throw e;
+				}
+			}).catch(function(reason) {
+				try {
+					console.log( "loadGoogleChart_CoreChartResult.loadingPromise.catch(reason) called" );
+				} catch( e ) {
+					reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+					throw e;
+				}
+			});
+		} else {
+			this.initActual();
+		}
 	};
 	
 	/**
@@ -1448,7 +1442,7 @@ var QCMergedPageMain = function() {
 
 const qcMergedPageMain = new QCMergedPageMain();
 
-window.qcMergedPageMainPageObject = qcMergedPageMain;
+qcMergedPageMain.init();
 
 //  Copy to standard page level JS Code Object
 //  Not currently supported  var standardFullPageCode = qcMergedPageMain;

@@ -11,6 +11,8 @@
 const Handlebars = require('handlebars');
 
 
+import { loadGoogleChart_CoreChart }  from 'page_js/data_pages/data_pages_common/googleChartLoaderForThisWebapp.js';
+
 
 //  For showing Data for links (Drilldown) (Called by HTML onclick):
 import { viewPsmPerPeptideLoadedFromWebServiceTemplate } from 'page_js/data_pages/project_search_ids_driven_pages/common/viewPsmPerPeptideLoadedFromWebServiceTemplate.js';
@@ -33,6 +35,7 @@ var ViewPsmsLoadedFromWebServiceTemplate = function() {
 	//  Queue of params for this._addChartsParams() before Google Chart API is loaded 
 	var _addChartsParamsQueue = [];
 	
+	var _googleChartAPIloadCalled = false;
 	var _googleChartAPIloaded = false;
 
 	var _excludeLinksWith_Root =  null;
@@ -47,7 +50,53 @@ var ViewPsmsLoadedFromWebServiceTemplate = function() {
 	//////////////
 	this.setPsmPeptideCriteria = function( psmPeptideCutoffsRootObject ) {
 		_psmPeptideCutoffsRootObject = psmPeptideCutoffsRootObject;
+
+		//  Use this to trigger loading the Google Charts API after a delay.
+		//     (Also trigger from load PSMs so will load sooner if load PSMs before this delay)
+
+		window.setTimeout(() => {
+			try {
+				this.loadGoogleChartsAPI();
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
+		}, 5000 );
 	};
+
+	//  Load Google charts API after delay or when show PSMs, whichever comes first
+	this.loadGoogleChartsAPI = function() {
+		if ( _googleChartAPIloadCalled ) {
+			//  Exit since already called
+			return; // EARLY RETURN
+		}
+
+		_googleChartAPIloadCalled = true;
+
+		let loadGoogleChart_CoreChartResult = loadGoogleChart_CoreChart();
+
+		if ( ! loadGoogleChart_CoreChartResult.isLoaded ) {
+			loadGoogleChart_CoreChartResult.loadingPromise.then( (value) => { // On Fulfilled
+				try {
+					console.log( "loadGoogleChart_CoreChartResult.loadingPromise.then ( On Fulfilled ) called" );
+					
+					this.googleChartAPIloaded();
+				} catch( e ) {
+					reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+					throw e;
+				}
+			}).catch(function(reason) {
+				try {
+					console.log( "loadGoogleChart_CoreChartResult.loadingPromise.catch(reason) called" );
+				} catch( e ) {
+					reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+					throw e;
+				}
+			});
+		} else {
+			this.googleChartAPIloaded();
+		}
+	}
 
 	//////////////
 	this.setPsmPeptideAnnTypeIdDisplay = function( psmPeptideAnnTypeIdDisplay ) {
@@ -88,6 +137,9 @@ var ViewPsmsLoadedFromWebServiceTemplate = function() {
 		var objectThis = this;
 		var $topTRelement = params.$topTRelement;
 		var $clickedElement = params.$clickedElement;
+
+		this.loadGoogleChartsAPI(); // Load Google Chart APIs if not already loaded
+
 		var dataLoaded = $topTRelement.data( _DATA_LOADED_DATA_KEY );
 		if ( dataLoaded ) {
 			return;  //  EARLY EXIT  since data already loaded. 

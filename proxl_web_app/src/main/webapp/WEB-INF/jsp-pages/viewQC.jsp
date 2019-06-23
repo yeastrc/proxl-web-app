@@ -20,12 +20,6 @@
 
  <c:set var="pageBodyClass" >project-page view-qc-page</c:set>
  
- <%--  Additions to Google Chart Package Load. Used in header_main.jsp.  Requires starting ',' --%>
- <%--  Not currently Used: "scatter" Material Design Scatter Plot --%>
- <%--  
- <c:set var="googleChartPackagesLoadAdditions">,"scatter"</c:set>
- --%>
- 
   <c:set var="headerAdditions">
  
 		<script type="text/javascript" src="js/libs/base64.js"></script> 
