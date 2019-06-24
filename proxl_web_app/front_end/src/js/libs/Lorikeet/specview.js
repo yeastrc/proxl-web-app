@@ -2,6 +2,16 @@
 // $LastChangedBy: djaschob@uw.edu $
 // $LastChangedRevision: 67 $
 
+//  Local Import
+
+import { AminoAcid } from './aminoacid.js';
+import { Ion } from './ion.js';
+import { Peptide, Modification, VariableModification, LoopLinkData, CrossLinkData }
+	from './peptide.js';
+
+
+let addLorikeetToJquery = function( jquery ) {
+	
 // (function($) {
 
     // plugin name - specview
@@ -2553,3 +2563,7 @@
 	}
 	
 // })(jQuery);
+
+}
+
+export { addLorikeetToJquery }

@@ -2,6 +2,11 @@
 // $LastChangedBy: vagisha@gmail.com $
 // $LastChangedRevision: 57 $
 
+//  Local Import
+
+import { AminoAcid } from './aminoacid.js';
+import { Ion } from './ion.js';
+
 // -----------------------------------------------------------------------------
 // Peptide sequence and modifications
 // -----------------------------------------------------------------------------
@@ -914,7 +919,7 @@ CrossLinkData.prototype.getCrossLinkedPeptideAndLinkerMass = function( massType 
 /*
  * mass diff of stable isotope label isotopes
  */
-IsotopeLabelMassShifts = { };
+const IsotopeLabelMassShifts = { };
 IsotopeLabelMassShifts[ '15N' ] = { 'atom':'N', massDiff: { mono:0.99703497,  avg:0.993409 } };
 IsotopeLabelMassShifts[ '13C' ] = { 'atom':'C', massDiff: { mono:1.00335483,  avg:0.992655 } };
 IsotopeLabelMassShifts[ '18O' ] = { 'atom':'O', massDiff: { mono:2.00424567,  avg:1.99976 } };
@@ -922,6 +927,9 @@ IsotopeLabelMassShifts[ '2H' ] =  { 'atom':'H', massDiff: { mono:1.006276744, av
 
 
 
+
+
+export { Peptide, Modification, VariableModification, LoopLinkData, CrossLinkData }
 
 
 

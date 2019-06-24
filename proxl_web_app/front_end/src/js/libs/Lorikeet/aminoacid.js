@@ -185,3 +185,6 @@ function _getAA(aaCode) {
    else
       return new AminoAcid(aaCode, aaCode, 0.0, 0.0);
 }
+
+export { AminoAcid }
+

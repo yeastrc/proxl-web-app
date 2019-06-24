@@ -358,3 +358,6 @@ function Ion_Z (peptide, startIdx, loopLinkData, charge, massType) {
 	this.term = "c";
 	return this;
 }
+
+
+export { Ion }

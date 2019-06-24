@@ -12,6 +12,13 @@
 
 "use strict";
 
+//  module import 
+
+import { addFlotToJquery } from 'libs/Lorikeet/jquery.flot.js';
+import { addFlotSelectionToJquery } from 'libs/Lorikeet/jquery.flot.selection.js';
+
+import { addLorikeetToJquery } from 'libs/Lorikeet/specview.js';
+
 // /////////////////////////////////////////
 
 var LORIKEET_PAGE_PROCESSING_CONSTANTS = {
@@ -34,6 +41,10 @@ var _MAKE_ARC_PATH_DIRECTION_DOWN__LORIKEET_PAGE_PROCESSING = "down";
 
 
 
+//  Variables visible in this file/module  
+let itemsAddedTo_jQuery = false;
+
+
 
 $(document).ready(function()  { 
 
@@ -46,6 +57,17 @@ $(document).ready(function()  {
 function initLorikeetViewer() {
 
 	try {
+
+		if ( ! itemsAddedTo_jQuery ) {
+			
+			let jquery = window.jQuery;
+			
+			addFlotToJquery( jquery );
+			addFlotSelectionToJquery( jquery );
+			addLorikeetToJquery( jquery );
+			
+			itemsAddedTo_jQuery = true;
+		}
 
 		attachLorikeetOverlayClickHandlers();
 
