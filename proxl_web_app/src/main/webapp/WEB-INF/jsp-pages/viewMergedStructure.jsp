@@ -32,14 +32,7 @@
 		<%--  Used by lz-string.min.js --%>
 		<script type="text/javascript" src="js/libs/lz-string/base64-string.js"></script>
 
-<%--  Start of Lorikeet Core Parts --%>		
-
 		<script src="js/libs/jquery-ui-1.12.1.min.js"></script>
-		
-<%--  End of Lorikeet Core Parts --%>		
-
-		
-		<script type="text/javascript" src="js/libs/snap.svg-min.js"></script> <%--  Used by lorikeetPageProcessing.js --%>
 				
 				<%-- 
 					The Struts Action for this page must call GetProteinNamesTooltipConfigData

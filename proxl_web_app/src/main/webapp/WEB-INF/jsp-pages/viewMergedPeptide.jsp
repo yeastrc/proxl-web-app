@@ -22,15 +22,8 @@
 			<%--  Old version of d3 used in venn.js and mergedSearchesVennDiagramCreator.js
 						to create the Venn Diagram --%>
 		<script type="text/javascript" src="js/libs/d3_OLD_VERSION.min.js"></script>
-	
-		
-<%--  Start of Lorikeet Core Parts --%>		
 
 		<script src="js/libs/jquery-ui-1.12.1.min.js"></script>
-		
-<%--  End of Lorikeet Core Parts --%>		
-				
-		<script type="text/javascript" src="js/libs/snap.svg-min.js"></script> <%--  Used by lorikeetPageProcessing.js --%>
 				
 		<script type="text/javascript" src="js/libs/spin.min.js"></script> 
 				
@@ -44,9 +37,7 @@
 		<link type="text/css" rel="stylesheet" href="css/jquery.qtip.min.css" />
 
 		<%--  some classes in this stylesheet collide with some in the lorikeet file since they are set to specific values for lorikeet drag and drop --%>
-		<%-- 
-		<link REL="stylesheet" TYPE="text/css" HREF="css/jquery-ui-1.10.2-Themes/ui-lightness/jquery-ui.min.css">
-		--%>
+		<%-- <link REL="stylesheet" TYPE="text/css" HREF="css/jquery-ui-1.10.2-Themes/ui-lightness/jquery-ui.min.css"> --%>
 
 		<link REL="stylesheet" TYPE="text/css" HREF="css/lorikeet.css">
 

@@ -29,16 +29,8 @@
 		<%--  Used by lz-string.min.js --%>
 		<script type="text/javascript" src="js/libs/lz-string/base64-string.js"></script>
 
-<%--  Start of Lorikeet Core Parts --%>		
-
 		<script src="js/libs/jquery-ui-1.12.1.min.js"></script>
 		
-<%--  End of Lorikeet Core Parts --%>		
-
-		
-			<%--  On this page Snap also used by crosslink-image-viewer.js and crosslink-image-viewer-click-element-handlers.js --%>				
-		<script type="text/javascript" src="js/libs/snap.svg-min.js"></script> <%--  Used by lorikeetPageProcessing.js --%>
-
 				<%-- 
 					The Struts Action for this page must call GetProteinNamesTooltipConfigData
 					This include is required on this page:
@@ -52,9 +44,8 @@
 		<link type="text/css" rel="stylesheet" href="css/jquery.qtip.min.css" />
 		
 		<%--  some classes in this stylesheet collide with some in the lorikeet file since they are set to specific values for lorikeet drag and drop --%>
-		<%-- 
-		<link REL="stylesheet" TYPE="text/css" HREF="css/jquery-ui-1.10.2-Themes/ui-lightness/jquery-ui.min.css">
-		--%>
+		<%-- <link REL="stylesheet" TYPE="text/css" HREF="css/jquery-ui-1.10.2-Themes/ui-lightness/jquery-ui.min.css"> --%>
+
 		<link REL="stylesheet" TYPE="text/css" HREF="css/lorikeet.css">
 		<link rel="stylesheet" media="screen" type="text/css" href="css/libs/colorpicker_custom_colors.css" />
 		

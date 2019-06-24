@@ -14,6 +14,8 @@
 
 //  module import 
 
+import { loadSnapSVG_Library } from 'page_js/data_pages/data_pages_common/snapSVG_Library_Loader.js';
+
 import { addFlotToJquery } from 'libs/Lorikeet/jquery.flot.js';
 import { addFlotSelectionToJquery } from 'libs/Lorikeet/jquery.flot.selection.js';
 
@@ -107,65 +109,115 @@ function addOpenLorikeetViewerClickHandlers( $openLorkeetLinks ) {
 
 	////////////////////////////////////////////////////
 
+	//   On Click Handler
+
 	var openViewLorikeetOverlay = function( event, ui ) {
+		try {
+			const eventTarget = event.target;
 
-		var $this = $( this );
+			var $eventTarget = $( eventTarget );  //  'eventTarget' is DOM element
 
-		//  Code to mark the last clicked psm with a different color.  The CSS class does not exist yet
-		$(".psm-open-spectrum-link-clicked").removeClass("psm-open-spectrum-link-clicked");
-		$this.addClass("psm-open-spectrum-link-clicked");
+			//  Code to mark the last clicked psm with a different color.  The CSS class does not exist yet
+			$(".psm-open-spectrum-link-clicked").removeClass("psm-open-spectrum-link-clicked");
+			$eventTarget.addClass("psm-open-spectrum-link-clicked");
 
+			var psmId = $eventTarget.attr("psmId");
+
+			const promises = [];
+			
+			const promise_getLorikeetDatFromServer = getLorikeetDatFromServer({ psmId });
+			promises.push( promise_getLorikeetDatFromServer );
+
+			const loadSnapSVG_Library_Response = loadSnapSVG_Library();
+			const promise_loadSnapSVG_Library = loadSnapSVG_Library_Response.loadingPromise;
+			if ( promise_loadSnapSVG_Library ) {
+				promises.push( promise_loadSnapSVG_Library );
+			}
+
+
+			const promisesAll = Promise.all( promises );
+
+			promisesAll.catch( ( ) => { } );
+
+			promisesAll.then( ( promiseResolveResultsArray ) => {
+				try {
+					let processDataParam = {};
+					for ( const promiseResolveResultsEntry of promiseResolveResultsArray ) {
+						if ( promiseResolveResultsEntry && promiseResolveResultsEntry.lorikeetData ) {
+							processDataParam.lorikeetData = promiseResolveResultsEntry.lorikeetData;
+						}
+					}
+
+					openViewLorikeetOverlayProcessData( processDataParam );
+
+				} catch( e ) {
+					reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+					throw e;
+				}
+			});
+
+			event.preventDefault(); // prevent default for element
+			
+			event.stopPropagation(); // prevent click bubbling
+
+		} catch( e ) {
+			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+			throw e;
+		}
+	}
+
+	const getLorikeetDatFromServer = function({ psmId }) {
 		
-		
-		
-		var psmId = $this.attr("psmId");
-
 //		var ajaxRequestData = { scanId: scanId, peptideId: peptideId, psmId: psmId };
 		
-		var ajaxRequestData = { psmId: psmId };
-		
-		$.ajax(
-				{ url : LORIKEET_PAGE_PROCESSING_CONSTANTS.serviceURL_lorikeetSpectrum_getData,
+		return new Promise( (resolve, reject) => { 
+			try {
 
-					success :  function( data ) {
+				var ajaxRequestData = { psmId };
+				
+				$.ajax(
+						{ url : LORIKEET_PAGE_PROCESSING_CONSTANTS.serviceURL_lorikeetSpectrum_getData,
 
-						try {
-//							testStatusOnReturnedJSON( data );
+							success :  function( data ) {
+								try {
+									resolve({ lorikeetData : data })
+									
+								} catch( e ) {
+									reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+									throw e;
+								}
+							},
+							failure: function(errMsg) {
+								handleAJAXFailure( errMsg );
+								reject();
+							},
 
-							openViewLorikeetOverlayProcessData( data );
-							
-						} catch( e ) {
-							reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
-							throw e;
-						}
-					},
-			        failure: function(errMsg) {
-			        	handleAJAXFailure( errMsg );
-			        },
+							error: function(jqXHR, textStatus, errorThrown) {
 
-					error: function(jqXHR, textStatus, errorThrown) {
+		//						alert("Error response from server getting Lorikeet data");
+								
+								handleAJAXError( jqXHR, textStatus, errorThrown );
+								reject();
+							},
+							data: ajaxRequestData,  //  The data sent as params on the URL
+							dataType : "json"
+						});
 
-//						alert("Error response from server getting Lorikeet data");
-						
-						handleAJAXError( jqXHR, textStatus, errorThrown );
-
-					},
-					data: ajaxRequestData,  //  The data sent as params on the URL
-					dataType : "json"
-				});
-
-		event.preventDefault(); // prevent default for element
-		
-		event.stopPropagation(); // prevent click bubbling
+					} catch( e ) {
+						reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+						throw e;
+					}
+				 });
 	};
 
 
 	///////////////////////////////
 
-	var openViewLorikeetOverlayProcessData = function( data ) {
+	var openViewLorikeetOverlayProcessData = function( processDataParam ) {
 
+		const lorikeetData = processDataParam.lorikeetData;
 		
-		var lorikeetOptions = data.data;
+		var lorikeetOptions = lorikeetData.data;
 		
 		//  Set Lorikeet options
 		

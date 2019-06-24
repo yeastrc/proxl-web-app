@@ -47,6 +47,8 @@ import { searchesChangeDisplayOrder } from 'page_js/data_pages/project_search_id
 import { searchesForPageChooser } from 'page_js/data_pages/project_search_ids_driven_pages/common/searchesForPageChooser.js';
 import { sharePageURLShortener  } from 'page_js/data_pages/project_search_ids_driven_pages/common/sharePageURLShortener.js';
 
+import { loadSnapSVG_CoreChart } from 'page_js/data_pages/data_pages_common/snapSVG_Library_Loader.js';
+
 
 import { defaultPageView } from 'page_js/data_pages/project_search_ids_driven_pages/common/defaultPageView.js';
 
@@ -6403,7 +6405,15 @@ window.imageViewerPageObject = {
 
 $(document).ready(function()  { 
 	try {
-		imagePagePrimaryRootCodeObject.call__initPage();
+		const loadSnapSVG_CoreChart_Response = loadSnapSVG_CoreChart();
+		const promise_loadSnapSVG_CoreChart = loadSnapSVG_CoreChart_Response.loadingPromise;
+		if ( promise_loadSnapSVG_CoreChart ) {
+			promise_loadSnapSVG_CoreChart.then( ( ) => {
+				imagePagePrimaryRootCodeObject.call__initPage();
+			});
+		} else {
+			imagePagePrimaryRootCodeObject.call__initPage();
+		}
 	} catch( e ) {
 		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
 		throw e;
