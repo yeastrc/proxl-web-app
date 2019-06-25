@@ -47,30 +47,34 @@ export class ProjectPg_setAnnotationCutoffsDefaults_ProjectLevel {
     initialize() {
 
         const $set_project_level_default_cutoffs_button = $("#set_project_level_default_cutoffs_button");
-        if ( $set_project_level_default_cutoffs_button.length === 0 ) {
-            throw Error("No DOM element with id 'set_project_level_default_cutoffs_button'");
+
+        //  Comment out since DOM element likely will not exist for project with no searches
+        // if ( $set_project_level_default_cutoffs_button.length === 0 ) {
+        //     throw Error("No DOM element with id 'set_project_level_default_cutoffs_button'");
+        // }
+        if ( $set_project_level_default_cutoffs_button.length !== 0 ) {
+            $set_project_level_default_cutoffs_button.click( ( eventObject ) => {
+                try {
+                    eventObject.preventDefault();
+                    const eventTarget = eventObject.target;
+
+                    this._projectPg_setAnnotationCutoffsDefaults_ProjectLevel_Overlay = 
+                        new ProjectPg_setAnnotationCutoffsDefaults_ProjectLevel_Overlay({ 
+                            projectId : this._projectId,
+                            projectPg_setAnnotationCutoffsDefaults_ProjectLevel : this
+                        });
+
+                    this._projectPg_setAnnotationCutoffsDefaults_ProjectLevel_Overlay.initialize();
+
+                    this._projectPg_setAnnotationCutoffsDefaults_ProjectLevel_Overlay.openOverlay({ eventTarget });
+
+                    return false;
+                } catch( e ) {
+                    reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+                    throw e;
+                }
+            });
         }
-        $set_project_level_default_cutoffs_button.click( ( eventObject ) => {
-            try {
-                eventObject.preventDefault();
-                const eventTarget = eventObject.target;
-
-                this._projectPg_setAnnotationCutoffsDefaults_ProjectLevel_Overlay = 
-                    new ProjectPg_setAnnotationCutoffsDefaults_ProjectLevel_Overlay({ 
-                        projectId : this._projectId,
-                        projectPg_setAnnotationCutoffsDefaults_ProjectLevel : this
-                    });
-
-                this._projectPg_setAnnotationCutoffsDefaults_ProjectLevel_Overlay.initialize();
-
-                this._projectPg_setAnnotationCutoffsDefaults_ProjectLevel_Overlay.openOverlay({ eventTarget });
-
-                return false;
-            } catch( e ) {
-                reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
-                throw e;
-            }
-        })
     }
 
     /**
