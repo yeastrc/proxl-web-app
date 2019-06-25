@@ -47,7 +47,7 @@ import { searchesChangeDisplayOrder } from 'page_js/data_pages/project_search_id
 import { searchesForPageChooser } from 'page_js/data_pages/project_search_ids_driven_pages/common/searchesForPageChooser.js';
 import { sharePageURLShortener  } from 'page_js/data_pages/project_search_ids_driven_pages/common/sharePageURLShortener.js';
 
-import { loadSnapSVG_CoreChart } from 'page_js/data_pages/data_pages_common/snapSVG_Library_Loader.js';
+import { loadSnapSVG_Library } from 'page_js/data_pages/data_pages_common/snapSVG_Library_Loader.js';
 
 
 import { defaultPageView } from 'page_js/data_pages/project_search_ids_driven_pages/common/defaultPageView.js';
@@ -6405,10 +6405,10 @@ window.imageViewerPageObject = {
 
 $(document).ready(function()  { 
 	try {
-		const loadSnapSVG_CoreChart_Response = loadSnapSVG_CoreChart();
-		const promise_loadSnapSVG_CoreChart = loadSnapSVG_CoreChart_Response.loadingPromise;
-		if ( promise_loadSnapSVG_CoreChart ) {
-			promise_loadSnapSVG_CoreChart.then( ( ) => {
+		const loadSnapSVG_Library_Response = loadSnapSVG_Library();
+		const promise_loadSnapSVG_Library = loadSnapSVG_Library_Response.loadingPromise;
+		if ( promise_loadSnapSVG_Library ) {
+			promise_loadSnapSVG_Library.then( ( ) => {
 				imagePagePrimaryRootCodeObject.call__initPage();
 			});
 		} else {

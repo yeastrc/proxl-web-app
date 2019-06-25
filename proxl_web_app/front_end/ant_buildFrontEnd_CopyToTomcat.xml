@@ -5,7 +5,6 @@
 	
 	<!--
 	<property environment="env" />
-	<property name="gradle.wrapper.executable" location="${env.GRADLE_HOME}/bin/gradle" />
 	
 	<echo>env:${env}</echo>
 	<echo>env.GRADLE_HOME:${env.GRADLE_HOME}</echo>
@@ -38,8 +37,6 @@
 	
 	<!-- This does not fail if the file is not found -->
 	<property file="${config_file__Build_Front_End_with_path}" />
-	
-	<echo>gradle.wrapper.executable: ${gradle.wrapper.executable}</echo>
 	
 	<echo>tomcat.webapps.root: ${tomcat.webapps.root}</echo>
 	<echo>proxl.context: ${proxl.context}</echo>
