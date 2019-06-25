@@ -7,9 +7,11 @@ import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.www.dao.ProjectLevelDefaultFltrAnnCutoffs_CutoffAsStringValue_DAO;
 import org.yeastrc.xlink.www.dao.ProjectLevelDefaultFltrAnnCutoffs_DAO;
+import org.yeastrc.xlink.www.dao.ProjectLevelDefaultFltr_MinPSMs_DAO;
 import org.yeastrc.xlink.www.dto.ProjectLevelDefaultFltrAnnCutoffs_CutoffAsStringValue_DTO;
 import org.yeastrc.xlink.www.dto.ProjectLevelDefaultFltrAnnCutoffs_DTO;
-import org.yeastrc.xlink.www.project_level_default_cutoffs.ProjectLevelDefaultCutoffs_Cache;
+import org.yeastrc.xlink.www.dto.ProjectLevelDefaultFltr_MinPSMs_DTO;
+import org.yeastrc.xlink.www.project_level_default_cutoffs.ProjectLevelDefaultCutoffsAndOthers_Cache;
 /**
  * 
  * Accept new Project Level Default Cutoffs
@@ -40,7 +42,7 @@ public class ProjectLevelDefaultCutoffs_SaveUpdate_UsingDBTransactionService {
 	 * @param entries
 	 * @throws Exception
 	 */
-	public void saveUpdate( int projectId, List<Entry> entries ) throws Exception {
+	public void saveUpdate( int projectId, List<Entry> entries, ProjectLevelDefaultFltr_MinPSMs_DTO projectLevelDefaultFltr_MinPSMs_DTO ) throws Exception {
 		
 		Connection dbConnection = null;
 		try {
@@ -62,9 +64,18 @@ public class ProjectLevelDefaultCutoffs_SaveUpdate_UsingDBTransactionService {
 				entry.projectLevelDefaultFltrAnnCutoffs_CutoffAsStringValue_DTO.setProjectLevelDefaultFltrAnnCutoffs_CutoffAsStringValue_Id( entry.projectLevelDefaultFltrAnnCutoffs_DTO.getId() );
 				projectLevelDefaultFltrAnnCutoffs_CutoffAsStringValue_DAO.save( entry.projectLevelDefaultFltrAnnCutoffs_CutoffAsStringValue_DTO, dbConnection);
 			}
+			
+			ProjectLevelDefaultFltr_MinPSMs_DAO.getInstance().copyToPrevTable_ForProjectId( projectId, dbConnection );
+			ProjectLevelDefaultFltr_MinPSMs_DAO.getInstance().deleteAllFor_ProjectId( projectId, dbConnection );
+			if ( projectLevelDefaultFltr_MinPSMs_DTO != null ) {
+				ProjectLevelDefaultFltr_MinPSMs_DAO.getInstance().save( projectLevelDefaultFltr_MinPSMs_DTO, dbConnection );
+			}
+			
 			dbConnection.commit();
+			
 			///  Invalidate
-			ProjectLevelDefaultCutoffs_Cache.getSingletonInstance().invalidateProjectId( projectId );
+			
+			ProjectLevelDefaultCutoffsAndOthers_Cache.getSingletonInstance().invalidateProjectId( projectId );
 			
 			
 		} catch ( Exception e ) {

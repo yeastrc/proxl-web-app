@@ -18,6 +18,7 @@ import org.yeastrc.xlink.www.cached_data_mgmt.CachedDataCommonIF;
 import org.yeastrc.xlink.www.dto.ProjectLevelDefaultFltrAnnCutoffs_DTO;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappInternalErrorException;
 import org.yeastrc.xlink.www.searcher.ProjectLevelDefaultFltrAnnCutoffs_For_SettingSearchDefaults_Searcher;
+import org.yeastrc.xlink.www.searcher.ProjectLevelDefaultFltr_MinPSMs_Searcher;
 import org.yeastrc.xlink.www.searcher_via_cached_data.config_size_etc_central_code.CachedDataCentralConfigStorageAndProcessing;
 import org.yeastrc.xlink.www.searcher_via_cached_data.config_size_etc_central_code.CachedDataSizeOptions;
 
@@ -30,12 +31,12 @@ import com.google.common.cache.LoadingCache;
  * 
  * Singleton instance
  * 
- * Cache Key:  
- * Cache Value: 
+ * Cache Key:  Project Id
+ * Cache Value: Default Cutoffs, Default Min PSMs - All per Project Id
  */
-public class ProjectLevelDefaultCutoffs_Cache implements CachedDataCommonIF {
+public class ProjectLevelDefaultCutoffsAndOthers_Cache implements CachedDataCommonIF {
 
-	private static final Logger log = LoggerFactory.getLogger( ProjectLevelDefaultCutoffs_Cache.class);
+	private static final Logger log = LoggerFactory.getLogger( ProjectLevelDefaultCutoffsAndOthers_Cache.class);
 	
 	private static final int CACHE_MAX_SIZE_FULL_SIZE = 8000;
 	private static final int CACHE_MAX_SIZE_SMALL_FEW = 500;
@@ -54,16 +55,16 @@ public class ProjectLevelDefaultCutoffs_Cache implements CachedDataCommonIF {
 	/**
 	 * Static singleton instance
 	 */
-	private static ProjectLevelDefaultCutoffs_Cache _instance = null; //  Delay creating until first getInstance() call
+	private static ProjectLevelDefaultCutoffsAndOthers_Cache _instance = null; //  Delay creating until first getInstance() call
 
 	/**
 	 * Static get singleton instance
 	 * @return
 	 * @throws Exception 
 	 */
-	public static synchronized ProjectLevelDefaultCutoffs_Cache getSingletonInstance() throws Exception {
+	public static synchronized ProjectLevelDefaultCutoffsAndOthers_Cache getSingletonInstance() throws Exception {
 		if ( _instance == null ) {
-			_instance = new ProjectLevelDefaultCutoffs_Cache();
+			_instance = new ProjectLevelDefaultCutoffsAndOthers_Cache();
 		}
 		return _instance; 
 	}
@@ -71,7 +72,7 @@ public class ProjectLevelDefaultCutoffs_Cache implements CachedDataCommonIF {
 	/**
 	 * constructor
 	 */
-	private ProjectLevelDefaultCutoffs_Cache() {
+	private ProjectLevelDefaultCutoffsAndOthers_Cache() {
 		if ( log.isDebugEnabled() ) {
 			debugLogLevelEnabled = true;
 			log.debug( "debug log level enabled" );
@@ -108,6 +109,7 @@ public class ProjectLevelDefaultCutoffs_Cache implements CachedDataCommonIF {
 	
 	public static class ProjectLevelDefaultCutoffs_Cache_Result {
 		
+		private Integer minPSMsForProjectId;
 		private ProjectLevelDefaultCutoffs_Cache_Result_Per_Type reportedPeptide_ProjectLevelDefaultCutoffs_Cache_Result_Per_Type;
 		private ProjectLevelDefaultCutoffs_Cache_Result_Per_Type psm_ProjectLevelDefaultCutoffs_Cache_Result_Per_Type;
 		
@@ -116,6 +118,9 @@ public class ProjectLevelDefaultCutoffs_Cache implements CachedDataCommonIF {
 		}
 		public ProjectLevelDefaultCutoffs_Cache_Result_Per_Type getPsm_ProjectLevelDefaultCutoffs_Cache_Result_Per_Type() {
 			return psm_ProjectLevelDefaultCutoffs_Cache_Result_Per_Type;
+		}
+		public Integer getMinPSMsForProjectId() {
+			return minPSMsForProjectId;
 		}
 	}
 
@@ -162,13 +167,11 @@ public class ProjectLevelDefaultCutoffs_Cache implements CachedDataCommonIF {
 	}
 	
 	/**
-	 * @param searchIds
-	 * @param filterableDescriptiveAnnotationType
-	 * @param psmPeptideAnnotationType
+	 * @param projectId
 	 * @return
 	 * @throws Exception
 	 */
-	public ProjectLevelDefaultCutoffs_Cache_Result getDefaultCutoffs_ForProjectId( int projectId ) throws Exception {
+	public ProjectLevelDefaultCutoffs_Cache_Result getDefaultCutoffsAndOtherDefaults_ForProjectId( int projectId ) throws Exception {
 		
 		LocalCacheKey localCacheKey = new LocalCacheKey();
 		localCacheKey.projectId = projectId;
@@ -181,6 +184,7 @@ public class ProjectLevelDefaultCutoffs_Cache implements CachedDataCommonIF {
 		}
 
 		ProjectLevelDefaultCutoffs_Cache_Result response = new ProjectLevelDefaultCutoffs_Cache_Result();
+		response.minPSMsForProjectId = localCacheValue.minPSMsForProjectId;
 		response.reportedPeptide_ProjectLevelDefaultCutoffs_Cache_Result_Per_Type = localCacheValue.reportedPeptide_ProjectLevelDefaultCutoffs_Cache_Result_Per_Type;
 		response.psm_ProjectLevelDefaultCutoffs_Cache_Result_Per_Type = localCacheValue.psm_ProjectLevelDefaultCutoffs_Cache_Result_Per_Type;
 				
@@ -228,6 +232,7 @@ public class ProjectLevelDefaultCutoffs_Cache implements CachedDataCommonIF {
 	 */
 	private static class LocalCacheValue {
 
+		private Integer minPSMsForProjectId;
 		private ProjectLevelDefaultCutoffs_Cache_Result_Per_Type reportedPeptide_ProjectLevelDefaultCutoffs_Cache_Result_Per_Type;
 		private ProjectLevelDefaultCutoffs_Cache_Result_Per_Type psm_ProjectLevelDefaultCutoffs_Cache_Result_Per_Type;
 	}
@@ -238,9 +243,9 @@ public class ProjectLevelDefaultCutoffs_Cache implements CachedDataCommonIF {
 	 */
 	private static class CacheHolderInternal {
 
-		private ProjectLevelDefaultCutoffs_Cache parentObject;
+		private ProjectLevelDefaultCutoffsAndOthers_Cache parentObject;
 		
-		private CacheHolderInternal( ProjectLevelDefaultCutoffs_Cache parentObject ) {
+		private CacheHolderInternal( ProjectLevelDefaultCutoffsAndOthers_Cache parentObject ) {
 			this.parentObject = parentObject;
 		}
 		
@@ -283,12 +288,12 @@ public class ProjectLevelDefaultCutoffs_Cache implements CachedDataCommonIF {
 //				}
 				
 				int cacheTimeout = CACHE_TIMEOUT_FULL_SIZE;
-				cacheMaxSize = ProjectLevelDefaultCutoffs_Cache.CACHE_MAX_SIZE_FULL_SIZE;
+				cacheMaxSize = ProjectLevelDefaultCutoffsAndOthers_Cache.CACHE_MAX_SIZE_FULL_SIZE;
 				if ( cachedDataSizeOptions == CachedDataSizeOptions.HALF ) {
 					cacheMaxSize = cacheMaxSize / 2;
 				} else if ( cachedDataSizeOptions == CachedDataSizeOptions.SMALL
 						|| cachedDataSizeOptions == CachedDataSizeOptions.FEW ) {
-					cacheMaxSize = ProjectLevelDefaultCutoffs_Cache.CACHE_MAX_SIZE_SMALL_FEW;
+					cacheMaxSize = ProjectLevelDefaultCutoffsAndOthers_Cache.CACHE_MAX_SIZE_SMALL_FEW;
 					cacheTimeout = CACHE_TIMEOUT_SMALL;
 				}
 				
@@ -339,6 +344,8 @@ public class ProjectLevelDefaultCutoffs_Cache implements CachedDataCommonIF {
 			//   If would return null, throw ProxlWebappDataNotFoundException and catch at the .get(...)
 			//  value is NOT in cache so get it and return it
 			
+			Integer minPSMsForProjectId = ProjectLevelDefaultFltr_MinPSMs_Searcher.getInstance().getMinPSMsForProjectId( localCacheKey.projectId );
+			
 			List<ProjectLevelDefaultFltrAnnCutoffs_DTO> dbResultList =
 					ProjectLevelDefaultFltrAnnCutoffs_For_SettingSearchDefaults_Searcher.getInstance().getAllForProjectId( localCacheKey.projectId );
 			
@@ -377,12 +384,18 @@ public class ProjectLevelDefaultCutoffs_Cache implements CachedDataCommonIF {
 			psm_ProjectLevelDefaultCutoffs_Cache_Result_Per_Type.perSingleSearchProgramName_Key_SearchProgramName = psm_perSingleSearchName_Key_SearchName;
 			
 			LocalCacheValue localCacheValue = new LocalCacheValue();
+			localCacheValue.minPSMsForProjectId = minPSMsForProjectId;
 			localCacheValue.reportedPeptide_ProjectLevelDefaultCutoffs_Cache_Result_Per_Type = reportedPeptide_ProjectLevelDefaultCutoffs_Cache_Result_Per_Type;
 			localCacheValue.psm_ProjectLevelDefaultCutoffs_Cache_Result_Per_Type = psm_ProjectLevelDefaultCutoffs_Cache_Result_Per_Type;
 
 			return localCacheValue;
 		}
 
+		/**
+		 * @param entry
+		 * @param projectLevelDefaultFltrAnnCutoffs
+		 * @param perSingleSearchName_Key_SearchName
+		 */
 		private void loadFromDB_ProcessPerType( 
 				ProjectLevelDefaultFltrAnnCutoffs_DTO entry, 
 				List<ProjectLevelDefaultFltrAnnCutoffs_DTO> projectLevelDefaultFltrAnnCutoffs,

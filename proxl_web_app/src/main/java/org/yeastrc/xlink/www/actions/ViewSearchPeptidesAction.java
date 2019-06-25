@@ -27,9 +27,8 @@ import org.yeastrc.xlink.www.objects.ViewSearchPeptidesPageDataRoot;
 import org.yeastrc.xlink.www.constants.PeptideViewLinkTypesConstants;
 import org.yeastrc.xlink.www.constants.StrutsGlobalForwardNames;
 import org.yeastrc.xlink.www.constants.WebConstants;
-import org.yeastrc.xlink.www.cutoff_processing_web.GetDefaultPsmPeptideCutoffs;
+import org.yeastrc.xlink.www.cutoff_processing_web.Set__A_QueryBase_JSONRoot__Defaults;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
-import org.yeastrc.xlink.www.form_query_json_objects.CutoffValuesRootLevel;
 import org.yeastrc.xlink.www.form_query_json_objects.PeptideQueryJSONRoot;
 import org.yeastrc.xlink.www.form_utils.Update__A_QueryBase_JSONRoot__ForCurrentSearchIds;
 import org.yeastrc.xlink.www.forms.PeptideProteinCommonForm;
@@ -38,6 +37,7 @@ import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAut
 import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId;
 import org.yeastrc.xlink.www.web_utils.ExcludeLinksWith_Remove_NonUniquePSMs_Checkbox_PopRequestItems;
 import org.yeastrc.xlink.www.web_utils.GetAnnotationDisplayUserSelectionDetailsData;
+import org.yeastrc.xlink.www.web_utils.GetMinimumPSMsDefaultForProject_PutInRequestScope;
 import org.yeastrc.xlink.www.web_utils.GetPageHeaderData;
 import org.yeastrc.xlink.www.web_utils.GetSearchDetailsData;
 import org.yeastrc.xlink.www.web_utils.IsShowDownloadLinks_Skyline_SetRequestParameters;
@@ -158,6 +158,8 @@ public class ViewSearchPeptidesAction extends Action {
 				//  Populate request objects for Standard Search Display
 				GetSearchDetailsData.getInstance().getSearchDetailsData( search, searchesAreUserSorted, request );
 			}
+
+			GetMinimumPSMsDefaultForProject_PutInRequestScope.getSingletonInstance().getMinimumPSMsDefaultForProject_PutInRequestScope( projectId, request );
 			
 			//  Populate request objects for User Selection of Annotation Data Display
 			GetAnnotationDisplayUserSelectionDetailsData.getInstance().getSearchDetailsData( search, request );
@@ -207,10 +209,8 @@ public class ViewSearchPeptidesAction extends Action {
 			} else {
 				//  Query JSON in the form is empty so create an empty object that will be populated.
 				peptideQueryJSONRoot = new PeptideQueryJSONRoot();
-				CutoffValuesRootLevel cutoffValuesRootLevel =
-						GetDefaultPsmPeptideCutoffs.getInstance()
-						.getDefaultPsmPeptideCutoffs( projectId, projectSearchIdsSet, searchIdsSet, mapProjectSearchIdToSearchId );
-				peptideQueryJSONRoot.setCutoffs( cutoffValuesRootLevel );
+				Set__A_QueryBase_JSONRoot__Defaults.getInstance().set__A_QueryBase_JSONRoot__Defaults( peptideQueryJSONRoot, projectId, projectSearchIdsSet, searchIdsSet, mapProjectSearchIdToSearchId );
+				
 			}   //   END  ELSE of  if ( StringUtils.isNotEmpty( queryJSONFromForm ) ) {
 			
 			//   Update Link Type to default to Crosslink if no value was set

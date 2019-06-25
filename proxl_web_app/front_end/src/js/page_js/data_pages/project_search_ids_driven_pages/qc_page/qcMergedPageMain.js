@@ -115,6 +115,10 @@ var QCMergedPageMain = function() {
 	var _searchIdsObject_Key_projectSearchId = null;
 	
 	var _userOrderedProjectSearchIds = null;
+
+
+	let _defaultsCutoffsAndOthers = null;  // Passed from server code via DOM element JSOn
+
 	
 	var _colorsPerSearch = null;
 
@@ -238,6 +242,8 @@ var QCMergedPageMain = function() {
 			var objectThis = this;
 
 			this.populateConstantsFromPage();
+
+			this.getDefaultsFromPage();  //  Get the defaults out of the DOM placed by the Server Side Code and store in Javascript variables 
 
 			this.updatePageFiltersFromURLHash();
 
@@ -670,6 +676,41 @@ var QCMergedPageMain = function() {
 	};
 
 	/**
+	 * Get the defaults out of the DOM placed by the Server Side Code and store in Javascript variables 
+	 */
+	this.getDefaultsFromPage = function() {
+
+		const $default_values_cutoffs_others = $("#default_values_cutoffs_others");
+		const default_values_cutoffs_othersString = $default_values_cutoffs_others.val();
+
+		try {
+			const default_values_cutoffs_others = JSON.parse( default_values_cutoffs_othersString );
+
+			//  Copy only the properties that are set in the server side code
+			_defaultsCutoffsAndOthers = { cutoffs: default_values_cutoffs_others.cutoffs, minPSMs : default_values_cutoffs_others.minPSMs };
+
+		} catch( e2 ) {
+			throw Error( "Failed to parse default_values_cutoffs_othersString as JSON.  " +
+					"Error Message: " + e2.message +
+					".  default_values_cutoffs_othersString: |" +
+					default_values_cutoffs_othersString +
+					"|." );
+		}
+	}
+
+	/**
+	 * 
+	 */
+	this.getCutoffDefaults = function() {
+
+		const default_values_cutoffs = _defaultsCutoffsAndOthers.cutoffs;
+
+		return default_values_cutoffs;
+	}
+
+	///////////////////////////////////////////////////////////
+
+	/**
 	 * return bar color for link type
 	 */
 	this.getColorAndBarColorFromLinkType = function( linkType ) {
@@ -924,7 +965,7 @@ var QCMergedPageMain = function() {
 		if ( windowHash === "" || windowHash === "#" ) {
 			//  No Hash value so set defaults and return
 			jsonFromHash = { 
-					cutoffs : this.getCutoffDefaultsFromPage(),
+					cutoffs : this.getCutoffDefaults(),
 					linkTypes : _link_type_default_selected
 			};
 			return jsonFromHash;
@@ -985,14 +1026,14 @@ var QCMergedPageMain = function() {
 		var json = this.getRawJsonFromHash();
 		if ( json.cutoffs === undefined || json.cutoffs === null ) {
 			//  Set cutoff defaults if not in JSON
-			json.cutoffs = getCutoffDefaultsFromPage();
+			json.cutoffs = getCutoffDefaults();
 		}
 
 		//  START: Special update to allow projectSearchId values to be added or removed from URL
 		//  Update cutoffs to add defaults for search ids in defaults but not in cutoffs
 		//  Update cutoffs to remove search ids not in defaults but in cutoffs
 		var cutoffs_Searches = json.cutoffs.searches;
-		var cutoffDefaultsFromPage = this.getCutoffDefaultsFromPage();
+		var cutoffDefaultsFromPage = this.getCutoffDefaults();
 		var cutoffDefaultsFromPage_Searches = cutoffDefaultsFromPage.searches;
 		//  Update cutoffs_Searches with values from cutoffDefaultsFromPage
 		//      for any searches in cutoffDefaultsFromPage but not in cutoffs_Searches
@@ -1042,25 +1083,6 @@ var QCMergedPageMain = function() {
 			}
 		}
 	}
-
-	/**
-	 * 
-	 */
-	this.getCutoffDefaultsFromPage = function() {
-		var $cutoffValuesRootLevelCutoffDefaults = $("#cutoffValuesRootLevelCutoffDefaults");
-		var cutoffValuesRootLevelCutoffDefaultsString = $cutoffValuesRootLevelCutoffDefaults.val();
-		try {
-			var cutoffValuesRootLevelCutoffDefaults = JSON.parse( cutoffValuesRootLevelCutoffDefaultsString );
-		} catch( e2 ) {
-			throw Error( "Failed to parse cutoffValuesRootLevelCutoffDefaults string as JSON.  " +
-					"Error Message: " + e2.message +
-					".  cutoffValuesRootLevelCutoffDefaultsString: |" +
-					cutoffValuesRootLevelCutoffDefaultsString +
-			"|" );
-		}
-		return cutoffValuesRootLevelCutoffDefaults;
-	};
-	
 
 	/////////////////////////////////////////////////
 	/////////////////////////////////////////////////

@@ -5,9 +5,8 @@ import java.util.Collection;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
-import org.yeastrc.xlink.www.cutoff_processing_web.GetDefaultPsmPeptideCutoffs;
+import org.yeastrc.xlink.www.cutoff_processing_web.Set__A_QueryBase_JSONRoot__Defaults;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
-import org.yeastrc.xlink.www.form_query_json_objects.CutoffValuesRootLevel;
 import org.yeastrc.xlink.www.form_query_json_objects.ProteinQueryJSONRoot;
 import org.yeastrc.xlink.www.forms.ProteinCommonForm;
 import com.fasterxml.jackson.core.JsonParseException;
@@ -74,10 +73,8 @@ public class GetProteinQueryJSONRootFromFormData {
 		} else {
 			//  Query JSON in the form is empty so create an empty object that will be populated.
 			proteinQueryJSONRoot = new ProteinQueryJSONRoot();
-			CutoffValuesRootLevel cutoffValuesRootLevel =
-					GetDefaultPsmPeptideCutoffs.getInstance()
-					.getDefaultPsmPeptideCutoffs( projectId,projectSearchIds, searchIds, mapProjectSearchIdToSearchId );
-			proteinQueryJSONRoot.setCutoffs( cutoffValuesRootLevel );
+
+			Set__A_QueryBase_JSONRoot__Defaults.getInstance().set__A_QueryBase_JSONRoot__Defaults( proteinQueryJSONRoot, projectId,projectSearchIds, searchIds, mapProjectSearchIdToSearchId );
 		}
 ////////////  An experiment that goes with the function getEncodedExcludeProteins in the JS
 //		UpdateProteinQueryJSONRootWithFormData.getInstance().updateProteinQueryJSONRootWithFormData( proteinQueryJSONRoot, proteinCommonForm );

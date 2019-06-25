@@ -17,6 +17,7 @@ import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.database_update_with_transaction_services.ProjectLevelDefaultCutoffs_SaveUpdate_UsingDBTransactionService;
 import org.yeastrc.xlink.www.dto.ProjectLevelDefaultFltrAnnCutoffs_CutoffAsStringValue_DTO;
 import org.yeastrc.xlink.www.dto.ProjectLevelDefaultFltrAnnCutoffs_DTO;
+import org.yeastrc.xlink.www.dto.ProjectLevelDefaultFltr_MinPSMs_DTO;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappInternalErrorException;
 import org.yeastrc.xlink.www.user_session_management.UserSession;
 import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result;
@@ -75,6 +76,18 @@ public class ProjectLevelDefaultCutoffs_SaveUpdateEntries_ForProjectId_Service {
 		    	        .build()
 		    	        );
 		}
+		
+		Integer minPSMs = webserviceRequest.minPSMs;
+
+//		if ( minPSMs == null || minPSMs == 0 ) {
+//			String msg = ": Provided minPSMs is not provided or is zero";
+//			log.error( msg );
+//		    throw new WebApplicationException(
+//		    	      Response.status(WebServiceErrorMessageConstants.INVALID_PARAMETER_STATUS_CODE)  //  return 400 error
+//		    	        .entity( WebServiceErrorMessageConstants.INVALID_PARAMETER_TEXT )
+//		    	        .build()
+//		    	        );
+//		}
 
 		WebserviceRequest_CutoffValues cutoffValues = webserviceRequest.cutoffValues;
 
@@ -87,7 +100,6 @@ public class ProjectLevelDefaultCutoffs_SaveUpdateEntries_ForProjectId_Service {
 		    	        .build()
 		    	        );
 		}
-		
 		
 		try {
 			GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result accessAndSetupWebSessionResult =
@@ -184,8 +196,16 @@ public class ProjectLevelDefaultCutoffs_SaveUpdateEntries_ForProjectId_Service {
 					entriesToSave.add( entry );
 				}
 			}
+			ProjectLevelDefaultFltr_MinPSMs_DTO projectLevelDefaultFltr_MinPSMs_DTO = null;
+			if ( minPSMs != null ){
+				projectLevelDefaultFltr_MinPSMs_DTO = new ProjectLevelDefaultFltr_MinPSMs_DTO();
+				projectLevelDefaultFltr_MinPSMs_DTO.setProjectId( projectId );
+				projectLevelDefaultFltr_MinPSMs_DTO.setMinPSMs( minPSMs );
+				projectLevelDefaultFltr_MinPSMs_DTO.setCreatedAuthUserId( authUserId );
+				projectLevelDefaultFltr_MinPSMs_DTO.setLastUpdatedAuthUserId( authUserId );
+			}
 			
-			ProjectLevelDefaultCutoffs_SaveUpdate_UsingDBTransactionService.getInstance().saveUpdate( projectId, entriesToSave );
+			ProjectLevelDefaultCutoffs_SaveUpdate_UsingDBTransactionService.getInstance().saveUpdate( projectId, entriesToSave, projectLevelDefaultFltr_MinPSMs_DTO );
 			
 			WebserviceResult result = new WebserviceResult();
 			result.status = true;
@@ -212,12 +232,16 @@ public class ProjectLevelDefaultCutoffs_SaveUpdateEntries_ForProjectId_Service {
 		
 		private Integer projectId;
 		private WebserviceRequest_CutoffValues cutoffValues;
+		private Integer minPSMs;
 
 		public void setProjectId(Integer projectId) {
 			this.projectId = projectId;
 		}
 		public void setCutoffValues(WebserviceRequest_CutoffValues cutoffValues) {
 			this.cutoffValues = cutoffValues;
+		}
+		public void setMinPSMs(Integer minPSMs) {
+			this.minPSMs = minPSMs;
 		}
 	}
 

@@ -21,6 +21,7 @@ import org.yeastrc.xlink.www.dao.SearchDAO;
 import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.www.dao.ConfigSystemDAO;
 import org.yeastrc.xlink.www.form_query_json_objects.CutoffValuesRootLevel;
+import org.yeastrc.xlink.www.form_query_json_objects.ImageStructure_QC_QueryJSONRoot;
 import org.yeastrc.xlink.www.forms.MergedSearchViewProteinsForm;
 import org.yeastrc.xlink.www.forms.PeptideProteinCommonForm;
 import org.yeastrc.xlink.www.access_control.result_objects.WebSessionAuthAccessLevel;
@@ -29,6 +30,7 @@ import org.yeastrc.xlink.www.constants.ConfigSystemsKeysConstants;
 import org.yeastrc.xlink.www.constants.StrutsGlobalForwardNames;
 import org.yeastrc.xlink.www.constants.WebConstants;
 import org.yeastrc.xlink.www.cutoff_processing_web.GetDefaultPsmPeptideCutoffs;
+import org.yeastrc.xlink.www.cutoff_processing_web.Set__A_QueryBase_JSONRoot__Defaults;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
 import org.yeastrc.xlink.www.searcher.ProteinSequenceVersionIdAnnotationNameSearcher;
 import org.yeastrc.xlink.www.searcher.SearchModMassDistinctSearcher;
@@ -38,6 +40,7 @@ import org.yeastrc.xlink.www.web_utils.AnyPDBFilesForProjectId;
 import org.yeastrc.xlink.www.web_utils.CombineProteinAnnNamesForSameSeqVId;
 import org.yeastrc.xlink.www.web_utils.GetAnnotationDisplayUserSelectionDetailsData;
 import org.yeastrc.xlink.www.web_utils.GetCutoffsAppliedOnImport;
+import org.yeastrc.xlink.www.web_utils.GetMinimumPSMsDefaultForProject_PutInRequestScope;
 import org.yeastrc.xlink.www.web_utils.GetPageHeaderData;
 import org.yeastrc.xlink.www.web_utils.GetSearchDetailsData;
 import org.yeastrc.xlink.www.web_utils.ProjectSearchIdsSearchIds_SetRequestParameter;
@@ -209,6 +212,8 @@ public class ViewMergedSearchQCAction extends Action {
 				GetSearchDetailsData.getInstance().getSearchDetailsData( searches, searchesAreUserSorted, request );
 			}
 
+			GetMinimumPSMsDefaultForProject_PutInRequestScope.getSingletonInstance().getMinimumPSMsDefaultForProject_PutInRequestScope( projectId, request );
+			
 			//  Populate request objects for User Selection of Annotation Data Display
 			GetAnnotationDisplayUserSelectionDetailsData.getInstance().getSearchDetailsData( searches, request );
 			
@@ -275,14 +280,14 @@ public class ViewMergedSearchQCAction extends Action {
 //				throw new ProxlWebappInternalErrorException(msg);
 			}
 			
-			/////////////////////////////////////////////////////////////////////////////
-			////////   Generic Param processing
-			CutoffValuesRootLevel cutoffValuesRootLevelCutoffDefaults =
-					GetDefaultPsmPeptideCutoffs.getInstance()
-					.getDefaultPsmPeptideCutoffs( projectId, projectSearchIdsListDeduppedSorted, searchIds, mapProjectSearchIdToSearchId );
-			String cutoffValuesRootLevelCutoffDefaultsJSONString = jacksonJSON_Mapper.writeValueAsString( cutoffValuesRootLevelCutoffDefaults );
-			request.setAttribute( "cutoffValuesRootLevelCutoffDefaults", cutoffValuesRootLevelCutoffDefaultsJSONString );
-			//  This builds an object for the cutoff selection block on the page
+			{
+				/////////////////////////////////////////////////////////////////////////////
+				////////   Defaults to put on page for Javascript to read
+				ImageStructure_QC_QueryJSONRoot defaultsQueryJSON = new ImageStructure_QC_QueryJSONRoot();
+				Set__A_QueryBase_JSONRoot__Defaults.getInstance().set__A_QueryBase_JSONRoot__Defaults( defaultsQueryJSON, projectId, projectSearchIdsListDeduppedSorted, searchIdsListDeduppedSorted, mapProjectSearchIdToSearchId) ;
+				String defaultsQueryJSONString = jacksonJSON_Mapper.writeValueAsString( defaultsQueryJSON );
+				request.setAttribute( "default_values_cutoffs_others", defaultsQueryJSONString );
+			}
 			
 			//  So certain sections treat this like coverage page.  ie: no selection of annotation data to display
 			request.setAttribute( "coveragePageForAnnDispMgmt", true );

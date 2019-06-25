@@ -17,6 +17,7 @@ import org.yeastrc.xlink.www.access_control.result_objects.WebSessionAuthAccessL
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
 import org.yeastrc.xlink.www.searcher.ProjectLevelDefaultFltrAnnCutoffs_For_DisplayOnMgmtPage_Searcher;
+import org.yeastrc.xlink.www.searcher.ProjectLevelDefaultFltr_MinPSMs_Searcher;
 import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result;
 import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId;
 import org.yeastrc.xlink.www.web_utils.UnmarshalJSON_ToObject;
@@ -138,11 +139,18 @@ public class ProjectLevelDefaultCutoffs_GetExistingEntries_ForProjectId_Service 
 					throw new ProxlWebappDataException( msg );
 				}
 			}
+			
+			Integer minPSMs = ProjectLevelDefaultFltr_MinPSMs_Searcher.getInstance().getMinPSMsForProjectId( projectId );
+			
+//			if ( minPSMs == null ) {
+//				minPSMs = MinimumPSMsConstants.MINIMUM_PSMS_DEFAULT; // Not in DB so set to default minimum value
+//			}
 
 			WebserviceResult result = new WebserviceResult();
 			
 			result.reportedPeptideEntriesList = reportedPeptideEntriesList;
 			result.psmEntriesList = psmEntriesList;
+			result.minPSMs = minPSMs;
 			
 			return result;
 			
@@ -167,12 +175,19 @@ public class ProjectLevelDefaultCutoffs_GetExistingEntries_ForProjectId_Service 
 		
 		private List<WebserviceResultEntry> reportedPeptideEntriesList;
 		private List<WebserviceResultEntry> psmEntriesList;
+		private Integer minPSMs;
 
 		public List<WebserviceResultEntry> getReportedPeptideEntriesList() {
 			return reportedPeptideEntriesList;
 		}
 		public List<WebserviceResultEntry> getPsmEntriesList() {
 			return psmEntriesList;
+		}
+		public Integer getMinPSMs() {
+			return minPSMs;
+		}
+		public void setMinPSMs(Integer minPSMs) {
+			this.minPSMs = minPSMs;
 		}
 	}
 	

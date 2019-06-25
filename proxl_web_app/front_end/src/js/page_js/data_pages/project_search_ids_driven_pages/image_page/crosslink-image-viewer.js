@@ -699,6 +699,8 @@ var ImagePagePrimaryRootCodeClass = function() {
 	var _projectSearchIds;
 	var _projectSearchIdsUserOrdered = "";
 
+	let _defaultsCutoffsAndOthers = undefined;
+
 	//  Loaded data:
 	
 	var _allLinkersSupportedForLinkablePositions = undefined; // true or false returned from webservice
@@ -870,7 +872,7 @@ var ImagePagePrimaryRootCodeClass = function() {
 		if ( windowHash === "" || windowHash === "#" ) {
 			//  No Hash value so set defaults and return
 			jsonFromHash = { 
-					cutoffs : getCutoffDefaultsFromPage(),
+					cutoffs : getCutoffDefaults(),
 					'excludeType' : EXCLUDE_LINK_TYPE_DEFAULT
 			};
 			return jsonFromHash;
@@ -944,13 +946,13 @@ var ImagePagePrimaryRootCodeClass = function() {
 		}
 		if ( json.cutoffs === undefined || json.cutoffs === null ) {
 			//  Set cutoff defaults if not in JSON
-			json.cutoffs = getCutoffDefaultsFromPage();
+			json.cutoffs = getCutoffDefaults();
 		}
 		//  START: Special update to allow projectSearchId values to be added or removed from URL
 		//  Update cutoffs to add defaults for search ids in defaults but not in cutoffs
 		//  Update cutoffs to remove search ids not in defaults but in cutoffs
 		var cutoffs_Searches = json.cutoffs.searches;
-		var cutoffDefaultsFromPage = getCutoffDefaultsFromPage();
+		var cutoffDefaultsFromPage = getCutoffDefaults();
 		var cutoffDefaultsFromPage_Searches = cutoffDefaultsFromPage.searches;
 		//  Update cutoffs_Searches with values from cutoffDefaultsFromPage
 		//      for any searches in cutoffDefaultsFromPage but not in cutoffs_Searches
@@ -981,24 +983,6 @@ var ImagePagePrimaryRootCodeClass = function() {
 			json[ 'excludeType' ] = EXCLUDE_LINK_TYPE_DEFAULT;
 		}
 		return json;
-	}
-
-	/**
-	 * 
-	 */
-	function getCutoffDefaultsFromPage() {
-		var $cutoffValuesRootLevelCutoffDefaults = $("#cutoffValuesRootLevelCutoffDefaults");
-		var cutoffValuesRootLevelCutoffDefaultsString = $cutoffValuesRootLevelCutoffDefaults.val();
-		try {
-			var cutoffValuesRootLevelCutoffDefaults = JSON.parse( cutoffValuesRootLevelCutoffDefaultsString );
-		} catch( e2 ) {
-			throw Error( "Failed to parse cutoffValuesRootLevelCutoffDefaults string as JSON.  " +
-					"Error Message: " + e2.message +
-					".  cutoffValuesRootLevelCutoffDefaultsString: |" +
-					cutoffValuesRootLevelCutoffDefaultsString +
-					"|" );
-		}
-		return cutoffValuesRootLevelCutoffDefaults;
 	}
 
 	/**
@@ -6141,6 +6125,42 @@ var ImagePagePrimaryRootCodeClass = function() {
 		} );
 	}
 
+
+	/**
+	 * Get the defaults out of the DOM placed by the Server Side Code and store in Javascript variables 
+	 */
+	let getDefaultsFromPage = function() {
+
+		const $default_values_cutoffs_others = $("#default_values_cutoffs_others");
+		const default_values_cutoffs_othersString = $default_values_cutoffs_others.val();
+
+		try {
+			const default_values_cutoffs_others = JSON.parse( default_values_cutoffs_othersString );
+
+			//  Copy only the properties that are set in the server side code
+			_defaultsCutoffsAndOthers = { cutoffs: default_values_cutoffs_others.cutoffs, minPSMs : default_values_cutoffs_others.minPSMs };
+
+		} catch( e2 ) {
+			throw Error( "Failed to parse default_values_cutoffs_othersString as JSON.  " +
+					"Error Message: " + e2.message +
+					".  default_values_cutoffs_othersString: |" +
+					default_values_cutoffs_othersString +
+					"|." );
+		}
+	}
+
+	/**
+	 * 
+	 */
+	let getCutoffDefaults = function() {
+
+		const default_values_cutoffs = _defaultsCutoffsAndOthers.cutoffs;
+
+		return default_values_cutoffs;
+	}
+
+
+
 	//////////////////////////////////////////////////
 
 	/**
@@ -6148,6 +6168,9 @@ var ImagePagePrimaryRootCodeClass = function() {
 	 */
 	function initPage() {
 		console.log( "Initializing the page." );
+
+		getDefaultsFromPage();
+
 		// convert old JSON
 		console.log( "\tPerforming necessary legacy JSON updates." );
 		var _legacyJSONUpdater = new LegacyJSONUpdater();

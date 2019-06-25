@@ -57,8 +57,10 @@
 			onclick="minimumPSM_Count_Filter.openOverlay();"
 			>Minimum PSMs: <img src="images/icon-edit-small.png" onclick="minimumPSM_Count_Filter.openOverlay()"></span>
 			
+		 <script type="text/text" id="minimum_psm_count_default_value">${ minimum_psm_count_default_value }</script>
+<%-- WAS:
 		 <script type="text/text" id="minimum_psm_count_default_value"><%= MinimumPSMsConstants.MINIMUM_PSMS_DEFAULT %></script>
-			
+--%>			
 		</td>
 		<td>
 		  

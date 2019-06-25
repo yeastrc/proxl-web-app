@@ -17,11 +17,11 @@ import org.yeastrc.xlink.www.exceptions.ProxlWebappDBDataOutOfSyncException;
 import org.yeastrc.xlink.www.form_query_json_objects.CutoffValuesAnnotationLevel;
 import org.yeastrc.xlink.www.form_query_json_objects.CutoffValuesRootLevel;
 import org.yeastrc.xlink.www.form_query_json_objects.CutoffValuesSearchLevel;
-import org.yeastrc.xlink.www.project_level_default_cutoffs.ProjectLevelDefaultCutoffs_Cache;
-import org.yeastrc.xlink.www.project_level_default_cutoffs.ProjectLevelDefaultCutoffs_Cache.ProjectLevelDefaultCutoffs_Cache_Result;
-import org.yeastrc.xlink.www.project_level_default_cutoffs.ProjectLevelDefaultCutoffs_Cache.ProjectLevelDefaultCutoffs_Cache_Result_Per_AnnotationTypeName;
-import org.yeastrc.xlink.www.project_level_default_cutoffs.ProjectLevelDefaultCutoffs_Cache.ProjectLevelDefaultCutoffs_Cache_Result_Per_SearchProgramName;
-import org.yeastrc.xlink.www.project_level_default_cutoffs.ProjectLevelDefaultCutoffs_Cache.ProjectLevelDefaultCutoffs_Cache_Result_Per_Type;
+import org.yeastrc.xlink.www.project_level_default_cutoffs.ProjectLevelDefaultCutoffsAndOthers_Cache;
+import org.yeastrc.xlink.www.project_level_default_cutoffs.ProjectLevelDefaultCutoffsAndOthers_Cache.ProjectLevelDefaultCutoffs_Cache_Result;
+import org.yeastrc.xlink.www.project_level_default_cutoffs.ProjectLevelDefaultCutoffsAndOthers_Cache.ProjectLevelDefaultCutoffs_Cache_Result_Per_AnnotationTypeName;
+import org.yeastrc.xlink.www.project_level_default_cutoffs.ProjectLevelDefaultCutoffsAndOthers_Cache.ProjectLevelDefaultCutoffs_Cache_Result_Per_SearchProgramName;
+import org.yeastrc.xlink.www.project_level_default_cutoffs.ProjectLevelDefaultCutoffsAndOthers_Cache.ProjectLevelDefaultCutoffs_Cache_Result_Per_Type;
 import org.yeastrc.xlink.www.search_programs_per_search_utils.GetSearchProgramsPerSearchData;
 import org.yeastrc.xlink.www.searcher.CutoffsAppliedOnImportSearcher;
 /**
@@ -51,12 +51,13 @@ public class GetDefaultPsmPeptideCutoffs {
 	public CutoffValuesRootLevel getDefaultPsmPeptideCutoffs(
 			int projectId,
 			Collection<Integer> projectSearchIds,
-			Collection<Integer> searchIds, Map<Integer,Integer> mapProjectSearchIdToSearchId
+			Collection<Integer> searchIds, 
+			Map<Integer,Integer> mapProjectSearchIdToSearchId
 			) throws Exception {
 
 		//  Retrieve this here so only retrieve once
 		ProjectLevelDefaultCutoffs_Cache_Result projectLevelDefaultCutoffs_Cache_Result =
-				ProjectLevelDefaultCutoffs_Cache.getSingletonInstance().getDefaultCutoffs_ForProjectId( projectId );
+				ProjectLevelDefaultCutoffsAndOthers_Cache.getSingletonInstance().getDefaultCutoffsAndOtherDefaults_ForProjectId( projectId );
 		
 		ProjectLevelDefaultCutoffs_Cache_Result_Per_Type reportedPeptide_ProjectLevelDefaultCutoffs_Cache_Result_Per_Type = projectLevelDefaultCutoffs_Cache_Result.getReportedPeptide_ProjectLevelDefaultCutoffs_Cache_Result_Per_Type();
 		ProjectLevelDefaultCutoffs_Cache_Result_Per_Type psm_ProjectLevelDefaultCutoffs_Cache_Result_Per_Type = projectLevelDefaultCutoffs_Cache_Result.getPsm_ProjectLevelDefaultCutoffs_Cache_Result_Per_Type();

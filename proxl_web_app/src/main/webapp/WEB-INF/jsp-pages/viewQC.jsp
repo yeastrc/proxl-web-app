@@ -115,7 +115,7 @@
 				
 			<%--  Hidden fields to pass data to JS --%>
 			
-			<input type="hidden" id="cutoffValuesRootLevelCutoffDefaults" value="<c:out value="${ cutoffValuesRootLevelCutoffDefaults }"></c:out>"> 
+			<input type="hidden" id="default_values_cutoffs_others" value='<c:out value="${ default_values_cutoffs_others }"></c:out>' >
 			
 				<%--  A block outside any form for PSM Peptide cutoff JS code --%>
 				<%@ include file="/WEB-INF/jsp-includes/psmPeptideCutoffBlock_outsideAnyForm.jsp" %>

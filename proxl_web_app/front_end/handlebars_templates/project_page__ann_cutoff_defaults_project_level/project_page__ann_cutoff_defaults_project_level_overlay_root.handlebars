@@ -18,7 +18,7 @@
     <div class="project-level-ann-cutoff-defaults-modal-dialog-overlay-body selector_project_page__ann_cutoff_defaults_project_level_body " 
         style="max-height: {{ mainBodyMaxHeight }}px; overflow-y: auto;">
                  
-        <div style="margin-top: 10px; margin-bottom: 10px;">
+        <div style="margin-top: 10px; margin-bottom: 20px;">
             <div >
                 All data in project will be filtered using these values.
             </div>
@@ -26,8 +26,27 @@
                 Remove all values to disable project-level filtering.
             </div>
         </div>
+
+        <style >
+            #project_page__ann_cutoff_defaults_project_level_main_table td { padding-left: 0px; }
+        </style>
+
       <table border="0" id="project_page__ann_cutoff_defaults_project_level_main_table" class=" main-cutoffs-table " >
         <tbody >
+            <tr>
+                <td style="font-weight: bold;">
+                    Min PSMs
+                </td>
+                <td>
+                    <input type="text" maxlength="30" style="width: 150px;"
+                        id="project_page__ann_cutoff_defaults_project_level_psms_min">
+                </td>
+                <td>
+                    <div id="project_page__ann_cutoff_defaults_project_level_psms_min_invalid_entry" class=" error-text " style=" display: none;" >
+                        Invalid value.  Must be positive integer or empty field.
+                    </div>
+                </td>
+            </tr>
         </tbody>            
       </table>
 

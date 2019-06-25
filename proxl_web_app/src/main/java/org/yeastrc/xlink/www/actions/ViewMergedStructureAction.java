@@ -23,8 +23,10 @@ import org.yeastrc.xlink.www.constants.ConfigSystemsKeysConstants;
 import org.yeastrc.xlink.www.constants.StrutsGlobalForwardNames;
 import org.yeastrc.xlink.www.constants.WebConstants;
 import org.yeastrc.xlink.www.cutoff_processing_web.GetDefaultPsmPeptideCutoffs;
+import org.yeastrc.xlink.www.cutoff_processing_web.Set__A_QueryBase_JSONRoot__Defaults;
 import org.yeastrc.xlink.www.dao.ConfigSystemDAO;
 import org.yeastrc.xlink.www.form_query_json_objects.CutoffValuesRootLevel;
+import org.yeastrc.xlink.www.form_query_json_objects.ImageStructure_QC_QueryJSONRoot;
 import org.yeastrc.xlink.www.forms.MergedSearchViewProteinsForm;
 import org.yeastrc.xlink.www.forms.PeptideProteinCommonForm;
 import org.yeastrc.xlink.www.access_control.result_objects.WebSessionAuthAccessLevel;
@@ -33,6 +35,7 @@ import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAut
 import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId;
 import org.yeastrc.xlink.www.web_utils.ExcludeLinksWith_Remove_NonUniquePSMs_Checkbox_PopRequestItems;
 import org.yeastrc.xlink.www.web_utils.GetAnnotationDisplayUserSelectionDetailsData;
+import org.yeastrc.xlink.www.web_utils.GetMinimumPSMsDefaultForProject_PutInRequestScope;
 import org.yeastrc.xlink.www.web_utils.GetPageHeaderData;
 import org.yeastrc.xlink.www.web_utils.GetSearchDetailsData;
 import org.yeastrc.xlink.www.web_utils.ProjectSearchIdsSearchIds_SetRequestParameter;
@@ -201,6 +204,8 @@ public class ViewMergedStructureAction extends Action {
 				//  Populate request objects for Standard Search Display
 				GetSearchDetailsData.getInstance().getSearchDetailsData( searches, searchesAreUserSorted, request );
 			}
+
+			GetMinimumPSMsDefaultForProject_PutInRequestScope.getSingletonInstance().getMinimumPSMsDefaultForProject_PutInRequestScope( projectId, request );
 			
 			//  Populate request objects for User Selection of Annotation Data Display
 			GetAnnotationDisplayUserSelectionDetailsData.getInstance().getSearchDetailsData( searches, request );
@@ -211,14 +216,15 @@ public class ViewMergedStructureAction extends Action {
 					ConfigSystemDAO.getInstance().getConfigValueForConfigKey( ConfigSystemsKeysConstants.PROTEIN_ANNOTATION_WEBSERVICE_URL_KEY );
 			request.setAttribute( "annotation_data_webservice_base_url", annotation_data_webservice_base_url );
 			
-			/////////////////////////////////////////////////////////////////////////////
-			////////   Generic Param processing
-			CutoffValuesRootLevel cutoffValuesRootLevelCutoffDefaults =
-					GetDefaultPsmPeptideCutoffs.getInstance()
-					.getDefaultPsmPeptideCutoffs( projectId, projectSearchIdsListDedupped_SortedIfNeeded, searchIds, mapProjectSearchIdToSearchId );
-			String cutoffValuesRootLevelCutoffDefaultsJSONString = jacksonJSON_Mapper.writeValueAsString( cutoffValuesRootLevelCutoffDefaults );
-			request.setAttribute( "cutoffValuesRootLevelCutoffDefaults", cutoffValuesRootLevelCutoffDefaultsJSONString );
-
+			{
+				/////////////////////////////////////////////////////////////////////////////
+				////////   Defaults to put on page for Javascript to read
+				ImageStructure_QC_QueryJSONRoot defaultsQueryJSON = new ImageStructure_QC_QueryJSONRoot();
+				Set__A_QueryBase_JSONRoot__Defaults.getInstance().set__A_QueryBase_JSONRoot__Defaults( defaultsQueryJSON, projectId, projectSearchIdsListDedupped_SortedIfNeeded, searchIdsListDeduppedSorted, mapProjectSearchIdToSearchId) ;
+				String defaultsQueryJSONString = jacksonJSON_Mapper.writeValueAsString( defaultsQueryJSON );
+				request.setAttribute( "default_values_cutoffs_others", defaultsQueryJSONString );
+			}
+			
 		} catch ( Exception e ) {
 			String msg = "Exception caught: " + e.toString();
 			log.error( msg, e );

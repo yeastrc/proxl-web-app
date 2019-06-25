@@ -1,0 +1,41 @@
+
+--  2019_06_Update_2__add__project_level_default_fltr_min_psms.txt
+
+CREATE TABLE IF NOT EXISTS project_level_default_fltr_min_psms_tbl (
+  id INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  project_id INT(10) UNSIGNED NOT NULL,
+  min_psms INT NOT NULL,
+  created_auth_user_id INT UNSIGNED NOT NULL,
+  created_date_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  last_updated_auth_user_id INT NOT NULL,
+  last_updated_date_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  CONSTRAINT project_level_default_fltr_min_psms_tbl
+    FOREIGN KEY (project_id)
+    REFERENCES project (id)
+    ON DELETE CASCADE
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+COMMENT = 'User Entered Min PSMs that apply to all searches in the proj' /* comment truncated */ /*ect*/;
+
+
+CREATE TABLE  project_level_default_fltr_min_psms_prev_tbl (
+  id INT(10) UNSIGNED NOT NULL,
+  project_id INT(10) UNSIGNED NOT NULL,
+  min_psms INT NOT NULL,
+  created_auth_user_id INT UNSIGNED NOT NULL,
+  created_date_time DATETIME NOT NULL,
+  last_updated_auth_user_id INT NOT NULL,
+  last_updated_date_time DATETIME NOT NULL,
+  id_prev_record INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  copy_create_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id_prev_record),
+  CONSTRAINT project_level_default_fltr_min_psms_prev_tbl
+    FOREIGN KEY (project_id)
+    REFERENCES project (id)
+    ON DELETE CASCADE
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+COMMENT = 'User Entered Min PSMs that apply to all searches in the proj' /* comment truncated */ /*ect*/;
+
+

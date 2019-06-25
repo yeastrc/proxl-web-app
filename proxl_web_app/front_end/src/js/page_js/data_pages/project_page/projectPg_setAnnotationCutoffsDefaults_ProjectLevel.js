@@ -297,6 +297,8 @@ class ProjectPg_setAnnotationCutoffsDefaults_ProjectLevel_Overlay {
 
         const displayObjects = this._createDisplayObjectsFromWebserviceResponseData({ responseData });
 
+        const minPSMs = responseData.existingEntriesResponse.minPSMs;
+
         const $body = $( "body" );
 
         {
@@ -332,6 +334,15 @@ class ProjectPg_setAnnotationCutoffsDefaults_ProjectLevel_Overlay {
                 const html = this._project_page__ann_cutoff_defaults_project_level_overlay_root_Template( rootContext );
                 $overlay = $( html )
                 $overlay.appendTo( $body );
+            }
+
+            {
+                const $project_page__ann_cutoff_defaults_project_level_psms_min = $("#project_page__ann_cutoff_defaults_project_level_psms_min");
+                if ( $project_page__ann_cutoff_defaults_project_level_psms_min.length === 0 ) {
+                    throw Error("No DOM element with id 'project_page__ann_cutoff_defaults_project_level_psms_min'");
+                }
+                $project_page__ann_cutoff_defaults_project_level_psms_min.val( minPSMs );
+                this._add_MinPSM_InputField__OnChange_Processing({ $project_page__ann_cutoff_defaults_project_level_psms_min });
             }
 
             const $project_page__ann_cutoff_defaults_project_level_main_table = $overlay.find("#project_page__ann_cutoff_defaults_project_level_main_table");
@@ -449,6 +460,76 @@ class ProjectPg_setAnnotationCutoffsDefaults_ProjectLevel_Overlay {
         }
     }
 
+    //////////  Validate Min PSM Value
+
+    /**
+     * 
+     */
+    _add_MinPSM_InputField__OnChange_Processing({ $project_page__ann_cutoff_defaults_project_level_psms_min }) {
+
+        const project_page__ann_cutoff_defaults_project_level_psms_min_DOM = $project_page__ann_cutoff_defaults_project_level_psms_min[ 0 ];
+
+        project_page__ann_cutoff_defaults_project_level_psms_min_DOM.addEventListener('input', ( eventObject ) => {
+            try {
+                eventObject.preventDefault();
+                // console.log("'input' fired");
+                const eventTarget = eventObject.target;
+                // const inputBoxValue = eventTarget.value;
+                // console.log("'input' fired. inputBoxValue: " + inputBoxValue );
+                const $eventTarget = $( eventTarget );
+                const $selector_invalid_entry = $("#project_page__ann_cutoff_defaults_project_level_psms_min_invalid_entry");
+                var fieldValue = $eventTarget.val();
+                if ( ! this._isFieldValueValidMinimumPSMValue({ fieldValue }) ) {
+                    $selector_invalid_entry.show();
+
+                    if ( this._minPSMs_Entry_Valid ) {
+                        this._minPSMs_Entry_Valid = false;
+
+                        //  Value changed so update dependent items
+                        this._update_enable_disable_SaveButton();
+                    }
+                } else {
+                    $selector_invalid_entry.hide();
+
+                    if ( ! this._minPSMs_Entry_Valid ) {
+                        this._minPSMs_Entry_Valid = true;
+
+                        //  Value changed so update dependent items
+                        this._update_enable_disable_SaveButton();
+                    }
+                }
+                return false;
+            } catch( e ) {
+                reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+                throw e;
+            }
+        });
+    }
+
+	_isFieldValueValidMinimumPSMValue({ fieldValue }) {
+		if ( fieldValue === "" ) {
+			return true;
+        }
+        if ( fieldValue === "0" ) {
+			return false;
+        }
+		// only test for valid cutoff value if not empty string
+		if ( !  /^[+]?(\d+)$/.test( fieldValue ) ) {
+			//  cutoff value is not a valid integer number
+			return false; 
+        }
+        const valueNumber = Number.parseInt( fieldValue );
+        if ( Number.isNaN( valueNumber ) ) {
+            return false;
+        }
+        if ( valueNumber < 1 ) {
+            return false;
+        }
+		return true;
+    };
+    
+    //////////  Validate Filterable Annotation Cutoff Value
+
     /**
      * 
      */
@@ -475,7 +556,7 @@ class ProjectPg_setAnnotationCutoffsDefaults_ProjectLevel_Overlay {
                 const $selector_ann_type_containing_row = $eventTarget.closest(".selector_ann_type_containing_row");
                 const $selector_invalid_entry = $selector_ann_type_containing_row.find(".selector_invalid_entry");
                 var fieldValue = $eventTarget.val();
-                if ( ! this._isFieldValueValidNumber({ fieldValue }) ) {
+                if ( ! this._isFieldValueValidDecimalNumber({ fieldValue }) ) {
                     $selector_invalid_entry.show();
 
                     const indexOverall = annType_Entry.indexOverall;
@@ -504,7 +585,7 @@ class ProjectPg_setAnnotationCutoffsDefaults_ProjectLevel_Overlay {
         });
     }
 
-	_isFieldValueValidNumber({ fieldValue }) {
+	_isFieldValueValidDecimalNumber({ fieldValue }) {
 		if ( fieldValue === "" ) {
 			return true;
 		}
@@ -525,6 +606,8 @@ class ProjectPg_setAnnotationCutoffsDefaults_ProjectLevel_Overlay {
 
         const annotationTypeDataResponse = responseData.annotationTypeDataResponse;
         const existingEntriesResponse = responseData.existingEntriesResponse;
+
+        const minPSMs = existingEntriesResponse.minPSMs;
 
         // Use objects for index so can increment the index property in called methods
 
@@ -744,7 +827,7 @@ class ProjectPg_setAnnotationCutoffsDefaults_ProjectLevel_Overlay {
             throw Error("No DOM element with id 'project_page__ann_cutoff_defaults_project_level_save_button'");
         }
         
-        if ( this._annotationTypes_Entries_UserDataError.size === 0 ) {
+        if ( this._annotationTypes_Entries_UserDataError.size === 0 && this._minPSMs_Entry_Valid ) {
             if ( ! this._saveButton_IsEnabled ) {
                 
                 project_page__ann_cutoff_defaults_project_level_save_buttonDOM.disabled = false;
@@ -765,8 +848,10 @@ class ProjectPg_setAnnotationCutoffsDefaults_ProjectLevel_Overlay {
     _save() {
 
         const cutoffValuesFromPage = this._getCutoffValuesFromPage();
+
+        const minPSMs = this._get_minPSMs_FromPage();
         
-        const promise_save_ValuesToServer = this._save_ValuesToServer({ cutoffValuesFromPage });
+        const promise_save_ValuesToServer = this._save_ValuesToServer({ cutoffValuesFromPage, minPSMs });
 
         promise_save_ValuesToServer.catch( ( ) => { } );
 
@@ -779,8 +864,19 @@ class ProjectPg_setAnnotationCutoffsDefaults_ProjectLevel_Overlay {
             var $element = $("#set_project_level_default_cutoffs_button_success_message_values_updated");
             showErrorMsg( $element );  //  Used for success messages as well
         });
+    }
 
+    /**
+     * 
+     */
+    _get_minPSMs_FromPage() {
 
+        const $project_page__ann_cutoff_defaults_project_level_psms_min = $("#project_page__ann_cutoff_defaults_project_level_psms_min");
+        let minPSMs = $project_page__ann_cutoff_defaults_project_level_psms_min.val();
+        if ( minPSMs === "" ) {
+            minPSMs = undefined;
+        }
+        return minPSMs;
     }
 
     /**
@@ -844,7 +940,7 @@ class ProjectPg_setAnnotationCutoffsDefaults_ProjectLevel_Overlay {
                 //  No value so skip to next 
                 return; // EARLY RETURN
             }
-            if ( ! this._isFieldValueValidNumber({ fieldValue : fieldValueString }) ) {
+            if ( ! this._isFieldValueValidDecimalNumber({ fieldValue : fieldValueString }) ) {
                 throw Error("_getCutoffValuesFromPage_ForType(...) '! this._isFieldValueValidNumber( fieldValueString )' fieldValueString: " + fieldValueString );
             }
             const fieldValue = Number.parseFloat( fieldValueString );
@@ -877,13 +973,14 @@ class ProjectPg_setAnnotationCutoffsDefaults_ProjectLevel_Overlay {
     /**
      * 
      */
-    _save_ValuesToServer({ cutoffValuesFromPage }) {
+    _save_ValuesToServer({ cutoffValuesFromPage, minPSMs }) {
 
         return new Promise( (resolve, reject) => {
             try {
                 let requestObj = {
                     projectId : this._projectId,
-                    cutoffValues : cutoffValuesFromPage
+                    cutoffValues : cutoffValuesFromPage,
+                    minPSMs
                 };
 
                 const url = "services/projectLevelDefaultCutoffs_SaveUpdateEntries_ForProjectId";
