@@ -22,9 +22,9 @@ var SearchesChangeDisplayOrder = function( params ) {
 	this._singleSearchTemplate_HandlebarsTemplate = undefined;
 	this.minimumNumberOfSearches = 1;
 
-	this.CONSTANTS = {
+	// this.CONSTANTS = {
 			
-	};
+	// };
 
 	/**
 	 * 
@@ -355,6 +355,17 @@ var SearchesChangeDisplayOrder = function( params ) {
  */
 var searchesChangeDisplayOrder = new SearchesChangeDisplayOrder();
 
-window.searchesChangeDisplayOrder = searchesChangeDisplayOrder;
+// window.searchesChangeDisplayOrder = searchesChangeDisplayOrder;
+
+
+$(document).ready(function()  { 
+	try {
+		searchesChangeDisplayOrder.init();
+
+	} catch( e ) {
+		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+		throw e;
+	}
+});
 
 export { searchesChangeDisplayOrder }

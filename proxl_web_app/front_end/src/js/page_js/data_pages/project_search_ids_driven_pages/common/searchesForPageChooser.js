@@ -804,6 +804,19 @@ SearchesForPageChooser.prototype.getProjectSearchIdsForCurrentPage = function() 
  */
 var searchesForPageChooser = new SearchesForPageChooser();
 
-window.searchesForPageChooser = searchesForPageChooser;
+// window.searchesForPageChooser = searchesForPageChooser;
+
+
+
+$(document).ready(function()  { 
+	try {
+		searchesForPageChooser.init();
+
+	} catch( e ) {
+		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+		throw e;
+	}
+});
+
 
 export { searchesForPageChooser }
