@@ -22,6 +22,16 @@ public class ConvertAndDownloadSVGForm extends ActionForm {
 	public void setFileType(String fileType) {
 		this.fileType = fileType;
 	}
+	public String getBrowserURL() {
+		return browserURL;
+	}
+	public void setBrowserURL(String browserURL) {
+		this.browserURL = browserURL;
+	}
+	
+	
 	private String svgString;
 	private String fileType;
+	private String browserURL;
+
 }

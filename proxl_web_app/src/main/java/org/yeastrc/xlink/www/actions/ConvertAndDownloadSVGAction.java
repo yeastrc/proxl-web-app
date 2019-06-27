@@ -66,7 +66,7 @@ public class ConvertAndDownloadSVGAction extends Action {
 			  ActionForm actionForm,
 			  HttpServletRequest request,
 			  HttpServletResponse response ) throws Exception {
-
+		
 		String referrerURLString = null;
 		String thisURLString = null;
 		URL referrerURL = null;
@@ -81,6 +81,10 @@ public class ConvertAndDownloadSVGAction extends Action {
 			log.error( msg, e );
 			throw e;
 		}
+		
+//		log.warn( "Request  FileType: " + form.getFileType() );
+//		log.warn( "Request  BrowserURL: " + form.getBrowserURL() );
+//		log.warn( "Request  SvgString: " + form.getSvgString() );
 		
 		try {
 			// ensure referrer was on the same server as this Action to prevent abuse
@@ -169,6 +173,8 @@ public class ConvertAndDownloadSVGAction extends Action {
 
 			String msg = "Exception:  RemoteAddr: " + request.getRemoteAddr()  
 					+ ", Exception caught: " + e.toString()
+					+ "\nBrowserURL: " + form.getBrowserURL()
+					+ "\nFileType: " + form.getFileType()
 					+ "\nreferrerURL: " + referrerURLString
 					+ "\nthisURLString: " + thisURLString
 					+ "\nInput SVG:" + form.getSvgString();

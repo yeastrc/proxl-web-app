@@ -182,6 +182,13 @@ var QC_ChartDownloadHelp = function() {
 			fileTypeField.setAttribute("value", download_type);
 			form.appendChild( svgStringField );
 			form.appendChild( fileTypeField );
+
+			const browserURL = window.location.href;
+			const browserURLField = document.createElement( "input" );
+			browserURLField.setAttribute("name", "browserURL");
+			browserURLField.setAttribute("value", browserURL);
+			form.appendChild( browserURLField );
+
 			document.body.appendChild(form);    // Not entirely sure if this is necessary			
 			form.submit();
 			document.body.removeChild( form );
