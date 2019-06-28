@@ -195,10 +195,6 @@ dependencies {
 	// https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
 	compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.9'
 	
-		//  Apache FOP:   For creating PDF file from SVG in class ConvertAndDownloadSVGAction
-	// https://mvnrepository.com/artifact/org.apache.xmlgraphics/fop
-	compile group: 'org.apache.xmlgraphics', name: 'fop', version: '2.3'
-	
 	//  BioJava
 	
 		//  version 5 exists for all jars:  https://mvnrepository.com/artifact/org.biojava/
