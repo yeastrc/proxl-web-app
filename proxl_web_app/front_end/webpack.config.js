@@ -22,12 +22,13 @@ const mainConfig = {
 	resolve: {
 	    alias: { // A trailing $ can also be added to the given object's keys to signify an exact match:
 	       'handlebars.runtime$': 'handlebars/dist/handlebars.runtime.min.js',
-	       'handlebars$': 'handlebars/dist/handlebars.min.js'
+	       'handlebars$': 'handlebars/dist/handlebars.min.js',
+			fs: 'pdfkit/js/virtual-fs.js'
 	    },
 	    modules: [
 	        path.resolve('./src/js'),
 	        path.resolve('./node_modules'),
-		]
+		],
 	},
 	plugins: [
 		new CaseSensitivePathsPlugin()
@@ -129,28 +130,32 @@ const mainConfig = {
 
 	module:{
 		rules:[
-				{
-					test:/\.scss$/,
-					use: [
-						{
-							loader: 'file-loader',
-							options: {
-								name: '[name].css',
-								outputPath: 'css_generated/'
-							}
-						},
-						{
-							loader: 'extract-loader'
-						},
-						{
-							loader: 'css-loader',
-							options: { minimize: true }
-						},
-						{
-							loader: 'sass-loader'
+			{ enforce: 'post', test: /fontkit[/\\]index.js$/, loader: "transform-loader?brfs" },				// for pdfkit
+			{ enforce: 'post', test: /unicode-properties[/\\]index.js$/, loader: "transform-loader?brfs" },		// for pdfkit
+			{ enforce: 'post', test: /linebreak[/\\]src[/\\]linebreaker.js/, loader: "transform-loader?brfs" },	// for pdfkit
+
+			{
+				test:/\.scss$/,
+				use: [
+					{
+						loader: 'file-loader',
+						options: {
+							name: '[name].css',
+							outputPath: 'css_generated/'
 						}
-					]
-				}
+					},
+					{
+						loader: 'extract-loader'
+					},
+					{
+						loader: 'css-loader',
+						options: { minimize: true }
+					},
+					{
+						loader: 'sass-loader'
+					}
+				]
+			}
 		 	]
 	  },
 };

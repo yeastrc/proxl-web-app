@@ -1,6 +1,19 @@
 
 "use strict";
 
+let PDFDocument = require('pdfkit').default;
+let blobStream = require('blob-stream');
+
+import { saveAs } from 'file-saver';
+import { saveSvgAsPng } from 'save-svg-as-png'
+import * as SVGtoPDF from 'svg-to-pdfkit';
+import { downloadStringAsFile} from "./download-string-as-file";
+
+// 3 lines here to make svgtopdf work
+import fs from 'fs'
+import Helvetica from '!!raw-loader!pdfkit/js/data/Helvetica.afm'
+fs.writeFileSync('data/Helvetica.afm', Helvetica)
+
 export class SVGDownloadUtils {
 
     /**
@@ -10,48 +23,50 @@ export class SVGDownloadUtils {
      * @param type The type, must be one of svg, jpeg, png, pdf
      */
     static downloadSvgAsImageType( svgNode, type ) {
+        console.log('called downloadSvgAsImageType');
+
         try {
 
-            const svgString = SVGDownloadUtils.getSVGStringForSvgNode( svgNode );
-            SVGDownloadUtils.convertAndDownloadSVG( svgString, type );
+            if( type === 'jpeg' ) {
+                type = 'jpg';
+            }
+
+            let filename = 'proxl-image.' + type;
+
+            if( type === 'jpg' || type === 'png' ) {
+
+                let options = {
+                    backgroundColor:'#ffffff',
+                    encoderType:'image/'+type,
+                    scale:3,            // 3x size
+                    encoderOptions:9,   // quality
+                }
+
+                saveSvgAsPng(svgNode, filename, options);
+
+            } else if( type === 'pdf' ) {
+
+                let doc = new PDFDocument({compress: false});
+                let stream = doc.pipe(blobStream());
+
+                SVGtoPDF(doc, svgNode, 0, 0, {useCSS:true});
+                doc.end();
+
+                stream.on('finish', function() {
+                    let blob = stream.toBlob('application/pdf');
+                    saveAs(blob, filename);
+                });
+
+            } else if( type === 'svg' ) {
+                downloadStringAsFile( filename, 'image/svg', SVGDownloadUtils.getSVGStringForSvgNode(svgNode) );
+            }
+
 
         } catch( e ) {
             reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
             throw e;
         }
     }
-
-    /**
-     * Convert and download the conversion of the supplied SVG to the supplied type
-     * As of this writing, the type must be "pdf", "png", "jpeg", or "svg"
-     */
-    static convertAndDownloadSVG( svgString, typeString ) {
-        var form = document.createElement( "form" );
-        $( form ).hide();
-        form.setAttribute( "method", "post" );
-        form.setAttribute( "action", "convertAndDownloadSVG.do" );
-        //form.setAttribute( "target", "_blank" );
-        const svgStringField = document.createElement( "input" );
-        svgStringField.setAttribute("name", "svgString");
-        svgStringField.setAttribute("value", svgString);
-        const fileTypeField = document.createElement( "input" );
-        fileTypeField.setAttribute("name", "fileType");
-        fileTypeField.setAttribute("value", typeString);
-        form.appendChild( svgStringField );
-        form.appendChild( fileTypeField );
-
-		const browserURL = window.location.href;
-		const browserURLField = document.createElement( "input" );
-		browserURLField.setAttribute("name", "browserURL");
-		browserURLField.setAttribute("value", browserURL);
-		form.appendChild( browserURLField );
-
-        document.body.appendChild(form);    // Not entirely sure if this is necessary
-
-        form.submit();
-        document.body.removeChild( form );
-    };
-
 
     /**
      * Get string representation of a SVG element as valid XML. Mostly taken from
@@ -72,6 +87,5 @@ export class SVGDownloadUtils {
 
         return fullSVG_String;
     }
-
 
 }

@@ -8,6 +8,8 @@
 "use strict";
 
 //  require full Handlebars since compiling templates
+import {SVGDownloadUtils} from "./svgDownloadUtils";
+
 const Handlebars = require('handlebars');
 
 
@@ -829,44 +831,21 @@ var ViewPsmsLoadedFromWebServiceTemplate = function() {
 	 */
 	this._downloadChart = function( params ) {
 		try {
-			var clickedThis = params.clickedThis;
+			const clickedThis = params.clickedThis;
+			const $clickedThis = $( clickedThis );
 
-			var $clickedThis = $( clickedThis );
-			var download_type = $clickedThis.attr("data-download_type");
-			var $psm_qc_either_chart_outer_container_jq = $clickedThis.closest(".psm_qc_either_chart_outer_container_jq");
-			var chart_type = $psm_qc_either_chart_outer_container_jq.attr("data-chart_type");
+			const download_type = $clickedThis.attr("data-download_type");
 
-			var getSVGContentsAsStringResult = this._getSVGContentsAsString( $psm_qc_either_chart_outer_container_jq );
-			
-			if ( getSVGContentsAsStringResult.errorException ) {
-				throw errorException;
+			const $psm_qc_either_chart_outer_container_jq = $clickedThis.closest(".psm_qc_either_chart_outer_container_jq");
+
+			const $psm_qc_either_chart_container_jq = $psm_qc_either_chart_outer_container_jq.find(".psm_qc_either_chart_container_jq");
+			if ( $psm_qc_either_chart_container_jq.length === 0 ) {
+				// No element found with class psm_qc_either_chart_container_jq
+				return { noPageElement : true };
 			}
-			
-			var fullSVG_String = getSVGContentsAsStringResult.fullSVG_String;
-			
-			var form = document.createElement( "form" );
-			$( form ).hide();
-			form.setAttribute( "method", "post" );
-			form.setAttribute( "action", "convertAndDownloadSVG.do" );
+			const $svgRoot = $psm_qc_either_chart_container_jq.find("svg");
 
-			var svgStringField = document.createElement( "input" );
-			svgStringField.setAttribute("name", "svgString");
-			svgStringField.setAttribute("value", fullSVG_String );
-			var fileTypeField = document.createElement( "input" );
-			fileTypeField.setAttribute("name", "fileType");
-			fileTypeField.setAttribute("value", download_type);
-			form.appendChild( svgStringField );
-			form.appendChild( fileTypeField );
-
-			const browserURL = window.location.href;
-			const browserURLField = document.createElement( "input" );
-			browserURLField.setAttribute("name", "browserURL");
-			browserURLField.setAttribute("value", browserURL);
-			form.appendChild( browserURLField );
-
-			document.body.appendChild(form);    // Not entirely sure if this is necessary			
-			form.submit();
-			document.body.removeChild( form );
+			SVGDownloadUtils.downloadSvgAsImageType($svgRoot[0], download_type);
 
 		} catch( e ) {
 			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
@@ -874,10 +853,10 @@ var ViewPsmsLoadedFromWebServiceTemplate = function() {
 		}
 		
 	};
-	
+
 
 	/**
-	 * 
+	 *
 	 */
 	this._getSVGContentsAsString = function ( $psm_qc_either_chart_outer_container_jq ) {
 		try {
@@ -899,7 +878,7 @@ var ViewPsmsLoadedFromWebServiceTemplate = function() {
 			fullSVG_String += "height=\"" + $svgRoot.attr( "height" ) + "\" ";
 			fullSVG_String += "xmlns=\"http://www.w3.org/2000/svg\">" + svgContents + "</svg>";
 			// fix the URL that google charts is putting into the SVG. Breaks parsing.
-			fullSVG_String = fullSVG_String.replace( /url\(.+\#_ABSTRACT_RENDERER_ID_(\d+)\)/g, "url(#_ABSTRACT_RENDERER_ID_$1)" );	
+			fullSVG_String = fullSVG_String.replace( /url\(.+\#_ABSTRACT_RENDERER_ID_(\d+)\)/g, "url(#_ABSTRACT_RENDERER_ID_$1)" );
 
 			return { fullSVG_String : fullSVG_String};
 		} catch( e ) {

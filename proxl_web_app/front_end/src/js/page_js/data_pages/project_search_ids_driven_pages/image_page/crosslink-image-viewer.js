@@ -1,19 +1,19 @@
 /**
  * crosslink-image-viewer.js
- * 
+ *
  * Javascript for the viewMergedImage.jsp page
- * 
- *  !!!! Warning !!!!:  
+ *
+ *  !!!! Warning !!!!:
  *		the objects in _searches have property ['id'] which is the projectSearchId
- *		search.id and _searches[i]['id']  reference the projectSearchId 
+ *		search.id and _searches[i]['id']  reference the projectSearchId
  *		Some uses of searchId are actually projectSearchId
  *
  *   All references to proteinId are actually referencing the protein sequence id
  *
  *   A plain "protein" variable is the protein sequence id
- *   
+ *
  *   The actual svg image is drawn in the function drawSvg()
- *   
+ *
  *   WARNING:  There are global variables scattered throughout the file
  */
 
@@ -32,6 +32,8 @@
 "use strict";
 
 //  require full Handlebars since compiling templates
+import {SVGDownloadUtils} from "../common/svgDownloadUtils";
+
 const Handlebars = require('handlebars');
 
 
@@ -5724,9 +5726,9 @@ var ImagePagePrimaryRootCodeClass = function() {
 	 */
 	function downloadSvg( type ) {
 		try {
-			var getSVGContentsAsStringResult = getSVGContentsAsString();
-			var svgString = getSVGContentsAsStringResult.fullSVG_String;
-			convertAndDownloadSVG( svgString, type );
+			const svgElement = $('#svg_image_inner_container_div').children()[0]
+			SVGDownloadUtils.downloadSvgAsImageType( svgElement, type );
+
 			updateURLHash( false /* useSearchForm */ );
 		} catch( e ) {
 			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
@@ -5734,24 +5736,6 @@ var ImagePagePrimaryRootCodeClass = function() {
 		}
 	}
 
-	/**
-	 * 
-	 */
-	function getSVGContentsAsString() {
-		try {
-			if ( !_GLOBAL_SNAP_SVG_OBJECT ) {
-				//  No SVG element found
-				return { noPageElement : true };   //  EARLY EXIT
-			}
-			var fullSVG_String = "<?xml version=\"1.0\" standalone=\"no\"?>\n";
-			fullSVG_String += "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\" \"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">";
-			fullSVG_String += _GLOBAL_SNAP_SVG_OBJECT.toString();
-			return { fullSVG_String : fullSVG_String};
-		} catch( e ) {
-			//  Not all browsers have svgElement.innerHTML which .html() tries to use, causing an exception
-			return { error : true };
-		}
-	}
 
 	/**
 	 * 
@@ -6333,39 +6317,6 @@ var ImagePagePrimaryRootCodeClass = function() {
 		saveView_dataPages.initialize({ /* projectSearchIds, container_DOM_Element, enableSetDefault */ });
 
 		loadDataFromService();
-	};
-
-
-	/**
-	 * Convert and download the conversion of the supplied SVG to the supplied type
-	 * As of this writing, the type must be "pdf", "png", "jpeg", or "svg"
-	 */
-	var convertAndDownloadSVG = function( svgString, typeString ) {	
-		console.log( "convertAndDownloadSVG called." );
-		var form = document.createElement( "form" );
-		$( form ).hide();
-		form.setAttribute( "method", "post" );
-		form.setAttribute( "action", "convertAndDownloadSVG.do" );
-		//form.setAttribute( "target", "_blank" );
-		var svgStringField = document.createElement( "input" );
-		svgStringField.setAttribute("name", "svgString");
-		svgStringField.setAttribute("value", svgString);
-		var fileTypeField = document.createElement( "input" );
-		fileTypeField.setAttribute("name", "fileType");
-		fileTypeField.setAttribute("value", typeString);
-
-		form.appendChild( svgStringField );
-		form.appendChild( fileTypeField );
-		
-		const browserURL = window.location.href;
-		const browserURLField = document.createElement( "input" );
-		browserURLField.setAttribute("name", "browserURL");
-		browserURLField.setAttribute("value", browserURL);
-		form.appendChild( browserURLField );
-
-		document.body.appendChild(form);    // Not entirely sure if this is necessary			
-		form.submit();
-		document.body.removeChild( form );
 	};
 
 }

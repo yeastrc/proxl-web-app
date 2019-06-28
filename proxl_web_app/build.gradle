@@ -194,12 +194,6 @@ dependencies {
 	
 	// https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
 	compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.9'
-
-	
-	
-	//  Apache Batik:   For creating JPEG and PNG images from SVG in class ConvertAndDownloadSVGAction
-	// https://mvnrepository.com/artifact/org.apache.xmlgraphics/batik-all
-	compile group: 'org.apache.xmlgraphics', name: 'batik-all', version: '1.11' // removed since didn't work:   , ext: 'pom'
 	
 		//  Apache FOP:   For creating PDF file from SVG in class ConvertAndDownloadSVGAction
 	// https://mvnrepository.com/artifact/org.apache.xmlgraphics/fop

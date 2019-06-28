@@ -17,9 +17,6 @@
 			  Used for downloads and maybe other uses where only a POST of a single JSON string needs to be supported
   		-->
   		<form-bean name="singleRequestJSONStringFieldForm" type="org.yeastrc.xlink.www.forms.SingleRequestJSONStringFieldForm" />
-  		
-  		<form-bean name="convertAndDownloadSVGForm" type="org.yeastrc.xlink.www.forms.ConvertAndDownloadSVGForm" />
-
 
 		<!--    The following forms are for supporting old URLs before change to Generic -->
 
@@ -205,13 +202,6 @@
 	 	<action path="/downloadPDBFile"
 				type="org.yeastrc.xlink.www.actions.DownloadPDBFileAction"
 				scope="request"
-				validate="false">
-		</action>
-		
-		<action path="/convertAndDownloadSVG"
-				type="org.yeastrc.xlink.www.actions.ConvertAndDownloadSVGAction"
-				scope="request"
-				name="convertAndDownloadSVGForm"
 				validate="false">
 		</action>
 		
