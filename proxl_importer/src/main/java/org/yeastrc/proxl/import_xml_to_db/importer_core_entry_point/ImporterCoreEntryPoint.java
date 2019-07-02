@@ -19,8 +19,6 @@ import org.yeastrc.proxl.import_xml_to_db.constants.Proxl_XSD_XML_Schema_Enabled
 import org.yeastrc.proxl.import_xml_to_db.dao.ProjectSearchDAO_Importer;
 import org.yeastrc.proxl.import_xml_to_db.dao.SearchDAO_Importer;
 import org.yeastrc.proxl.import_xml_to_db.db.ImportDBConnectionFactory;
-import org.yeastrc.proxl.import_xml_to_db.drop_peptides_psms_for_cutoffs.DropPeptidePSMCutoffValues;
-import org.yeastrc.proxl.import_xml_to_db.drop_peptides_psms_for_cutoffs.DropPeptidePSMPopulateFromProxlXMLInput;
 import org.yeastrc.proxl.import_xml_to_db.dto.ProjectSearchDTO_Importer;
 import org.yeastrc.proxl.import_xml_to_db.dto.SearchDTO_Importer;
 import org.yeastrc.proxl.import_xml_to_db.exception.ProxlImporterProjectNotAllowImportException;
@@ -82,9 +80,7 @@ public class ImporterCoreEntryPoint {
 			File mainXMLFileToImport,
 			ProxlInput proxlInputForImportParam,
 			List<ScanFileFileContainer> scanFileFileContainerList,
-			DropPeptidePSMCutoffValues dropPeptidePSMCutoffValues,
-			Boolean skipPopulatingPathOnSearchLineOptChosen,
-			Boolean doNotUseCutoffInInputFile 
+			Boolean skipPopulatingPathOnSearchLineOptChosen
 			) throws Exception, ProxlImporterProjectNotAllowImportException, ProxlImporterProxlXMLDeserializeFailException {
 		
 		ProxlInput proxlInputForImport = null;
@@ -144,9 +140,7 @@ public class ImporterCoreEntryPoint {
 				proxlInputObjectContainer, 
 				scanFileFileContainerList, 
 				importDirectory, 
-				dropPeptidePSMCutoffValues, 
-				skipPopulatingPathOnSearchLineOptChosen,
-				doNotUseCutoffInInputFile );
+				skipPopulatingPathOnSearchLineOptChosen );
 		return insertedSearchId;
 	}
 	
@@ -232,9 +226,7 @@ public class ImporterCoreEntryPoint {
 			ProxlInputObjectContainer proxlInputObjectContainer,
 			List<ScanFileFileContainer> scanFileFileContainerList,
 			String importDirectory,
-			DropPeptidePSMCutoffValues dropPeptidePSMCutoffValues,
-			Boolean skipPopulatingPathOnSearchLineOptChosen,
-			Boolean doNotUseCutoffInInputFile
+			Boolean skipPopulatingPathOnSearchLineOptChosen
 			) throws Exception, ProxlImporterProjectNotAllowImportException {
 		
 		ProxlInput proxlInputForImport = proxlInputObjectContainer.getProxlInput();
@@ -242,10 +234,6 @@ public class ImporterCoreEntryPoint {
 			String msg = "<matched_proteins> is not populated in Proxl XML File.";
 			log.error( msg );
 			throw new ProxlImporterDataException( msg );
-		}
-		///////////
-		if ( dropPeptidePSMCutoffValues == null ) {
-			dropPeptidePSMCutoffValues = new DropPeptidePSMCutoffValues();
 		}
 		try {
 			//  isImportingAllowForProject(...) throws ProxlImporterProjectNotAllowImportException 
@@ -273,14 +261,7 @@ public class ImporterCoreEntryPoint {
 			ValidateMatchedProteinSection.getInstance().validateMatchedProteinSection( proxlInputForImport );
 			//   Throws ProxlImporterDataException if data error found
 			ValidateScanFilenamesInXMLAreOnCommandLine.getInstance().validateScanFilenamesInXMLAreOnCommandLine( proxlInputForImport, scanFileFileContainerList );
-			
-			if ( doNotUseCutoffInInputFile ) {
-				dropPeptidePSMCutoffValues = new DropPeptidePSMCutoffValues();
-			} else {
-				//   Throws ProxlImporterDataException if data error found
-				DropPeptidePSMPopulateFromProxlXMLInput.getInstance().populateFromProxlXMLInput( dropPeptidePSMCutoffValues, proxlInputForImport );
-			}
-			
+						
 			//  Process proxl Input
 			processProxlInput = ProcessProxlInput.getInstance();
 			processProxlInput.processProxlInput( 
@@ -289,7 +270,6 @@ public class ImporterCoreEntryPoint {
 					proxlInputForImport, 
 					scanFileFileContainerList,
 					importDirectory, 
-					dropPeptidePSMCutoffValues,
 					skipPopulatingPathOnSearchLineOptChosen
 					);
 			SearchDTO_Importer searchDTOInserted = processProxlInput.getSearchDTOInserted();

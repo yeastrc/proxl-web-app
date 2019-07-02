@@ -7,8 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.slf4j.LoggerFactory;import org.slf4j.Logger;
-import org.yeastrc.proxl.import_xml_to_db.drop_peptides_psms_for_cutoffs.DropPeptideAndOrPSMForCutoffs;
-import org.yeastrc.proxl.import_xml_to_db.drop_peptides_psms_for_cutoffs.DropPeptidePSMCutoffValues;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterDataException;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterInteralException;
 import org.yeastrc.proxl_import.api.xml_dto.ProxlInput;
@@ -43,7 +41,7 @@ public class GetScanFilenamesAndScanNumbersToInsert {
 	 * @throws ProxlImporterDataException 
 	 * @throws ProxlImporterInteralException 
 	 */
-	public Map<String, Set<Integer>> getScanFilenamesAndScanNumbersToInsert( ProxlInput proxlInput, DropPeptidePSMCutoffValues dropPeptidePSMCutoffValues ) throws ProxlImporterDataException, ProxlImporterInteralException  {
+	public Map<String, Set<Integer>> getScanFilenamesAndScanNumbersToInsert( ProxlInput proxlInput ) throws ProxlImporterDataException, ProxlImporterInteralException  {
 		
 		Map<String, Set<Integer>> mapOfScanFilenamesSetsOfScanNumbers = new HashMap<String, Set<Integer>>();
 		Set<Integer> setOfScanNumbersArbitraryScanfile = new HashSet<>();
@@ -53,17 +51,9 @@ public class GetScanFilenamesAndScanNumbersToInsert {
 				reportedPeptides.getReportedPeptide();
 		if ( reportedPeptideList != null && ( ! reportedPeptideList.isEmpty() ) ) {
 			for ( ReportedPeptide reportedPeptide : reportedPeptideList ) {
-				if ( DropPeptideAndOrPSMForCutoffs.getInstance()
-						.dropPeptideForCmdLineCutoffs( reportedPeptide, dropPeptidePSMCutoffValues ) ) {
-					continue;  // EARLY continue to next record
-				}
 				Psms psms =	reportedPeptide.getPsms();
 				List<Psm> psmList = psms.getPsm();
 				for ( Psm psm : psmList ) {
-					if ( DropPeptideAndOrPSMForCutoffs.getInstance()
-							.dropPSMForCmdLineCutoffs( psm, dropPeptidePSMCutoffValues ) ) {
-						continue;  // EARLY continue to next record
-					}
 					{	// Process <psm> level data
 						BigInteger scanNumberBI = psm.getScanNumber();
 						String scanFileName = psm.getScanFileName();

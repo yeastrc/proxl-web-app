@@ -16,9 +16,6 @@ import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_SearchReported
 import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_UnifiedRepPep_Search_ReportedPeptide_BestPsmValue_Generic_Lookup__DAO;
 import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_UnifiedRepPep_Search_ReportedPeptide_PeptideValue_Generic_Lookup__DAO;
 import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_UnifiedRepPep_Search_ReportedPeptide__Generic_Lookup__DAO;
-import org.yeastrc.proxl.import_xml_to_db.drop_peptides_psms_for_cutoffs.DropPeptideAndOrPSMForCutoffs;
-import org.yeastrc.proxl.import_xml_to_db.drop_peptides_psms_for_cutoffs.DropPeptidePSMCutoffValues;
-import org.yeastrc.proxl.import_xml_to_db.drop_peptides_psms_for_cutoffs.DroppedPeptideCount;
 import org.yeastrc.proxl.import_xml_to_db.dto.SearchDTO_Importer;
 import org.yeastrc.proxl.import_xml_to_db.dto.SearchReportedPeptideDTO;
 import org.yeastrc.proxl.import_xml_to_db.dto.SrchRepPeptPeptide_IsotopeLabel_DTO;
@@ -85,7 +82,6 @@ public class ProcessReportedPeptidesAndPSMs {
 			ProxlInput proxlInput, 
 			SearchDTO_Importer search,
 			LinkersDBDataSingleSearchRoot linkersDBDataSingleSearchRoot,
-			DropPeptidePSMCutoffValues dropPeptidePSMCutoffValues,
 			Map<String, SearchProgramEntry> searchProgramEntryMap,
 			ReportedPeptideAndPsmFilterableAnnotationTypesOnId reportedPeptideAndPsmFilterableAnnotationTypesOnId,
 			Map<String, ScanFilenameScanNumberScanIdScanFileId_Mapping> mapOfScanFilenamesMapsOfScanNumbersToScanIds ) throws Exception {
@@ -123,7 +119,6 @@ public class ProcessReportedPeptidesAndPSMs {
 							reportedPeptide, 
 							searchId, 
 							linkers_Main_ForSingleSearch, 
-							dropPeptidePSMCutoffValues, 
 							searchProgramEntryMap, 
 							filterableReportedPeptideAnnotationTypesOnId,
 							filterablePsmAnnotationTypesOnId,
@@ -178,7 +173,6 @@ public class ProcessReportedPeptidesAndPSMs {
 			ReportedPeptide reportedPeptide,
 			int searchId, 
 			ILinkers_Main_ForSingleSearch linkers_Main_ForSingleSearch,
-			DropPeptidePSMCutoffValues dropPeptidePSMCutoffValues,
 			Map<String, SearchProgramEntry> searchProgramEntryMap,
 			Map<Integer, AnnotationTypeDTO> filterableReportedPeptideAnnotationTypesOnId,
 			Map<Integer, AnnotationTypeDTO> filterablePsmAnnotationTypesOnId,
@@ -198,11 +192,6 @@ public class ProcessReportedPeptidesAndPSMs {
 			String msg = "filterablePsmAnnotationTypesOnId.isEmpty() ";
 			log.error( msg );
 			throw new ProxlImporterInteralException(msg);
-		}
-		if ( DropPeptideAndOrPSMForCutoffs.getInstance()
-				.dropPeptideForCmdLineCutoffs( reportedPeptide, dropPeptidePSMCutoffValues ) ) {
-			DroppedPeptideCount.incrementDroppedPeptideCount();
-			return;  // EARLY EXIT  to skip to next record
 		}
 		String reportedPeptideString =
 				reportedPeptide.getReportedPeptideString();
@@ -333,7 +322,6 @@ public class ProcessReportedPeptidesAndPSMs {
 						linkTypeNumber, 
 						reportedPeptideDTO, 
 						perPeptideDataList,
-						dropPeptidePSMCutoffValues, 
 						searchProgramEntryMap,
 						filterablePsmAnnotationTypesOnId,
 						filterablePsmPerPeptideAnnotationTypesOnId,
@@ -555,7 +543,6 @@ public class ProcessReportedPeptidesAndPSMs {
 			int linkTypeNumber, 
 			ReportedPeptideDTO reportedPeptideDTO, 
 			List<PerPeptideData> perPeptideDataList,
-			DropPeptidePSMCutoffValues dropPeptidePSMCutoffValues,
 			Map<String, SearchProgramEntry> searchProgramEntryMap,
 			Map<Integer, AnnotationTypeDTO> filterablePsmAnnotationTypesOnId,
 			Map<Integer, AnnotationTypeDTO> filterablePsmPerPeptideAnnotationTypesOnId,
@@ -594,11 +581,6 @@ public class ProcessReportedPeptidesAndPSMs {
 		int psmCountPassDefaultCutoffs = 0;
 		boolean saveAnyPSMs = false;
 		for ( Psm psm : psmList ) {
-			if ( DropPeptideAndOrPSMForCutoffs.getInstance()
-					.dropPSMForCmdLineCutoffs( psm, dropPeptidePSMCutoffValues ) ) {
-				DroppedPeptideCount.incrementDroppedPsmCount();
-				continue;  // EARLY continue to next record
-			}
 			PsmDTO psmDTO = 
 					PopulateAndSavePsmDTO.getInstance().populateAndSavePSMDTO( 
 							searchId, 

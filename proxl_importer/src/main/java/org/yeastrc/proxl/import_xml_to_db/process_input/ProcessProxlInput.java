@@ -2,7 +2,6 @@ package org.yeastrc.proxl.import_xml_to_db.process_input;
 
 import java.io.File;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -10,13 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;import org.slf4j.Logger;
 import org.yeastrc.proxl.import_xml_to_db.dao.ProjectSearchDAO_Importer;
 import org.yeastrc.proxl.import_xml_to_db.dao.SearchDAO_Importer;
-import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_LinkerPerSearchCleavedCrosslinkMassDAO;
-import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_LinkerPerSearchCrosslinkMassDAO;
-import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_LinkerPerSearchMonolinkMassDAO;
-import org.yeastrc.proxl.import_xml_to_db.dao_db_insert.DB_Insert_SearchLinkerDAO;
 import org.yeastrc.proxl.import_xml_to_db.db.ImportDBConnectionFactory;
-import org.yeastrc.proxl.import_xml_to_db.drop_peptides_psms_for_cutoffs.DropPeptidePSMCutoffValues;
-import org.yeastrc.proxl.import_xml_to_db.drop_peptides_psms_for_cutoffs.DropPeptidePSM_InsertToDB;
 import org.yeastrc.proxl.import_xml_to_db.dto.ProjectSearchDTO_Importer;
 import org.yeastrc.proxl.import_xml_to_db.dto.SearchDTO_Importer;
 import org.yeastrc.proxl.import_xml_to_db.exceptions.ProxlImporterDataException;
@@ -27,13 +20,6 @@ import org.yeastrc.proxl.import_xml_to_db.objects.SearchProgramEntry;
 import org.yeastrc.proxl.import_xml_to_db.post_insert_search_processing.PerformPostInsertSearchProcessing;
 import org.yeastrc.proxl.import_xml_to_db.spectrum.mzml_mzxml.process_scans.Process_MzML_MzXml_File;
 import org.yeastrc.proxl.import_xml_to_db.spectrum.validate_input_scan_file.ValidateInputScanFile;
-import org.yeastrc.proxl_import.api.xml_dto.CleavedCrosslinkMass;
-import org.yeastrc.proxl_import.api.xml_dto.CrosslinkMass;
-import org.yeastrc.proxl_import.api.xml_dto.CrosslinkMasses;
-import org.yeastrc.proxl_import.api.xml_dto.Linker;
-import org.yeastrc.proxl_import.api.xml_dto.Linkers;
-import org.yeastrc.proxl_import.api.xml_dto.MonolinkMass;
-import org.yeastrc.proxl_import.api.xml_dto.MonolinkMasses;
 import org.yeastrc.proxl_import.api.xml_dto.Peptide;
 import org.yeastrc.proxl_import.api.xml_dto.Peptides;
 import org.yeastrc.proxl_import.api.xml_dto.ProxlInput;
@@ -44,11 +30,7 @@ import org.yeastrc.proxl_import.api.xml_dto.Peptide.PeptideIsotopeLabels.Peptide
 import org.yeastrc.xlink.base.file_import_proxl_xml_scans.dto.ProxlXMLFileImportTrackingSingleFileDTO;
 import org.yeastrc.xlink.dao.SearchCommentDAO;
 import org.yeastrc.xlink.dto.AnnotationTypeDTO;
-import org.yeastrc.xlink.dto.LinkerPerSearchCleavedCrosslinkMassDTO;
-import org.yeastrc.xlink.dto.LinkerPerSearchCrosslinkMassDTO;
-import org.yeastrc.xlink.dto.LinkerPerSearchMonolinkMassDTO;
 import org.yeastrc.xlink.dto.SearchCommentDTO;
-import org.yeastrc.xlink.dto.SearchLinkerDTO;
 import org.yeastrc.xlink.enum_classes.FilterableDescriptiveAnnotationType;
 import org.yeastrc.xlink.linker_data_processing_base.linker_db_data_per_search.LinkersDBDataSingleSearchRoot;
 
@@ -88,7 +70,6 @@ public class ProcessProxlInput {
 			ProxlInput proxlInput,
 			List<ScanFileFileContainer> scanFileFileContainerList,
 			String importDirectory,
-			DropPeptidePSMCutoffValues dropPeptidePSMCutoffValues,
 			Boolean skipPopulatingPathOnSearchLineOptChosen
 			) throws Exception {
 		searchDTOInserted = null;
@@ -139,7 +120,7 @@ public class ProcessProxlInput {
 				//  Scan Numbers in the input XML that need to be read from the scan files and inserted into the DB
 				Map<String, Set<Integer>> mapOfScanFilenamesSetsOfScanNumbers = 
 						GetScanFilenamesAndScanNumbersToInsert.getInstance()
-						.getScanFilenamesAndScanNumbersToInsert( proxlInput, dropPeptidePSMCutoffValues );
+						.getScanFilenamesAndScanNumbersToInsert( proxlInput );
 				if ( scanFileFileContainerList.size() == 1 ) {
 					if ( mapOfScanFilenamesSetsOfScanNumbers.size() != 1 ) {
 					}
@@ -222,8 +203,6 @@ public class ProcessProxlInput {
 					ProcessSearchProgramEntries.getInstance()
 					.processSearchProgramEntries( proxlInput, searchDTO.getId() );
 			
-			DropPeptidePSM_InsertToDB.getInstance().insertDBEntries( dropPeptidePSMCutoffValues, searchProgramEntryMap );
-			
 			ReportedPeptideAndPsmFilterableAnnotationTypesOnId reportedPeptideAndPsmFilterableAnnotationTypesOnId = new ReportedPeptideAndPsmFilterableAnnotationTypesOnId();
 			reportedPeptideAndPsmFilterableAnnotationTypesOnId.filterableReportedPeptideAnnotationTypesOnId = 
 					createReportedPeptideFilterableAnnotationTypesOnId( searchProgramEntryMap );
@@ -249,7 +228,6 @@ public class ProcessProxlInput {
 					proxlInput, 
 					searchDTO, 
 					linkersDBDataSingleSearchRoot,
-					dropPeptidePSMCutoffValues,
 					searchProgramEntryMap,
 					reportedPeptideAndPsmFilterableAnnotationTypesOnId,
 					mapOfScanFilenamesMapsOfScanNumbersToScanIds );
