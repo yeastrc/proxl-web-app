@@ -356,7 +356,6 @@
 								
 							<span id="svg-download-options">
 								Choose file format:
-								<a data-tooltip="Download as a JPEG image file." id="svg-download-jpeg" class="svg-download-option tool_tip_attached_jq" href="javascript:" style="margin-top:5px;">JPEG</a>
 								<a data-tooltip="Download as PDF file suitable for use in Adobe Illustrator or printing." id="svg-download-pdf" class="svg-download-option tool_tip_attached_jq" href="javascript:">PDF</a>
 								<a data-tooltip="Download as PNG image file." id="svg-download-png" class="svg-download-option tool_tip_attached_jq" href="javascript:">PNG</a>
 								<a data-tooltip="Download as scalable vector graphics file suitable for use in Inkscape or other compatible software." id="svg-download-svg" class="svg-download-option tool_tip_attached_jq" href="javascript:">SVG</a>

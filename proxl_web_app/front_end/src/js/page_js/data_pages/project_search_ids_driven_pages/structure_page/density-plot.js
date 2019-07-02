@@ -160,7 +160,6 @@ export class DensityPlot {
 
             "<span id=\"svg-download-options\" style=\"font-size:10pt;\">\n" +
             "Choose file format:\n" +
-            "<a data-tooltip=\"Download as a JPEG image file.\" id=\"svg-download-jpeg\" class=\"svg-download-option tool_tip_attached_jq\" href=\"javascript:\" style=\"margin-top:5px;\">JPEG</a>\n" +
             "<a data-tooltip=\"Download as PDF file suitable for use in Adobe Illustrator or printing.\" id=\"svg-download-pdf\" class=\"svg-download-option tool_tip_attached_jq\" href=\"javascript:\">PDF</a>\n" +
             "<a data-tooltip=\"Download as PNG image file.\" id=\"svg-download-png\" class=\"svg-download-option tool_tip_attached_jq\" href=\"javascript:\">PNG</a>\n" +
             "<a data-tooltip=\"Download as scalable vector graphics file suitable for use in Inkscape or other compatible software.\" id=\"svg-download-svg\" class=\"svg-download-option tool_tip_attached_jq\" href=\"javascript:\">SVG</a>\n" +
@@ -170,7 +169,6 @@ export class DensityPlot {
 
         $parentSpan.append( $html );
 
-        $html.find( "#svg-download-jpeg" ).click( function() { SVGDownloadUtils.downloadSvgAsImageType( $("#density-plot-svg")[0], 'jpeg' ); });
         $html.find( "#svg-download-png" ).click( function() { SVGDownloadUtils.downloadSvgAsImageType( $("#density-plot-svg")[0], 'png' ); });
         $html.find( "#svg-download-pdf" ).click( function() { SVGDownloadUtils.downloadSvgAsImageType( $("#density-plot-svg")[0], 'pdf' ); });
         $html.find( "#svg-download-svg" ).click( function() { SVGDownloadUtils.downloadSvgAsImageType( $("#density-plot-svg")[0], 'svg' ); });

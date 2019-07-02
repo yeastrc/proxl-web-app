@@ -5931,7 +5931,6 @@ var ImagePagePrimaryRootCodeClass = function() {
 				throw e;
 			}
 		});
-		$( "#svg-download-jpeg" ).click( function() { downloadSvg( 'jpeg' ); });
 		$( "#svg-download-png" ).click( function() { downloadSvg( 'png' ); });
 		$( "#svg-download-pdf" ).click( function() { downloadSvg( 'pdf' ); });
 		$( "#svg-download-svg" ).click( function() { downloadSvg( 'svg' ); });

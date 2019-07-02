@@ -29,10 +29,6 @@
 					<!-- Overlay: display on hover of download icon -->
 					<div class="svg-download-options-block">
 						Choose download file format:
-						<a data-tooltip="Download as a JPEG image file." 
-							data-download_type="jpeg"
-							class="svg-download-option tool_tip_attached_jq chart_download_link_jq " href="javascript:" style="margin-top:5px;"
-							>JPEG</a>
 						<a data-tooltip="Download as PDF file suitable for use in Adobe Illustrator or printing." 
 							data-download_type="pdf"
 							class="svg-download-option tool_tip_attached_jq chart_download_link_jq " href="javascript:" style="margin-top:5px;"
@@ -69,10 +65,6 @@
 					<!-- Overlay: display on hover of download icon -->
 					<span class="svg-download-options-block">
 						Choose download file format:
-						<a data-tooltip="Download as a JPEG image file." 
-							data-download_type="jpeg"
-							class="svg-download-option tool_tip_attached_jq chart_download_link_jq " href="javascript:" style="margin-top:5px;"
-							>JPEG</a>
 						<a data-tooltip="Download as PDF file suitable for use in Adobe Illustrator or printing." 
 							data-download_type="pdf"
 							class="svg-download-option tool_tip_attached_jq chart_download_link_jq " href="javascript:" style="margin-top:5px;"

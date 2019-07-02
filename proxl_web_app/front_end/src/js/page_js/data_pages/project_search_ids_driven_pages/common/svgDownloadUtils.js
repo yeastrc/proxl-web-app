@@ -20,20 +20,16 @@ export class SVGDownloadUtils {
      * Download the given SVG string as an image
      *
      * @param svgString The <svg>...</svg> XML as a string
-     * @param type The type, must be one of svg, jpeg, png, pdf
+     * @param type The type, must be one of svg, png, pdf
      */
     static downloadSvgAsImageType( svgNode, type ) {
         console.log('called downloadSvgAsImageType');
 
         try {
 
-            if( type === 'jpeg' ) {
-                type = 'jpg';
-            }
-
             let filename = 'proxl-image.' + type;
 
-            if( type === 'jpg' || type === 'png' ) {
+            if( type === 'png' ) {
 
                 let options = {
                     backgroundColor:'#ffffff',
