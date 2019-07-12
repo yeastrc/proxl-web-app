@@ -20,10 +20,6 @@ public class ProxlConfigFileReader {
 	private static String CONFIG_DEFAULTS_FILENAME = "proxl_config_defaults.properties";
 	private static String CONFIG_OVERRIDES_FILENAME = "proxl_config.properties";
 
-	private static String PROPERTY_NAME__USER_ACCOUNT_WEB_APP_URL = "user.account.webapp.url.app.context";
-	private static String PROPERTY_NAME__PROXL_WEBAPP_IDENTIFIER_FOR_USER_ACCOUNT_WEB_APP = "proxl.webapp.identifier.for.user.account.webapp";
-	private static String PROPERTY_NAME__PROXL_WEBAPP_KEY_FOR_USER_ACCOUNT_WEB_APP = "proxl.webapp.key.for.user.account.webapp";
-	
 	private static String PROPERTY_NAME__SPECTRAL_STORAGE_WEB_APP_URL = "spectral.storage.webapp.url.app.context";
 	
 	/**
@@ -35,10 +31,6 @@ public class ProxlConfigFileReader {
 			"allowAnnTypeFilterDefaultFilterValueAtDatabaseLoad_Null_When_isDefaultFilter_True";
 	
 	private static String PROPERTY_NAME__allowAnnTypeFilterDefaultFilterValueAtDatabaseLoad_Null_When_isDefaultFilter_True_ValueTrue = "true";
-	
-	//  Encryption key.  Value must be 16 characters, 128 bits
-	private static String PROPERTY_NAME__PROXL_WEBAPP_ENCRYPTION_KEY_FOR_USER_ACCOUNT_WEB_APP = 
-			"proxl.webapp.encryption.key.for.user.account.webapp";
 	
 	private static enum AllowNoPropertiesFile { YES, NO }
 	
@@ -77,24 +69,6 @@ public class ProxlConfigFileReader {
 //			log.error( msg );
 //			throw new ProxlWebappConfigException( msg );
 //		}
-		
-		log.warn( "INFO: '" + PROPERTY_NAME__USER_ACCOUNT_WEB_APP_URL + "' has value: " 
-				+ proxlConfigFileValues.getUserAccountServerURLandAppContext() );
-		log.warn( "INFO: '" + PROPERTY_NAME__PROXL_WEBAPP_IDENTIFIER_FOR_USER_ACCOUNT_WEB_APP + "' has value: " 
-				+ proxlConfigFileValues.getRequestingWebappIdentifier() );
-		if ( StringUtils.isNotEmpty( proxlConfigFileValues.getRequestingWebappKey() ) ) {
-			log.warn( "INFO: '" + PROPERTY_NAME__PROXL_WEBAPP_KEY_FOR_USER_ACCOUNT_WEB_APP + "' has value: " 
-					+ proxlConfigFileValues.getRequestingWebappKey() );
-		} else {
-			log.warn( "INFO: '" + PROPERTY_NAME__PROXL_WEBAPP_KEY_FOR_USER_ACCOUNT_WEB_APP 
-					+ "' is not populated in config or is empty string." ); 
-		}
-		if ( StringUtils.isNotEmpty( proxlConfigFileValues.getRequestingEncryptionKey() ) ) {
-			log.warn( "INFO: '" + PROPERTY_NAME__PROXL_WEBAPP_ENCRYPTION_KEY_FOR_USER_ACCOUNT_WEB_APP + "' has a value" );
-		} else {
-			log.warn( "INFO: '" + PROPERTY_NAME__PROXL_WEBAPP_ENCRYPTION_KEY_FOR_USER_ACCOUNT_WEB_APP 
-					+ "' is not populated in config or is empty string." ); 
-		}
 		
 		log.warn( "INFO: '" + PROPERTY_NAME__SPECTRAL_STORAGE_WEB_APP_URL + "' has value: " 
 				+ proxlConfigFileValues.getSpectralStorageServerURLandAppContext() );
@@ -139,23 +113,7 @@ public class ProxlConfigFileReader {
 			Properties configProps = new Properties();
 			configProps.load(propertiesFileAsStream);
 			String propertyValue = null;
-			propertyValue = configProps.getProperty( PROPERTY_NAME__USER_ACCOUNT_WEB_APP_URL );
-			if ( StringUtils.isNotEmpty( propertyValue ) ) {
-				proxlConfigFileValues.setUserAccountServerURLandAppContext( propertyValue );
-			}
-			propertyValue = configProps.getProperty( PROPERTY_NAME__PROXL_WEBAPP_IDENTIFIER_FOR_USER_ACCOUNT_WEB_APP );
-			if ( StringUtils.isNotEmpty( propertyValue ) ) {
-				proxlConfigFileValues.setRequestingWebappIdentifier( propertyValue );
-			}
-			propertyValue = configProps.getProperty( PROPERTY_NAME__PROXL_WEBAPP_KEY_FOR_USER_ACCOUNT_WEB_APP );
-			if ( StringUtils.isNotEmpty( propertyValue ) ) {
-				proxlConfigFileValues.setRequestingWebappKey( propertyValue );
-			}
-			propertyValue = configProps.getProperty( PROPERTY_NAME__PROXL_WEBAPP_ENCRYPTION_KEY_FOR_USER_ACCOUNT_WEB_APP );
-			if ( StringUtils.isNotEmpty( propertyValue ) ) {
-				proxlConfigFileValues.setRequestingEncryptionKey( propertyValue );
-			}
-			
+
 			propertyValue = configProps.getProperty( PROPERTY_NAME__SPECTRAL_STORAGE_WEB_APP_URL );
 			if ( StringUtils.isNotEmpty( propertyValue ) ) {
 				proxlConfigFileValues.setSpectralStorageServerURLandAppContext( propertyValue );

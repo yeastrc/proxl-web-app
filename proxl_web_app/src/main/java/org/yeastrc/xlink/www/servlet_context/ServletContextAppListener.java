@@ -6,7 +6,6 @@ import javax.servlet.http.*;
 import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.auth.db.AuthLibraryDBConnectionFactory;
 import org.yeastrc.session_mgmt.main.YRCSessionMgmtMain;
-import org.yeastrc.user_mgmt_central.main_code.db.UserMgmtCentralMainDBConnectionFactory;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.base.config_system_table_common_access.ConfigSystemTableGetValueCommon;
 import org.yeastrc.xlink.base.config_system_table_common_access.IConfigSystemTableGetValue;
@@ -88,9 +87,6 @@ public class ServletContextAppListener extends HttpServlet implements ServletCon
 		AuthLibraryDBConnectionFactoryForWeb dbConnectFactory = new AuthLibraryDBConnectionFactoryForWeb();
 		AuthLibraryDBConnectionFactory.setDbConnectionFactoryImpl(dbConnectFactory);
 		
-		UserMgmtCentralMainDBConnectionFactory_For_Proxl userMgmtCentralMainDBConnectionFactory_For_Proxl = new UserMgmtCentralMainDBConnectionFactory_For_Proxl();
-		UserMgmtCentralMainDBConnectionFactory.setDbConnectionFactoryImpl( userMgmtCentralMainDBConnectionFactory_For_Proxl );
-		
 		//  Remove validation so web app will start up with no configuration records
 //		try {
 //			GetEmailConfig.validateEmailConfig(); // throws Exception if error
@@ -108,7 +104,9 @@ public class ServletContextAppListener extends HttpServlet implements ServletCon
 			throw new RuntimeException( e );
 		} 
 		
-		UserMgmtCentralWebappWebserviceAccess.getInstance().init();
+		UserMgmtCentralMainDBConnectionFactory_For_Proxl userMgmtCentralMainDBConnectionFactory_For_Proxl = new UserMgmtCentralMainDBConnectionFactory_For_Proxl();
+
+		UserMgmtCentralWebappWebserviceAccess.getInstance().init( userMgmtCentralMainDBConnectionFactory_For_Proxl );
 		
 		AppContextConfigSystemValuesRetrieval appContextConfigSystemValuesRetrieval = 
 				new AppContextConfigSystemValuesRetrieval();
