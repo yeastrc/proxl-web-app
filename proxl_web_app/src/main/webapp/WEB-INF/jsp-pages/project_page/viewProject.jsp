@@ -33,7 +33,6 @@
 	
 		<script type="text/javascript" src="js/libs/base64.js"></script> 
 		<script type="text/javascript" src="js/libs/jquery.qtip.min.js"></script>
-		<script type="text/javascript" src="js/libs/spin.min.js"></script> 
 		
 	<%-- Choose which Javascript bundle to load, based on user type --%>
 <c:choose>

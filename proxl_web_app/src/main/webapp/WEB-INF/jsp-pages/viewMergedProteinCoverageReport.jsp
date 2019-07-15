@@ -18,8 +18,6 @@
 					/WEB-INF/jsp-includes/proteinNameTooltipDataForJSCode.jsp
 				  --%>
 				  
-		<script type="text/javascript" src="js/libs/spin.min.js"></script> 
-	
 		<link rel="stylesheet" href="css/tablesorter.css" type="text/css" media="print, projection, screen" />
 		<link type="text/css" rel="stylesheet" href="css/jquery.qtip.min.css" />
 

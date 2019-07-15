@@ -141,6 +141,8 @@
   		Please Sign In
   	</div>
   	
+		<div id="coverage-map-loading-spinner"></div>
+		
 
  	<form action="javascript:loginPersonFormSubmit()" >
 		<input type="hidden" id="requestedURL" value="<c:out value="${ param.requestedURL }" />"/>

@@ -1,3 +1,18 @@
+/**
+ * spinner.js
+ * 
+ * Code that uses Spinner Library code
+ * 
+ */
+
+//////////////////////////////////
+// JavaScript directive:   all variables have to be declared with "var", maybe other things
+"use strict";
+
+import { Spinner } from 'libs/spinner/spin.min.js';
+
+
+
 var SPINNER_OPTIONS = {
 		  lines: 13, // The number of lines to draw
 		  length: 20, // The length of each line

@@ -7,6 +7,9 @@
 // JavaScript directive:   all variables have to be declared with "var", maybe other things
 "use strict";
 
+import { createSpinner, destroySpinner, incrementSpinner, decrementSpinner }  from 'page_js/header_section_js_all_pages_main_pages/header_section_every_page/spinner.js';
+
+
 var PAGE_CONSTANTS = {
 		USER_LOGIN_PAGE_URL_FRAGMENT :  "user_loginPage",
 		ERROR_MESSAGE_VERTICAL_MOVEMENT : 50 // number of pixels for moving error message when showing it. 
@@ -56,6 +59,10 @@ window.loginPerson = function( params ) {
 	}
 	// inviteTrackingCode Only when came to Sign in page from Clicking "Sign in" on Invite landing page
 	var inviteTrackingCode = $inviteTrackingCode.val();
+
+
+	createSpinner();				// create spinner - External Function
+
 	
 	var requestData = {
 			username : username,
@@ -99,23 +106,38 @@ window.loginComplete = function(requestData, responseData) {
 	if ( ! responseData.status ) {
 		//  User not logged in if status not true
 		if ( responseData.termsOfServiceAcceptanceRequired ) {
+
+			destroySpinner();  // Destroy Spinner - External Function
+				
 			$("#terms_of_service_modal_dialog_overlay_background").show();
 			$("#terms_of_service_overlay_div").show();
 			pageGlobals.tosKey = responseData.termsOfServiceKey;
 			$("#terms_of_service_acceptance_required_text").html( responseData.termsOfServiceText );
 		} else if ( responseData.invalidUserOrPassword ) {
+
+			destroySpinner();  // Destroy Spinner - External Function
+				
 			var $element = $("#error_message_username_or_password_invalid");
 			showErrorMsg( $element );
 		} else if ( responseData.disabledUser ) {
+
+			destroySpinner();  // Destroy Spinner - External Function
+				
 			var $element = $("#error_message_user_disabled");
 			showErrorMsg( $element );
 		} else if ( responseData.noProxlAccount ) {
+
+			destroySpinner();  // Destroy Spinner - External Function
+				
 			var $element = $("#error_message_no_proxl_account");
 			showErrorMsg( $element );
 		} else if ( responseData. invalidInviteTrackingCode ) {
 			//  Invalid Invite tracking code so redirect to requestedURL to process tracking code and show error msg
 			var $requestedURL = $("#requestedURL");
 			if ($requestedURL.length === 0) {
+
+				destroySpinner();  // Destroy Spinner - External Function
+				
 				throw Error("Unable to find input field for id 'requestedURL' ");
 			}
 			var requestedURL = $requestedURL.val();
@@ -124,24 +146,39 @@ window.loginComplete = function(requestData, responseData) {
 				return;
 			}
 		} else {
+
+			destroySpinner();  // Destroy Spinner - External Function
+				
 			var $element = $("#error_message_system_error");
 			showErrorMsg( $element );
 		}
+
+		destroySpinner();  // Destroy Spinner - External Function
+				
 		return;
 	} 
 //	alert("Person login complete: ");
 	var $useDefaultURL = $("#useDefaultURL");
 	if ($useDefaultURL.length === 0) {
+
+		destroySpinner();  // Destroy Spinner - External Function
+				
 		throw Error("Unable to find input field for id 'useDefaultURL' ");
 	}
 	var useDefaultURL = $useDefaultURL.val();
 	var $defaultURL = $("#defaultURL");
 	if ($defaultURL.length === 0) {
+
+		destroySpinner();  // Destroy Spinner - External Function
+				
 		throw Error("Unable to find input field for id 'defaultURL' ");
 	}
 	var defaultURL = $defaultURL.val();
 	if ( useDefaultURL ) {
 		if (  defaultURL === undefined ||  defaultURL === null || defaultURL === "" ) {
+
+			destroySpinner();  // Destroy Spinner - External Function
+				
 			throw Error("input field for id 'defaultURL' is empty");
 		}
 		window.location.href = defaultURL;
@@ -149,6 +186,9 @@ window.loginComplete = function(requestData, responseData) {
 	} else {
 		var $requestedURL = $("#requestedURL");
 		if ($requestedURL.length === 0) {
+
+			destroySpinner();  // Destroy Spinner - External Function
+				
 			throw Error("Unable to find input field for id 'requestedURL' ");
 		}
 		var requestedURL = $requestedURL.val();
@@ -171,6 +211,8 @@ window.loginComplete = function(requestData, responseData) {
 		return;
 	}
 	
+	destroySpinner();  // Destroy Spinner - External Function
+				
 	//  WAS
 //	var $defaultURL = $("#defaultURL");
 //
