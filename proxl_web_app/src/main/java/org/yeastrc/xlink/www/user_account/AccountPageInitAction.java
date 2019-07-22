@@ -9,8 +9,12 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.yeastrc.xlink.www.constants.StrutsGlobalForwardNames;
-
+import org.yeastrc.xlink.www.exceptions.ProxlWebappInternalErrorException;
+import org.yeastrc.xlink.www.user_mgmt_webapp_access.UserMgmtCentralWebappWebserviceAccess;
+import org.yeastrc.xlink.www.user_mgmt_webapp_access.UserMgmtSessionKeyAliveWebserviceRequest;
+import org.yeastrc.xlink.www.user_mgmt_webapp_access.UserMgmtSessionKeyAliveWebserviceResponse;
 import org.yeastrc.xlink.www.user_session_management.UserSession;
+import org.yeastrc.xlink.www.user_session_management.UserSessionManager;
 import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result;
 import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId;
 import org.yeastrc.xlink.www.web_utils.GetPageHeaderData;
@@ -43,6 +47,27 @@ public class AccountPageInitAction extends Action {
 			if ( ! TestIsUserSignedIn.getInstance().testIsUserSignedIn( userSession ) ) {
 				//  No User session 
 				return mapping.findForward( StrutsGlobalForwardNames.NO_USER_SESSION );
+			}
+			{
+				UserMgmtSessionKeyAliveWebserviceRequest userMgmtSessionKeyAliveWebserviceRequest = new UserMgmtSessionKeyAliveWebserviceRequest();
+				userMgmtSessionKeyAliveWebserviceRequest.setSessionKey( userSession.getUserMgmtSessionKey() );
+				
+				UserMgmtSessionKeyAliveWebserviceResponse userMgmtSessionKeyAliveWebserviceResponse =
+						UserMgmtCentralWebappWebserviceAccess.getInstance().sessionKeyAlive(userMgmtSessionKeyAliveWebserviceRequest);
+				if ( userMgmtSessionKeyAliveWebserviceResponse.isSessionKeyNotValid() ) {
+					
+					//  Session Key not valid in User Mgmt.  Force User to log back in to create new session in User Mgmt
+					
+					//  Invalidate session
+					UserSessionManager.getSinglesonInstance().invalidateUserSession( request );
+
+					// Send to login page
+					return mapping.findForward( StrutsGlobalForwardNames.NO_USER_SESSION );
+				}
+			
+				if ( ! userMgmtSessionKeyAliveWebserviceResponse.isSuccess() ) {
+					throw new ProxlWebappInternalErrorException( "Response from User Mgmt Not Success" );
+				}
 			}
 			GetPageHeaderData.getInstance().getPageHeaderDataWithoutProjectId( request );
 			

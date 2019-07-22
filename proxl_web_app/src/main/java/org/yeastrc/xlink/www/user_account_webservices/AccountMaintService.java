@@ -87,7 +87,23 @@ public class AccountMaintService {
 					UserMgmtCentralWebappWebserviceAccess.getInstance().
 					manageUserData( userMgmtManageAccountRequest );
 			if ( ! userMgmtManageAccountResponse.isSuccess() ) {
+
 				accountMaintResult.setStatus(false);
+				
+				if ( userMgmtManageAccountResponse.isSessionKeyNotValid() ) {
+					
+					//  No User session In User Mgmt
+					
+					//  Invalidate session
+					UserSessionManager.getSinglesonInstance().invalidateUserSession( request );
+					
+					//  Return HTTP status so JS reloads page and user logs back in, creating new session in User Mgmt
+					throw new WebApplicationException(
+							Response.status( WebServiceErrorMessageConstants.NO_SESSION_STATUS_CODE )  //  Send HTTP code
+							.entity( WebServiceErrorMessageConstants.NO_SESSION_TEXT ) // This string will be passed to the client
+							.build()
+							);
+				}
 				return accountMaintResult; // EARLY RETURN
 			}
 
@@ -172,6 +188,21 @@ public class AccountMaintService {
 					UserMgmtCentralWebappWebserviceAccess.getInstance().
 					manageUserData( userMgmtManageAccountRequest );
 			if ( ! userMgmtManageAccountResponse.isSuccess() ) {
+
+				if ( userMgmtManageAccountResponse.isSessionKeyNotValid() ) {
+					
+					//  No User session In User Mgmt
+					
+					//  Invalidate session
+					UserSessionManager.getSinglesonInstance().invalidateUserSession( request );
+					
+					//  Return HTTP status so JS reloads page and user logs back in, creating new session in User Mgmt
+					throw new WebApplicationException(
+							Response.status( WebServiceErrorMessageConstants.NO_SESSION_STATUS_CODE )  //  Send HTTP code
+							.entity( WebServiceErrorMessageConstants.NO_SESSION_TEXT ) // This string will be passed to the client
+							.build()
+							);
+				}
 				accountMaintResult.setStatus(false);
 				return accountMaintResult; // EARLY RETURN
 			}
@@ -257,6 +288,21 @@ public class AccountMaintService {
 					UserMgmtCentralWebappWebserviceAccess.getInstance().
 					manageUserData( userMgmtManageAccountRequest );
 			if ( ! userMgmtManageAccountResponse.isSuccess() ) {
+
+				if ( userMgmtManageAccountResponse.isSessionKeyNotValid() ) {
+					
+					//  No User session In User Mgmt
+					
+					//  Invalidate session
+					UserSessionManager.getSinglesonInstance().invalidateUserSession( request );
+					
+					//  Return HTTP status so JS reloads page and user logs back in, creating new session in User Mgmt
+					throw new WebApplicationException(
+							Response.status( WebServiceErrorMessageConstants.NO_SESSION_STATUS_CODE )  //  Send HTTP code
+							.entity( WebServiceErrorMessageConstants.NO_SESSION_TEXT ) // This string will be passed to the client
+							.build()
+							);
+				}
 				accountMaintResult.setStatus(false);
 				return accountMaintResult; // EARLY RETURN
 			}
@@ -342,6 +388,21 @@ public class AccountMaintService {
 					UserMgmtCentralWebappWebserviceAccess.getInstance().
 					manageUserData( userMgmtManageAccountRequest );
 			if ( ! userMgmtManageAccountResponse.isSuccess() ) {
+
+				if ( userMgmtManageAccountResponse.isSessionKeyNotValid() ) {
+					
+					//  No User session In User Mgmt
+					
+					//  Invalidate session
+					UserSessionManager.getSinglesonInstance().invalidateUserSession( request );
+					
+					//  Return HTTP status so JS reloads page and user logs back in, creating new session in User Mgmt
+					throw new WebApplicationException(
+							Response.status( WebServiceErrorMessageConstants.NO_SESSION_STATUS_CODE )  //  Send HTTP code
+							.entity( WebServiceErrorMessageConstants.NO_SESSION_TEXT ) // This string will be passed to the client
+							.build()
+							);
+				}
 				accountMaintResult.setStatus(false);
 				if ( userMgmtManageAccountResponse.isDuplicateEmail() ) {
 					accountMaintResult.setValueAlreadyExists(true);
@@ -422,6 +483,21 @@ public class AccountMaintService {
 					UserMgmtCentralWebappWebserviceAccess.getInstance().
 					manageUserData( userMgmtManageAccountRequest );
 			if ( ! userMgmtManageAccountResponse.isSuccess() ) {
+
+				if ( userMgmtManageAccountResponse.isSessionKeyNotValid() ) {
+					
+					//  No User session In User Mgmt
+					
+					//  Invalidate session
+					UserSessionManager.getSinglesonInstance().invalidateUserSession( request );
+					
+					//  Return HTTP status so JS reloads page and user logs back in, creating new session in User Mgmt
+					throw new WebApplicationException(
+							Response.status( WebServiceErrorMessageConstants.NO_SESSION_STATUS_CODE )  //  Send HTTP code
+							.entity( WebServiceErrorMessageConstants.NO_SESSION_TEXT ) // This string will be passed to the client
+							.build()
+							);
+				}
 				accountMaintResult.setStatus(false);
 				if ( userMgmtManageAccountResponse.isDuplicateUsername() ) {
 					accountMaintResult.setValueAlreadyExists(true);
@@ -526,6 +602,22 @@ public class AccountMaintService {
 					UserMgmtCentralWebappWebserviceAccess.getInstance().changePassword( userMgmtChangePasswordRequest );
 			
 			if ( ! userMgmtChangePasswordResponse.isSuccess() ) {
+
+				if ( userMgmtChangePasswordResponse.isSessionKeyNotValid() ) {
+					
+					//  No User session In User Mgmt
+					
+					//  Invalidate session
+					UserSessionManager.getSinglesonInstance().invalidateUserSession( request );
+					
+					//  Return HTTP status so JS reloads page and user logs back in, creating new session in User Mgmt
+					throw new WebApplicationException(
+							Response.status( WebServiceErrorMessageConstants.NO_SESSION_STATUS_CODE )  //  Send HTTP code
+							.entity( WebServiceErrorMessageConstants.NO_SESSION_TEXT ) // This string will be passed to the client
+							.build()
+							);
+				}
+				
 				accountMaintResult.setStatus(false);
 				if ( userMgmtChangePasswordResponse.isSessionKeyNotValid() ) {
 					//  No User session 
@@ -597,7 +689,6 @@ public class AccountMaintService {
 		public void setStatus(boolean status) {
 			this.status = status;
 		}
-
 	}
 
 }
