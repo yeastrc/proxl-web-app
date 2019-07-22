@@ -64,8 +64,10 @@
 		</td>
 	  {{/if}}
 	{{/if}}
+					precursorMZ_DataAnyRows,
+				precursorRetentionTime_DataAnyRows,
 	
-	{{#if scanDataAnyRows}}
+	{{#if precursorMZ_DataAnyRows}}
 		<td style="text-align: right; white-space: nowrap; " class="integer-number-column{{#if  psm.scanIdMatchesInitialScanId }}   highlight-row  {{/if}}" >
 			{{ psm.preMZRounded }}
 		</td>
@@ -78,7 +80,7 @@
 	{{/if}}
 	
 
-	{{#if scanDataAnyRows}}
+	{{#if precursorRetentionTime_DataAnyRows}}
 		<td style="text-align: right; white-space: nowrap; " class="integer-number-column{{#if  psm.scanIdMatchesInitialScanId }}   highlight-row  {{/if}}" >
 			{{  psm.retentionTimeMinutesRoundedString }}
 		</td>

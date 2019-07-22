@@ -48,7 +48,7 @@ public class ProcessStaticModifications {
 
 				for ( StaticModification staticModification : staticModificationList ) {
 
-					BigDecimal mass = RoundDecimalFieldsIfNecessary.roundDecimalFieldsIfNecessary( staticModification.getMassChange() );
+					BigDecimal mass = RoundDecimalFieldsIfNecessary.roundDecimalFieldsIfNecessary_18comma9( staticModification.getMassChange() );
 					
 					
 					StaticModDTO StaticModDTO = new StaticModDTO();

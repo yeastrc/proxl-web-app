@@ -55,7 +55,7 @@ public class PopulateAndSavePsmDTO {
 		psmDTO.setSearchId( searchId );
 		psmDTO.setReportedPeptideId( reportedPeptideDTO.getId() );
 		if ( psm.getLinkerMass() != null ) {
-			BigDecimal linkerMass = RoundDecimalFieldsIfNecessary.roundDecimalFieldsIfNecessary( psm.getLinkerMass() );
+			BigDecimal linkerMass = RoundDecimalFieldsIfNecessary.roundDecimalFieldsIfNecessary_18comma9( psm.getLinkerMass() );
 			psmDTO.setLinkerMass( linkerMass );
 		} else {
 			//  linker mass cannot be null for crosslink or looplink
@@ -77,6 +77,16 @@ public class PopulateAndSavePsmDTO {
 		}
 		psmDTO.setCharge( psm.getPrecursorCharge().intValue() );
 		
+		if ( psm.getPrecursorRetentionTime() != null ) {
+			BigDecimal precursorRetentionTime = RoundDecimalFieldsIfNecessary.roundDecimalField__psm_precursor_retention_time( psm.getPrecursorRetentionTime() );
+			psmDTO.setPrecursor_RetentionTime( precursorRetentionTime );
+		}
+
+		if ( psm.getPrecursorMZ() != null ) {
+			BigDecimal precursorMZ = RoundDecimalFieldsIfNecessary.roundDecimalField__psm_precursor_m_z( psm.getPrecursorMZ() );
+			psmDTO.setPrecursor_MZ( precursorMZ );
+		}
+			
 		if ( psm.getScanNumber() != null ) {
 			psmDTO.setScanNumber( psm.getScanNumber().intValue() );
 		}

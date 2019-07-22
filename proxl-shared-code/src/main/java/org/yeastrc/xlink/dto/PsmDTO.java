@@ -8,16 +8,6 @@ import java.math.BigDecimal;
  */
 public class PsmDTO {
 	
-
-	@Override
-	public String toString() {
-		return "PsmDTO [id=" + id + ", searchId=" + searchId + ", scanId="
-				+ scanId + ", reportedPeptideId=" + reportedPeptideId
-				+ ", charge=" + charge + ", linkerMass=" + linkerMass
-				+ ", scanNumber=" + scanNumber + ", searchScanFilenameId="
-				+ searchScanFilenameId + "]";
-	}
-	
 	public int getId() {
 		return id;
 	}
@@ -66,7 +56,19 @@ public class PsmDTO {
 	public void setSearchScanFilenameId(Integer searchScanFilenameId) {
 		this.searchScanFilenameId = searchScanFilenameId;
 	}
-	
+	public BigDecimal getPrecursor_RetentionTime() {
+		return precursor_RetentionTime;
+	}
+	public void setPrecursor_RetentionTime(BigDecimal precursor_RetentionTime) {
+		this.precursor_RetentionTime = precursor_RetentionTime;
+	}
+	public BigDecimal getPrecursor_MZ() {
+		return precursor_MZ;
+	}
+	public void setPrecursor_MZ(BigDecimal precursor_MZ) {
+		this.precursor_MZ = precursor_MZ;
+	}
+
 
 
 	
@@ -78,5 +80,7 @@ public class PsmDTO {
 	private BigDecimal linkerMass;
 	private Integer scanNumber;
 	private Integer searchScanFilenameId;
+	private BigDecimal precursor_RetentionTime; // precursor_retention_time
+	private BigDecimal precursor_MZ;            // precursor_m_z
 
 }

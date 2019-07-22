@@ -135,7 +135,7 @@ public class ProcessPsmPerPeptideAnnotationsForPSM {
 		}
 		
 		if ( psmPeptide.getLinkerMass() != null ) {
-			BigDecimal linkerMass = RoundDecimalFieldsIfNecessary.roundDecimalFieldsIfNecessary( psmPeptide.getLinkerMass() );
+			BigDecimal linkerMass = RoundDecimalFieldsIfNecessary.roundDecimalFieldsIfNecessary_18comma9( psmPeptide.getLinkerMass() );
 			psmPerPeptideDTO.setLinkerMass( linkerMass );
 		}
 		

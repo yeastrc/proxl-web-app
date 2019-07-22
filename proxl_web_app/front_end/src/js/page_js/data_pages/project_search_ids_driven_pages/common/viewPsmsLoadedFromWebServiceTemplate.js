@@ -290,6 +290,8 @@ var ViewPsmsLoadedFromWebServiceTemplate = function() {
 		}
 		
 		var scanDataAnyRows = false;
+		let precursorMZ_DataAnyRows = false;
+		let precursorRetentionTime_DataAnyRows = false;
 		var scanNumberAnyRows = false;
 		var scanFilenameAnyRows = false;
 		var chargeDataAnyRows = false;
@@ -297,6 +299,12 @@ var ViewPsmsLoadedFromWebServiceTemplate = function() {
 			var psm = psmWebDisplayList[ psmIndex ];
 			if (  psm.psmDTO.scanId ) {
 				scanDataAnyRows = true;
+			}
+			if ( psm.preMZRounded ) {
+				precursorMZ_DataAnyRows = true;
+			}
+			if ( psm.retentionTimeMinutesRoundedString ) {
+				precursorRetentionTime_DataAnyRows = true;
 			}
 			if (  psm.scanNumber ) {
 				scanNumberAnyRows = true;
@@ -320,6 +328,8 @@ var ViewPsmsLoadedFromWebServiceTemplate = function() {
 				annotationDisplayNameDescriptionList : annotationDisplayNameDescriptionList,
 				showViewSpectrumLinkColumn : showViewSpectrumLinkColumn,
 				scanDataAnyRows : scanDataAnyRows,
+				precursorMZ_DataAnyRows,
+				precursorRetentionTime_DataAnyRows,
 				scanNumberAnyRows : scanNumberAnyRows,
 				scanFilenameAnyRows : scanFilenameAnyRows,
 				chargeDataAnyRows : chargeDataAnyRows,
@@ -353,6 +363,8 @@ var ViewPsmsLoadedFromWebServiceTemplate = function() {
 						psm : psm,
 						showViewSpectrumLinkColumn : showViewSpectrumLinkColumn,
 						scanDataAnyRows : scanDataAnyRows,
+						precursorMZ_DataAnyRows,
+						precursorRetentionTime_DataAnyRows,
 						scanNumberAnyRows : scanNumberAnyRows,
 						scanFilenameAnyRows : scanFilenameAnyRows,
 						chargeDataAnyRows : chargeDataAnyRows,

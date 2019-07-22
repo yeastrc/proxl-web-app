@@ -32,12 +32,14 @@ public class PsmWebDisplaySearcher {
 	
 	private static final String SQL_MAIN = 
 			"SELECT psm.id AS psm_id, psm.charge, psm.scan_number AS scan_number, "
-			+ 		 " scan.retention_time,  scan.preMZ,  scan.scan_file_id, "
+			+ 		 " psm.precursor_retention_time AS psm_precursor_retention_time,  psm.precursor_m_z AS psm_precursor_m_z,  "
+			+ 		 " scan.retention_time AS scan_retention_time,  scan.preMZ AS scan_preMZ,  "
+			+ 		 " scan.scan_file_id, "
 			+        " search_scan_filename.filename AS scan_filename "
 			+ " FROM psm  "
 			+ " LEFT OUTER JOIN search_scan_filename ON psm.search_scan_filename_id = search_scan_filename.id "
 			+ " LEFT OUTER JOIN scan ON psm.scan_id = scan.id ";
-	
+		
 	private static final String SQL_WHERE_START =  " WHERE psm.search_id = ? AND psm.reported_peptide_id = ?  ";
 	private static final String SQL_ORDER_BY =   " ORDER BY psm.id ";
 	/**
@@ -146,24 +148,45 @@ public class PsmWebDisplaySearcher {
 					psmWebDisplay.setScanFileId( scanFileId );
 				}
 				psmWebDisplay.setScanFilename( rs.getString( "scan_filename" ) );
-				BigDecimal retentionTime = rs.getBigDecimal( "retention_time" );
-				if ( retentionTime != null ) {
-					psmWebDisplay.setRetentionTime( retentionTime );
-					//  Get the retention time in minutes
-					BigDecimal retentionInMinutesRounded = RetentionTimeScalingAndRounding.retentionTimeToMinutesRounded( psmWebDisplay.getRetentionTime() );
-					psmWebDisplay.setRetentionTimeMinutesRounded( retentionInMinutesRounded );
+				
+//				+ 		 " psm.precursor_retention_time AS psm_precursor_retention_time,  psm.precursor_m_z AS psm_precursor_m_z,  "
+//				+ 		 " scan.retention_time AS scan_retention_time,  scan.preMZ AS scan_preMZ,  "
+
+				{
+					//  First try PSM psm.precursor_retention_time value
+					BigDecimal retentionTime = rs.getBigDecimal( "psm_precursor_retention_time" );
+					if ( retentionTime == null ) {		
+						//  PSM value is null so try Scan scan.retention_time
+						retentionTime = rs.getBigDecimal( "scan_retention_time" );
+					}	
+					if ( retentionTime != null ) {
+						psmWebDisplay.setRetentionTime( retentionTime );
+						//  Get the retention time in minutes
+						BigDecimal retentionInMinutesRounded = RetentionTimeScalingAndRounding.retentionTimeToMinutesRounded( psmWebDisplay.getRetentionTime() );
+						psmWebDisplay.setRetentionTimeMinutesRounded( retentionInMinutesRounded );
+					}
 				}
-				BigDecimal preMZ = rs.getBigDecimal( "preMZ" );
-				if ( preMZ != null ) {
-					psmWebDisplay.setPreMZ( preMZ );
-					//  Round the preMZ
+				{
+					//  First try PSM psm.precursor_m_z  value
+					BigDecimal preMZ = rs.getBigDecimal( "psm_precursor_m_z" );
 					String preMZRoundedString = null;
 					if ( preMZ != null ) {
-						// first param to setScale is the number of decimal places to keep  
-						BigDecimal preMZRounded = preMZ.setScale( 5, RoundingMode.HALF_UP );
-						preMZRoundedString = preMZRounded.toString();  // convert to string so trailing zeros are preserved
+						preMZRoundedString = preMZ.toString(); // Only 4 decimal places for psm_precursor_m_z so just to string
 					}
-					psmWebDisplay.setPreMZRounded( preMZRoundedString );
+					if ( preMZ == null ) {
+						//  PSM value is null so try Scan scan.scan_preMZ
+						preMZ = rs.getBigDecimal( "scan_preMZ" );
+						//  Round the preMZ
+						if ( preMZ != null ) {
+							// first param to setScale is the number of decimal places to keep  
+							BigDecimal preMZRounded = preMZ.setScale( 5, RoundingMode.HALF_UP );
+							preMZRoundedString = preMZRounded.toString();  // convert to string so trailing zeros are preserved
+						}
+					}
+					if ( preMZ != null ) {
+						psmWebDisplay.setPreMZ( preMZ );
+						psmWebDisplay.setPreMZRounded( preMZRoundedString );
+					}
 				}
 				psms.add( psmWebDisplay );
 			}

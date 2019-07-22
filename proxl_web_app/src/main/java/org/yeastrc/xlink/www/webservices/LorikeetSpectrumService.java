@@ -222,8 +222,16 @@ public class LorikeetSpectrumService {
 				throw e;
 			}
 			
-			Double ms_2_precursor_M_Over_Z =
-					scanDataFromSpectralStorageService_MS_2_1.ms_2_scanDataFromSpectralStorageService.getPrecursor_M_Over_Z();
+			Double ms_2_precursor_M_Over_Z = null;
+			
+			if ( psmDTO.getPrecursor_MZ() != null ) {
+				ms_2_precursor_M_Over_Z = psmDTO.getPrecursor_MZ().doubleValue();
+			}
+			
+			if ( ms_2_precursor_M_Over_Z == null ) {
+				//  No ms_2_precursor_M_Over_Z on PSM so get from Scan
+				ms_2_precursor_M_Over_Z = scanDataFromSpectralStorageService_MS_2_1.ms_2_scanDataFromSpectralStorageService.getPrecursor_M_Over_Z();
+			}
 			
 			if ( ms_2_precursor_M_Over_Z == null ) {
 				String msg = "ms_2_precursor_M_Over_Z == null: psm id: " + psmId;

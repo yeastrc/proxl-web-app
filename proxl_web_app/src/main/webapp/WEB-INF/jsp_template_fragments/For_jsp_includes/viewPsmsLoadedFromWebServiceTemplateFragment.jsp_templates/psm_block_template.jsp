@@ -108,7 +108,7 @@
 
 
 
-			{{#if scanDataAnyRows}}
+			{{#if precursorMZ_DataAnyRows}}
 				<th style="text-align:right;font-weight:bold;" class="integer-number-column"><span style="white-space: nowrap">Obs. m/z</span></th>
 			{{/if}}
 
@@ -116,7 +116,7 @@
 				<th style="text-align:right;font-weight:bold;" class="integer-number-column"><span style="white-space: nowrap">Charge</span></th>
 			{{/if}}
 			
-			{{#if scanDataAnyRows}}
+			{{#if precursorRetentionTime_DataAnyRows}}
 				<th style="text-align:right;font-weight:bold;" class="integer-number-column"><span style="white-space: nowrap">RT (min)<%-- Retention Time --%></span></th>
 			{{/if}}
 				

@@ -172,6 +172,10 @@ public class PsmDAO {
 		if ( ! rs.wasNull() ) {
 			psm.setSearchScanFilenameId( searchScanFilenameId );;
 		}
+		
+		psm.setPrecursor_RetentionTime( rs.getBigDecimal( "precursor_retention_time" ) );  //  Can be NULL
+		psm.setPrecursor_MZ( rs.getBigDecimal( "precursor_m_z" ) );  //  Can be NULL
+		
 		return psm;
 	}
 }

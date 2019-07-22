@@ -57,8 +57,9 @@ public class DB_Insert_PsmDAO {
 			
 			"INSERT INTO psm "
 			+ "( search_id, scan_id, charge, linker_mass, reported_peptide_id,"
-			+ " scan_number, search_scan_filename_id ) "
-			+ "VALUES ( ?, ?, ?, ?, ?, ?, ? )";
+			+ " scan_number, search_scan_filename_id,"
+			+ " precursor_retention_time, precursor_m_z ) "
+			+ "VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ? )";
 	
 	/**
 	 * @param psm
@@ -120,7 +121,13 @@ public class DB_Insert_PsmDAO {
 			} else {
 				pstmt.setNull( counter, java.sql.Types.INTEGER );
 			}
-			
+
+			counter++;
+			pstmt.setBigDecimal( counter, psm.getPrecursor_RetentionTime() );
+
+			counter++;
+			pstmt.setBigDecimal( counter, psm.getPrecursor_MZ() );
+
 			pstmt.executeUpdate();
 			
 			rs = pstmt.getGeneratedKeys();

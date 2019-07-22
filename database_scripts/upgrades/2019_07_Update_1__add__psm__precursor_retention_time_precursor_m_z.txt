@@ -1,0 +1,7 @@
+
+--  2019_07_Update_1__add__psm__precursor_retention_time_precursor_m_z.txt
+
+
+ALTER TABLE psm 
+ADD COLUMN precursor_retention_time DECIMAL(9,4) NULL AFTER search_scan_filename_id,
+ADD COLUMN precursor_m_z DECIMAL(10,4) NULL AFTER precursor_retention_time;

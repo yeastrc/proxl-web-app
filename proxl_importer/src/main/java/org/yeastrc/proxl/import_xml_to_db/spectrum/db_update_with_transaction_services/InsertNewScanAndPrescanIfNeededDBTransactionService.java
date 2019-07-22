@@ -174,9 +174,9 @@ public class InsertNewScanAndPrescanIfNeededDBTransactionService {
 		
 
 		BigDecimal retentionTime = 
-				RoundDecimalFieldsIfNecessary.roundDecimalFieldsIfNecessary( scanIn.getRetentionTime() );
+				RoundDecimalFieldsIfNecessary.roundDecimalFieldsIfNecessary_18comma9( scanIn.getRetentionTime() );
 		
-		BigDecimal preMZ = RoundDecimalFieldsIfNecessary.roundDecimalFieldsIfNecessary( scanIn.getPrecursorMz() );
+		BigDecimal preMZ = RoundDecimalFieldsIfNecessary.roundDecimalFieldsIfNecessary_18comma9( scanIn.getPrecursorMz() );
 		
 		
 		ScanDTO scanDTO = new ScanDTO();
