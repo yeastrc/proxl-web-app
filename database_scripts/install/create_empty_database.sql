@@ -404,6 +404,8 @@ CREATE TABLE  psm (
   linker_mass DECIMAL(18,9) NULL,
   scan_number INT UNSIGNED NULL,
   search_scan_filename_id INT UNSIGNED NULL,
+  precursor_retention_time DECIMAL(9,4) NULL,
+  precursor_m_z DECIMAL(10,4) NULL,
   PRIMARY KEY (id),
   CONSTRAINT psm_ibfk_1
     FOREIGN KEY (search_id)
@@ -2655,6 +2657,60 @@ ENGINE = InnoDB;
 CREATE INDEX prj_lvl_dfltfltr_ann_ctffs_as_str_prev_fk_idx ON project_level_default_fltr_ann_cutoffs_cutoff_as_string_prev_tbl (project_id ASC);
 
 
+-- -----------------------------------------------------
+-- Table project_level_default_fltr_min_psms_tbl
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS project_level_default_fltr_min_psms_tbl ;
+
+CREATE TABLE  project_level_default_fltr_min_psms_tbl (
+  id INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  project_id INT(10) UNSIGNED NOT NULL,
+  min_psms INT NOT NULL,
+  created_auth_user_id INT UNSIGNED NOT NULL,
+  created_date_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  last_updated_auth_user_id INT NOT NULL,
+  last_updated_date_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  CONSTRAINT project_level_default_fltr_min_psms_tbl
+    FOREIGN KEY (project_id)
+    REFERENCES project (id)
+    ON DELETE CASCADE
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+COMMENT = 'User Entered Min PSMs that apply to all searches in the project';
+
+
+-- -----------------------------------------------------
+-- Table project_level_default_fltr_min_psms_prev_tbl
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS project_level_default_fltr_min_psms_prev_tbl ;
+
+CREATE TABLE  project_level_default_fltr_min_psms_prev_tbl (
+  id INT(10) UNSIGNED NOT NULL,
+  project_id INT(10) UNSIGNED NOT NULL,
+  min_psms INT NOT NULL,
+  created_auth_user_id INT UNSIGNED NOT NULL,
+  created_date_time DATETIME NOT NULL,
+  last_updated_auth_user_id INT NOT NULL,
+  last_updated_date_time DATETIME NOT NULL,
+  id_prev_record INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  copy_create_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id_prev_record),
+  CONSTRAINT project_level_default_fltr_min_psms_prev_tbl
+    FOREIGN KEY (project_id)
+    REFERENCES project (id)
+    ON DELETE CASCADE
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+COMMENT = 'User Entered Min PSMs that apply to all searches in the project';
+
+CREATE UNIQUE INDEX unique_index ON project_level_default_fltr_min_psms_prev_tbl (project_id ASC);
+
+
+SET SQL_MODE=@OLD_SQL_MODE;
+SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
+SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
+
 
 DELIMITER $$
 
@@ -2674,8 +2730,4 @@ END$$
 
 
 DELIMITER ;
-
-SET SQL_MODE=@OLD_SQL_MODE;
-SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
-SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
 
