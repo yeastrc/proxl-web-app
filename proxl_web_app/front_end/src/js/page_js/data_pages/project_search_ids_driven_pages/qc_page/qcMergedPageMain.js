@@ -22,10 +22,10 @@ import { copyObject_DeepCopy_Proxl } from 'page_js/common_js_includes_all_pages/
 
 
 //  Import to make available on the page
-import { searchesChangeDisplayOrder } from 'page_js/data_pages/project_search_ids_driven_pages/common/searchesChangeDisplayOrder.js';
 import { searchesForPageChooser } from 'page_js/data_pages/project_search_ids_driven_pages/common/searchesForPageChooser.js';
 import { sharePageURLShortener  } from 'page_js/data_pages/project_search_ids_driven_pages/common/sharePageURLShortener.js';
 
+import { searchesChangeDisplayOrder } from 'page_js/data_pages/project_search_ids_driven_pages/common/searchesChangeDisplayOrder.js';
 
 import { DataPages_LoggedInUser_CommonObjectsFactory } from 'page_js/data_pages/data_pages_common/dataPages_LoggedInUser_CommonObjectsFactory.js';
 
@@ -1463,6 +1463,8 @@ var QCMergedPageMain = function() {
 };
 
 const qcMergedPageMain = new QCMergedPageMain();
+
+searchesChangeDisplayOrder.set_qcMergedPageMain( qcMergedPageMain );
 
 qcMergedPageMain.init();
 

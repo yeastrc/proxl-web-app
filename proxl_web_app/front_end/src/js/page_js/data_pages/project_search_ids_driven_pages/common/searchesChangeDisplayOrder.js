@@ -26,6 +26,11 @@ var SearchesChangeDisplayOrder = function( params ) {
 			
 	// };
 
+	this.set_qcMergedPageMain = function( qcMergedPageMain ) {
+
+		this._qcMergedPageMain = qcMergedPageMain;
+	}
+
 	/**
 	 * 
 	 */
@@ -261,11 +266,11 @@ var SearchesChangeDisplayOrder = function( params ) {
 
 		//   Special case for Merged QC Page
 		
-		if ( window.qcMergedPageMain ) {
+		if ( this._qcMergedPageMain ) {
 			
-			//   qcMergedPageMain object on window object so call this instead of the code below
+			//   qcMergedPageMain object passed in so call this instead of the code below
 			
-			qcMergedPageMain.changeProjectSearchIdOrderInURL( { projectSearchIdsInNewOrder : projectSearchIdsInNewOrder } );
+			this._qcMergedPageMain.changeProjectSearchIdOrderInURL( { projectSearchIdsInNewOrder : projectSearchIdsInNewOrder } );
 			
 			return;  //  EARLY EXIT
 		}
