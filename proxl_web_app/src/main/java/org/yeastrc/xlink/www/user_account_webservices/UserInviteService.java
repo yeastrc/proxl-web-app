@@ -250,7 +250,17 @@ public class UserInviteService {
 							.build()
 							);
 				}
-				addExistingUserToProjectUsingProjectId( invitedPersonUserId, invitedPersonAccessLevel, projectAuthShareableObjectId, userInviteResult );
+
+				//  Get User Mgmt User Id for authUserId
+				Integer invitedPerson_userMgmtUserId = AuthUserDAO.getInstance().getUserMgmtUserIdForId( invitedPersonUserId );
+				if ( invitedPerson_userMgmtUserId == null ) {
+					String msg = "Failed to get userMgmtUserId for Proxl auth user id: " + invitedPersonUserId;
+					log.error( msg );
+					throw new ProxlWebappInternalErrorException( msg );
+				}
+				
+				addExistingUserToProjectUsingProjectId( invitedPersonUserId, invitedPerson_userMgmtUserId, invitedPersonAccessLevel, projectAuthShareableObjectId, userInviteResult );
+				
 			} else if ( StringUtils.isNotEmpty( invitedPersonLastName ) ) {
 				//  process the last name
 				if ( projectId == null ) {
@@ -297,8 +307,22 @@ public class UserInviteService {
 //								);
 					}
 					Integer userIdEntry = userIdList.get(0);
-					int invitedPersonUserIdFromEmail = userIdEntry;
-					addExistingUserToProjectUsingProjectId( invitedPersonUserIdFromEmail, invitedPersonAccessLevel, projectAuthShareableObjectId, userInviteResult );
+					int invitedPerson_userMgmtUserId = userIdEntry;
+
+					addUser_Using_UserMgmtId_ToProjectUsingProjectId( 
+							invitedPerson_userMgmtUserId, 
+							invitedPersonAccessLevel,
+							projectAuthShareableObjectId,
+							userInviteResult );
+					
+//					When get here, need to add an account in Proxl
+//					This becomes a problem since then unlike when the user is creating their own account 
+//					the person making the invite cannot accept the terms. 
+					
+//					throw new RuntimeException( "Invalid here to pass invitedPerson_userMgmtUserId as invitedPersonUserId" );
+//					addExistingUserToProjectUsingProjectId( invitedPerson_userMgmtUserId /* invitedPersonUserId */, invitedPersonAccessLevel, projectAuthShareableObjectId, userInviteResult );
+
+//					addExistingUserToProjectUsingProjectId( invitedPersonUserIdFromEmail, invitedPersonAccessLevel, projectAuthShareableObjectId, userInviteResult );
 				} else {
 					//  no account with this email exists
 					inviteNewUserUsingEmail( invitedPersonEmail, request, 
@@ -340,104 +364,124 @@ public class UserInviteService {
 		userMgmtSearchUserDataRequest.setSearchStringExactMatch(true);
 		
 		UserMgmtSearchUserDataResponse userMgmtSearchUserDataResponse = 
-				UserMgmtCentralWebappWebserviceAccess.getInstance().searchUserDataByEmail( userMgmtSearchUserDataRequest );
+				UserMgmtCentralWebappWebserviceAccess.getInstance().searchUserDataByLastName( userMgmtSearchUserDataRequest );
 		
 		if ( ! userMgmtSearchUserDataResponse.isSuccess() ) {
 			if ( userMgmtSearchUserDataResponse.isSessionKeyNotValid() ) {
-				String msg = "Session Key invalid for call to UserMgmtCentralWebappWebserviceAccess.getInstance().searchUserDataByEmail(...)";
+				String msg = "Session Key invalid for call to UserMgmtCentralWebappWebserviceAccess.getInstance().searchUserDataByLastName(...)";
 				log.error( msg );
 				throw new ProxlWebappInternalErrorException( msg );
 			}
-			String msg = "call to UserMgmtCentralWebappWebserviceAccess.getInstance().searchUserDataByEmail(...) not successful, invitedPersonLastName: " + invitedPersonLastName;
+			String msg = "call to UserMgmtCentralWebappWebserviceAccess.getInstance().searchUserDataByLastName(...) not successful, invitedPersonLastName: " + invitedPersonLastName;
 			log.error( msg );
 			throw new ProxlWebappInternalErrorException( msg );
 		}
 		List<Integer> userIdList = userMgmtSearchUserDataResponse.getUserIdList();
-		if ( ! userIdList.isEmpty() ) {
+		if ( userIdList == null || ( userIdList.isEmpty() ) ) {
 			userInviteResult.setLastNameNotFoundError(true);
 		} else if ( userIdList.size() > 1 ) {
 			userInviteResult.setLastNameDuplicateError(true);
 		} else {
-			int invitedPersonUserId = userIdList.get( 0 );
-			addExistingUserToProjectUsingProjectId( invitedPersonUserId, invitedPersonAccessLevel, projectAuthShareableObjectId, userInviteResult );
+			int invitedPerson_userMgmtUserId = userIdList.get( 0 );
+			
+			addUser_Using_UserMgmtId_ToProjectUsingProjectId( 
+					invitedPerson_userMgmtUserId, 
+					invitedPersonAccessLevel,
+					projectAuthShareableObjectId,
+					userInviteResult );
+//			When get here, need to add an account in Proxl
+//			This becomes a problem since then unlike when the user is creating their own account 
+//			the person making the invite cannot accept the terms. 
+			
+//			throw new RuntimeException( "Invalid here to pass invitedPerson_userMgmtUserId as invitedPersonUserId" );
+//			addExistingUserToProjectUsingProjectId( invitedPerson_userMgmtUserId /* invitedPersonUserId */, invitedPersonAccessLevel, projectAuthShareableObjectId, userInviteResult );
 		}
 	}
 	
+
 	/**
-	 * @param invitedPersonUserId
+	 * @param invitedPerson_Proxl_AuthUserId - Proxl Auth User Id
+	 * @param invitedPersonAccessLevel
+	 * @param projectAuthShareableObjectId
+	 * @param userInviteResult
+	 * @throws Exception
+	 */
+	private void addUser_Using_UserMgmtId_ToProjectUsingProjectId( 
+			int invitedPerson_userMgmtUserId, 
+			int invitedPersonAccessLevel,
+			int projectAuthShareableObjectId,
+			UserInviteResult userInviteResult ) throws Exception {
+
+		addExistingUserToProjectUsingProjectId( 
+				null, // invitedPerson_Proxl_AuthUserId, // - Optional, null if not available 
+				invitedPerson_userMgmtUserId,
+				invitedPersonAccessLevel,
+				projectAuthShareableObjectId,
+				userInviteResult );
+	}
+	
+	
+	/**
+	 * @param invitedPerson_Proxl_AuthUserId - Proxl Auth User Id - Optional, null if not available 
+	 * @param invitedPerson_userMgmtUserId 
 	 * @param invitedPersonAccessLevel
 	 * @param projectAuthShareableObjectId
 	 * @param userInviteResult
 	 * @throws Exception
 	 */
 	private void addExistingUserToProjectUsingProjectId( 
-			int invitedPersonUserId, 
+			Integer invitedPerson_Proxl_AuthUserId, // - Optional, null if not available 
+			int invitedPerson_userMgmtUserId,
 			int invitedPersonAccessLevel,
 			int projectAuthShareableObjectId,
 			UserInviteResult userInviteResult ) throws Exception {
 
-		//  Get User Mgmt User Id for authUserId
-		Integer userMgmtUserId = AuthUserDAO.getInstance().getUserMgmtUserIdForId( invitedPersonUserId );
-		if ( userMgmtUserId == null ) {
-			String msg = "Failed to get userMgmtUserId for Proxl auth user id: " + invitedPersonUserId;
-			log.error( msg );
-			throw new WebApplicationException(
-					Response.status( WebServiceErrorMessageConstants.INTERNAL_SERVER_ERROR_STATUS_CODE )  //  Send HTTP code
-					.entity( WebServiceErrorMessageConstants.INTERNAL_SERVER_ERROR_TEXT ) // This string will be passed to the client
-					.build()
-					);
-		}
-		
 		//  Get full user data
 		
 		UserMgmtGetUserDataRequest userMgmtGetUserDataRequest = new UserMgmtGetUserDataRequest();
 //		userMgmtGetUserDataRequest.setSessionKey(  );
-		userMgmtGetUserDataRequest.setUserId( userMgmtUserId );
+		userMgmtGetUserDataRequest.setUserId( invitedPerson_userMgmtUserId );
 		
 		UserMgmtGetUserDataResponse userMgmtGetUserDataResponse = 
 				UserMgmtCentralWebappWebserviceAccess.getInstance().getUserData( userMgmtGetUserDataRequest );
 		
 		if ( ! userMgmtGetUserDataResponse.isSuccess() ) {
-			String msg = "Failed to get Full user data from User Mgmt Webapp for Proxl user id: " + invitedPersonUserId
-					+ ", userMgmtUserId: " + userMgmtUserId;
+			String msg = "Failed to get Full user data from User Mgmt Webapp for Proxl user id: " + invitedPerson_Proxl_AuthUserId
+					+ ", userMgmtUserId: " + invitedPerson_userMgmtUserId;
 			log.error( msg );
-			throw new WebApplicationException(
-					Response.status( WebServiceErrorMessageConstants.INTERNAL_SERVER_ERROR_STATUS_CODE )  //  Send HTTP code
-					.entity( WebServiceErrorMessageConstants.INTERNAL_SERVER_ERROR_TEXT ) // This string will be passed to the client
-					.build()
-					);
+			throw new ProxlWebappInternalErrorException( msg );
 		}
 
 		if ( ! userMgmtGetUserDataResponse.isEnabled() ) {
-			log.warn( "AddExistingUserToProjectService:  user is disabled: " + invitedPersonUserId );
+			log.warn( "AddExistingUserToProjectService:  user is disabled in User Mgmt: invitedPerson_Proxl_AuthUserId: " + invitedPerson_Proxl_AuthUserId );
 			throw new WebApplicationException(
 					Response.status( WebServiceErrorMessageConstants.INVALID_PARAMETER_STATUS_CODE )  //  Send HTTP code
 					.entity( WebServiceErrorMessageConstants.INVALID_PARAMETER_TEXT ) // This string will be passed to the client
 					.build()
 					);
 		}
-		Integer userAccessLevel = AuthUserDAO.getInstance().getUserAccessLevel(invitedPersonUserId);
-		if ( userAccessLevel != null && userAccessLevel == AuthAccessLevelConstants.ACCESS_LEVEL_NONE ) {
-			log.warn( "AddExistingUserToProjectService:  user is global acess level none: " + invitedPersonUserId );
-			throw new WebApplicationException(
-					Response.status( WebServiceErrorMessageConstants.INVALID_PARAMETER_STATUS_CODE )  //  Send HTTP code
-					.entity( WebServiceErrorMessageConstants.INVALID_PARAMETER_TEXT ) // This string will be passed to the client
-					.build()
-					);
+		
+		if ( invitedPerson_Proxl_AuthUserId != null ) {
+			Integer userAccessLevel = AuthUserDAO.getInstance().getUserAccessLevel( invitedPerson_Proxl_AuthUserId );
+			if ( userAccessLevel != null && userAccessLevel == AuthAccessLevelConstants.ACCESS_LEVEL_NONE ) {
+				log.warn( "AddExistingUserToProjectService:  user is acess level none at User Level in Proxl. invitedPerson_Proxl_AuthUserId: " + invitedPerson_Proxl_AuthUserId );
+				throw new WebApplicationException(
+						Response.status( WebServiceErrorMessageConstants.INVALID_PARAMETER_STATUS_CODE )  //  Send HTTP code
+						.entity( WebServiceErrorMessageConstants.INVALID_PARAMETER_TEXT ) // This string will be passed to the client
+						.build()
+						);
+			}
 		}
-		AuthSharedObjectUsersDTO authSharedObjectUsersDTO = new AuthSharedObjectUsersDTO();
-		authSharedObjectUsersDTO.setSharedObjectId( projectAuthShareableObjectId );
-		authSharedObjectUsersDTO.setAccessLevel( invitedPersonAccessLevel );
-		authSharedObjectUsersDTO.setUserId( invitedPersonUserId );
-		AuthSharedObjectUsersDAO authSharedObjectUsersDAO = AuthSharedObjectUsersDAO.getInstance();
+
 		try {
-			Integer proxlUserId = AuthUserDAO.getInstance().getIdForId( invitedPersonUserId );
-			if ( proxlUserId == null ) {
-				// No account in proxl for this user id.  
+//			Integer proxlUserId = AuthUserDAO.getInstance().getIdForId( invitedPerson_Proxl_AuthUserId );
+			if ( invitedPerson_Proxl_AuthUserId == null ) {
+				// No account in proxl for this invitedPerson_userMgmtUserId.  
 				// Create one
 				AuthUserDTO authUserDTO = new AuthUserDTO();
-				authUserDTO.setId( invitedPersonUserId );
-				authUserDTO.setEnabledAppSpecific(true);
+//				authUserDTO.setId( invitedPerson_Proxl_AuthUserId ); // Proxl AuthUserId
+				authUserDTO.setUserMgmtUserId( invitedPerson_userMgmtUserId );
+				authUserDTO.setEnabledAppSpecific( true );
 				if ( userMgmtGetUserDataResponse.isGlobalAdminUser() ) {
 					//  User is marked Global Admin User so create account with full admin rights
 					authUserDTO.setUserAccessLevel( AuthAccessLevelConstants.ACCESS_LEVEL_ADMIN );
@@ -454,22 +498,31 @@ public class UserInviteService {
 				try {
 					AddNewUserUsingDBTransactionService.getInstance().addNewUser( authUserDTO, zzUserDataMirrorDTO );
 				} catch ( Exception e ) {
-					String msg = "Failed to add new user for userId in User Mgmt but not in Proxl.  UserId: " + invitedPersonUserId;
+					String msg = "Failed to add new user for userId in User Mgmt but not in Proxl.  UserId: " + invitedPerson_Proxl_AuthUserId;
 					log.error( msg, e );
 					throw e;
 				}
+				
+				invitedPerson_Proxl_AuthUserId = authUserDTO.getId();
 			}
 			
-			authSharedObjectUsersDAO.save( authSharedObjectUsersDTO );
+			AuthSharedObjectUsersDTO authSharedObjectUsersDTO = new AuthSharedObjectUsersDTO();
+			authSharedObjectUsersDTO.setSharedObjectId( projectAuthShareableObjectId );
+			authSharedObjectUsersDTO.setAccessLevel( invitedPersonAccessLevel );
+			authSharedObjectUsersDTO.setUserId( invitedPerson_Proxl_AuthUserId ); // Proxl AuthUserId
+			
+			AuthSharedObjectUsersDAO.getInstance().save( authSharedObjectUsersDTO );
 			userInviteResult.setStatus(true);
 			userInviteResult.setAddedExistingUser(true);
 			
 		} catch ( SQLException sqlException ) {
 			String exceptionMessage = sqlException.getMessage();
 			if ( exceptionMessage != null && exceptionMessage.startsWith( "Duplicate entry" ) ) {
-				AuthSharedObjectUsersDTO existingAuthSharedObjectUsersDTO = authSharedObjectUsersDAO.getAuthSharedObjectUsersDTOForSharedObjectIdAndUserId( projectAuthShareableObjectId, invitedPersonUserId );
+				AuthSharedObjectUsersDTO existingAuthSharedObjectUsersDTO = 
+						AuthSharedObjectUsersDAO.getInstance()
+						.getAuthSharedObjectUsersDTOForSharedObjectIdAndUserId( projectAuthShareableObjectId, invitedPerson_Proxl_AuthUserId );
 				if ( existingAuthSharedObjectUsersDTO != null ) {
-					userInviteResult.setDuplicateInsertError(true);
+					userInviteResult.setDuplicateInsertError( true );
 				}
 			} else {
 				throw sqlException;
