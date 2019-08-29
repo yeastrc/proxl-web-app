@@ -435,6 +435,17 @@ public class UserInviteService {
 			int invitedPersonAccessLevel,
 			int projectAuthShareableObjectId,
 			UserInviteResult userInviteResult ) throws Exception {
+		
+		if ( invitedPerson_Proxl_AuthUserId == null ) {
+			//  Try to get invitedPerson_Proxl_AuthUserId for invitedPerson_userMgmtUserId
+			//  This applies for when user entered an email or last name that is in Proxl and clicked invite  
+			Integer authUserId_FromDB = AuthUserDAO.getInstance().getIdForUserMgmtUserId( invitedPerson_userMgmtUserId );
+			if ( authUserId_FromDB != null ) {
+				//  invitedPerson_userMgmtUserId is in Proxl DB so copy authUserId_FromDB to invitedPerson_Proxl_AuthUserId
+				invitedPerson_Proxl_AuthUserId = authUserId_FromDB;
+			}
+		}
+		
 
 		//  Get full user data
 		
