@@ -65,7 +65,6 @@ public class UserInviteService {
 	@Path("/invite") 
 	public UserInviteResult userInviteService(   
 			@FormParam( "invitedPersonUserId" ) String invitedPersonUserIdString,
-			@FormParam( "invitedPersonLastName" ) String invitedPersonLastName,
 			@FormParam( "invitedPersonEmail" ) String invitedPersonEmail,
 			@FormParam( "invitedPersonAccessLevel" ) String invitedPersonAccessLevelString,
 			@FormParam( "projectId" ) String projectIdString,
@@ -77,9 +76,6 @@ public class UserInviteService {
 		//  Restricted to users with ACCESS_LEVEL_ASSISTANT_PROJECT_OWNER or better
 		if ( invitedPersonUserIdString != null ) {
 			invitedPersonUserIdString = invitedPersonUserIdString.trim();
-		}		
-		if ( invitedPersonLastName != null ) {
-			invitedPersonLastName = invitedPersonLastName.trim();
 		}
 		if ( invitedPersonEmail != null ) {
 			invitedPersonEmail = invitedPersonEmail.trim();
@@ -103,15 +99,8 @@ public class UserInviteService {
 						);
 			}
 		} else {
-			if ( StringUtils.isEmpty( invitedPersonLastName ) && StringUtils.isEmpty( invitedPersonEmail )) {
-				log.warn( "UserInviteService: invitedPersonLastName and invitedPersonEmail both empty" );
-				throw new WebApplicationException(
-						Response.status( WebServiceErrorMessageConstants.INVALID_PARAMETER_STATUS_CODE )  //  Send HTTP code
-						.entity( WebServiceErrorMessageConstants.INVALID_PARAMETER_TEXT ) // This string will be passed to the client
-						.build()
-						);
-			} else if ( StringUtils.isNotEmpty( invitedPersonLastName ) && StringUtils.isNotEmpty( invitedPersonEmail )) {
-				log.warn( "UserInviteService: invitedPersonLastName and invitedPersonEmail both not empty" );
+			if ( StringUtils.isEmpty( invitedPersonEmail )) {
+				log.warn( "UserInviteService: invitedPersonEmail is empty when invitedPersonUserIdString is empty" );
 				throw new WebApplicationException(
 						Response.status( WebServiceErrorMessageConstants.INVALID_PARAMETER_STATUS_CODE )  //  Send HTTP code
 						.entity( WebServiceErrorMessageConstants.INVALID_PARAMETER_TEXT ) // This string will be passed to the client
@@ -260,18 +249,7 @@ public class UserInviteService {
 				}
 				
 				addExistingUserToProjectUsingProjectId( invitedPersonUserId, invitedPerson_userMgmtUserId, invitedPersonAccessLevel, projectAuthShareableObjectId, userInviteResult );
-				
-			} else if ( StringUtils.isNotEmpty( invitedPersonLastName ) ) {
-				//  process the last name
-				if ( projectId == null ) {
-					log.warn( "UserInviteService:  Adding existing user but no project id provided, invitedPersonUserId: " + invitedPersonUserId );
-					throw new WebApplicationException(
-							Response.status( WebServiceErrorMessageConstants.INVALID_PARAMETER_STATUS_CODE )  //  Send HTTP code
-							.entity( WebServiceErrorMessageConstants.INVALID_PARAMETER_TEXT ) // This string will be passed to the client
-							.build()
-							);
-				}
-				addExistingUserToProjectUsingLastName( invitedPersonLastName, invitedPersonAccessLevel, projectAuthShareableObjectId, userInviteResult, sessionKey );
+			
 			} else {
 				//  Process the email
 				UserMgmtSearchUserDataRequest userMgmtSearchUserDataRequest = new UserMgmtSearchUserDataRequest();
@@ -314,15 +292,7 @@ public class UserInviteService {
 							invitedPersonAccessLevel,
 							projectAuthShareableObjectId,
 							userInviteResult );
-					
-//					When get here, need to add an account in Proxl
-//					This becomes a problem since then unlike when the user is creating their own account 
-//					the person making the invite cannot accept the terms. 
-					
-//					throw new RuntimeException( "Invalid here to pass invitedPerson_userMgmtUserId as invitedPersonUserId" );
-//					addExistingUserToProjectUsingProjectId( invitedPerson_userMgmtUserId /* invitedPersonUserId */, invitedPersonAccessLevel, projectAuthShareableObjectId, userInviteResult );
 
-//					addExistingUserToProjectUsingProjectId( invitedPersonUserIdFromEmail, invitedPersonAccessLevel, projectAuthShareableObjectId, userInviteResult );
 				} else {
 					//  no account with this email exists
 					inviteNewUserUsingEmail( invitedPersonEmail, request, 
@@ -344,61 +314,6 @@ public class UserInviteService {
 		}
 	}
 	
-	/**
-	 * @param invitedPersonLastName
-	 * @param invitedPersonAccessLevel
-	 * @param projectAuthShareableObjectId
-	 * @param userInviteResult
-	 * @throws Exception
-	 */
-	private void addExistingUserToProjectUsingLastName( 
-			String invitedPersonLastName, 
-			int invitedPersonAccessLevel,
-			int projectAuthShareableObjectId,
-			UserInviteResult userInviteResult,
-			String sessionKey ) throws Exception {
-		
-		UserMgmtSearchUserDataRequest userMgmtSearchUserDataRequest = new UserMgmtSearchUserDataRequest();
-		userMgmtSearchUserDataRequest.setSessionKey( sessionKey );
-		userMgmtSearchUserDataRequest.setSearchString( invitedPersonLastName );
-		userMgmtSearchUserDataRequest.setSearchStringExactMatch(true);
-		
-		UserMgmtSearchUserDataResponse userMgmtSearchUserDataResponse = 
-				UserMgmtCentralWebappWebserviceAccess.getInstance().searchUserDataByLastName( userMgmtSearchUserDataRequest );
-		
-		if ( ! userMgmtSearchUserDataResponse.isSuccess() ) {
-			if ( userMgmtSearchUserDataResponse.isSessionKeyNotValid() ) {
-				String msg = "Session Key invalid for call to UserMgmtCentralWebappWebserviceAccess.getInstance().searchUserDataByLastName(...)";
-				log.error( msg );
-				throw new ProxlWebappInternalErrorException( msg );
-			}
-			String msg = "call to UserMgmtCentralWebappWebserviceAccess.getInstance().searchUserDataByLastName(...) not successful, invitedPersonLastName: " + invitedPersonLastName;
-			log.error( msg );
-			throw new ProxlWebappInternalErrorException( msg );
-		}
-		List<Integer> userIdList = userMgmtSearchUserDataResponse.getUserIdList();
-		if ( userIdList == null || ( userIdList.isEmpty() ) ) {
-			userInviteResult.setLastNameNotFoundError(true);
-		} else if ( userIdList.size() > 1 ) {
-			userInviteResult.setLastNameDuplicateError(true);
-		} else {
-			int invitedPerson_userMgmtUserId = userIdList.get( 0 );
-			
-			addUser_Using_UserMgmtId_ToProjectUsingProjectId( 
-					invitedPerson_userMgmtUserId, 
-					invitedPersonAccessLevel,
-					projectAuthShareableObjectId,
-					userInviteResult );
-//			When get here, need to add an account in Proxl
-//			This becomes a problem since then unlike when the user is creating their own account 
-//			the person making the invite cannot accept the terms. 
-			
-//			throw new RuntimeException( "Invalid here to pass invitedPerson_userMgmtUserId as invitedPersonUserId" );
-//			addExistingUserToProjectUsingProjectId( invitedPerson_userMgmtUserId /* invitedPersonUserId */, invitedPersonAccessLevel, projectAuthShareableObjectId, userInviteResult );
-		}
-	}
-	
-
 	/**
 	 * @param invitedPerson_Proxl_AuthUserId - Proxl Auth User Id
 	 * @param invitedPersonAccessLevel
@@ -445,7 +360,6 @@ public class UserInviteService {
 				invitedPerson_Proxl_AuthUserId = authUserId_FromDB;
 			}
 		}
-		
 
 		//  Get full user data
 		

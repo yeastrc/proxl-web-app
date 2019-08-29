@@ -611,14 +611,14 @@
 						     <tr>
 						      <td nowrap>
 						      	<input placeholder="Last Name" id="invite_user_last_name"  class="autocomplete-entry-field"  
-											title="Last Name" >
+											title="Last Name. Must choose from list." >
 						      </td>
 						      <td>
 						      	or
 						      </td>
 						      <td nowrap>
 								<input placeholder="Email Address" id="invite_user_email"  class="autocomplete-entry-field" 
-											title="Email Address" >
+											title="Email Address. May choose from list or use what is entered." >
 						      </td>
 						     </tr>
 						     <tr>
@@ -655,8 +655,15 @@
 										</c:if>
 										
 									</select>
+									
+									<div style="display: inline-block; position: relative;">
+										<input type="button" value="Invite User" disabled="disabled" id="invite_user_button">
+										<div id="invite_user_button_disabled_cover"
+											style="position: absolute; left:0px;right:0px;top:0px;bottom:0px"
+											title="First enter value for email or choose from selection for email or last name" 
+										></div>
+									</div>
 	
-									<input type="button" value="Invite User" id="invite_user_button">
 									<input type="button" value="Cancel" class="invite_user_cancel_button_jq">						   	
 						   </td>
 						  </tr>
