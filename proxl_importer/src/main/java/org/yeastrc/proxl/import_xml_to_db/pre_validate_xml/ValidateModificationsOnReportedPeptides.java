@@ -86,19 +86,31 @@ public class ValidateModificationsOnReportedPeptides {
 									}
 
 									if ( modification.isIsNTerminal() != null && modification.isIsNTerminal() ) {
+										//  Comment out to allow position
+//										if ( modification.getPosition() != null ) {
+//											String msg = "Peptide Modification Position is populated when modification is marked as 'n' terminal. Position: " + modification.getPosition().intValue()
+//													+ " Reported Peptide: " + reportedPeptide.getReportedPeptideString();
+//											log.error( msg );
+//											throw new ProxlImporterDataException( msg );
+//										}
+										//  Since allowing position, validate it.  Not really needed since will be ignored.
 										if ( modification.getPosition() != null ) {
-											String msg = "Peptide Modification Position is populated when modification is marked as 'n' terminal. Position: " + modification.getPosition().intValue()
-													+ " Reported Peptide: " + reportedPeptide.getReportedPeptideString();
-											log.error( msg );
-											throw new ProxlImporterDataException( msg );
+											validatePositionValue( modification, peptideSequenceLength, reportedPeptide);
 										}
+										//  No changed needed outside this class since in the import code the position is overlaid if the N or C terminus flag is set
 									} else if ( modification.isIsCTerminal() != null && modification.isIsCTerminal() ) {
-										if ( modification.getPosition()!= null ) {
-											String msg = "Peptide Modification Position is populated when modification is marked as 'c' terminal. Position: " + modification.getPosition().intValue()
-													+ " Reported Peptide: " + reportedPeptide.getReportedPeptideString();
-											log.error( msg );
-											throw new ProxlImporterDataException( msg );
+										//  Comment out to allow position
+//										if ( modification.getPosition()!= null ) {
+//											String msg = "Peptide Modification Position is populated when modification is marked as 'c' terminal. Position: " + modification.getPosition().intValue()
+//													+ " Reported Peptide: " + reportedPeptide.getReportedPeptideString();
+//											log.error( msg );
+//											throw new ProxlImporterDataException( msg );
+//										}
+										//  Since allowing position, validate it.  Not really needed since will be ignored.
+										if ( modification.getPosition() != null ) {
+											validatePositionValue( modification, peptideSequenceLength, reportedPeptide);
 										}
+										//  No changed needed outside this class since in the import code the position is overlaid if the N or C terminus flag is set
 									} else {
 
 										if ( modification.getPosition() == null ) {
@@ -106,21 +118,8 @@ public class ValidateModificationsOnReportedPeptides {
 											log.error( msg );
 											throw new ProxlImporterDataException( msg );
 										}
-										if ( modification.getPosition().intValue() < 1 ) {
-											String msg = "Peptide Modification Position is < 1. peptide Modification Position: " 
-													+ modification.getPosition()
-													+ ", Reported Peptide: " + reportedPeptide.getReportedPeptideString();
-											log.error( msg );
-											throw new ProxlImporterDataException( msg );
-										}
-										if ( modification.getPosition().intValue() > peptideSequenceLength ) {
-											String msg = "Peptide Modification Position is > peptide Sequence Length. peptide Modification Position: " 
-													+ modification.getPosition()
-													+ ", peptide Sequence Length: " + peptideSequenceLength
-													+ ", Reported Peptide: " + reportedPeptide.getReportedPeptideString();
-											log.error( msg );
-											throw new ProxlImporterDataException( msg );
-										}
+									
+										validatePositionValue( modification, peptideSequenceLength, reportedPeptide );
 									}
 								}
 							}
@@ -128,6 +127,31 @@ public class ValidateModificationsOnReportedPeptides {
 					}
 				}
 			}
+		}
+	}
+	
+	/**
+	 * @param modification
+	 * @param peptideSequenceLength
+	 * @param reportedPeptide
+	 * @throws ProxlImporterDataException
+	 */
+	private void validatePositionValue( Modification modification, int peptideSequenceLength, ReportedPeptide reportedPeptide ) throws ProxlImporterDataException {
+		
+		if ( modification.getPosition().intValue() < 1 ) {
+			String msg = "Peptide Modification Position is < 1. peptide Modification Position: " 
+					+ modification.getPosition()
+					+ ", Reported Peptide: " + reportedPeptide.getReportedPeptideString();
+			log.error( msg );
+			throw new ProxlImporterDataException( msg );
+		}
+		if ( modification.getPosition().intValue() > peptideSequenceLength ) {
+			String msg = "Peptide Modification Position is > peptide Sequence Length. peptide Modification Position: " 
+					+ modification.getPosition()
+					+ ", peptide Sequence Length: " + peptideSequenceLength
+					+ ", Reported Peptide: " + reportedPeptide.getReportedPeptideString();
+			log.error( msg );
+			throw new ProxlImporterDataException( msg );
 		}
 	}
 }
