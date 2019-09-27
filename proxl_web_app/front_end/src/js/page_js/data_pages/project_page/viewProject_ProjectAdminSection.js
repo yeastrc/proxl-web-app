@@ -1163,6 +1163,15 @@ var processChosenUserForAddProjectAccess = function(ui, thisValue) {
 };
 
 var initInviteUser = function() {
+
+	{
+		const invite_user_button_DOM = document.getElementById("invite_user_button");
+		if ( ! invite_user_button_DOM ) {
+			//  <button> with id 'invite_user_button' not on page so exit
+			return; // EARLY RETURN
+		}
+	}
+
 	initInviteUserLastNameAutoComplete();
 	initInviteUserEmailAutoComplete();
 	$("#close_invite_user_auto_complete_display").click(function(eventObject) {
