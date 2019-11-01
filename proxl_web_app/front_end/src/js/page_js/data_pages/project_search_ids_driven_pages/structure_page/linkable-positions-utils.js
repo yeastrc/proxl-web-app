@@ -36,10 +36,6 @@ export class LinkablePositionUtils {
                     position1: link.position1,
                     position2: link.position2 } )) {
                     if( !linkExclusionHandler || !linkExclusionHandler.isLinkExcluded( link ) ) {
-
-                        console.log( 'added looplink:' );
-                        console.log( link );
-
                         distanceArray.push(parseFloat(renderedLinks['looplinks'][i]['link']['length']));
                     }
                 }
