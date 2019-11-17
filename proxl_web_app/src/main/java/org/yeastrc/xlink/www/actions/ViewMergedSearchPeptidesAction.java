@@ -90,12 +90,12 @@ public class ViewMergedSearchPeptidesAction extends Action {
 			Collections.sort( projectSearchIdsListDeduppedSorted );
 			List<Integer> projectIdsFromSearchIds = ProjectIdsForProjectSearchIdsSearcher.getInstance().getProjectIdsForProjectSearchIds( projectSearchIdsSet );
 			if ( projectIdsFromSearchIds.isEmpty() ) {
-				// should never happen
-				String msg = "No project ids for search ids: ";
+				// 
+				String msg = "No project ids for projectSearchIdsFromForm: ";
 				for ( int projectSearchId : projectSearchIdsFromForm ) {
 					msg += projectSearchId + ", ";
 				}
-				log.error( msg );
+				log.warn( msg );
 				return mapping.findForward( StrutsGlobalForwardNames.INVALID_REQUEST_DATA );
 			}
 			if ( projectIdsFromSearchIds.size() > 1 ) {

@@ -67,9 +67,9 @@ public class ViewSearchProteinsAllAction extends Action {
 			projectSearchIdsSet.add( projectSearchId );
 			List<Integer> projectIdsFromSearchIds = ProjectIdsForProjectSearchIdsSearcher.getInstance().getProjectIdsForProjectSearchIds( projectSearchIdsSet );
 			if ( projectIdsFromSearchIds.isEmpty() ) {
-				// should never happen
-				String msg = "No project ids for search id: " + projectSearchId;
-				log.error( msg );
+				// 
+				String msg = "No project ids for projectSearchId: " + projectSearchId;
+				log.warn( msg );
 				return mapping.findForward( StrutsGlobalForwardNames.INVALID_REQUEST_DATA );
 			}
 			if ( projectIdsFromSearchIds.size() > 1 ) {
