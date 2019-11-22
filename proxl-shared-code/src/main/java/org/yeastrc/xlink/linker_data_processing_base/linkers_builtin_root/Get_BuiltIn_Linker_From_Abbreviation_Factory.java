@@ -28,6 +28,7 @@ public class Get_BuiltIn_Linker_From_Abbreviation_Factory {
 	public static final String BUILT_IN_LINKER_SULFO_SMCC = "sulfo-smcc";
 	public static final String BUILD_IN_LINKER_DSSO = "dsso";
 	public static final String BUILD_IN_LINKER_DSBU = "dsbu";
+	public static final String BUILD_IN_LINKER_PHOX = "phox";
 
 	public static final String BUILD_IN_LINKER_TG = "tg";
 	public static final String BUILD_IN_LINKER_transglutaminase = "transglutaminase";
@@ -50,6 +51,7 @@ public class Get_BuiltIn_Linker_From_Abbreviation_Factory {
 	private static ILinker_Builtin_Linker LINKER_DSSO = new DSSO();
 	private static ILinker_Builtin_Linker LINKER_DSBU = new DSBU();
 	private static ILinker_Builtin_Linker LINKER_TG = new Transglutaminase();
+	private static ILinker_Builtin_Linker LINKER_PHOX = new PhoX();
 
 	private static ILinker_Builtin_Linker LINKER_DSS_STY = new DSS_STY();
 	private static ILinker_Builtin_Linker LINKER_BS3_STY = new BS3_STY();
@@ -69,6 +71,7 @@ public class Get_BuiltIn_Linker_From_Abbreviation_Factory {
 		linkers.put( BUILT_IN_LINKER_SULFO_SMCC, LINKER_SULFO_SMCC);
 		linkers.put( BUILD_IN_LINKER_DSSO, LINKER_DSSO);
 		linkers.put( BUILD_IN_LINKER_DSBU, LINKER_DSBU);
+		linkers.put( BUILD_IN_LINKER_PHOX, LINKER_PHOX);
 
 		linkers.put( BUILD_IN_LINKER_TG, LINKER_TG );
 		linkers.put( BUILD_IN_LINKER_transglutaminase, LINKER_TG );
