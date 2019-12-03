@@ -19,8 +19,8 @@ public class A_QueryBase_JSONRoot {
 	private CutoffValuesRootLevel cutoffs;
 	private AnnTypeIdDisplayJSONRoot annTypeIdDisplay;
 	
-	private int minPSMs = -1; // Set default elsewhere since not always this constant: MinimumPSMsConstants.MINIMUM_PSMS_DEFAULT;
-	
+	private int minPSMs = MinimumPSMsConstants.MINIMUM_PSMS_DEFAULT;
+
 	private boolean removeNonUniquePSMs;
 
 	
