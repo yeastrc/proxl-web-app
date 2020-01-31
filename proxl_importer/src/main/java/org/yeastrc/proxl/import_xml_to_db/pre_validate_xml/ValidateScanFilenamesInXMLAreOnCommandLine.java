@@ -71,8 +71,10 @@ public class ValidateScanFilenamesInXMLAreOnCommandLine {
 									}
 								} else {
 									if ( ! scanFilenamesSet.contains( scanFileName ) ) {
-										String msg = "Scan Filename on PSM is not in Scan File List on Command Line."
-												+ "  Scan Filename on PSM: " + scanFileName;
+										String msg = "Found scan filename in Proxl XML file that is different than the scan file(s) uploaded.  Uploaded filename(s): " 
+												+ StringUtils.join( scanFilenamesSet, ", " )
+												+ ".  Filename found in Proxl XML file:  "
+												+ scanFileName;
 										log.error(msg);
 										throw new ProxlImporterDataException(msg);
 									}
