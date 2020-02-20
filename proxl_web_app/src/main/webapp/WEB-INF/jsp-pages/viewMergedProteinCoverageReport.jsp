@@ -12,6 +12,9 @@
 		<script type="text/javascript" src="js/libs/jquery.tablesorter_Modified.js"></script> 
 		<script type="text/javascript" src="js/libs/jquery.qtip.min.js"></script>
 
+		<%--  For change order of Searches "Re-order searches" --%>
+		<script src="js/libs/jquery-ui-1.12.1.min.js"></script>
+				
 				<%-- 
 					The Struts Action for this page must call GetProteinNamesTooltipConfigData
 					This include is required on this page:
