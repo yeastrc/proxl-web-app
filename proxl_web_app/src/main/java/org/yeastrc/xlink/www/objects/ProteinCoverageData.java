@@ -32,7 +32,12 @@ public class ProteinCoverageData {
 	
 	
 	public String getMLCSequenceCoverage() {
-		return coverageFormat.format( (double)this.getNumMLCResidues() / (double)this.getNumLinkableResidues() );
+		
+		double numMLCResidues_Div_NumLinkableResidues = 0;
+		if ( this.getNumLinkableResidues() != 0 ) {
+			numMLCResidues_Div_NumLinkableResidues = (double)this.getNumMLCResidues() / (double)this.getNumLinkableResidues();
+		}
+		return coverageFormat.format( numMLCResidues_Div_NumLinkableResidues );
 	}
 
 	public String getLCSequenceCoverage() {

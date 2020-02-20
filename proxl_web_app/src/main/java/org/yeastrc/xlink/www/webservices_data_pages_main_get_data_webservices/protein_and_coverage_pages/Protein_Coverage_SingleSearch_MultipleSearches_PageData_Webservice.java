@@ -77,7 +77,7 @@ public class Protein_Coverage_SingleSearch_MultipleSearches_PageData_Webservice 
 	 * 
 	 *  Increment this value whenever change the resulting image since Caching the resulting JSON
 	 */
-	static final int VERSION_FOR_CACHING = 1;
+	static final int VERSION_FOR_CACHING = 2;
 	
 
 	@POST

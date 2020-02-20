@@ -618,7 +618,7 @@ public class ProteinCoverageCompute {
 			pcd.setSequenceCoverage( sequenceCoverage );
 			pcd.setNumLinkableResidues( totalLinkableResidues );
 			double totalLinkableResiduesCoverage = 0;
-			if ( totalResidues != 0 ) {
+			if ( totalLinkableResidues != 0 ) {
 				totalLinkableResiduesCoverage = (double)totalLinkableResiduesCovered / (double)totalLinkableResidues;
 			}
 			pcd.setNumLinkableResiduesCovered( totalLinkableResiduesCovered );

@@ -2,6 +2,7 @@
 /handlebars_templates_precompiled/
 /webpack_build_output/
 /.gradle/
+/.vscode/
 /.settings/
 .project
 VS_Code_Workspace.code-workspace
