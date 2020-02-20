@@ -200,20 +200,23 @@ class Protein_crosslink_looplink_Common_MultipleSearches_PageData_Webservice {
 						Protein_crosslink_looplink_Common_MultipleSearches_PageData_Webservice_CachedResultManager.getSingletonInstance()
 						.retrieveDataFromCache( forCrosslinksOrLooplinkOrBoth, projectSearchIdsList, requestJSONBytes );
 				
-				byte[] cachedWebserviceResponseJSONAsBytes = result.getWebserviceResponseJSONAsBytes();
-				if ( cachedWebserviceResponseJSONAsBytes != null ) {
-					//  Have Cached response so just return it
-					
-					if ( forCrosslinksOrLooplinkOrBoth == ForCrosslinksOrLooplinkOrBoth.CROSSLINKS ) {
-						DataPagesMain_GetDataWebservices_CacheResults_InMemory.getInstance()
-						.putData( DataType.PROTEINS_CROSSLINKS_MULTIPLE_SEARCHES, requestJSONBytes, cachedWebserviceResponseJSONAsBytes );
+				if ( result != null ) { //  result is null when caching to disk not enabled
+
+					byte[] cachedWebserviceResponseJSONAsBytes = result.getWebserviceResponseJSONAsBytes();
+					if ( cachedWebserviceResponseJSONAsBytes != null ) {
+						//  Have Cached response so just return it
+
+						if ( forCrosslinksOrLooplinkOrBoth == ForCrosslinksOrLooplinkOrBoth.CROSSLINKS ) {
+							DataPagesMain_GetDataWebservices_CacheResults_InMemory.getInstance()
+							.putData( DataType.PROTEINS_CROSSLINKS_MULTIPLE_SEARCHES, requestJSONBytes, cachedWebserviceResponseJSONAsBytes );
+						}
+						if ( forCrosslinksOrLooplinkOrBoth == ForCrosslinksOrLooplinkOrBoth.LOOPLINKS ) {
+							DataPagesMain_GetDataWebservices_CacheResults_InMemory.getInstance()
+							.putData( DataType.PROTEINS_LOOPLINKS_MULTIPLE_SEARCHES, requestJSONBytes, cachedWebserviceResponseJSONAsBytes );
+						}
+
+						return cachedWebserviceResponseJSONAsBytes;  // EARLY RETURN !!!!!!!!!!!!!!
 					}
-					if ( forCrosslinksOrLooplinkOrBoth == ForCrosslinksOrLooplinkOrBoth.LOOPLINKS ) {
-						DataPagesMain_GetDataWebservices_CacheResults_InMemory.getInstance()
-						.putData( DataType.PROTEINS_LOOPLINKS_MULTIPLE_SEARCHES, requestJSONBytes, cachedWebserviceResponseJSONAsBytes );
-					}
-					
-					return cachedWebserviceResponseJSONAsBytes;  // EARLY RETURN !!!!!!!!!!!!!!
 				}
 			}
 		

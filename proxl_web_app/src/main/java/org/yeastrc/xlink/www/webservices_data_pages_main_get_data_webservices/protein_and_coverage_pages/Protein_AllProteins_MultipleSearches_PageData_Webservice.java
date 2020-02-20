@@ -182,17 +182,20 @@ public class Protein_AllProteins_MultipleSearches_PageData_Webservice {
 				Protein_AllProteins_MultipleSearches_PageData_Webservice_CachedResultManager_Result result = 
 						Protein_AllProteins_MultipleSearches_PageData_Webservice_CachedResultManager.getSingletonInstance()
 						.retrieveDataFromCache( projectSearchIdsList, requestJSONBytes );
+				
+				if ( result != null ) { //  result is null when caching to disk not enabled
+				
+					byte[] cachedWebserviceResponseJSONAsBytes = result.getWebserviceResponseJSONAsBytes();
+					if ( cachedWebserviceResponseJSONAsBytes != null ) {
+						//  Have Cached response so just return it
 
-				byte[] cachedWebserviceResponseJSONAsBytes = result.getWebserviceResponseJSONAsBytes();
-				if ( cachedWebserviceResponseJSONAsBytes != null ) {
-					//  Have Cached response so just return it
+						{  //  Cache response to RAM
+							DataPagesMain_GetDataWebservices_CacheResults_InMemory.getInstance()
+							.putData( DataType.PROTEINS_ALL_MULTIPLE_SEARCHES, requestJSONBytes, cachedWebserviceResponseJSONAsBytes );
+						}
 
-					{  //  Cache response to RAM
-						DataPagesMain_GetDataWebservices_CacheResults_InMemory.getInstance()
-						.putData( DataType.PROTEINS_ALL_MULTIPLE_SEARCHES, requestJSONBytes, cachedWebserviceResponseJSONAsBytes );
+						return cachedWebserviceResponseJSONAsBytes;  // EARLY RETURN !!!!!!!!!!!!!!
 					}
-					
-					return cachedWebserviceResponseJSONAsBytes;  // EARLY RETURN !!!!!!!!!!!!!!
 				}
 			}
 

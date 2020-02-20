@@ -88,46 +88,48 @@ public class Protein_Coverage_SingleSearch_MultipleSearches_PageData_Webservice 
 				byte[] requestJSONBytes,
 				@Context HttpServletRequest request )
 	throws Exception {
-		if ( requestJSONBytes == null || requestJSONBytes.length == 0 ) {
-			String msg = "requestJSONBytes is null or requestJSONBytes is empty";
-			log.error( msg );
-			throw new WebApplicationException(
-					Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
-					//		    	        .entity(  )
-					.build()
-					);
-		}
-
-		//  throws new WebApplicationException BAD_REQUEST if parse error
-		WebserviceRequest webserviceRequest = // class defined in this class
-				Unmarshal_RestRequest_JSON_ToObject.getInstance()
-				.getObjectFromJSONByteArray( requestJSONBytes, WebserviceRequest.class );
-
-		List<Integer> projectSearchIdsList = webserviceRequest.projectSearchIds;
-		ProteinQueryJSONRoot proteinQueryJSONRoot = webserviceRequest.proteinQueryJSONRoot;
-
-		if ( projectSearchIdsList == null || projectSearchIdsList.isEmpty() ) {
-			String msg = "Provided projectSearchIds is null or projectSearchIds is missing";
-			log.error( msg );
-			throw new WebApplicationException(
-					Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
-					.entity( msg )
-					.build()
-					);
-		}
-
-		if ( proteinQueryJSONRoot == null ) {
-			String msg = "proteinQueryJSONRoot is null or proteinQueryJSONRoot is missing";
-			log.error( msg );
-			throw new WebApplicationException(
-					Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
-					.entity( msg )
-					.build()
-					);
-		}
-
-
+		
 		try {
+		
+			if ( requestJSONBytes == null || requestJSONBytes.length == 0 ) {
+				String msg = "requestJSONBytes is null or requestJSONBytes is empty";
+				log.error( msg );
+				throw new WebApplicationException(
+						Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+						//		    	        .entity(  )
+						.build()
+						);
+			}
+
+			//  throws new WebApplicationException BAD_REQUEST if parse error
+			WebserviceRequest webserviceRequest = // class defined in this class
+					Unmarshal_RestRequest_JSON_ToObject.getInstance()
+					.getObjectFromJSONByteArray( requestJSONBytes, WebserviceRequest.class );
+
+			List<Integer> projectSearchIdsList = webserviceRequest.projectSearchIds;
+			ProteinQueryJSONRoot proteinQueryJSONRoot = webserviceRequest.proteinQueryJSONRoot;
+
+			if ( projectSearchIdsList == null || projectSearchIdsList.isEmpty() ) {
+				String msg = "Provided projectSearchIds is null or projectSearchIds is missing";
+				log.error( msg );
+				throw new WebApplicationException(
+						Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+						.entity( msg )
+						.build()
+						);
+			}
+
+			if ( proteinQueryJSONRoot == null ) {
+				String msg = "proteinQueryJSONRoot is null or proteinQueryJSONRoot is missing";
+				log.error( msg );
+				throw new WebApplicationException(
+						Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+						.entity( msg )
+						.build()
+						);
+			}
+
+
 			//   Get the project id for these searches
 			Set<Integer> projectSearchIdsSet = new HashSet<Integer>( );
 			projectSearchIdsSet.addAll( projectSearchIdsList );
@@ -194,16 +196,19 @@ public class Protein_Coverage_SingleSearch_MultipleSearches_PageData_Webservice 
 						Protein_Coverage_SingleSearch_MultipleSearches_PageData_Webservice_CachedResultManager.getSingletonInstance()
 						.retrieveDataFromCache( projectSearchIdsList, requestJSONBytes );
 
-				byte[] cachedWebserviceResponseJSONAsBytes = result.getWebserviceResponseJSONAsBytes();
-				if ( cachedWebserviceResponseJSONAsBytes != null ) {
-					//  Have Cached response so just return it
+				if ( result != null ) { //  result is null when caching to disk not enabled 
+				
+					byte[] cachedWebserviceResponseJSONAsBytes = result.getWebserviceResponseJSONAsBytes();
+					if ( cachedWebserviceResponseJSONAsBytes != null ) {
+						//  Have Cached response so just return it
 
-					{  //  Cache response to RAM
-						DataPagesMain_GetDataWebservices_CacheResults_InMemory.getInstance()
-						.putData( DataType.PROTEIN_COVERAGE_SINGLE_SEARCH_MULTIPLE_SEARCHES, requestJSONBytes, cachedWebserviceResponseJSONAsBytes );
+						{  //  Cache response to RAM
+							DataPagesMain_GetDataWebservices_CacheResults_InMemory.getInstance()
+							.putData( DataType.PROTEIN_COVERAGE_SINGLE_SEARCH_MULTIPLE_SEARCHES, requestJSONBytes, cachedWebserviceResponseJSONAsBytes );
+						}
+
+						return cachedWebserviceResponseJSONAsBytes;  // EARLY RETURN !!!!!!!!!!!!!!
 					}
-					
-					return cachedWebserviceResponseJSONAsBytes;  // EARLY RETURN !!!!!!!!!!!!!!
 				}
 			}
 
@@ -267,9 +272,9 @@ public class Protein_Coverage_SingleSearch_MultipleSearches_PageData_Webservice 
 			Z_CutoffValuesObjectsToOtherObjects_RootResult cutoffValuesObjectsToOtherObjects_RootResult =
 					Z_CutoffValuesObjectsToOtherObjectsFactory.createSearcherCutoffValuesRootLevel( searchIdsSet, cutoffValuesRootLevel );
 			SearcherCutoffValuesRootLevel searcherCutoffValuesRootLevel = cutoffValuesObjectsToOtherObjects_RootResult.getSearcherCutoffValuesRootLevel();
-			
+
 			LinkedPositions_FilterExcludeLinksWith_Param linkedPositions_FilterExcludeLinksWith_Param = new LinkedPositions_FilterExcludeLinksWith_Param( proteinQueryJSONRoot );
-			
+
 			//   Get the Protein Coverage Data
 			ProteinCoverageCompute pcs = new ProteinCoverageCompute();
 			pcs.setExcludedproteinSequenceVersionIds( proteinQueryJSONRoot.getExcludeproteinSequenceVersionIds() );
@@ -281,7 +286,7 @@ public class Protein_Coverage_SingleSearch_MultipleSearches_PageData_Webservice 
 			pcs.setLinkedPositions_FilterExcludeLinksWith_Param( linkedPositions_FilterExcludeLinksWith_Param );
 			pcs.setSearches( searches );
 			List<ProteinCoverageData> proteinCoverageDataList = pcs.getProteinCoverageData();
-			
+
 			List<WebserviceResponse_ProteinExcludeEntry> proteinExcludeEntryList = null;
 
 			//   Build list of proteins for the protein Exclusion list
@@ -290,7 +295,7 @@ public class Protein_Coverage_SingleSearch_MultipleSearches_PageData_Webservice 
 				Map<Integer,Set<Integer>> allProteinsExcludeProteinSelectOnWebPageKeyProteinIdValueSearchIds = new HashMap<>();
 				for ( SearchDTO search : searches ) {
 					Integer projectSearchId = search.getProjectSearchId();
-//					Integer searchId = search.getSearchId();
+					//					Integer searchId = search.getSearchId();
 					SearcherCutoffValuesSearchLevel searcherCutoffValuesSearchLevel = 
 							searcherCutoffValuesRootLevel.getPerSearchCutoffs( projectSearchId );
 					if ( searcherCutoffValuesSearchLevel == null ) {
@@ -396,7 +401,7 @@ public class Protein_Coverage_SingleSearch_MultipleSearches_PageData_Webservice 
 						}
 					}
 				}
-				
+
 				proteinExcludeEntryList = new ArrayList<>( allProteinsExcludeProteinSelectOnWebPageKeyProteinIdValueSearchIds.size() );
 
 				for ( Map.Entry<Integer, Set<Integer>> entry : allProteinsExcludeProteinSelectOnWebPageKeyProteinIdValueSearchIds.entrySet() ) {
@@ -433,21 +438,21 @@ public class Protein_Coverage_SingleSearch_MultipleSearches_PageData_Webservice 
 						//////////  Taxonomy Id in list of excluded taxonomy ids so drop the record
 						continue;  //   EARLY Continue
 					}
-//					int mergedSearchProteinTaxonomyId = mergedSearchProtein.getProteinSequenceVersionObject().getTaxonomyId(); 
-//
-//					if ( excludeTaxonomy_Ids_Set_UserInput.contains( mergedSearchProteinTaxonomyId ) ) {
-//						
-//						//////////  Taxonomy Id in list of excluded taxonomy ids so drop the record
-//						
-//						continue;  //   EARLY Continue
-//					}
+					//					int mergedSearchProteinTaxonomyId = mergedSearchProtein.getProteinSequenceVersionObject().getTaxonomyId(); 
+					//
+					//					if ( excludeTaxonomy_Ids_Set_UserInput.contains( mergedSearchProteinTaxonomyId ) ) {
+					//						
+					//						//////////  Taxonomy Id in list of excluded taxonomy ids so drop the record
+					//						
+					//						continue;  //   EARLY Continue
+					//					}
 
 					WebserviceResponse_ProteinExcludeEntry webserviceResponse_ProteinExcludeEntry = new WebserviceResponse_ProteinExcludeEntry();
 					webserviceResponse_ProteinExcludeEntry.proteinSequenceVersionId = mergedSearchProtein.getProteinSequenceVersionObject().getProteinSequenceVersionId();
 					webserviceResponse_ProteinExcludeEntry.proteinName = mergedSearchProtein.getName();
 					proteinExcludeEntryList.add( webserviceResponse_ProteinExcludeEntry );
 				}
-				
+
 
 				Collections.sort( proteinExcludeEntryList, new Comparator<WebserviceResponse_ProteinExcludeEntry>() {
 					@Override
@@ -468,7 +473,7 @@ public class Protein_Coverage_SingleSearch_MultipleSearches_PageData_Webservice 
 				} );
 			}
 
-			
+
 
 			///////////////
 			// build list of taxonomies to show in exclusion list
@@ -503,7 +508,9 @@ public class Protein_Coverage_SingleSearch_MultipleSearches_PageData_Webservice 
 			return webserviceResultByteArray;
 
 		} catch ( WebApplicationException e ) {
-			throw e;
+			
+			throw e;  //  Just rethrow
+			
 		} catch ( ProxlWebappDataException e ) {
 			String msg = "Exception processing request data, msg: " + e.toString();
 			log.error( msg, e );

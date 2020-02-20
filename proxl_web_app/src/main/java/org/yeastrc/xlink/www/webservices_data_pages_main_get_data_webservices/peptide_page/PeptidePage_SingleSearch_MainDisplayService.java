@@ -200,16 +200,19 @@ public class PeptidePage_SingleSearch_MainDisplayService {
 						PeptidePage_SingleSearch_MainDisplayService_CachedResultManager.getSingletonInstance()
 						.retrieveDataFromCache( projectSearchIdList, requestJSONBytes );
 				
-				byte[] cachedWebserviceResponseJSONAsBytes = result.getWebserviceResponseJSONAsBytes();
-				if ( cachedWebserviceResponseJSONAsBytes != null ) {
-					//  Have Cached response so just return it
+				if ( result != null ) { //  result is null when caching to disk not enabled
 
-					{  //  Cache response to RAM
-						DataPagesMain_GetDataWebservices_CacheResults_InMemory.getInstance()
-						.putData( DataType.PEPTIDE_SINGLE_SEARCH, requestJSONBytes, cachedWebserviceResponseJSONAsBytes );
+					byte[] cachedWebserviceResponseJSONAsBytes = result.getWebserviceResponseJSONAsBytes();
+					if ( cachedWebserviceResponseJSONAsBytes != null ) {
+						//  Have Cached response so just return it
+
+						{  //  Cache response to RAM
+							DataPagesMain_GetDataWebservices_CacheResults_InMemory.getInstance()
+							.putData( DataType.PEPTIDE_SINGLE_SEARCH, requestJSONBytes, cachedWebserviceResponseJSONAsBytes );
+						}
+
+						return cachedWebserviceResponseJSONAsBytes;  // EARLY RETURN !!!!!!!!!!!!!!
 					}
-					
-					return cachedWebserviceResponseJSONAsBytes;  // EARLY RETURN !!!!!!!!!!!!!!
 				}
 			}
 		

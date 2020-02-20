@@ -181,16 +181,19 @@ public class PeptidePage_MultipleSearches_MainDisplayService {
 						PeptidePage_MultipleSearches_MainDisplayService_CachedResultManager.getSingletonInstance()
 						.retrieveDataFromCache( projectSearchIdsList, requestJSONBytes );
 				
-				byte[] cachedWebserviceResponseJSONAsBytes = result.getWebserviceResponseJSONAsBytes();
-				if ( cachedWebserviceResponseJSONAsBytes != null ) {
-					//  Have Cached response so just return it
+				if ( result != null ) { //  result is null when caching to disk not enabled
 
-					{  //  Cache response to RAM
-						DataPagesMain_GetDataWebservices_CacheResults_InMemory.getInstance()
-						.putData( DataType.PEPTIDE_MULTIPLE_SEARCHES, requestJSONBytes, cachedWebserviceResponseJSONAsBytes );
+					byte[] cachedWebserviceResponseJSONAsBytes = result.getWebserviceResponseJSONAsBytes();
+					if ( cachedWebserviceResponseJSONAsBytes != null ) {
+						//  Have Cached response so just return it
+	
+						{  //  Cache response to RAM
+							DataPagesMain_GetDataWebservices_CacheResults_InMemory.getInstance()
+							.putData( DataType.PEPTIDE_MULTIPLE_SEARCHES, requestJSONBytes, cachedWebserviceResponseJSONAsBytes );
+						}
+						
+						return cachedWebserviceResponseJSONAsBytes;  // EARLY RETURN !!!!!!!!!!!!!!
 					}
-					
-					return cachedWebserviceResponseJSONAsBytes;  // EARLY RETURN !!!!!!!!!!!!!!
 				}
 			}
 		
