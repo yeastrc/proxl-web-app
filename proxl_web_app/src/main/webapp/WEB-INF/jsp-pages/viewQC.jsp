@@ -643,9 +643,11 @@ The total ion current in the bin is indicated by color, as indicated by the lege
 						Data is NOT available in the system to create these charts
 					</div>
 					
-					<div style="margin-top: 10px; display: none;" 
+					<div style=" display: none; " 
 						id="Scan_Statistics_Per_Scan_Ion_Injection_Time_BoxPlot_Charts_Block_Charts_Label">
-						!!!!  <b>Disclaimer</b>: For Scans with <b>ONLY Dots at Zero</b>, that means there is <b>NO Data</b>  !!!!
+						<div style="margin-top: 10px; font-size: 18px; color: red; " >
+							!!!!  <b>Disclaimer</b>: For Scans with <b>ONLY Dots at Zero</b>, that means there is <b>NO Data</b>  !!!!
+						</div>
 					</div>
 					
 					<div  id="Scan_Statistics_Per_Scan_Ion_Injection_Time_BoxPlot_Charts_Block" class="table-no-border-no-cell-spacing-no-cell-padding" >

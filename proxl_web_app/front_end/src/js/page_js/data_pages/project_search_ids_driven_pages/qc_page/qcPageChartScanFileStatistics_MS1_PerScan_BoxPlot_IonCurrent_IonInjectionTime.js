@@ -332,6 +332,8 @@ var QCPageChartScanFileStatistics_MS1_PerScan_BoxPlot_IonCurrent_IonInjectionTim
 		const $Scan_Statistics_Per_Scan_Ion_Injection_Time_BoxPlot_Charts_Block_Charts_Label = $("#Scan_Statistics_Per_Scan_Ion_Injection_Time_BoxPlot_Charts_Block_Charts_Label");
 		$Scan_Statistics_Per_Scan_Ion_Injection_Time_BoxPlot_Charts_Block_Charts_Label.show();
 
+		const Scan_Statistics_Per_Scan_Ion_Injection_Time_BoxPlot_Charts_Block_Charts_Label_HTML = $Scan_Statistics_Per_Scan_Ion_Injection_Time_BoxPlot_Charts_Block_Charts_Label.html()
+
 		// for ( const scanLevel of scanLevels ) {
 
 			// const $chart_outer_container_jq = this._addChartOuterTemplate( { $chart_group_container_table_jq : $Scan_Statistics_Per_Scan_Ion_Injection_Time_BoxPlot_Charts_Block } );
@@ -339,7 +341,7 @@ var QCPageChartScanFileStatistics_MS1_PerScan_BoxPlot_IonCurrent_IonInjectionTim
 
 			// const chartTitleAddition = ".  X Axis labels are Scan Numbers of MS1 Scans"
 
-			const chartTitleAddition = ".  X Axis labels are Retention Time (minutes) of MS1 Scans"
+			const chartTitleAddition = ".  X Axis labels are Retention Time (minutes) of MS1 Scans.   !!!! Disclaimer: For Scans with ONLY Dots at Zero, that means there is NO Data !!!!"
 
 			{
 				const $div = $("<div></div>");
@@ -355,6 +357,10 @@ var QCPageChartScanFileStatistics_MS1_PerScan_BoxPlot_IonCurrent_IonInjectionTim
 				} );
 			}
 			{
+				//  Append Disclaimer HTML 
+				$Scan_Statistics_Per_Scan_Ion_Injection_Time_BoxPlot_Charts_Block.append( Scan_Statistics_Per_Scan_Ion_Injection_Time_BoxPlot_Charts_Block_Charts_Label_HTML );
+			}
+			{
 				const $div = $("<div></div>");
 
 				$Scan_Statistics_Per_Scan_Ion_Injection_Time_BoxPlot_Charts_Block.append( $div );
@@ -366,6 +372,10 @@ var QCPageChartScanFileStatistics_MS1_PerScan_BoxPlot_IonCurrent_IonInjectionTim
 					chart_X_Axis_Label : "MS2 TIC",
 					$chartContainer : $div 
 				} );
+			}
+			{
+				//  Append Disclaimer HTML 
+				$Scan_Statistics_Per_Scan_Ion_Injection_Time_BoxPlot_Charts_Block.append( Scan_Statistics_Per_Scan_Ion_Injection_Time_BoxPlot_Charts_Block_Charts_Label_HTML );
 			}
 
 			//  WAS
