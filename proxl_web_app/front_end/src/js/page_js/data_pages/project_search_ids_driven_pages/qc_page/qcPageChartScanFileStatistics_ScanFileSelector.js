@@ -245,10 +245,11 @@ var QCPageChartScanFileStatistics_ScanFileSelector = function() {
 		var objectThis = this;
 		var changedThis = params.changedThis;
 		var $changedThis = $( changedThis );
-		
-		this.clearScanOverallStastics()
-		this.clear_MS_1_IonCurrent_Histograms()
-		this.clear_MS_1_IonCurrent_Heatmap()
+
+		for (  const chartToUpdateOnScanFilePopulateOrChange of _chartsToUpdateOnScanFilePopulateOrChange ) {
+
+			chartToUpdateOnScanFilePopulateOrChange.clearChart();
+		}
 
 		var scanFileId = $changedThis.val();
 
