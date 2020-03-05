@@ -364,7 +364,6 @@ The total ion current in the bin is indicated by color, as indicated by the lege
 			  	No Scan Files
 			  </div>
 			  
-			  
 			  <h2 id="scan_level_display_scan_file_selector_block" style="display: none;">
 			    File:
 			    	<!-- <select> For Multiple Scan Files --> 
@@ -493,8 +492,8 @@ The total ion current in the bin is indicated by color, as indicated by the lege
 					</td>
 
 	 		     </tr>
-	 		    </table>			  
-				  
+	 		    </table>			
+	 		    	
 			  	<div id="" style="margin-top: 10px;">
 
 	 		      <table class="table-no-border-no-cell-spacing-no-cell-padding" style="">
@@ -556,6 +555,113 @@ The total ion current in the bin is indicated by color, as indicated by the lege
 	 		    </table>
 					  
 			  </div>  <!--  close <div id="scan_file_selected_file_statistics_display_block" style="display: none;">  -->
+			  
+			  
+	 		    
+	 		    
+	 		    
+	 		    <%--   Only show following for now if request attribute 'strutsParameterAlex' is true --%>
+	 		    
+	 		    <c:if test="${ strutsParameterAlex }">  
+	
+					<div style="margin-top: 10px;">
+						--------------------------------------------------------------
+					</div>
+					
+					<div style="margin-top: 10px; font-weight: bold; font-size: 18px;">
+						The following charts are only shown when the URL is 'qc_Alex.do'
+					</div>
+					
+					
+					<div style="margin-top: 10px;">
+						--------------------------------------------------------------
+					</div>
+					
+					<%--  Per Scan Ion Injection Time and Total Ion Current Per Scan  --  Per Scan Level charts --%>
+					<div style="margin-top: 15px; margin-bottom: 10px;">
+						<div >
+							Following Charts: Per Scan (Average in Bin per block of Retention Time) Ion Injection Time and Total Ion Current (TIC) (1 chart per scan level):
+						</div>
+						<div style="margin-top: 5px;">
+							These charts are <b>Different</b> from the chart above with title '<b>MS1 Ion Current vs/ Retention Time</b>'.
+						</div>
+						<div >
+							These charts are the <b>Average value in the bin</b> 
+							where as the chart above with title '<b>MS1 Ion Current vs/ Retention Time</b>' are the <b>Sum of the values in the bin</b>.
+						</div>
+					</div>
+					
+			 		<table  id="Scan_Statistics_Per_Scan_Ion_Injection_Time_and_Total_Ion_Current_Per_Scan__PerScanLevel_Charts_Block" class="table-no-border-no-cell-spacing-no-cell-padding" >
+					</table>			
+					  
+					<div style="margin-top: 10px; display: none;" 
+						id="Scan_Statistics_Per_Scan_Ion_Injection_Time_and_Total_Ion_Current_Per_Scan__PerScanLevel_Charts_DataNotAvailable">
+						Data is NOT available in the system to create these charts
+					</div>
+					
+					<div style="margin-top: 5px; margin-bottom: 5px; display: none;" 
+						id="Scan_Statistics_Per_Scan_Ion_Injection_Time_and_Total_Ion_Current_Per_Scan__PerScanLevel_Charts_Block_Create_NotBinned_Charts_Link_Container">
+						<a id="Scan_Statistics_Per_Scan_Ion_Injection_Time_and_Total_Ion_Current_Per_Scan__PerScanLevel_Charts_Block_Create_NotBinned_Charts_Link"
+					   		href="javascript:" data-tooltip="Charts created when link is clicked." class="tool_tip_attached_jq " 
+						   	>Click to create version of above charts ('Ion Injection Time and Total Ion Current VS Retention Time') Not Binned.  
+						   	This will take a <b>LONG</b> Time.
+					   	</a>
+					</div>
+					
+					<div  id="Scan_Statistics_Per_Scan_Ion_Injection_Time_and_Total_Ion_Current_Per_Scan__PerScanLevel_NotBinned_Charts_Block" class="table-no-border-no-cell-spacing-no-cell-padding" >
+					</div>	
+					
+					<div style="margin-top: 10px;">
+						--------------------------------------------------------------
+					</div>
+					
+					<div style="margin-top: 15px;">
+						<a id="Scan_Statistics_MS2_Count_Per_MS1_Scan_Block_Create_Charts_Link"
+					   		href="javascript:" data-tooltip="Charts created when link is clicked." class="tool_tip_attached_jq " 
+						   	>Click to create chart 'MS2 Count Per MS1 Scan'
+					   	</a>
+					</div>
+					
+					<div  id="Scan_Statistics_MS2_Count_Per_MS1_Scan_Block_Create_Charts_Block" class="table-no-border-no-cell-spacing-no-cell-padding" >
+					</div>			
+					  
+					<div style="margin-top: 10px;">
+						--------------------------------------------------------------
+					</div>
+					
+					<div style="margin-top: 15px;">
+						<a id="Scan_Statistics_Per_Scan_Ion_Injection_Time_BoxPlot_Charts_Block_Create_Charts_Link"
+					   		href="javascript:" data-tooltip="Charts created when link is clicked." class="tool_tip_attached_jq " 
+						   	>Click to create charts 'MS2 Ion Injection Time Per MS1 Scan Boxplot (Quartiles, Max, Min, Outliers)' 
+						   	and 'MS2 Total Ion Current (TIC) Per MS1 Scan Boxplot (Quartiles, Max, Min, Outliers)'.  
+						   	This will take a <b>LONG</b> Time.
+					   	</a>
+					</div>
+					
+					<div style="margin-top: 10px; display: none;" 
+						id="Scan_Statistics_Per_Scan_Ion_Injection_Time_BoxPlot_Charts_Block_Charts_DataNotAvailable">
+						Data is NOT available in the system to create these charts
+					</div>
+					
+					<div style="margin-top: 10px; display: none;" 
+						id="Scan_Statistics_Per_Scan_Ion_Injection_Time_BoxPlot_Charts_Block_Charts_Label">
+						!!!!  <b>Disclaimer</b>: For Scans with <b>ONLY Dots at Zero</b>, that means there is <b>NO Data</b>  !!!!
+					</div>
+					
+					<div  id="Scan_Statistics_Per_Scan_Ion_Injection_Time_BoxPlot_Charts_Block" class="table-no-border-no-cell-spacing-no-cell-padding" >
+					</div>			
+					  
+					<div style="margin-top: 10px;">
+						--------------------------------------------------------------
+					</div>
+					
+				
+				
+				
+				</c:if>  <%--   <c:if test="${ strutsParameterAlex }">   --%>
+				
+				
+				
  
 			</div> <!-- close <div class="project-info-block  collapsable_jq" > -->
 		  </div> <!-- close <div class="top-level-container collapsable_container_jq" > -->

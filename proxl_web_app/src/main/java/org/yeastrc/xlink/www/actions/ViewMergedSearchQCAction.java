@@ -55,12 +55,28 @@ public class ViewMergedSearchQCAction extends Action {
 	
 	private static final Logger log = LoggerFactory.getLogger( ViewMergedSearchQCAction.class);
 	
+	private static final String STRUTS_PARAMETER_VALUE_ALEX = "Alex";
+	
 	@Override
 	public ActionForward execute( ActionMapping mapping,
 			  ActionForm actionForm,
 			  HttpServletRequest request,
 			  HttpServletResponse response ) throws Exception {
 		try {
+			//  Detect which Struts action mapping was called by examining the value of the "parameter" attribute
+			//     accessed by calling mapping.getParameter()
+			String strutsActionMappingParameter = mapping.getParameter();
+			
+			boolean strutsParameterAlex = false;
+			
+			if ( STRUTS_PARAMETER_VALUE_ALEX.equals(strutsActionMappingParameter) ) {
+				strutsParameterAlex = true;
+			}
+			
+			request.setAttribute( "strutsParameterAlex", strutsParameterAlex );
+			
+			
+			
 			MergedSearchViewProteinsForm form = (MergedSearchViewProteinsForm) actionForm;
 			int[] projectSearchIdsFromForm = form.getProjectSearchId();
 			if ( projectSearchIdsFromForm.length == 0 ) {

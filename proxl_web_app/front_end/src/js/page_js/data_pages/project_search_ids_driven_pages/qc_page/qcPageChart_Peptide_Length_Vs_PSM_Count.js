@@ -18,6 +18,13 @@
 //JavaScript directive:   all variables have to be declared with "var", maybe other things
 "use strict";
 
+
+const reportWebErrorToServer = window.reportWebErrorToServer;
+const addToolTips = window.addToolTips;
+const _PROXL_DEFAULT_FONT_COLOR = window._PROXL_DEFAULT_FONT_COLOR;
+
+
+
 import { webserviceCallStandardPost } from 'page_js/webservice_call_common/webserviceCallStandardPost.js';
 
 import { qc_pages_Single_Merged_Common } from './qc_pages_Single_Merged_Common.js';
@@ -304,7 +311,7 @@ var QCPageChart_Peptide_Length_Vs_PSM_Count = function() {
 			if ( chartBuckets === null || chartBuckets.length === 0 ) {
 				//  No data for this link type
 
-				var $chart_outer_container_jq =
+				const $chart_outer_container_jq =
 					this._addChartOuterTemplate( { $chart_group_container_table_jq : $PeptideLengthVsPSMCountBlock } );
 				//  Add empty chart with No Data message
 				this._placeEmptyDummyChartForMessage( { 
@@ -317,7 +324,7 @@ var QCPageChart_Peptide_Length_Vs_PSM_Count = function() {
 				return;  //  EARLY exit for this array element
 			}
 
-			var $chart_outer_container_jq =
+			const $chart_outer_container_jq =
 				this._addChartOuterTemplate( { $chart_group_container_table_jq : $PeptideLengthVsPSMCountBlock } );
 			var $chart_container_jq = this._addChartInnerTemplate( { $chart_outer_container_jq : $chart_outer_container_jq } );
 

@@ -18,6 +18,11 @@
 //JavaScript directive:   all variables have to be declared with "var", maybe other things
 "use strict";
 
+
+const reportWebErrorToServer = window.reportWebErrorToServer;
+
+
+
 import { qcPageChartSummaryStatistics } from './qcPageChartSummaryStatistics.js';
 
 

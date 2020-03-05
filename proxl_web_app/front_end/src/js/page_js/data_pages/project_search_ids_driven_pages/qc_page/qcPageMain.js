@@ -11,6 +11,22 @@
 //JavaScript directive:   all variables have to be declared with "var", maybe other things
 "use strict";
 
+const reportWebErrorToServer = window.reportWebErrorToServer;
+const handleAJAXFailure = window.handleAJAXFailure;
+const handleAJAXError = window.handleAJAXError;
+const addToolTips = window.addToolTips;
+const LZString = window.LZString;
+
+const _PROXL_COLOR_LINK_TYPE_CROSSLINK = window._PROXL_COLOR_LINK_TYPE_CROSSLINK // '#A55353', // Crosslink: Proxl shades of red
+const _PROXL_COLOR_LINK_TYPE_LOOPLINK = window._PROXL_COLOR_LINK_TYPE_LOOPLINK // '#53a553',  // Looplink: green: #53a553
+const _PROXL_COLOR_LINK_TYPE_UNLINKED = window._PROXL_COLOR_LINK_TYPE_UNLINKED // '#5353a5'   //	Unlinked: blue: #5353a5
+const _PROXL_COLOR_LINK_TYPE_ALL_COMBINED = window._PROXL_COLOR_LINK_TYPE_ALL_COMBINED  //  All Combined  Grey  #A5A5A5
+const _PROXL_COLOR_SITE_RED = window._PROXL_COLOR_SITE_RED
+const _PROXL_COLOR_SITE_PINK = window._PROXL_COLOR_SITE_PINK
+
+const _PROXL_DEFAULT_FONT_COLOR = window._PROXL_DEFAULT_FONT_COLOR;
+
+
 //Import header_main.js and children to ensure on the page
 import { header_mainVariable } from 'page_js/header_section_js_all_pages_main_pages/header_section_main_pages/header_main.js';
 
@@ -348,21 +364,25 @@ var QCPageMain = function() {
 
 			this.addClickAndOnChangeHandlers();
 
+			//  TODO   TEMP COMMENT OUT
+
 			qcPageSectionSummaryStatistics.show_Section_From_qcPageMain();
 
+
+			
 			//  TODO  TEMP Add
 
-//			qcPageSectionDigestionStatistics.showDigestionStatistics();
+			// qcPageSectionDigestionStatistics.show_Section();
 			
-//			qcPageSectionScanFileStatistics.showScanFileStatistics();
+			// qcPageSectionScanFileStatistics.show_Section();
 
-//			qcPageSection_PSM_Level_Statistics.show_PSM_Level_Statistics();
+//			qcPageSection_PSM_Level_Statistics.show_Section();
 
-//			qcPageSection_PSM_Error_Estimates.show_PSM_Error_Estimates();
+//			qcPageSection_PSM_Error_Estimates.show_Section();
 
-//			qcPageSectionModificationStatistics.showModificationStatistics();
+//			qcPageSectionModificationStatistics.show_Section();
 
-//			qcPageSection_Peptide_Level_Statistics.show_Peptide_Level_Statistics();
+//			qcPageSection_Peptide_Level_Statistics.show_Section();
 
 
 			saveView_dataPages.initialize();
@@ -672,7 +692,7 @@ var QCPageMain = function() {
 		if ( dynamicModMasses !== undefined && dynamicModMasses !== null && dynamicModMasses.length > 0  ) {
 			//  dynamicModMasses not null so process it, empty array means nothing chosen
 			if ( dynamicModMasses.length > 0 ) {
-				var $mod_mass_filter_jq = $(".mod_mass_filter_jq");
+				const $mod_mass_filter_jq = $(".mod_mass_filter_jq");
 				$mod_mass_filter_jq.each( function( index, element ) {
 					var $item = $( this );
 					var linkTypeFieldValue = $item.val();
@@ -690,7 +710,7 @@ var QCPageMain = function() {
 			}
 		} else {
 			//  dynamicModMasses null means all are chosen, since don't know which one was wanted
-			var $mod_mass_filter_jq = $(".mod_mass_filter_jq");
+			const $mod_mass_filter_jq = $(".mod_mass_filter_jq");
 			$mod_mass_filter_jq.each( function( index, element ) {
 				var $item = $( this );
 				$item.prop('checked', true);
@@ -720,7 +740,7 @@ var QCPageMain = function() {
 		if ( linkTypes !== undefined && linkTypes !== null ) {
 			//  linkTypes not null so process it, empty array means nothing chosen
 			if ( linkTypes.length > 0 ) {
-				var $link_type_jq = $(".link_type_jq");
+				const $link_type_jq = $(".link_type_jq");
 				$link_type_jq.each( function( index, element ) {
 					var $item = $( this );
 					var linkTypeFieldValue = $item.val();
@@ -738,7 +758,7 @@ var QCPageMain = function() {
 			}
 		} else {
 			//  linkTypes null means all are chosen, since don't know which one was wanted
-			var $link_type_jq = $(".link_type_jq");
+			const $link_type_jq = $(".link_type_jq");
 			$link_type_jq.each( function( index, element ) {
 				var $item = $( this );
 				$item.prop('checked', true);
@@ -962,7 +982,7 @@ var QCPageMain = function() {
 		//  Update cutoffs_Searches with values from cutoffDefaultsFromPage
 		//      for any searches in cutoffDefaultsFromPage but not in cutoffs_Searches
 		var cutoffDefaultsFromPageSrchIdArry = Object.keys( cutoffDefaultsFromPage_Searches );
-		for ( var index = 0; index < cutoffDefaultsFromPageSrchIdArry.length; index++ ) {
+		for ( let index = 0; index < cutoffDefaultsFromPageSrchIdArry.length; index++ ) {
 			var cutoffDefaultsFromPageSrchId = cutoffDefaultsFromPageSrchIdArry[ index ];
 			var cutoffs_SearchesEntryForDefProcessing = cutoffs_Searches[ cutoffDefaultsFromPageSrchId ];
 			if ( cutoffs_SearchesEntryForDefProcessing === undefined || cutoffs_SearchesEntryForDefProcessing === null ) {
@@ -975,7 +995,7 @@ var QCPageMain = function() {
 		}
 		//  Remove cutoffs in cutoffs_Searches for searches not in cutoffDefaultsFromPage
 		var cutoffs_SearchesSrchIdArry = Object.keys( cutoffs_Searches );
-		for ( var index = 0; index < cutoffs_SearchesSrchIdArry.length; index++ ) {
+		for ( let index = 0; index < cutoffs_SearchesSrchIdArry.length; index++ ) {
 			var cutoffs_SearchesSrchId = cutoffs_SearchesSrchIdArry[ index ];
 			var cutoffDefaultsFromPageForSrchId = cutoffDefaultsFromPage_Searches[ cutoffs_SearchesSrchId ];
 			if ( cutoffDefaultsFromPageForSrchId === undefined || cutoffDefaultsFromPageForSrchId === null ) {
@@ -1257,7 +1277,7 @@ var QCPageMain = function() {
 		var viewMergedImageDefaultPageUrl = $("#viewMergedImageDefaultPageUrl").val();
 		if ( viewMergedImageDefaultPageUrl === undefined || viewMergedImageDefaultPageUrl === "" ) {
 			var imageQueryString = "?";
-			for ( var j = 0; j < _project_search_ids.length; j++ ) {
+			for ( let j = 0; j < _project_search_ids.length; j++ ) {
 				if ( j > 0 ) {
 					imageQueryString += "&";
 				}
@@ -1267,7 +1287,7 @@ var QCPageMain = function() {
 			//  Add Filter cutoffs
 			imageJSON[ 'cutoffs' ] = baseJSONObject.cutoffs;
 			//  Add Ann Type Display
-			var annTypeIdDisplay = baseJSONObject.annTypeIdDisplay;
+			const annTypeIdDisplay = baseJSONObject.annTypeIdDisplay;
 			imageJSON[ 'annTypeIdDisplay' ] = annTypeIdDisplay;
 //			add filter out non unique peptides
 			var imageJSONString = encodeURIComponent( JSON.stringify( imageJSON ) );
@@ -1292,7 +1312,7 @@ var QCPageMain = function() {
 			var viewMergedStructureDefaultPageUrl = $("#viewMergedStructureDefaultPageUrl").val();
 			if ( viewMergedStructureDefaultPageUrl === undefined || viewMergedStructureDefaultPageUrl === "" ) {
 				var structureQueryString = "?";
-				for ( var j = 0; j < _project_search_ids.length; j++ ) {
+				for ( let j = 0; j < _project_search_ids.length; j++ ) {
 					if ( j > 0 ) {
 						structureQueryString += "&";
 					}
@@ -1302,7 +1322,7 @@ var QCPageMain = function() {
 				//  Add Filter cutoffs
 				structureJSON[ 'cutoffs' ] = baseJSONObject.cutoffs;
 				//  Add Ann Type Display
-				var annTypeIdDisplay = baseJSONObject.annTypeIdDisplay;
+				const annTypeIdDisplay = baseJSONObject.annTypeIdDisplay;
 				structureJSON[ 'annTypeIdDisplay' ] = annTypeIdDisplay;
 //				add filter out non unique peptides
 				var structureJSONString = encodeURIComponent( JSON.stringify( structureJSON ) );

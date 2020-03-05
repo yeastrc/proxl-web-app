@@ -19,6 +19,11 @@
 "use strict";
 
 
+const reportWebErrorToServer = window.reportWebErrorToServer;
+const addToolTips = window.addToolTips;
+const _PROXL_DEFAULT_FONT_COLOR = window._PROXL_DEFAULT_FONT_COLOR;
+
+
 import { webserviceCallStandardPost } from 'page_js/webservice_call_common/webserviceCallStandardPost.js';
 
 import { qc_pages_Single_Merged_Common } from './qc_pages_Single_Merged_Common.js';
@@ -443,72 +448,71 @@ var QCPageChartSummaryStatistics = function() {
 
 		
 		//   PSM Count Chart
+		{
+			const $chart_outer_container_jq = this._addChartOuterTemplate( { $chart_group_container_table_jq : $Summary_Statistics_CountsBlock } );
 
-		var $chart_outer_container_jq =
-			this._addChartOuterTemplate( { $chart_group_container_table_jq : $Summary_Statistics_CountsBlock } );
+			const $chart_container_jq = this._addChartInnerTemplate( { $chart_outer_container_jq : $chart_outer_container_jq } );
 
-		var $chart_container_jq = this._addChartInnerTemplate( { $chart_outer_container_jq : $chart_outer_container_jq } );
+			this._addSummaryChart( { 
+				chartTitle : 'PSM Count',
+				dataWithOneElementPerType: psmCountPerType, 
+				$chartContainer : $chart_container_jq } );
+			
+			//  Download Data Setup
+			const download_Psm_DataCallback = function( params ) {
+	//			var clickedThis = params.clickedThis;
+				//  Download the data for params
+				const dataToSend = { projectSearchIds : _project_search_ids, qcPageQueryJSONRoot : hash_json_Contents };
+				qc_pages_Single_Merged_Common.submitDownloadForParams( { downloadStrutsAction : _download_PSM_StrutsAction, dataToSend } );
+			};
 
-		this._addSummaryChart( { 
-			chartTitle : 'PSM Count',
-			dataWithOneElementPerType: psmCountPerType, 
-			$chartContainer : $chart_container_jq } );
-		
-		//  Download Data Setup
-		var download_Psm_DataCallback = function( params ) {
-//			var clickedThis = params.clickedThis;
-			//  Download the data for params
-			const dataToSend = { projectSearchIds : _project_search_ids, qcPageQueryJSONRoot : hash_json_Contents };
-			qc_pages_Single_Merged_Common.submitDownloadForParams( { downloadStrutsAction : _download_PSM_StrutsAction, dataToSend } );
-		};
+			qcChartDownloadHelp.add_DownloadClickHandlers_HelpTooltip( { $chart_outer_container_for_download_jq :  $chart_outer_container_jq, helpTooltipHTML : _psmCountChart_helpTooltipHTML, downloadDataCallback : download_Psm_DataCallback } );
+		}
 
-		qcChartDownloadHelp.add_DownloadClickHandlers_HelpTooltip( { $chart_outer_container_for_download_jq :  $chart_outer_container_jq, helpTooltipHTML : _psmCountChart_helpTooltipHTML, downloadDataCallback : download_Psm_DataCallback } );
-		
 		//  Peptide Count Chart
+		{
+			const $chart_outer_container_jq = this._addChartOuterTemplate( { $chart_group_container_table_jq : $Summary_Statistics_CountsBlock } );
 
-		var $chart_outer_container_jq =
-			this._addChartOuterTemplate( { $chart_group_container_table_jq : $Summary_Statistics_CountsBlock } );
+			const $chart_container_jq = this._addChartInnerTemplate( { $chart_outer_container_jq : $chart_outer_container_jq } );
 
-		var $chart_container_jq = this._addChartInnerTemplate( { $chart_outer_container_jq : $chart_outer_container_jq } );
+			this._addSummaryChart( { 
+				chartTitle : 'Peptide Count',
+				dataWithOneElementPerType: reportedPeptideCountPerType, 
+				$chartContainer : $chart_container_jq } );
 
-		this._addSummaryChart( { 
-			chartTitle : 'Peptide Count',
-			dataWithOneElementPerType: reportedPeptideCountPerType, 
-			$chartContainer : $chart_container_jq } );
-
-		//  Download Data Setup
-		var download_Peptide_DataCallback = function( params ) {
-//			var clickedThis = params.clickedThis;
-			//  Download the data for params
-			const dataToSend = { projectSearchIds : _project_search_ids, qcPageQueryJSONRoot : hash_json_Contents };
-			qc_pages_Single_Merged_Common.submitDownloadForParams( { downloadStrutsAction : _download_Peptide_StrutsAction, dataToSend } );
-		};
+			//  Download Data Setup
+			const download_Peptide_DataCallback = function( params ) {
+//				var clickedThis = params.clickedThis;
+				//  Download the data for params
+				const dataToSend = { projectSearchIds : _project_search_ids, qcPageQueryJSONRoot : hash_json_Contents };
+				qc_pages_Single_Merged_Common.submitDownloadForParams( { downloadStrutsAction : _download_Peptide_StrutsAction, dataToSend } );
+			};
 		
-		qcChartDownloadHelp.add_DownloadClickHandlers_HelpTooltip( { $chart_outer_container_for_download_jq :  $chart_outer_container_jq, helpTooltipHTML : _peptideCountChart_helpTooltipHTML, downloadDataCallback : download_Peptide_DataCallback } );
+			qcChartDownloadHelp.add_DownloadClickHandlers_HelpTooltip( { $chart_outer_container_for_download_jq :  $chart_outer_container_jq, helpTooltipHTML : _peptideCountChart_helpTooltipHTML, downloadDataCallback : download_Peptide_DataCallback } );
+		}
 
 		//   Protein Count Chart
+		{
+			const $chart_outer_container_jq = this._addChartOuterTemplate( { $chart_group_container_table_jq : $Summary_Statistics_CountsBlock } );
 
-		var $chart_outer_container_jq =
-			this._addChartOuterTemplate( { $chart_group_container_table_jq : $Summary_Statistics_CountsBlock } );
+			const $chart_container_jq = this._addChartInnerTemplate( { $chart_outer_container_jq : $chart_outer_container_jq } );
 
-		var $chart_container_jq = this._addChartInnerTemplate( { $chart_outer_container_jq : $chart_outer_container_jq } );
+			this._addSummaryChart( { 
+				chartTitle : 'Protein Count',
+				dataWithOneElementPerType: proteinSequenceVersionIdCountPerType, 
+				combinedCount : uniqueproteinSequenceVersionIdCountAllLinkTypes,
+				$chartContainer : $chart_container_jq } );
 
-		this._addSummaryChart( { 
-			chartTitle : 'Protein Count',
-			dataWithOneElementPerType: proteinSequenceVersionIdCountPerType, 
-			combinedCount : uniqueproteinSequenceVersionIdCountAllLinkTypes,
-			$chartContainer : $chart_container_jq } );
-
-		//  Download Data Setup
-		var download_Protein_DataCallback = function( params ) {
-//			var clickedThis = params.clickedThis;
-			//  Download the data for params
-			const dataToSend = { projectSearchIds : _project_search_ids, qcPageQueryJSONRoot : hash_json_Contents };
-			qc_pages_Single_Merged_Common.submitDownloadForParams( { downloadStrutsAction : _download_Protein_StrutsAction, dataToSend } );
-		};
-		
-		qcChartDownloadHelp.add_DownloadClickHandlers_HelpTooltip( { $chart_outer_container_for_download_jq :  $chart_outer_container_jq, helpTooltipHTML : _proteinCountChart_helpTooltipHTML, downloadDataCallback : download_Protein_DataCallback } );
-
+			//  Download Data Setup
+			const download_Protein_DataCallback = function( params ) {
+	//			var clickedThis = params.clickedThis;
+				//  Download the data for params
+				const dataToSend = { projectSearchIds : _project_search_ids, qcPageQueryJSONRoot : hash_json_Contents };
+				qc_pages_Single_Merged_Common.submitDownloadForParams( { downloadStrutsAction : _download_Protein_StrutsAction, dataToSend } );
+			};
+			
+			qcChartDownloadHelp.add_DownloadClickHandlers_HelpTooltip( { $chart_outer_container_for_download_jq :  $chart_outer_container_jq, helpTooltipHTML : _proteinCountChart_helpTooltipHTML, downloadDataCallback : download_Protein_DataCallback } );
+		}
 		
 		
 		// Add tooltips for download links

@@ -1,16 +1,8 @@
 /**
  * qcPageSectionScanFileStatistics.js
  * 
- * Javascript for the viewQC.jsp page - Section Ion Current Statistics
- * 
- * page variable qcPageSectionScanFileStatistics
- * 
- * 		!!!!  Currently only works for single search.  
- * 
- * 		The page is designed to work with multiple merged searches 
- * 		but the code and SQL need to be reviewed to determine that the results returned are what the user expects,
- * 		especially for reported peptide level results. 
- * 
+ * Javascript for the viewQC.jsp page - Section Scan File Statistics
+ *  * 
  * This code has been updated to cancel existing active AJAX calls when "Update from Database" button is clicked.
  *   This is done so that previous AJAX responses don't overlay new AJAX responses.
  */
@@ -18,7 +10,12 @@
 //JavaScript directive:   all variables have to be declared with "var", maybe other things
 "use strict";
 
-import { qcPageChartScanFileStatistics } from './qcPageChartScanFileStatistics.js';
+
+const reportWebErrorToServer = window.reportWebErrorToServer;
+
+
+
+import { qcPageChartScanFileStatistics_ScanFileSelector_Driven_Subsection } from './qcPageChartScanFileStatistics_ScanFileSelector_Driven_Subsection.js';
 
 
 /**
@@ -26,9 +23,9 @@ import { qcPageChartScanFileStatistics } from './qcPageChartScanFileStatistics.j
  */
 var QCPageSectionScanFileStatistics = function() {
 
-	//  _pageChartObjectsForSection not used everywhere, hard coded in some places
 	var _pageChartObjectsForSection = [
-		qcPageChartScanFileStatistics
+		
+		qcPageChartScanFileStatistics_ScanFileSelector_Driven_Subsection
 	];
 
 	//  From QCPageMain
@@ -246,23 +243,18 @@ var QCPageSectionScanFileStatistics = function() {
 	 * Load the data for the section
 	 */
 	this.loadSectionIfNeeded = function() {
-//		_pageChartObjectsForSection.forEach( function( pageChartObjectForSection, index, array ) {
-//			pageChartObjectForSection.loadChartIfNeeded();
-//		}, this );
-		qcPageChartScanFileStatistics.loadScanFileSelectorIfNeeded();
+		_pageChartObjectsForSection.forEach( function( pageChartObjectForSection, index, array ) {
+			pageChartObjectForSection.loadChartIfNeeded();
+		}, this );
 	};
 
 	/**
 	 * Clear the data for the section
 	 */
 	this.clearSection = function() {
-//		_pageChartObjectsForSection.forEach( function( pageChartObjectForSection, index, array ) {
-//			pageChartObjectForSection.clearChart();
-//		}, this );
-		qcPageChartScanFileStatistics.clearScanFileSelector();
-		qcPageChartScanFileStatistics.clearScanOverallStastics();
-		qcPageChartScanFileStatistics.clear_MS_1_IonCurrent_Histograms();
-		qcPageChartScanFileStatistics.clear_MS_1_IonCurrent_Heatmap();
+		_pageChartObjectsForSection.forEach( function( pageChartObjectForSection, index, array ) {
+			pageChartObjectForSection.clearChart();
+		}, this );
 	};
 };
 

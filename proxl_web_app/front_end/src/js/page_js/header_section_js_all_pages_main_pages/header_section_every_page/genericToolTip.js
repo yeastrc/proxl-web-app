@@ -7,6 +7,8 @@
  */	
 
 
+import { reportWebErrorToServer } from 'page_js/header_section_js_all_pages_main_pages/header_section_every_page/reportWebErrorToServer';
+
 if ( ! window.genericToolTip_js_Initialized ) {
 
 	$(document).ready(function() {

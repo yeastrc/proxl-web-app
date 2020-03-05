@@ -18,6 +18,10 @@
 //JavaScript directive:   all variables have to be declared with "var", maybe other things
 "use strict";
 
+const reportWebErrorToServer = window.reportWebErrorToServer;
+
+
+
 import { qcPageChart_PSM_Count_Vs_RetentionTime_PSM } from './qcPageChart_PSM_Count_Vs_RetentionTime_PSM.js';
 import { qcPageChart_PSM_Count_Vs_Score_PSM } from './qcPageChart_PSM_Count_Vs_Score_PSM.js';
 import { qcPageChart_PSM_Score_Vs_Score_PSM } from './qcPageChart_PSM_Score_Vs_Score_PSM.js';

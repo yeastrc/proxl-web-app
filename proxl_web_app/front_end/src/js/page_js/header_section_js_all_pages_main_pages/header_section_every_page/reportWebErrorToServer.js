@@ -13,7 +13,7 @@
 
 //  Constructor
 
-window.ReportWebErrorToServer = function() {
+const ReportWebErrorToServer = function() {
 	
 	
 	
@@ -81,7 +81,7 @@ window.ReportWebErrorToServer = function() {
 	
 };
 
-
+window.ReportWebErrorToServer = ReportWebErrorToServer;
 
 //  Instance of class
 

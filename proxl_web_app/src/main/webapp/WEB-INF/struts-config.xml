@@ -312,6 +312,17 @@
 			<forward name="SuccessMerged" path="/WEB-INF/jsp-pages/viewQCMerged.jsp" redirect="false" />
 		</action>		
 		
+		
+    	<action path="/qc_Alex"
+				type="org.yeastrc.xlink.www.actions.ViewMergedSearchQCAction"
+				name="mergedSearchViewProteinForm"
+				parameter="Alex"
+				scope="request"
+				validate="false">
+			<forward name="SuccessSingle" path="/WEB-INF/jsp-pages/viewQC.jsp" redirect="false" />
+			<forward name="SuccessMerged" path="/WEB-INF/jsp-pages/viewQCMerged.jsp" redirect="false" />
+		</action>		
+		
 		<!-- Downloads for QC pages (Single search and Merged) -->
 
       	<action path="/downloadQC_SummaryPsmChartData"

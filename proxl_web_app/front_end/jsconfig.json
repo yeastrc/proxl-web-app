@@ -1,0 +1,11 @@
+{
+    "compilerOptions": {
+        "target": "ES6"
+    },
+    "exclude": [
+        "node_modules",
+        "./handlebars_templates_precompiled/**/*",
+        "**/__snapshots__/*",
+        "**/*.snap"
+    ]
+}
