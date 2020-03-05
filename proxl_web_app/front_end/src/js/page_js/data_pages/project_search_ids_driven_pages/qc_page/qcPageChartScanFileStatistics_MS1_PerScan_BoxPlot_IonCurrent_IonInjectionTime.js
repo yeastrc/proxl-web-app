@@ -341,7 +341,7 @@ var QCPageChartScanFileStatistics_MS1_PerScan_BoxPlot_IonCurrent_IonInjectionTim
 
 			// const chartTitleAddition = ".  X Axis labels are Scan Numbers of MS1 Scans"
 
-			const chartTitleAddition = ".  X Axis labels are Retention Time (minutes) of MS1 Scans.   !!!! Disclaimer: For Scans with ONLY Dots at Zero, that means there is NO Data !!!!"
+			const chartTitleAddition = ".  X Axis labels are Retention Time (minutes) of MS1 Scans."; // Remove since appear to have fixed the issue  !!!! Disclaimer: For Scans with ONLY Dots at Zero, that means there is NO Data !!!!"
 
 			{
 				const $div = $("<div></div>");
@@ -592,6 +592,19 @@ var QCPageChartScanFileStatistics_MS1_PerScan_BoxPlot_IonCurrent_IonInjectionTim
 			
 			// wholeChartTooltipData.push( wholeChartTooltipEntry );
 			
+
+
+			let chartEntryStyle = 'color: blue;'  // style required to make visible :  color: blue; opacity: 1;
+
+			if ( singleScan_IonInjectionTime_BoxplotData.chartIntervalMax === 0 &&
+				singleScan_IonInjectionTime_BoxplotData.chartIntervalMin === 0 &&
+				singleScan_IonInjectionTime_BoxplotData.firstQuartile === 0 &&
+				singleScan_IonInjectionTime_BoxplotData.median === 0 &&
+				singleScan_IonInjectionTime_BoxplotData.thirdQuartile === 0 ) {
+
+				chartEntryStyle = 'color: white; opacity: 0;'  ///  Hide when all values are zero
+			}
+				
 			var chartEntry = [ 
 				{ v: ms1_RetentionTime_MinutesDisplay, f: ms1_RetentionTime_MinutesDisplay }, //  X axis label as well as for tooltip
 				//  First list for charting for tool tips
@@ -610,10 +623,7 @@ var QCPageChartScanFileStatistics_MS1_PerScan_BoxPlot_IonCurrent_IonInjectionTim
 
 				mainBoxPlotTooltip, // tooltip for top of top box
 
-				'color: blue;'  // style required to make visible :  color: blue; opacity: 1;
-				
-				//  WAS
-				// 'color: ' + colorForSearchEntry + ';'  // style required to make visible :  color: blue; opacity: 1;
+				chartEntryStyle // style required to make visible :  color: blue; opacity: 1;
 			
 			];
 			
