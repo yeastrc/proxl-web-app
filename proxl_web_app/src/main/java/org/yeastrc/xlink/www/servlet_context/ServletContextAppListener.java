@@ -19,6 +19,7 @@ import org.yeastrc.xlink.www.config_system_table.ConfigSystemCaching;
 import org.yeastrc.xlink.www.constants.WebConstants;
 import org.yeastrc.xlink.www.db_web.DBConnectionFactoryWeb;
 import org.yeastrc.xlink.www.db_web.DBSet_JNDI_Name_FromConfigFile;
+import org.yeastrc.xlink.www.log_error_after_webapp_undeploy_started.Log_Info_Error_AfterWebAppUndeploy_Started;
 import org.yeastrc.xlink.www.user_mgmt_webapp_access.UserMgmtCentralWebappWebserviceAccess;
 import org.yeastrc.xlink.www.no_data_validation.ThrowExceptionOnNoDataConfig;
 import org.yeastrc.xlink.www.user_mgmt_db.UserMgmtCentralMainDBConnectionFactory_For_Proxl;
@@ -132,28 +133,56 @@ public class ServletContextAppListener extends HttpServlet implements ServletCon
 	public void contextDestroyed(ServletContextEvent event) {
 		
 //		ServletContext context = event.getServletContext();
+
+		Webapp_Undeploy_Started_Completed.setWebapp_Undeploy_Started(true);
 		
-		log.warn("INFO:  !!!!!!!!  Web app Undeploying   !!!!!!!!");
+		//  Nothing output since Log4J2 has stopped logging
+		log.warn("INFO:  !!!!!!!!  Web app Undeploying STARTING  !!!!!!!!");
+
+		Log_Info_Error_AfterWebAppUndeploy_Started.log_INFO_AfterWebAppUndeploy_Started("  !!!!!!!!" );
+		Log_Info_Error_AfterWebAppUndeploy_Started.log_INFO_AfterWebAppUndeploy_Started("  !!!!!!!!  Web app Undeploying STARTING  !!!!!!!!" );
+
 		
 		try {
 			CachedDataCentralRegistry.getInstance().writeToLogAllCacheSizes();
 		} catch (Exception e) {
-			log.error( "CachedDataCentralRegistry.getInstance().writeToLogAllCacheSizes() threw exception while app undeploying.", e);
+			String msg = "CachedDataCentralRegistry.getInstance().writeToLogAllCacheSizes() threw exception while app undeploying.";
+			//  Nothing output since Log4J2 has stopped logging
+			log.error( msg, e );
+			Log_Info_Error_AfterWebAppUndeploy_Started.log_ERROR_AfterWebAppUndeploy_Started( msg, e );
 		}
 
 		try {
 			CachedDataInFileMgmtRegistration.getSingletonInstance().shutdownNow();
 		} catch ( Exception e ) {
-			log.error( "In contextDestroyed(ServletContextEvent event), CachedDataInFileMgmtRegistration.getSingletonInstance().shutdownNow();", e );
+			
+			String msg = "In contextDestroyed(ServletContextEvent event), CachedDataInFileMgmtRegistration.getSingletonInstance().shutdownNow();";
+			//  Nothing output since Log4J2 has stopped logging
+			log.error( msg, e );
+			Log_Info_Error_AfterWebAppUndeploy_Started.log_ERROR_AfterWebAppUndeploy_Started( msg, e );
 		}
 		
 		try {
 			AsyncActionViaExecutorService.getInstance().shutdownNow();
 		} catch ( Exception e ) {
-			log.error( "In contextDestroyed(ServletContextEvent event), AsyncActionViaExecutorService.getInstance().shutdownNow();", e );
+			
+			String msg = "In contextDestroyed(ServletContextEvent event), AsyncActionViaExecutorService.getInstance().shutdownNow();";
+			//  Nothing output since Log4J2 has stopped logging
+			log.error( msg, e );
+			Log_Info_Error_AfterWebAppUndeploy_Started.log_ERROR_AfterWebAppUndeploy_Started( msg, e );
 		}
 		
 		
+		//  Nothing output since Log4J2 has stopped logging
+		log.warn("INFO:  !!!!!!!!  Web app Undeploying FINISHED  !!!!!!!!");
 
+		Log_Info_Error_AfterWebAppUndeploy_Started.log_INFO_AfterWebAppUndeploy_Started(
+				"  !!!!!!!!  Web app Undeploying: Initial run of contextDestroyed(...) is complete." );
+		
+		Log_Info_Error_AfterWebAppUndeploy_Started.log_INFO_AfterWebAppUndeploy_Started("  !!!!!!!!" );
+		
+		Webapp_Undeploy_Started_Completed.setWebapp_Undeploy_Completed(true);
 	}
+
+
 }

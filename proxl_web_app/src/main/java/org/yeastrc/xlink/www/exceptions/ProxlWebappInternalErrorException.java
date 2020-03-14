@@ -1,6 +1,6 @@
 package org.yeastrc.xlink.www.exceptions;
 
-public class ProxlWebappInternalErrorException extends Exception {
+public class ProxlWebappInternalErrorException extends RuntimeException {
 
 
 	/**
