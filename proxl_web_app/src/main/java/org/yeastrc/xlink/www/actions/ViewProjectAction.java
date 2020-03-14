@@ -74,7 +74,10 @@ public class ViewProjectAction extends Action {
 				try {
 					projectId = Integer.parseInt( projectIdString );
 				} catch ( Exception ex ) {
-					log.warn( "Failed to parse project id: " + projectIdString );
+					
+					if ( projectIdString != null ) { // Only log if value provided
+						log.warn( "Failed to parse project id: " + projectIdString );
+					}
 					this.getDataForProjectNotFoundPage(request); 
 					return mapping.findForward( PROJECT_NOT_FOUND );
 				}

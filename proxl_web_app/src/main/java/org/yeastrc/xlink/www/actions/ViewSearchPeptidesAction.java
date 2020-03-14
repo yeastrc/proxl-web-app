@@ -85,9 +85,12 @@ public class ViewSearchPeptidesAction extends Action {
 			projectSearchIdsSet.add( projectSearchId );
 			List<Integer> projectIdsFromSearchIds = ProjectIdsForProjectSearchIdsSearcher.getInstance().getProjectIdsForProjectSearchIds( projectSearchIdsSet );
 			if ( projectIdsFromSearchIds.isEmpty() ) {
-				// should never happen
-				String msg = "No project ids for projectSearchId: " + projectSearchId;
-				log.warn( msg );
+
+				if ( projectSearchId != 0 ) {  //  projectSearchId == 0 if no value provided since is default value in form
+					//  Only log if value provided. 
+					String msg = "No project ids for projectSearchId: " + projectSearchId;
+					log.warn( msg );
+				}
 				return mapping.findForward( StrutsGlobalForwardNames.INVALID_REQUEST_DATA );
 			}
 			if ( projectIdsFromSearchIds.size() > 1 ) {

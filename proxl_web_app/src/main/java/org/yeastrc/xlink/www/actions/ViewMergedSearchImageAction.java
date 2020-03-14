@@ -74,7 +74,6 @@ public class ViewMergedSearchImageAction extends Action {
 			
 			List<Integer> projectIdsFromSearchIds = ProjectIdsForProjectSearchIdsSearcher.getInstance().getProjectIdsForProjectSearchIds( projectSearchIdsSet );
 			if ( projectIdsFromSearchIds.isEmpty() ) {
-				// should never happen
 				String msg = "No project ids for projectSearchIds: ";
 				for ( int projectSearchId : projectSearchIdsFromForm ) {
 					msg += projectSearchId + ", ";
