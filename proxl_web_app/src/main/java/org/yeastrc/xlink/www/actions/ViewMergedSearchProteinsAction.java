@@ -21,6 +21,8 @@ import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.www.nav_links_image_structure.PopulateRequestDataForImageAndStructureAndQC_NavLinks;
 import org.yeastrc.xlink.www.access_control.result_objects.WebSessionAuthAccessLevel;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
+import org.yeastrc.xlink.www.user_session_management.UserSession;
+import org.yeastrc.xlink.www.user_session_management.UserSessionManager;
 import org.yeastrc.xlink.www.constants.StrutsGlobalForwardNames;
 import org.yeastrc.xlink.www.constants.WebConstants;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
@@ -71,6 +73,9 @@ public class ViewMergedSearchProteinsAction extends Action {
 			webappTiming = WebappTiming.getInstance( log );
 			request.setAttribute( "webappTiming", webappTiming );
 		}
+		
+		Integer projectId = null;
+
 		try {
 			// our form
 			MergedSearchViewProteinsForm form = (MergedSearchViewProteinsForm)actionForm;
@@ -100,7 +105,9 @@ public class ViewMergedSearchProteinsAction extends Action {
 				//  Invalid request, searches across projects
 				return mapping.findForward( StrutsGlobalForwardNames.INVALID_REQUEST_SEARCHES_ACROSS_PROJECTS );
 			}
-			int projectId = projectIdsFromSearchIds.get( 0 );
+			
+			projectId = projectIdsFromSearchIds.get( 0 );
+			
 			request.setAttribute( "projectId", projectId ); 
 			request.setAttribute( "project_id", projectId );
 			///////////////////////
@@ -246,14 +253,61 @@ public class ViewMergedSearchProteinsAction extends Action {
 			}
 			
 			return mapping.findForward( "Success" );
-			
+
 		} catch ( ProxlWebappDataException e ) {
-			String msg = "Exception processing request data";
+
+			Integer authUserId = null;
+			Integer userMgmtUserId = null;
+			String username = null;
+
+			try {	
+				UserSession userSession = UserSessionManager.getSinglesonInstance().getUserSession(request);
+				
+				if ( userSession != null ) {
+	
+					authUserId = userSession.getAuthUserId();
+					userMgmtUserId = userSession.getUserMgmtUserId();
+					username = userSession.getUsername();
+				}	
+			} catch ( Exception e2 ) {
+				log.error( "In Main } catch ( Exception e ) {: Error getting User Id and Username: ", e2 );
+			}
+			
+			String msg = "Exception processing request data. authUserId (null if no session): " 
+					+ authUserId
+					+ ", userMgmtUserId (null if no session): " + userMgmtUserId
+					+ ", username (null if no session): " + username
+					+ e.toString();
 			log.error( msg, e );
+			
 			return mapping.findForward( StrutsGlobalForwardNames.INVALID_REQUEST_DATA );
+			
 		} catch ( Exception e ) {
-			String msg = "Exception caught: " + e.toString();
+		
+			Integer authUserId = null;
+			Integer userMgmtUserId = null;
+			String username = null;
+
+			try {	
+				UserSession userSession = UserSessionManager.getSinglesonInstance().getUserSession(request);
+				
+				if ( userSession != null ) {
+	
+					authUserId = userSession.getAuthUserId();
+					userMgmtUserId = userSession.getUserMgmtUserId();
+					username = userSession.getUsername();
+				}	
+			} catch ( Exception e2 ) {
+				log.error( "In Main } catch ( Exception e ) {: Error getting User Id and Username: ", e2 );
+			}
+			
+			String msg = "Exception caught. authUserId (null if no session): " 
+					+ authUserId
+					+ ", userMgmtUserId (null if no session): " + userMgmtUserId
+					+ ", username (null if no session): " + username
+					+ e.toString();
 			log.error( msg, e );
+			
 			throw e;
 		}
 	}

@@ -20,7 +20,6 @@ import org.apache.struts.action.ActionMapping;
 import org.yeastrc.xlink.www.dao.SearchDAO;
 import org.yeastrc.xlink.www.dto.SearchDTO;
 import org.yeastrc.xlink.www.dao.ConfigSystemDAO;
-import org.yeastrc.xlink.www.form_query_json_objects.CutoffValuesRootLevel;
 import org.yeastrc.xlink.www.form_query_json_objects.ImageStructure_QC_QueryJSONRoot;
 import org.yeastrc.xlink.www.forms.MergedSearchViewProteinsForm;
 import org.yeastrc.xlink.www.forms.PeptideProteinCommonForm;
@@ -29,11 +28,12 @@ import org.yeastrc.xlink.www.objects.ProteinSequenceVersionIdProteinAnnotationNa
 import org.yeastrc.xlink.www.constants.ConfigSystemsKeysConstants;
 import org.yeastrc.xlink.www.constants.StrutsGlobalForwardNames;
 import org.yeastrc.xlink.www.constants.WebConstants;
-import org.yeastrc.xlink.www.cutoff_processing_web.GetDefaultPsmPeptideCutoffs;
 import org.yeastrc.xlink.www.cutoff_processing_web.Set__A_QueryBase_JSONRoot__Defaults;
 import org.yeastrc.xlink.www.searcher.ProjectIdsForProjectSearchIdsSearcher;
 import org.yeastrc.xlink.www.searcher.ProteinSequenceVersionIdAnnotationNameSearcher;
 import org.yeastrc.xlink.www.searcher.SearchModMassDistinctSearcher;
+import org.yeastrc.xlink.www.user_session_management.UserSession;
+import org.yeastrc.xlink.www.user_session_management.UserSessionManager;
 import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result;
 import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId;
 import org.yeastrc.xlink.www.web_utils.AnyPDBFilesForProjectId;
@@ -62,6 +62,9 @@ public class ViewMergedSearchQCAction extends Action {
 			  ActionForm actionForm,
 			  HttpServletRequest request,
 			  HttpServletResponse response ) throws Exception {
+
+		Integer projectId = null;
+
 		try {
 			//  Detect which Struts action mapping was called by examining the value of the "parameter" attribute
 			//     accessed by calling mapping.getParameter()
@@ -102,7 +105,9 @@ public class ViewMergedSearchQCAction extends Action {
 				//  Invalid request, searches across projects
 				return mapping.findForward( StrutsGlobalForwardNames.INVALID_REQUEST_SEARCHES_ACROSS_PROJECTS );
 			}
-			int projectId = projectIdsFromSearchIds.get( 0 );
+			
+			projectId = projectIdsFromSearchIds.get( 0 );
+			
 			request.setAttribute( "projectId", projectId ); 
 			request.setAttribute( "project_id", projectId );
 			///////////////////////
@@ -310,11 +315,35 @@ public class ViewMergedSearchQCAction extends Action {
 			if ( searchIdsArray.length == 1 ) {
 				return mapping.findForward( "SuccessSingle" );
 			}
-			return mapping.findForward( "SuccessMerged" );
 			
+			return mapping.findForward( "SuccessMerged" );
+
 		} catch ( Exception e ) {
-			String msg = "Exception caught: " + e.toString();
+		
+			Integer authUserId = null;
+			Integer userMgmtUserId = null;
+			String username = null;
+
+			try {	
+				UserSession userSession = UserSessionManager.getSinglesonInstance().getUserSession(request);
+				
+				if ( userSession != null ) {
+	
+					authUserId = userSession.getAuthUserId();
+					userMgmtUserId = userSession.getUserMgmtUserId();
+					username = userSession.getUsername();
+				}	
+			} catch ( Exception e2 ) {
+				log.error( "In Main } catch ( Exception e ) {: Error getting User Id and Username: ", e2 );
+			}
+			
+			String msg = "Exception caught. authUserId (null if no session): " 
+					+ authUserId
+					+ ", userMgmtUserId (null if no session): " + userMgmtUserId
+					+ ", username (null if no session): " + username
+					+ e.toString();
 			log.error( msg, e );
+			
 			throw e;
 		}
 	}

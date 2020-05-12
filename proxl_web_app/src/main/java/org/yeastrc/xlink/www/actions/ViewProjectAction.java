@@ -19,6 +19,7 @@ import org.yeastrc.xlink.www.searcher.ProjectToCopyToSearcher;
 import org.yeastrc.xlink.www.constants.StrutsGlobalForwardNames;
 import org.yeastrc.xlink.www.constants.WebConstants;
 import org.yeastrc.xlink.www.user_session_management.UserSession;
+import org.yeastrc.xlink.www.user_session_management.UserSessionManager;
 import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result;
 import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId;
 import org.yeastrc.xlink.www.web_utils.AnyPDBFilesForProjectId;
@@ -54,10 +55,15 @@ public class ViewProjectAction extends Action {
 			  HttpServletRequest request,
 			  HttpServletResponse response )
 					  throws Exception {
+
+		Integer projectId = null;
+
 		try {
 			//  First try to get project id from request as passed from another struts action
 			String projectIdString = null;
-			int projectId = 0;
+			
+			projectId = 0;
+			
 			Integer projectIdInteger = (Integer)request.getAttribute( WebConstants.REQUEST_PROJECT_ID );
 			if ( projectIdInteger != null ) {
 				projectId = projectIdInteger;
@@ -68,7 +74,13 @@ public class ViewProjectAction extends Action {
 			} else {
 				//  get project id from query string
 				projectIdString = request.getParameter( WebConstants.PARAMETER_PROJECT_ID );
-				
+
+				if ( projectIdString == null ) { // return if no project id provided
+					
+					this.getDataForProjectNotFoundPage(request); 
+					return mapping.findForward( PROJECT_NOT_FOUND ); //  EARLY RETURN
+				}
+
 				request.setAttribute( REQUEST_PROJECT_ID_FROM_VIEW_PROJECT_ACTION, projectIdString );
 				
 				try {
@@ -76,10 +88,34 @@ public class ViewProjectAction extends Action {
 				} catch ( Exception ex ) {
 					
 					if ( projectIdString != null ) { // Only log if value provided
-						log.warn( "Failed to parse project id: " + projectIdString );
+
+						Integer authUserId = null;
+						Integer userMgmtUserId = null;
+						String username = null;
+
+						try {	
+							UserSession userSession = UserSessionManager.getSinglesonInstance().getUserSession(request);
+							
+							if ( userSession != null ) {
+				
+								authUserId = userSession.getAuthUserId();
+								userMgmtUserId = userSession.getUserMgmtUserId();
+								username = userSession.getUsername();
+							}	
+						} catch ( Exception e2 ) {
+							log.error( "In parse projectIdString catch ( Exception ex ) {: Error getting User Id and Username: ", e2 );
+						}
+						
+						String msg = "Failed to parse project id. authUserId (null if no session): " 
+								+ authUserId
+								+ ", userMgmtUserId (null if no session): " + userMgmtUserId
+								+ ", username (null if no session): " + username
+								+ ", project id: " + projectIdString;
+						log.warn( msg );
 					}
+					
 					this.getDataForProjectNotFoundPage(request); 
-					return mapping.findForward( PROJECT_NOT_FOUND );
+					return mapping.findForward( PROJECT_NOT_FOUND ); //  EARLY RETURN
 				}
 			}
 			{
@@ -187,10 +223,33 @@ public class ViewProjectAction extends Action {
 			
 			ActionForward actionForward =  mapping.findForward( "Success" );
 			return actionForward;
-			
+
 		} catch ( Exception e ) {
-			String msg = "Exception caught: " + e.toString();
+		
+			Integer authUserId = null;
+			Integer userMgmtUserId = null;
+			String username = null;
+
+			try {	
+				UserSession userSession = UserSessionManager.getSinglesonInstance().getUserSession(request);
+				
+				if ( userSession != null ) {
+	
+					authUserId = userSession.getAuthUserId();
+					userMgmtUserId = userSession.getUserMgmtUserId();
+					username = userSession.getUsername();
+				}	
+			} catch ( Exception e2 ) {
+				log.error( "In Main } catch ( Exception e ) {: Error getting User Id and Username: ", e2 );
+			}
+			
+			String msg = "Exception caught. authUserId (null if no session): " 
+					+ authUserId
+					+ ", userMgmtUserId (null if no session): " + userMgmtUserId
+					+ ", username (null if no session): " + username
+					+ e.toString();
 			log.error( msg, e );
+			
 			throw e;
 		}
 	}
