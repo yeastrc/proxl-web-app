@@ -103,6 +103,17 @@ dependencies {
 	// https://mvnrepository.com/artifact/joda-time/joda-time
 	compile group: 'joda-time', name: 'joda-time', version: '2.10.2'
 	
+	
+	
+	
+	// JAXB dependencies (Required for Java 11+)
+	// https://mvnrepository.com/artifact/jakarta.xml.bind/jakarta.xml.bind-api
+	implementation group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '2.3.2'
+	// https://mvnrepository.com/artifact/org.glassfish.jaxb/jaxb-runtime
+	implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '2.3.2'
+	
+	
+	
 
 	//  NOT FOUND  either jcenter() or mavenCentral()
 	

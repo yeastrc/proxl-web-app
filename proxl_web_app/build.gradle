@@ -217,6 +217,16 @@ dependencies {
 	// https://mvnrepository.com/artifact/struts/struts-el
 	compile group: 'struts', name: 'struts-el', version: '1.2.9'
 		
+		
+	
+	// JAXB dependencies (Required for Java 11+)
+	// https://mvnrepository.com/artifact/jakarta.xml.bind/jakarta.xml.bind-api
+	implementation group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '2.3.2'
+	// https://mvnrepository.com/artifact/org.glassfish.jaxb/jaxb-runtime
+	implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '2.3.2'
+	
+	
+	
 		///////////
 		
 	//  Other Proxl Jars
