@@ -3,6 +3,7 @@
 /webpack_build_output/
 /.gradle/
 /.vscode/
+.idea
 /.settings/
 .project
 VS_Code_Workspace.code-workspace

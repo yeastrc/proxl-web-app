@@ -63,7 +63,7 @@ import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAut
  */
 public class DownloadMergedProteinsPeptidesSkylineEngAction extends Action {
 
-	private static final Logger log = LoggerFactory.getLogger( DownloadMergedSearchProteinsAction.class);
+	private static final Logger log = LoggerFactory.getLogger( DownloadMergedProteinsPeptidesSkylineEngAction.class);
 
 	@Override
 	public ActionForward execute( ActionMapping mapping,
