@@ -56,6 +56,7 @@ import {StructureAlignmentUtils} from "./structure-alignment-utils.js";
 import {DensityPlot} from "./density-plot.js";
 import {LinkablePositionDataManager} from "./linkable-position-data-manager";
 import {PValueUtils} from "./p-value-utils";
+import {StructureMarkupHandler} from "./structure-markup-handler";
 
 /////////////////////////////
 
@@ -409,16 +410,19 @@ var StructurePagePrimaryRootCodeClass = function() {
 	/////////////////
 
 	// object to handle all link color determination duties
-	var _linkColorHandler = new LinkColorHandler();
+	const _structureMarkupHandler = new StructureMarkupHandler();
+
+	// object to handle all link color determination duties
+	let _linkColorHandler = new LinkColorHandler();
 
 	// object to handle link exclusions
-	var _linkExclusionHandler = new LinkExclusionHandler();
+	let _linkExclusionHandler = new LinkExclusionHandler();
 
 	// object to handle link exclusions
-	var _linkablePositionDataManager = new LinkablePositionDataManager();
+	let _linkablePositionDataManager = new LinkablePositionDataManager();
 
 	// object to handle chain colors
-	var _backboneColorManager = new BackboneColorManager();
+	let _backboneColorManager = new BackboneColorManager();
 
 	const dataPages_LoggedInUser_CommonObjectsFactory = new DataPages_LoggedInUser_CommonObjectsFactory();
 	const saveView_dataPages = dataPages_LoggedInUser_CommonObjectsFactory.instantiate_SaveView_dataPages();
@@ -4436,7 +4440,7 @@ var StructurePagePrimaryRootCodeClass = function() {
 
 		var $pdbTitleDiv = $( "#pdb-title-div" );
 		$pdbTitleDiv.html( html );
-			
+
 		for( var i = 0; i < chains.length; i++ ) {
 			
 			var chainDisplayName = chains[ i ].name();
@@ -4538,7 +4542,7 @@ var StructurePagePrimaryRootCodeClass = function() {
 		// add color picker handlers
 		addColorPickers( $chainsDiv );
 
-		html = "<div class=\"clickable\" style=\"margin-top:15px\;color:#A55353;\">[Reset Colors]</div>";
+		html = "<div class=\"clickable\" style=\"margin-top:15px\;color:#A55353;\">[Reset Chain Colors]</div>";
 		let $html = $(html);
 		$html.click( function() {
 			_backboneColorManager.resetColors();
@@ -4552,12 +4556,49 @@ var StructurePagePrimaryRootCodeClass = function() {
 		});
 		$chainsDiv.append( $html );
 
+		// add in list of linked proteins we're annotating on the structure
+		// this is meant to show where proteins not in the structure are linked to the structure
+		addIncludedProteinMarkupList($chainsDiv);
+
 
 		if( doDraw ) {
 			drawStructure();
 		}
 		
 	};
+
+	/**
+	 * Add the list of which proteins are being annotated on the structure and set up the interface to
+	 * changing it.
+	 *
+	 * @param $chainsDiv
+	 */
+	const addIncludedProteinMarkupList = function ($chainsDiv) {
+
+		let html = "<div style=\"margin-top:20px;\">";
+		html += "<span style=\"font-size:14pt;\">Proteins Marked On Structure:</span>";
+		html += "</div>";
+
+		// list currently marked proteins
+		html += "<div id=\"structure-markup-list\">";
+
+		html += "</div>"
+
+		// add button
+		html += "<input style=\"margin-top:15px;\" type=\"button\" id=\"add-structure-markup-button\" value=\"Add Protein Markup\">";
+
+		// add form
+		html += "<div id=\"add-structure-form\">";
+		html += "<form>";
+		// todo add proteni list
+		html += "</form>";
+		html += "</div>";
+
+
+		const $newDiv = $(html);
+		$chainsDiv.append($newDiv);
+
+	}
 
 	const addColorPickers = function( $chainsDiv ) {
 
@@ -7123,8 +7164,3 @@ $(window).unload(function()  {
 		_NEW_WINDOW.close();
 	}
 });
-
-
-
-
-
