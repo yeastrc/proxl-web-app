@@ -5403,14 +5403,19 @@ var StructurePagePrimaryRootCodeClass = function() {
 					userData.position = _linkablePositions[ proteinId ][ j ];
 					
 					_LINKABLE_MESH.addSphere( coords[ k ], 1, { color: '#000000', userData: userData } );
-					
-					
 				}
-				
 			}
-			
-			
 		}
+	};
+
+	let _PROTEIN_MARKUP_MESH;
+	const drawStructureProteinMarkup = function() {
+
+		if( _PROTEIN_MARKUP_MESH ) { _PROTEIN_MARKUP_MESH.hide(); }
+		_PROTEIN_MARKUP_MESH = _VIEWER.customMesh('structure-markup');
+
+		// todo figure out how to figure out where to draw the spheres!
+
 	};
 
 
