@@ -1063,6 +1063,10 @@ var StructurePagePrimaryRootCodeClass = function() {
 		items[ 'le' ] = _linkExclusionHandler.getDataStructureForHash();
 		items[ 'bc' ] = _backboneColorManager.getDataStructureForHash();
 
+		if(_structureMarkupHandler.getSortedIds().length > 0) {
+			items['mp'] = _structureMarkupHandler.getDataStructureForHash();
+		}
+
 		updateURLHashWithJSONObject( items );
 	}
 
@@ -4663,11 +4667,11 @@ var StructurePagePrimaryRootCodeClass = function() {
 		html += "<input style=\"margin-top:15px;\" type=\"button\" id=\"add-structure-markup-button\" value=\"Add New Protein Markup\">";
 
 		// add form
-		html += "<div id=\"add-structure-form\" style=\"display:none;\">";
+		html += "<div id=\"add-structure-form\" style=\"display:none;margin-top:15px;\">";
 		html += "<form>";
 
 		// build select box for proteins
-		html += "<select id=\"pdb-map-protein-overlay-protein-select\" style=\"width:100%;max-width:280px;text-overflow:ellipsis;overflow:ellipsis;\">";
+		html += "<select id=\"pdb-map-protein-overlay-protein-select\" style=\"width:100%;max-width:280px;text-overflow:ellipsis;\">";
 		html += "<option value=\"0\">Select protein:</option>\n";
 
 		for(let i = 0; i < _proteins.length; i++ ) {
@@ -4680,7 +4684,7 @@ var StructurePagePrimaryRootCodeClass = function() {
 		html += "End: <input id=\"protein-markup-end\" type=\"text\" name=\"proten-markup-end\" size=\"3\">";
 
 		html += "<div style=\"margin-top:15px;\">";
-		html += "<input type=\"button\" id=\"add-structure-markup-protein\" value=\"Add\">";
+		html += "<input type=\"button\" id=\"add-structure-markup-protein-button\" value=\"Add\">";
 		html += "<input type=\"button\" id=\"cancel-add-structure-markup-button\" value=\"Cancel\">";
 		html += "</div>";
 
@@ -4692,6 +4696,7 @@ var StructurePagePrimaryRootCodeClass = function() {
 
 		$chainsDiv.find('#add-structure-markup-button').click( function() {
 			$chainsDiv.find('#add-structure-markup-button').hide();
+			$chainsDiv.find('#cancel-add-structure-markup-button').val('Cancel');
 			$chainsDiv.find('#add-structure-form').show();
 		});
 
@@ -4700,9 +4705,128 @@ var StructurePagePrimaryRootCodeClass = function() {
 			$chainsDiv.find('#add-structure-form').hide();
 		});
 
+		$chainsDiv.find('#add-structure-markup-protein-button').click( function() {
+			handleAddProteinToStructureMarkup($chainsDiv);
+		});
+
 		$chainsDiv.find('#pdb-map-protein-overlay-protein-select').change( function() {
 			handleMarkupProteinSelect($chainsDiv);
 		});
+
+		listCurrentStructureProteinMarkups($chainsDiv);
+	}
+
+	const listCurrentStructureProteinMarkups = function($chainsDiv) {
+
+		const $contentDiv = $chainsDiv.find("#structure-markup-list");
+		const currentProteinMarkups = _structureMarkupHandler.getOrderedProteinColorAnnotations();
+
+		$contentDiv.empty();
+
+		let html = '';
+
+		if(currentProteinMarkups.length < 1) {
+			html = "<div style=\"margin-top:10px;\">No proteins currently marked on structure.</div>";
+
+			$contentDiv.append($(html));
+
+		} else {
+			html += "<div style=\"width:100%;max-width:573px;margin-top:10px;\">";
+			html += "<div style=\"display:inline-block;min-width:15px;max-width:15px;\">&nbsp;</div>";
+			html += "<div style=\"display:inline-block;min-width:350px;max-width:340px;\">&nbsp;</div>";
+			html += "<div style=\"display:inline-block;min-width:60px;max-width:30px;\">Start</div>";
+			html += "<div style=\"display:inline-block;min-width:60px;max-width:30px;\">End</div>";
+			html += "</div>";
+
+			for (const proteinMarkup of currentProteinMarkups) {
+				html += "<div style=\"width:100%;max-width:573px;\">";
+
+				html += "<div style=\"display:inline-block;min-width:15px;max-width:15px;\">";
+				html += "<img style=\"margin-bottom:2px;\" src=\"images/icon-delete-small.png\" id=\"delete-markup-" + proteinMarkup['id'] + "\">";
+				html += "</div>";
+
+				html += "<div style=\"display:inline-block;min-width:350px;max-width:340px;text-overflow:ellipsis;overflow:hidden;\">";
+				html += _proteinNames[proteinMarkup['proteinId']];
+				html += "</div>";
+
+				html += "<div style=\"display:inline-block;min-width:60px;max-width:60px;\">";
+				html += proteinMarkup['start'];
+				html += "</div>";
+
+				html += "<div style=\"display:inline-block;min-width:60px;max-width:60px;\">";
+				html += proteinMarkup['end'];
+				html += "</div>";
+
+				html += "</div>";
+			}
+
+			$contentDiv.append($(html));
+
+			// add deletion click handlers
+			for (const proteinMarkup of currentProteinMarkups) {
+				$contentDiv.find("#delete-markup-" + proteinMarkup['id']).click(function () {
+					_structureMarkupHandler.deleteStructureProteinMarkup({id: proteinMarkup['id']});
+					listCurrentStructureProteinMarkups($chainsDiv);
+					drawStructure();
+				});
+			}
+
+		}
+	}
+
+	const handleAddProteinToStructureMarkup = function($chainsDiv) {
+
+		const selectedProteinId = $chainsDiv.find('#pdb-map-protein-overlay-protein-select').children("option:selected").val();
+
+		let start = $chainsDiv.find('#protein-markup-start').val();
+		let end = $chainsDiv.find('#protein-markup-end').val();
+
+		try {
+			start = parseInt(start, 10);
+			end = parseInt(end, 10);
+		} catch(e) {
+			console.log("Error parsing start or end as an integer. Doing nothing.");
+			return;
+		}
+
+		if(isNaN(start) || isNaN(end)) {
+			console.log("Error parsing start or end as an integer. Doing nothing.");
+			return;
+		}
+
+		// just do nothing if these values are the same
+		if(start === end) { return; }
+
+		if(start > end) {
+			const tmp = start;
+			start = end;
+			end = tmp;
+		}
+
+		if(start < 1) { start = 1; }
+		if(end > _proteinSequences[selectedProteinId].length) {
+			end = _proteinSequences[selectedProteinId].length;
+		}
+
+		// add this to markup handler
+		_structureMarkupHandler.addProteinColorAnnotation({
+			proteinId:selectedProteinId,
+			start:start,
+			end:end,
+			color:"#FFFF00"
+		});
+
+		// reset form elements
+		$chainsDiv.find('#pdb-map-protein-overlay-protein-select').children("option:selected").removeAttr("selected");
+		$chainsDiv.find('#protein-markup-start').val('');
+		$chainsDiv.find('#protein-markup-end').val('');
+		$chainsDiv.find('#cancel-add-structure-markup-button').val('Done');
+
+		// redraw markup list
+		listCurrentStructureProteinMarkups($chainsDiv);
+
+		// redraw structure
+		drawStructure();
 	}
 
 	const handleMarkupProteinSelect = async function($chainsDiv) {

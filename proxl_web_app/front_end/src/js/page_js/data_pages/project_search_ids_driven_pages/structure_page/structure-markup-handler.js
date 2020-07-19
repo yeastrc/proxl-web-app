@@ -45,6 +45,8 @@ export class StructureMarkupHandler {
         }
 
         this._proteinsMarkedOnStructure[newId] = structureMarkupObject;
+
+        console.log(this);
     }
 
     /**
@@ -99,6 +101,27 @@ export class StructureMarkupHandler {
 
         ids = ids.sort();
         return ids;
+    }
+
+    /**
+     * Get the data structure to use for storing the state of this object in the URL hash
+     *
+     * @returns {[]}
+     */
+    getDataStructureForHash() {
+        let ds = [];
+
+        for(const markup of this.getSortedIds()) {
+            let item = "";
+            item += markup.proteinId + "-";
+            item += markup.start + "-";
+            item += markup.end + "-";
+            item += markup.color;
+
+            ds.push(item);
+        }
+
+        return ds;
     }
 
 
