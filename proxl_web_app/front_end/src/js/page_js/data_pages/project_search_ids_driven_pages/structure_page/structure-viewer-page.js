@@ -2011,6 +2011,80 @@ var StructurePagePrimaryRootCodeClass = function() {
 
 	}
 
+	//Load protein sequence data for a list of proteins
+	function loadSingleProteinSequenceWithPromise( proteinIdToLoad ) {
+
+		return new Promise( function( resolve, reject ) {
+
+			console.log("Loading single protein sequence data for protein: " + proteinIdToLoad);
+
+			incrementSpinner();				// create spinner
+
+			const url = "services/proteinSequence/getDataForProtein";
+			const project_id = $("#project_id").val();
+
+			if (project_id === undefined || project_id === null
+				|| project_id === "") {
+
+				throw Error('$("#project_id").val() returned no value');
+			}
+
+
+			const ajaxRequestData = {
+				project_id: project_id,
+				proteinIdsToGetSequence: [proteinIdToLoad]
+			};
+
+			$.ajax({
+				type: "GET",
+				url: url,
+				dataType: "json",
+				data: ajaxRequestData,  //  The data sent as params on the URL
+
+				traditional: true,  //  Force traditional serialization of the data sent
+				//   One thing this means is that arrays are sent as the object property instead of object property followed by "[]".
+				//   So proteinIdsToGetSequence array is passed as "proteinIdsToGetSequence=<value>" which is what Jersey expects
+
+				success: function (data) {
+
+					try {
+
+						const returnedProteinIdsAndSequences = data;  //  The property names are the protein ids and the property values are the sequences
+
+						// copy the returned sequences into the global object
+
+						const returnedProteinIdsAndSequences_Keys = Object.keys(returnedProteinIdsAndSequences);
+
+						for (let keysIndex = 0; keysIndex < returnedProteinIdsAndSequences_Keys.length; keysIndex++) {
+
+							const proteinId = returnedProteinIdsAndSequences_Keys[keysIndex];
+							_proteinSequences[proteinId] = returnedProteinIdsAndSequences[proteinId];
+						}
+
+
+						decrementSpinner();
+
+						resolve();
+
+					} catch (e) {
+						reportWebErrorToServer.reportErrorObjectToServer({errorException: e});
+						throw e;
+					}
+
+				},
+				failure: function (errMsg) {
+					decrementSpinner();
+					handleAJAXFailure(errMsg);
+				},
+				error: function (jqXHR, textStatus, errorThrown) {
+					decrementSpinner();
+					handleAJAXError(jqXHR, textStatus, errorThrown);
+				}
+			});
+
+		});
+	}
+
 
 	function loadDataFromService() {
 		
@@ -4576,7 +4650,8 @@ var StructurePagePrimaryRootCodeClass = function() {
 	const addIncludedProteinMarkupList = function ($chainsDiv) {
 
 		let html = "<div style=\"margin-top:20px;\">";
-		html += "<span style=\"font-size:14pt;\">Proteins Marked On Structure:</span>";
+		html += "<span style=\"font-size:14pt;\">Proteins Marked On Structure:</span><br/>";
+		html += "Mark up the structure with linked positions to proteins not in the structure."
 		html += "</div>";
 
 		// list currently marked proteins
@@ -4585,18 +4660,70 @@ var StructurePagePrimaryRootCodeClass = function() {
 		html += "</div>"
 
 		// add button
-		html += "<input style=\"margin-top:15px;\" type=\"button\" id=\"add-structure-markup-button\" value=\"Add Protein Markup\">";
+		html += "<input style=\"margin-top:15px;\" type=\"button\" id=\"add-structure-markup-button\" value=\"Add New Protein Markup\">";
 
 		// add form
-		html += "<div id=\"add-structure-form\">";
+		html += "<div id=\"add-structure-form\" style=\"display:none;\">";
 		html += "<form>";
-		// todo add proteni list
+
+		// build select box for proteins
+		html += "<select id=\"pdb-map-protein-overlay-protein-select\" style=\"width:100%;max-width:280px;text-overflow:ellipsis;overflow:ellipsis;\">";
+		html += "<option value=\"0\">Select protein:</option>\n";
+
+		for(let i = 0; i < _proteins.length; i++ ) {
+			html += "<option value=\"" + _proteins[ i ] + "\">" + _proteinNames[_proteins[ i ] ] + "</option>\n";
+		}
+
+		html += "</select>\n";
+
+		html += "Start: <input id=\"protein-markup-start\" type=\"text\" name=\"proten-markup-start\" size=\"3\">";
+		html += "End: <input id=\"protein-markup-end\" type=\"text\" name=\"proten-markup-end\" size=\"3\">";
+
+		html += "<div style=\"margin-top:15px;\">";
+		html += "<input type=\"button\" id=\"add-structure-markup-protein\" value=\"Add\">";
+		html += "<input type=\"button\" id=\"cancel-add-structure-markup-button\" value=\"Cancel\">";
+		html += "</div>";
+
 		html += "</form>";
 		html += "</div>";
 
-
 		const $newDiv = $(html);
 		$chainsDiv.append($newDiv);
+
+		$chainsDiv.find('#add-structure-markup-button').click( function() {
+			$chainsDiv.find('#add-structure-markup-button').hide();
+			$chainsDiv.find('#add-structure-form').show();
+		});
+
+		$chainsDiv.find('#cancel-add-structure-markup-button').click( function() {
+			$chainsDiv.find('#add-structure-markup-button').show();
+			$chainsDiv.find('#add-structure-form').hide();
+		});
+
+		$chainsDiv.find('#pdb-map-protein-overlay-protein-select').change( function() {
+			handleMarkupProteinSelect($chainsDiv);
+		});
+	}
+
+	const handleMarkupProteinSelect = async function($chainsDiv) {
+
+		const selectedProteinId = $chainsDiv.find('#pdb-map-protein-overlay-protein-select').children("option:selected").val();
+
+		const $startOption = $chainsDiv.find('#protein-markup-start');
+		const $endOption = $chainsDiv.find('#protein-markup-end');
+
+		if(selectedProteinId === "0") {
+			$startOption.val("");
+			$endOption.val("");
+		} else {
+			$startOption.val("1");
+
+			if(!(selectedProteinId in _proteinSequences)) {
+				await loadSingleProteinSequenceWithPromise(selectedProteinId);
+			}
+
+			$endOption.val(""+ _proteinSequences[selectedProteinId].length);
+		}
 
 	}
 
