@@ -2499,6 +2499,8 @@ var StructurePagePrimaryRootCodeClass = function() {
 		_linkColorHandler.setUserColorByType( json[ 'ucbt' ] );
 		
 		_linkColorHandler.setUserColorByLength( json[ 'ucbl' ] );
+
+		_structureMarkupHandler.initializeFromJSON( json[ 'mp' ] );
 		
 		drawLegend();
 		
@@ -4767,6 +4769,7 @@ var StructurePagePrimaryRootCodeClass = function() {
 				$contentDiv.find("#delete-markup-" + proteinMarkup['id']).click(function () {
 					_structureMarkupHandler.deleteStructureProteinMarkup({id: proteinMarkup['id']});
 					listCurrentStructureProteinMarkups($chainsDiv);
+					updateURLHash(false);
 					drawStructure();
 				});
 			}
@@ -4824,6 +4827,9 @@ var StructurePagePrimaryRootCodeClass = function() {
 
 		// redraw markup list
 		listCurrentStructureProteinMarkups($chainsDiv);
+
+		// update the main url hash
+		updateURLHash(false);
 
 		// redraw structure
 		drawStructure();

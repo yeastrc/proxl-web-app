@@ -111,7 +111,7 @@ export class StructureMarkupHandler {
     getDataStructureForHash() {
         let ds = [];
 
-        for(const markup of this.getSortedIds()) {
+        for(const markup of this.getOrderedProteinColorAnnotations()) {
             let item = "";
             item += markup.proteinId + "-";
             item += markup.start + "-";
@@ -124,5 +124,32 @@ export class StructureMarkupHandler {
         return ds;
     }
 
+    /**
+     * Populate this object with data passed in via the dataObject, expected format is
+     * ["proteinid-start-end-color", "proteinid-start-end-color", ...]
+     * @param dataObject
+     */
+    initializeFromJSON(dataObject) {
+
+        console.log('dataObject', dataObject);
+
+        if(!dataObject) { return; }
+
+        for(const stringifiedData of dataObject) {
+            const fields = stringifiedData.split('-');
+
+            const proteinId = fields[0];
+            const start = parseInt(fields[1]);
+            const end = parseInt(fields[2]);
+            const color = fields[3];
+
+            this.addProteinColorAnnotation({
+                proteinId:proteinId,
+                start:start,
+                end:end,
+                color:color
+            });
+        }
+    }
 
 }
