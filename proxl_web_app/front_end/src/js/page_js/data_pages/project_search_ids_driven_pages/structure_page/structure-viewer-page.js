@@ -4828,7 +4828,7 @@ var StructurePagePrimaryRootCodeClass = function() {
 		html += "<form>";
 
 		// build select box for proteins
-		html += "<select id=\"pdb-map-protein-overlay-protein-select\" style=\"width:100%;max-width:280px;text-overflow:ellipsis;\">";
+		html += "<select id=\"markup-structure-overlay-protein-select\" style=\"width:100%;max-width:280px;text-overflow:ellipsis;\">";
 		html += "<option value=\"0\">Select protein:</option>\n";
 
 		for(let i = 0; i < _proteins.length; i++ ) {
@@ -4866,7 +4866,7 @@ var StructurePagePrimaryRootCodeClass = function() {
 			handleAddProteinToStructureMarkup($chainsDiv);
 		});
 
-		$chainsDiv.find('#pdb-map-protein-overlay-protein-select').change( function() {
+		$chainsDiv.find('#markup-structure-overlay-protein-select').change( function() {
 			handleMarkupProteinSelect($chainsDiv);
 		});
 
@@ -4934,7 +4934,7 @@ var StructurePagePrimaryRootCodeClass = function() {
 
 	const handleAddProteinToStructureMarkup = function($chainsDiv) {
 
-		const selectedProteinId = $chainsDiv.find('#pdb-map-protein-overlay-protein-select').children("option:selected").val();
+		const selectedProteinId = $chainsDiv.find('#markup-structure-overlay-protein-select').children("option:selected").val();
 
 		let start = $chainsDiv.find('#protein-markup-start').val();
 		let end = $chainsDiv.find('#protein-markup-end').val();
@@ -4975,7 +4975,7 @@ var StructurePagePrimaryRootCodeClass = function() {
 		});
 
 		// reset form elements
-		$chainsDiv.find('#pdb-map-protein-overlay-protein-select').children("option:selected").removeAttr("selected");
+		$chainsDiv.find('#markup-structure-overlay-protein-select').children("option:selected").removeAttr("selected");
 		$chainsDiv.find('#protein-markup-start').val('');
 		$chainsDiv.find('#protein-markup-end').val('');
 		$chainsDiv.find('#cancel-add-structure-markup-button').val('Done');
@@ -4992,7 +4992,7 @@ var StructurePagePrimaryRootCodeClass = function() {
 
 	const handleMarkupProteinSelect = async function($chainsDiv) {
 
-		const selectedProteinId = $chainsDiv.find('#pdb-map-protein-overlay-protein-select').children("option:selected").val();
+		const selectedProteinId = $chainsDiv.find('#markup-structure-overlay-protein-select').children("option:selected").val();
 
 		const $startOption = $chainsDiv.find('#protein-markup-start');
 		const $endOption = $chainsDiv.find('#protein-markup-end');
