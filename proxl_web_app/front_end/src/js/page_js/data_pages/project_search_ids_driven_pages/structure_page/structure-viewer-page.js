@@ -5431,15 +5431,57 @@ var StructurePagePrimaryRootCodeClass = function() {
 		if( _PROTEIN_MARKUP_MESH ) { _PROTEIN_MARKUP_MESH.hide(); }
 		_PROTEIN_MARKUP_MESH = _VIEWER.customMesh('structure-markup');
 
+		// nothing to draw if there are no marked up proteins
 		if(_structureMarkupHandler.getOrderedProteinColorAnnotations().length < 1) {
 			return;
 		}
 
-		const proteins = getVisibleProteins();
+		const visibleProteins = getVisibleProteins();
+		const visibleProteinIds = Object.keys( visibleProteins );
 
-		// todo figure out how to figure out where to draw the spheres!
+		for(const markup of _structureMarkupHandler.getOrderedProteinColorAnnotations()) {
+
+			const markupProteinId = markup.proteinId;
+			const markupProteinStart = markup.start;
+			const markupProteinEnd = markup.end;
+			const markupProteinColor = markup.color;
+
+			if(markupProteinId in _proteinLinkPositions) {
+
+				for (let i = 0; i < visibleProteinIds.length; i++) {
+
+					const visibleProteinId = visibleProteinIds[i];
+
+					if(visibleProteinId in _proteinLinkPositions[markupProteinId]) {
+
+						// there is a link between a markup protein and a visible protein
+
+						// get linked positions in the markup protein
+
+						// iterate over each one, only process those >= start and <= end
+						const markupLinkPositions = Object.keys(_proteinLinkPositions[markupProteinId][visibleProteinId]);
+
+						for(const markupPosition of markupLinkPositions) {
+
+
+						}
+
+
+
+						// find all atoms corresponding to those positions
+
+						// markup those atoms
+					}
+				}
+			}
+
+		}
+
+
+
+			// todo figure out how to figure out where to draw the spheres!
 		console.log(_proteinLinkPositions);
-		console.log(proteins);
+		console.log(visibleProteins);
 	};
 
 
