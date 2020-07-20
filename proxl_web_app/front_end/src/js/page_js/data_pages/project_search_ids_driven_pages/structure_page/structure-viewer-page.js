@@ -1226,7 +1226,19 @@ var StructurePagePrimaryRootCodeClass = function() {
 	}
 
 
-	//Toggle the visibility of crosslink data on the viewer
+	/**
+	 * Populates _proteinLinkPositions with this data structure for all visible cross-links:
+	 * {
+	 *     protein1:{
+	 *         protein2:{
+	 *             position1:{
+	 *                 position2:[searches]
+	 *             }
+	 *         }
+	 *     }
+	 * }
+	 * @param doDraw
+	 */
 	function loadCrosslinkData( doDraw ) {
 		
 		console.log( "Loading crosslink data." );
@@ -4955,6 +4967,7 @@ var StructurePagePrimaryRootCodeClass = function() {
 			if ( $( "input#show-linkable-positions" ).is( ':checked' ) ) {
 				drawLinkableResidues( proteins );
 			}
+
 		}
 	};
 
@@ -5302,6 +5315,10 @@ var StructurePagePrimaryRootCodeClass = function() {
 				
 			}
 		}
+
+		if(_structureMarkupHandler.getOrderedProteinColorAnnotations().length >= 1) {
+			drawStructureProteinMarkup();
+		}
 	};
 
 
@@ -5414,8 +5431,15 @@ var StructurePagePrimaryRootCodeClass = function() {
 		if( _PROTEIN_MARKUP_MESH ) { _PROTEIN_MARKUP_MESH.hide(); }
 		_PROTEIN_MARKUP_MESH = _VIEWER.customMesh('structure-markup');
 
-		// todo figure out how to figure out where to draw the spheres!
+		if(_structureMarkupHandler.getOrderedProteinColorAnnotations().length < 1) {
+			return;
+		}
 
+		const proteins = getVisibleProteins();
+
+		// todo figure out how to figure out where to draw the spheres!
+		console.log(_proteinLinkPositions);
+		console.log(proteins);
 	};
 
 
