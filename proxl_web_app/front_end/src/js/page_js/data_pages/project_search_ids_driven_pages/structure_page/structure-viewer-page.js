@@ -5442,8 +5442,8 @@ var StructurePagePrimaryRootCodeClass = function() {
 		for(const markup of _structureMarkupHandler.getOrderedProteinColorAnnotations()) {
 
 			const markupProteinId = markup.proteinId;
-			const markupProteinStart = markup.start;
-			const markupProteinEnd = markup.end;
+			const markupProteinStart = parseInt(markup.start);
+			const markupProteinEnd = parseInt(markup.end);
 			const markupProteinColor = markup.color;
 
 			if(markupProteinId in _proteinLinkPositions) {
@@ -5456,21 +5456,21 @@ var StructurePagePrimaryRootCodeClass = function() {
 
 						// there is a link between a markup protein and a visible protein
 
-						// get linked positions in the markup protein
-
-						// iterate over each one, only process those >= start and <= end
+						// get linked positions in the markup protein to this visible protein
 						const markupLinkPositions = Object.keys(_proteinLinkPositions[markupProteinId][visibleProteinId]);
 
-						for(const markupPosition of markupLinkPositions) {
+						// iterate over each one, only process those >= start and <= end
+						for(let markupPosition of markupLinkPositions) {
+							markupPosition = parseInt(markupPosition);
 
+							if(markupPosition >= markupProteinStart && markupPosition <= markupProteinEnd) {
 
+								// find all atoms corresponding to those positions in the visible protein
+
+								// markup those atoms
+
+							}
 						}
-
-
-
-						// find all atoms corresponding to those positions
-
-						// markup those atoms
 					}
 				}
 			}
