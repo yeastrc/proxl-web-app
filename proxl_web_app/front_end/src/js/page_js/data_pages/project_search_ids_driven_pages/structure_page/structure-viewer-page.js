@@ -56,6 +56,7 @@ import {StructureAlignmentUtils} from "./structure-alignment-utils.js";
 import {DensityPlot} from "./density-plot.js";
 import {LinkablePositionDataManager} from "./linkable-position-data-manager";
 import {PValueUtils} from "./p-value-utils";
+import {StructureMarkupHandler} from "./structure-markup-handler";
 
 /////////////////////////////
 
@@ -409,16 +410,19 @@ var StructurePagePrimaryRootCodeClass = function() {
 	/////////////////
 
 	// object to handle all link color determination duties
-	var _linkColorHandler = new LinkColorHandler();
+	const _structureMarkupHandler = new StructureMarkupHandler();
+
+	// object to handle all link color determination duties
+	let _linkColorHandler = new LinkColorHandler();
 
 	// object to handle link exclusions
-	var _linkExclusionHandler = new LinkExclusionHandler();
+	let _linkExclusionHandler = new LinkExclusionHandler();
 
 	// object to handle link exclusions
-	var _linkablePositionDataManager = new LinkablePositionDataManager();
+	let _linkablePositionDataManager = new LinkablePositionDataManager();
 
 	// object to handle chain colors
-	var _backboneColorManager = new BackboneColorManager();
+	let _backboneColorManager = new BackboneColorManager();
 
 	const dataPages_LoggedInUser_CommonObjectsFactory = new DataPages_LoggedInUser_CommonObjectsFactory();
 	const saveView_dataPages = dataPages_LoggedInUser_CommonObjectsFactory.instantiate_SaveView_dataPages();
@@ -1059,6 +1063,10 @@ var StructurePagePrimaryRootCodeClass = function() {
 		items[ 'le' ] = _linkExclusionHandler.getDataStructureForHash();
 		items[ 'bc' ] = _backboneColorManager.getDataStructureForHash();
 
+		if(_structureMarkupHandler.getSortedIds().length > 0) {
+			items['mp'] = _structureMarkupHandler.getDataStructureForHash();
+		}
+
 		updateURLHashWithJSONObject( items );
 	}
 
@@ -1218,7 +1226,19 @@ var StructurePagePrimaryRootCodeClass = function() {
 	}
 
 
-	//Toggle the visibility of crosslink data on the viewer
+	/**
+	 * Populates _proteinLinkPositions with this data structure for all visible cross-links:
+	 * {
+	 *     protein1:{
+	 *         protein2:{
+	 *             position1:{
+	 *                 position2:[searches]
+	 *             }
+	 *         }
+	 *     }
+	 * }
+	 * @param doDraw
+	 */
 	function loadCrosslinkData( doDraw ) {
 		
 		console.log( "Loading crosslink data." );
@@ -2007,6 +2027,80 @@ var StructurePagePrimaryRootCodeClass = function() {
 
 	}
 
+	//Load protein sequence data for a list of proteins
+	function loadSingleProteinSequenceWithPromise( proteinIdToLoad ) {
+
+		return new Promise( function( resolve, reject ) {
+
+			console.log("Loading single protein sequence data for protein: " + proteinIdToLoad);
+
+			incrementSpinner();				// create spinner
+
+			const url = "services/proteinSequence/getDataForProtein";
+			const project_id = $("#project_id").val();
+
+			if (project_id === undefined || project_id === null
+				|| project_id === "") {
+
+				throw Error('$("#project_id").val() returned no value');
+			}
+
+
+			const ajaxRequestData = {
+				project_id: project_id,
+				proteinIdsToGetSequence: [proteinIdToLoad]
+			};
+
+			$.ajax({
+				type: "GET",
+				url: url,
+				dataType: "json",
+				data: ajaxRequestData,  //  The data sent as params on the URL
+
+				traditional: true,  //  Force traditional serialization of the data sent
+				//   One thing this means is that arrays are sent as the object property instead of object property followed by "[]".
+				//   So proteinIdsToGetSequence array is passed as "proteinIdsToGetSequence=<value>" which is what Jersey expects
+
+				success: function (data) {
+
+					try {
+
+						const returnedProteinIdsAndSequences = data;  //  The property names are the protein ids and the property values are the sequences
+
+						// copy the returned sequences into the global object
+
+						const returnedProteinIdsAndSequences_Keys = Object.keys(returnedProteinIdsAndSequences);
+
+						for (let keysIndex = 0; keysIndex < returnedProteinIdsAndSequences_Keys.length; keysIndex++) {
+
+							const proteinId = returnedProteinIdsAndSequences_Keys[keysIndex];
+							_proteinSequences[proteinId] = returnedProteinIdsAndSequences[proteinId];
+						}
+
+
+						decrementSpinner();
+
+						resolve();
+
+					} catch (e) {
+						reportWebErrorToServer.reportErrorObjectToServer({errorException: e});
+						throw e;
+					}
+
+				},
+				failure: function (errMsg) {
+					decrementSpinner();
+					handleAJAXFailure(errMsg);
+				},
+				error: function (jqXHR, textStatus, errorThrown) {
+					decrementSpinner();
+					handleAJAXError(jqXHR, textStatus, errorThrown);
+				}
+			});
+
+		});
+	}
+
 
 	function loadDataFromService() {
 		
@@ -2417,6 +2511,8 @@ var StructurePagePrimaryRootCodeClass = function() {
 		_linkColorHandler.setUserColorByType( json[ 'ucbt' ] );
 		
 		_linkColorHandler.setUserColorByLength( json[ 'ucbl' ] );
+
+		_structureMarkupHandler.initializeFromJSON( json[ 'mp' ] );
 		
 		drawLegend();
 		
@@ -2934,9 +3030,78 @@ var StructurePagePrimaryRootCodeClass = function() {
 				
 			}
 		}
+
+		// do structure markups
+		if( _structureMarkupHandler.getOrderedProteinColorAnnotations().length > 0 ) {
+
+			const visibleProteins = getVisibleProteins();
+			const visibleProteinIds = Object.keys( visibleProteins );
+
+			for(const markup of _structureMarkupHandler.getOrderedProteinColorAnnotations()) {
+
+				const markupProteinId = markup.proteinId;
+				const markupProteinStart = parseInt(markup.start);
+				const markupProteinEnd = parseInt(markup.end);
+				const markupProteinColor = markup.color;
+
+				if(markupProteinId in _proteinLinkPositions) {
+
+					for (let i = 0; i < visibleProteinIds.length; i++) {
+
+						const visibleProteinId = visibleProteinIds[i];
+
+						if(visibleProteinId in _proteinLinkPositions[markupProteinId]) {
+
+							// there is a link between a markup protein and a visible protein
+
+							// get linked positions in the markup protein to this visible protein
+							const markupLinkPositions = Object.keys(_proteinLinkPositions[markupProteinId][visibleProteinId]);
+
+							// iterate over each one, only process those >= start and <= end
+							for(let markupPosition of markupLinkPositions) {
+								markupPosition = parseInt(markupPosition);
+
+								if(markupPosition >= markupProteinStart && markupPosition <= markupProteinEnd) {
+
+									const linkedPositions = Object.keys(_proteinLinkPositions[markupProteinId][visibleProteinId][markupPosition]);
+
+									for(const linkedPosition of linkedPositions) {
+
+										// find all atoms corresponding to those positions in the visible protein
+										const atoms = StructureAlignmentUtils.findCAAtoms( visibleProteinId, linkedPosition, visibleProteins[ visibleProteinId ], _ALIGNMENTS, _STRUCTURE );
+
+										for( let k = 0; k < atoms.length; k++ ) {
+											const atom = atoms[k];
+
+											let colorName;
+											if( !( markupProteinColor in customColorHash ) ) {
+												colorName = getCustomColorName( customColorHash, markupProteinColor );
+												const rgbaColor = _linkColorHandler.hexToRgbaDecimalArray( markupProteinColor, 1 );
+
+												scriptText += "colordef " + colorName + " " + rgbaColor[ 0 ] + " " + rgbaColor[ 1 ] + " " + rgbaColor[ 2 ] + "\n";
+											} else {
+												colorName = getCustomColorName( customColorHash, markupProteinColor );
+											}
+
+											if( !colorName ) {
+												console.log( "ERROR: Could not get a color name for protein markup." );
+											}
+
+											scriptText += "shape sphere ";
+											scriptText += "center :" + atom.residue().num() + "." + atom.residue().chain().name() + "@CA ";
+											scriptText += "radius 3.0 color " + colorName + " modelName markup modelId 5\n";
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
 		
 		
-		downloadStringAsFile( "chimera-script-" + getSelectedPDBFile().filename + ".txt", "text/plain", scriptText );
+		downloadStringAsFile( "chimera-script-" + getSelectedPDBFile().filename + ".cmd", "text/plain", scriptText );
 	};
 
 	function endsWith(str, suffix) {
@@ -3159,6 +3324,80 @@ var StructurePagePrimaryRootCodeClass = function() {
 				scriptText += "color " + colorName +", " + uniqueId + "\n";			
 			}
 		}
+
+
+		// do structure markups
+		if( _structureMarkupHandler.getOrderedProteinColorAnnotations().length > 0 ) {
+
+			const visibleProteins = getVisibleProteins();
+			const visibleProteinIds = Object.keys( visibleProteins );
+
+			for(const markup of _structureMarkupHandler.getOrderedProteinColorAnnotations()) {
+
+				const markupProteinId = markup.proteinId;
+				const markupProteinStart = parseInt(markup.start);
+				const markupProteinEnd = parseInt(markup.end);
+				const markupProteinColor = markup.color;
+
+				if(markupProteinId in _proteinLinkPositions) {
+
+					scriptText += "set sphere_scale, 3.0, (all)\n"
+
+					for (let i = 0; i < visibleProteinIds.length; i++) {
+
+						const visibleProteinId = visibleProteinIds[i];
+
+						if(visibleProteinId in _proteinLinkPositions[markupProteinId]) {
+
+							// there is a link between a markup protein and a visible protein
+
+							// get linked positions in the markup protein to this visible protein
+							const markupLinkPositions = Object.keys(_proteinLinkPositions[markupProteinId][visibleProteinId]);
+
+							// iterate over each one, only process those >= start and <= end
+							for(let markupPosition of markupLinkPositions) {
+								markupPosition = parseInt(markupPosition);
+
+								if(markupPosition >= markupProteinStart && markupPosition <= markupProteinEnd) {
+
+									const linkedPositions = Object.keys(_proteinLinkPositions[markupProteinId][visibleProteinId][markupPosition]);
+
+									for(const linkedPosition of linkedPositions) {
+
+										// find all atoms corresponding to those positions in the visible protein
+										const atoms = StructureAlignmentUtils.findCAAtoms( visibleProteinId, linkedPosition, visibleProteins[ visibleProteinId ], _ALIGNMENTS, _STRUCTURE );
+
+										for( let k = 0; k < atoms.length; k++ ) {
+											const atom = atoms[k];
+
+											let colorName;
+											if( !( markupProteinColor in customColorHash ) ) {
+												colorName = getCustomColorName( customColorHash, markupProteinColor );
+												const rgbaColor = _linkColorHandler.hexToRgbaDecimalArray( markupProteinColor, 1 );
+
+												scriptText += "set_color " + colorName + ", [" + rgbaColor[ 0 ] + ", " + rgbaColor[ 1 ] + "," + rgbaColor[ 2 ] + "]\n";
+											} else {
+												colorName = getCustomColorName( customColorHash, markupProteinColor );
+											}
+
+											if( !colorName ) {
+												console.log( "ERROR: Could not get a color name for markup." );
+											}
+
+											scriptText += "color " + colorName + ", /" + pdbName + "//" + atom.residue().chain().name() + "/" + atom.residue().num() + "/ca\n";
+											scriptText += "show sphere, /" + pdbName + "//" + atom.residue().chain().name() + "/" + atom.residue().num() + "/ca\n";
+										}
+									}
+								}
+							}
+						}
+					}
+
+					scriptText += "set sphere_scale\n";
+				}
+			}
+		}
+
 		
 		scriptText += "set dash_width, 5\n";
 		scriptText += "set dash_length, 2\n";
@@ -4436,7 +4675,7 @@ var StructurePagePrimaryRootCodeClass = function() {
 
 		var $pdbTitleDiv = $( "#pdb-title-div" );
 		$pdbTitleDiv.html( html );
-			
+
 		for( var i = 0; i < chains.length; i++ ) {
 			
 			var chainDisplayName = chains[ i ].name();
@@ -4538,7 +4777,7 @@ var StructurePagePrimaryRootCodeClass = function() {
 		// add color picker handlers
 		addColorPickers( $chainsDiv );
 
-		html = "<div class=\"clickable\" style=\"margin-top:15px\;color:#A55353;\">[Reset Colors]</div>";
+		html = "<div class=\"clickable\" style=\"margin-top:15px\;color:#A55353;\">[Reset Chain Colors]</div>";
 		let $html = $(html);
 		$html.click( function() {
 			_backboneColorManager.resetColors();
@@ -4552,12 +4791,226 @@ var StructurePagePrimaryRootCodeClass = function() {
 		});
 		$chainsDiv.append( $html );
 
+		// add in list of linked proteins we're annotating on the structure
+		// this is meant to show where proteins not in the structure are linked to the structure
+		addIncludedProteinMarkupList($chainsDiv);
+
 
 		if( doDraw ) {
 			drawStructure();
 		}
 		
 	};
+
+	/**
+	 * Add the list of which proteins are being annotated on the structure and set up the interface to
+	 * changing it.
+	 *
+	 * @param $chainsDiv
+	 */
+	const addIncludedProteinMarkupList = function ($chainsDiv) {
+
+		let html = "<div style=\"margin-top:20px;\">";
+		html += "<span style=\"font-size:14pt;\">Proteins Marked On Structure:</span><br/>";
+		html += "Mark up the structure with linked positions to proteins not in the structure."
+		html += "</div>";
+
+		// list currently marked proteins
+		html += "<div id=\"structure-markup-list\">";
+
+		html += "</div>"
+
+		// add button
+		html += "<input style=\"margin-top:15px;\" type=\"button\" id=\"add-structure-markup-button\" value=\"Add New Protein Markup\">";
+
+		// add form
+		html += "<div id=\"add-structure-form\" style=\"display:none;margin-top:15px;\">";
+		html += "<form>";
+
+		// build select box for proteins
+		html += "<select id=\"pdb-map-protein-overlay-protein-select\" style=\"width:100%;max-width:280px;text-overflow:ellipsis;\">";
+		html += "<option value=\"0\">Select protein:</option>\n";
+
+		for(let i = 0; i < _proteins.length; i++ ) {
+			html += "<option value=\"" + _proteins[ i ] + "\">" + _proteinNames[_proteins[ i ] ] + "</option>\n";
+		}
+
+		html += "</select>\n";
+
+		html += "Start: <input id=\"protein-markup-start\" type=\"text\" name=\"proten-markup-start\" size=\"3\">";
+		html += "End: <input id=\"protein-markup-end\" type=\"text\" name=\"proten-markup-end\" size=\"3\">";
+
+		html += "<div style=\"margin-top:15px;\">";
+		html += "<input type=\"button\" id=\"add-structure-markup-protein-button\" value=\"Add\">";
+		html += "<input type=\"button\" id=\"cancel-add-structure-markup-button\" value=\"Cancel\">";
+		html += "</div>";
+
+		html += "</form>";
+		html += "</div>";
+
+		const $newDiv = $(html);
+		$chainsDiv.append($newDiv);
+
+		$chainsDiv.find('#add-structure-markup-button').click( function() {
+			$chainsDiv.find('#add-structure-markup-button').hide();
+			$chainsDiv.find('#cancel-add-structure-markup-button').val('Cancel');
+			$chainsDiv.find('#add-structure-form').show();
+		});
+
+		$chainsDiv.find('#cancel-add-structure-markup-button').click( function() {
+			$chainsDiv.find('#add-structure-markup-button').show();
+			$chainsDiv.find('#add-structure-form').hide();
+		});
+
+		$chainsDiv.find('#add-structure-markup-protein-button').click( function() {
+			handleAddProteinToStructureMarkup($chainsDiv);
+		});
+
+		$chainsDiv.find('#pdb-map-protein-overlay-protein-select').change( function() {
+			handleMarkupProteinSelect($chainsDiv);
+		});
+
+		listCurrentStructureProteinMarkups($chainsDiv);
+	}
+
+	const listCurrentStructureProteinMarkups = function($chainsDiv) {
+
+		const $contentDiv = $chainsDiv.find("#structure-markup-list");
+		const currentProteinMarkups = _structureMarkupHandler.getOrderedProteinColorAnnotations();
+
+		$contentDiv.empty();
+
+		let html = '';
+
+		if(currentProteinMarkups.length < 1) {
+			html = "<div style=\"margin-top:10px;\">No proteins currently marked on structure.</div>";
+
+			$contentDiv.append($(html));
+
+		} else {
+			html += "<div style=\"width:100%;max-width:573px;margin-top:10px;\">";
+			html += "<div style=\"display:inline-block;min-width:15px;max-width:15px;\">&nbsp;</div>";
+			html += "<div style=\"display:inline-block;min-width:350px;max-width:340px;\">&nbsp;</div>";
+			html += "<div style=\"display:inline-block;min-width:60px;max-width:30px;\">Start</div>";
+			html += "<div style=\"display:inline-block;min-width:60px;max-width:30px;\">End</div>";
+			html += "</div>";
+
+			for (const proteinMarkup of currentProteinMarkups) {
+				html += "<div style=\"width:100%;max-width:573px;\">";
+
+				html += "<div style=\"display:inline-block;min-width:15px;max-width:15px;\">";
+				html += "<img style=\"margin-bottom:2px;\" src=\"images/icon-delete-small.png\" id=\"delete-markup-" + proteinMarkup['id'] + "\">";
+				html += "</div>";
+
+				html += "<div style=\"display:inline-block;min-width:350px;max-width:340px;text-overflow:ellipsis;overflow:hidden;\">";
+				html += _proteinNames[proteinMarkup['proteinId']];
+				html += "</div>";
+
+				html += "<div style=\"display:inline-block;min-width:60px;max-width:60px;\">";
+				html += proteinMarkup['start'];
+				html += "</div>";
+
+				html += "<div style=\"display:inline-block;min-width:60px;max-width:60px;\">";
+				html += proteinMarkup['end'];
+				html += "</div>";
+
+				html += "</div>";
+			}
+
+			$contentDiv.append($(html));
+
+			// add deletion click handlers
+			for (const proteinMarkup of currentProteinMarkups) {
+				$contentDiv.find("#delete-markup-" + proteinMarkup['id']).click(function () {
+					_structureMarkupHandler.deleteStructureProteinMarkup({id: proteinMarkup['id']});
+					listCurrentStructureProteinMarkups($chainsDiv);
+					updateURLHash(false);
+					drawStructure();
+				});
+			}
+
+		}
+	}
+
+	const handleAddProteinToStructureMarkup = function($chainsDiv) {
+
+		const selectedProteinId = $chainsDiv.find('#pdb-map-protein-overlay-protein-select').children("option:selected").val();
+
+		let start = $chainsDiv.find('#protein-markup-start').val();
+		let end = $chainsDiv.find('#protein-markup-end').val();
+
+		try {
+			start = parseInt(start, 10);
+			end = parseInt(end, 10);
+		} catch(e) {
+			console.log("Error parsing start or end as an integer. Doing nothing.");
+			return;
+		}
+
+		if(isNaN(start) || isNaN(end)) {
+			console.log("Error parsing start or end as an integer. Doing nothing.");
+			return;
+		}
+
+		// just do nothing if these values are the same
+		if(start === end) { return; }
+
+		if(start > end) {
+			const tmp = start;
+			start = end;
+			end = tmp;
+		}
+
+		if(start < 1) { start = 1; }
+		if(end > _proteinSequences[selectedProteinId].length) {
+			end = _proteinSequences[selectedProteinId].length;
+		}
+
+		// add this to markup handler
+		_structureMarkupHandler.addProteinColorAnnotation({
+			proteinId:selectedProteinId,
+			start:start,
+			end:end,
+			color:"#FF0000"
+		});
+
+		// reset form elements
+		$chainsDiv.find('#pdb-map-protein-overlay-protein-select').children("option:selected").removeAttr("selected");
+		$chainsDiv.find('#protein-markup-start').val('');
+		$chainsDiv.find('#protein-markup-end').val('');
+		$chainsDiv.find('#cancel-add-structure-markup-button').val('Done');
+
+		// redraw markup list
+		listCurrentStructureProteinMarkups($chainsDiv);
+
+		// update the main url hash
+		updateURLHash(false);
+
+		// redraw structure
+		drawStructure();
+	}
+
+	const handleMarkupProteinSelect = async function($chainsDiv) {
+
+		const selectedProteinId = $chainsDiv.find('#pdb-map-protein-overlay-protein-select').children("option:selected").val();
+
+		const $startOption = $chainsDiv.find('#protein-markup-start');
+		const $endOption = $chainsDiv.find('#protein-markup-end');
+
+		if(selectedProteinId === "0") {
+			$startOption.val("");
+			$endOption.val("");
+		} else {
+			$startOption.val("1");
+
+			if(!(selectedProteinId in _proteinSequences)) {
+				await loadSingleProteinSequenceWithPromise(selectedProteinId);
+			}
+
+			$endOption.val(""+ _proteinSequences[selectedProteinId].length);
+		}
+
+	}
 
 	const addColorPickers = function( $chainsDiv ) {
 
@@ -4657,6 +5110,7 @@ var StructurePagePrimaryRootCodeClass = function() {
 			if ( $( "input#show-linkable-positions" ).is( ':checked' ) ) {
 				drawLinkableResidues( proteins );
 			}
+
 		}
 	};
 
@@ -5004,6 +5458,10 @@ var StructurePagePrimaryRootCodeClass = function() {
 				
 			}
 		}
+
+		if(_structureMarkupHandler.getOrderedProteinColorAnnotations().length >= 1) {
+			drawStructureProteinMarkup();
+		}
 	};
 
 
@@ -5105,14 +5563,81 @@ var StructurePagePrimaryRootCodeClass = function() {
 					userData.position = _linkablePositions[ proteinId ][ j ];
 					
 					_LINKABLE_MESH.addSphere( coords[ k ], 1, { color: '#000000', userData: userData } );
-					
-					
 				}
-				
 			}
-			
-			
 		}
+	};
+
+	let _PROTEIN_MARKUP_MESH;
+	const drawStructureProteinMarkup = function() {
+
+		if( _PROTEIN_MARKUP_MESH ) { _PROTEIN_MARKUP_MESH.hide(); }
+		_PROTEIN_MARKUP_MESH = _VIEWER.customMesh('structure-markup');
+
+		// nothing to draw if there are no marked up proteins
+		if(_structureMarkupHandler.getOrderedProteinColorAnnotations().length < 1) {
+			return;
+		}
+
+		const visibleProteins = getVisibleProteins();
+		const visibleProteinIds = Object.keys( visibleProteins );
+
+		for(const markup of _structureMarkupHandler.getOrderedProteinColorAnnotations()) {
+
+			const markupProteinId = markup.proteinId;
+			const markupProteinStart = parseInt(markup.start);
+			const markupProteinEnd = parseInt(markup.end);
+			const markupProteinColor = markup.color;
+
+			if(markupProteinId in _proteinLinkPositions) {
+
+				for (let i = 0; i < visibleProteinIds.length; i++) {
+
+					const visibleProteinId = visibleProteinIds[i];
+
+					if(visibleProteinId in _proteinLinkPositions[markupProteinId]) {
+
+						// there is a link between a markup protein and a visible protein
+
+						// get linked positions in the markup protein to this visible protein
+						const markupLinkPositions = Object.keys(_proteinLinkPositions[markupProteinId][visibleProteinId]);
+
+						// iterate over each one, only process those >= start and <= end
+						for(let markupPosition of markupLinkPositions) {
+							markupPosition = parseInt(markupPosition);
+
+							if(markupPosition >= markupProteinStart && markupPosition <= markupProteinEnd) {
+
+								const linkedPositions = Object.keys(_proteinLinkPositions[markupProteinId][visibleProteinId][markupPosition]);
+
+								for(const linkedPosition of linkedPositions) {
+
+									// find all atoms corresponding to those positions in the visible protein
+									const coords = StructureAlignmentUtils.findCACoords( visibleProteinId, linkedPosition, visibleProteins[ visibleProteinId ], _ALIGNMENTS, _STRUCTURE );
+
+									for( let k = 0; k < coords.length; k++ ) {
+
+										const userData = { };
+										userData.proteinId = visibleProteinId;
+										userData.position = linkedPosition;
+
+										//console.log('Marking up ' + _proteinNames[visibleProteinId] + ' at position ' + linkedPosition, coords[k]);
+
+										_PROTEIN_MARKUP_MESH.addSphere( coords[ k ], 3, { color: markupProteinColor, userData: userData } );
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+
+
+
+			// todo figure out how to figure out where to draw the spheres!
+		console.log(_proteinLinkPositions);
+		console.log(visibleProteins);
 	};
 
 
@@ -7123,8 +7648,3 @@ $(window).unload(function()  {
 		_NEW_WINDOW.close();
 	}
 });
-
-
-
-
-
