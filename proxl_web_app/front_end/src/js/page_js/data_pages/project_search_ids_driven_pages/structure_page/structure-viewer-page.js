@@ -4828,7 +4828,7 @@ var StructurePagePrimaryRootCodeClass = function() {
 			proteinId:selectedProteinId,
 			start:start,
 			end:end,
-			color:"#FFFF00"
+			color:"#FF0000"
 		});
 
 		// reset form elements
@@ -5465,16 +5465,29 @@ var StructurePagePrimaryRootCodeClass = function() {
 
 							if(markupPosition >= markupProteinStart && markupPosition <= markupProteinEnd) {
 
-								// find all atoms corresponding to those positions in the visible protein
+								const linkedPositions = Object.keys(_proteinLinkPositions[markupProteinId][visibleProteinId][markupPosition]);
 
-								// markup those atoms
+								for(const linkedPosition of linkedPositions) {
 
+									// find all atoms corresponding to those positions in the visible protein
+									const coords = StructureAlignmentUtils.findCACoords( visibleProteinId, linkedPosition, visibleProteins[ visibleProteinId ], _ALIGNMENTS, _STRUCTURE );
+
+									for( let k = 0; k < coords.length; k++ ) {
+
+										const userData = { };
+										userData.proteinId = visibleProteinId;
+										userData.position = linkedPosition;
+
+										console.log('Marking up ' + _proteinNames[visibleProteinId] + ' at position ' + linkedPosition, coords[k]);
+
+										_PROTEIN_MARKUP_MESH.addSphere( coords[ k ], 3, { color: markupProteinColor, userData: userData } );
+									}
+								}
 							}
 						}
 					}
 				}
 			}
-
 		}
 
 
