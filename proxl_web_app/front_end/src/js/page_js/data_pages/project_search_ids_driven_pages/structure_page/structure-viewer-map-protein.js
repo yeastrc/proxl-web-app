@@ -420,7 +420,7 @@ window.saveAlignment = function( alignment ) {
 	        success: function(data)	{
 	        	try {
 	        		closePDBShowAlignmentOverlay();
-	        		structurePagePrimaryRootCodeObject_LocalCopy.call__loadPDBFileAlignments( structurePagePrimaryRootCodeObject_LocalCopy.getVariable__v_listChains() );
+	        		structurePagePrimaryRootCodeObject_LocalCopy.call__loadPDBFileAlignments( structurePagePrimaryRootCodeObject_LocalCopy.getVariable__v_listChains(), true );
 	        	} catch( e ) {
 	        		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
 	        		throw e;
