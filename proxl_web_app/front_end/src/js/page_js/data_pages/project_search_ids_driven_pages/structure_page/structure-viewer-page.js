@@ -6793,7 +6793,7 @@ var StructurePagePrimaryRootCodeClass = function() {
 					closeConfirmDeleteAlignmentOverlay( clickThis, eventObject );
 
 
-					loadPDBFileAlignments( listChains );
+					loadPDBFileAlignments( listChains, true );
 
 					decrementSpinner();
 					
