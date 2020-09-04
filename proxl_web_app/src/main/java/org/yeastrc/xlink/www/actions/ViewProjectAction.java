@@ -16,6 +16,7 @@ import org.yeastrc.xlink.www.file_import_proxl_xml_scans.searchers.ProxlXMLFileI
 import org.yeastrc.xlink.www.file_import_proxl_xml_scans.utils.IsProxlXMLFileImportFullyConfigured;
 import org.yeastrc.xlink.www.searcher.NoteSearcher;
 import org.yeastrc.xlink.www.searcher.ProjectToCopyToSearcher;
+import org.yeastrc.xlink.www.searcher.SavedView_AnyForProjectId_Searcher;
 import org.yeastrc.xlink.www.constants.StrutsGlobalForwardNames;
 import org.yeastrc.xlink.www.constants.WebConstants;
 import org.yeastrc.xlink.www.user_session_management.UserSession;
@@ -148,6 +149,17 @@ public class ViewProjectAction extends Action {
 				}
 				return mapping.findForward( StrutsGlobalForwardNames.INSUFFICIENT_ACCESS_PRIVILEGE );
 			}
+			
+			boolean isPublicAccessUser = false;
+			
+			if ( authAccessLevel.isAssistantProjectOwnerAllowed()
+					|| authAccessLevel.isAssistantProjectOwnerIfProjectNotLockedAllowed() ) {
+			} else {
+				//  Public access user:
+				isPublicAccessUser = true;
+			}
+			
+			
 			request.setAttribute( WebConstants.REQUEST_AUTH_ACCESS_LEVEL, authAccessLevel );
 
 			///    Done Processing Auth Check and Auth Level
@@ -173,10 +185,7 @@ public class ViewProjectAction extends Action {
 			GetPageHeaderData.getInstance().getPageHeaderDataWithProjectId( projectId, request );
 			
 			boolean showStructureLink = true;
-			if ( authAccessLevel.isAssistantProjectOwnerAllowed()
-					|| authAccessLevel.isAssistantProjectOwnerIfProjectNotLockedAllowed() ) {
-			} else {
-				//  Public access user:
+			if ( isPublicAccessUser ) {
 				showStructureLink = AnyPDBFilesForProjectId.getInstance().anyPDBFilesForProjectId( projectId );
 			}
 			request.setAttribute( WebConstants.REQUEST_SHOW_STRUCTURE_LINK, showStructureLink );
@@ -195,6 +204,20 @@ public class ViewProjectAction extends Action {
 				int pendingCount = 
 						ProxlXMLFileImportTracking_PendingCount_Searcher.getInstance().getPendingCountForProject( projectId );
 				request.setAttribute( "proxlXMLFileImportTrackingPendingCount", pendingCount );
+			}
+			
+			if ( isPublicAccessUser ) {
+				// For Public user, only show Saved Views section if there are any saved views
+				
+				if ( SavedView_AnyForProjectId_Searcher.getInstance().savedView_AnyForProjectId( projectId ) ) {
+				
+					request.setAttribute( WebConstants.REQUEST_SHOW_SAVED_VIEWS_BLOCK, true );
+				}
+				
+			} else {
+				//  Otherwise always show Saved Views section
+				
+				request.setAttribute( WebConstants.REQUEST_SHOW_SAVED_VIEWS_BLOCK, true );
 			}
 			
 			request.setAttribute( "project", projectDTO );

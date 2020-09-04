@@ -49,6 +49,8 @@ public class WebConstants {
 	
 	public static final String REQUEST_PROJECT_ID = "projectId";
 	
+	public static final String REQUEST_SHOW_SAVED_VIEWS_BLOCK = "showSavedViewsBlock";
+	
 	public static final String REQUEST_SHOW_STRUCTURE_LINK = "showStructureLink";
 	
 

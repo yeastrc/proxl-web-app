@@ -73,8 +73,18 @@ export class ProjectPage_SavedViews_Section_AllUsersInteraction {
 	 */
 	getSavedViewsData( params ) {
 
-		if (!this._initializeCalled) {
+		if ( ! this._initializeCalled ) {
 			throw Error("initialize method not called");
+		}
+		
+		{
+			const $saved_views_block_shown = $("#saved_views_block_shown")
+			if ( $saved_views_block_shown.length === 0 ) {
+				
+				//  No Saved Views block so skip initialization
+				
+				return;  // EARLY RETURN
+			}
 		}
 
 		let retryCount = undefined;
