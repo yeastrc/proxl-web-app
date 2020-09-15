@@ -187,7 +187,7 @@ public class ProcessLinkTypeCrosslink {
 			Collections.sort( peptideLinkPositions );
 			
 			
-			if ( linkers_Main_ForSingleSearch.isAllLinkersHave_LinkablePositions() ) {
+			if ( ! linkers_Main_ForSingleSearch.isAllLinkersHave_LinkablePositions() ) {
 				
 				//  Not all linkers have linkable positions so linkable positions not used for filtering
 
