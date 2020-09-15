@@ -19,6 +19,9 @@
 package org.systemsbiology.jrap.stax;
 
 import javax.xml.stream.*;
+
+import org.systemsbiology.jrap.proxl_exceptions.Proxl_Read_MzML_MzXML_File_Data_Exception;
+
 import java.io.*;
 import java.util.*;
 
@@ -81,7 +84,7 @@ public class IndexParser
         return maxScan;
     }
 
-    private long getIndexPosition()
+    private long getIndexPosition() throws Exception
     {
         FileInputStream fileIN = null;
         long indexPosition = -1;
@@ -96,6 +99,10 @@ public class IndexParser
 
         try
         {
+        	//  DJJ: PROXL:  Output Data Error Exception when XML tag or closing tag not found.
+        	
+        	String errorMsg = null;
+        	
             tmpXML = new File(inputMZXMLfilename);
             //System.out.println(inputMZXMLfilename +" length is "+ tmpXML.length());
 
@@ -107,13 +114,25 @@ public class IndexParser
             int offset;
             if ((offset = footer.indexOf("<"+indexName+">")) == -1)
             {
-                System.err.println("<"+indexName+">"+" not found!!!");
+            	String msg = "<"+indexName+">"+" not found in scan file!!!";
+                System.err.println( msg );
+                if ( errorMsg == null ) {
+                	errorMsg = msg;
+                }
             }
             footer = footer.substring(offset + indexName.length()+2);
             int endIndex = footer.indexOf("</"+indexName+">");
             if (endIndex == -1)
             {
-                System.err.println("</"+indexName+"> not found!!!");
+            	String msg = "</"+indexName+">"+" not found in scan file!!!";
+                System.err.println( msg );
+                if ( errorMsg == null ) {
+                	errorMsg = msg;
+                }
+            }
+            
+            if ( errorMsg != null ) {
+            	throw new Proxl_Read_MzML_MzXML_File_Data_Exception( errorMsg );
             }
 
             footer = footer.substring(0, endIndex);
@@ -127,6 +146,7 @@ public class IndexParser
         {
             System.out.println("exception:" + e);
             e.printStackTrace();
+            throw e;
         }
         finally
         {

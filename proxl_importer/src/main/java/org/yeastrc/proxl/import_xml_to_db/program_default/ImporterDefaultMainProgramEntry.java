@@ -24,7 +24,9 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.stream.StreamSource;
 
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.LoggerFactory;import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.systemsbiology.jrap.proxl_exceptions.Proxl_Read_MzML_MzXML_File_Data_Exception;
+import org.slf4j.Logger;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.LoggerContext;
@@ -825,7 +827,23 @@ public class ImporterDefaultMainProgramEntry {
 						proxlXMLFileImportTrackingDTO.getId(), 
 						proxlXMLFileImportTrackingRunDTO );
 			}
+			
 			return importResults;  //  EARLY EXIT
+			
+
+			
+			
+		} catch ( Proxl_Read_MzML_MzXML_File_Data_Exception e) {
+			log.error( "Caught Proxl_Read_MzML_MzXML_File_Data_Exception: " + e.getMessage(), e );
+			processProxl_Read_MzML_MzXML_File_Data_Exception(
+					importResults,
+					proxlXMLFileImportTrackingDTO,
+					proxlXMLFileImportTrackingRunDTO, 
+					outputDataErrorsFileName,
+					e );
+			return importResults;  //  EARLY EXIT
+			
+			
 		} catch ( ProxlImporterDataException e) {
 			log.error( "Caught ProxlImporterDataException: " + e.getMessage(), e );
 			processImporterDataException(
@@ -834,7 +852,8 @@ public class ImporterDefaultMainProgramEntry {
 					proxlXMLFileImportTrackingRunDTO, 
 					outputDataErrorsFileName,
 					e );
-			return importResults;
+			return importResults;  //  EARLY EXIT
+			
 		} catch ( ProxlBaseDataException e) {
 			log.error( "Caught ProxlBaseDataException: " + e.getMessage(), e );
 			processBaseDataException(
@@ -843,7 +862,8 @@ public class ImporterDefaultMainProgramEntry {
 					proxlXMLFileImportTrackingRunDTO, 
 					outputDataErrorsFileName,
 					e );
-			return importResults;
+			return importResults;  //  EARLY EXIT
+			
 		} catch ( Exception e ) {
 			if ( ! shutdownReceivedViaShutdownHook ) {
 				System.out.println( "Exception in processing" );
@@ -891,7 +911,28 @@ public class ImporterDefaultMainProgramEntry {
 			System.out.println( "--------------------------------------" );
 			System.out.println( "" );
 		}
+		
 		return importResults;
+	}
+
+	/**
+	 * @param importResults
+	 * @param proxlXMLFileImportTrackingDTO
+	 * @param proxlXMLFileImportTrackingRunDTO
+	 * @param outputDataErrorsFileName
+	 * @param exception
+	 * @throws IOException
+	 * @throws Exception
+	 */
+	private void processProxl_Read_MzML_MzXML_File_Data_Exception(
+			ImportResults importResults,
+			ProxlXMLFileImportTrackingDTO proxlXMLFileImportTrackingDTO,
+			ProxlXMLFileImportTrackingRunDTO proxlXMLFileImportTrackingRunDTO,
+			String outputDataErrorsFileName, 
+			Proxl_Read_MzML_MzXML_File_Data_Exception exception )
+			throws IOException, Exception {
+		
+		processDataException_call_Importer_or_BaseExceptionProcessing( importResults, proxlXMLFileImportTrackingDTO, proxlXMLFileImportTrackingRunDTO, outputDataErrorsFileName, exception );
 	}
 	
 	/**
@@ -953,11 +994,14 @@ public class ImporterDefaultMainProgramEntry {
 			throws IOException, Exception {
 		
 		if ( ( ! ( exception instanceof ProxlImporterDataException ) )
-				&& ( ! ( exception instanceof ProxlBaseDataException ) ) ) {
-			String msg = "exception not ProxlImporterDataException or ProxlBaseDataException";
+				&& ( ! ( exception instanceof ProxlBaseDataException ) ) 
+				&& ( ! ( exception instanceof Proxl_Read_MzML_MzXML_File_Data_Exception ) ) ) {
+			
+			String msg = "exception not ProxlImporterDataException or ProxlBaseDataException or Proxl_Read_MzML_MzXML_File_Data_Exception";
 			log.error( msg );
 			throw new IllegalArgumentException( msg );
 		}
+		
 		if ( outputDataErrorsFileName != null ) {
 			writeDataErrorToFile( exception.getMessage(), exception, outputDataErrorsFileName );
 		}
