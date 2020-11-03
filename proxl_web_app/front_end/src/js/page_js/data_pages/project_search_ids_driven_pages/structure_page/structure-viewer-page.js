@@ -4821,7 +4821,7 @@ var StructurePagePrimaryRootCodeClass = function() {
 		html += "</div>"
 
 		// add button
-		html += "<input style=\"margin-top:15px;\" type=\"button\" id=\"add-structure-markup-button\" value=\"Add New Protein Markup\">";
+		html += "<input style=\"margin-top:15px;margin-bottom:15px;\" type=\"button\" id=\"add-structure-markup-button\" value=\"Add New Protein Markup\">";
 
 		// add form
 		html += "<div id=\"add-structure-form\" style=\"display:none;margin-top:15px;\">";
@@ -4840,7 +4840,7 @@ var StructurePagePrimaryRootCodeClass = function() {
 		html += "Start: <input id=\"protein-markup-start\" type=\"text\" name=\"proten-markup-start\" size=\"3\">";
 		html += "End: <input id=\"protein-markup-end\" type=\"text\" name=\"proten-markup-end\" size=\"3\">";
 
-		html += "<div style=\"margin-top:15px;\">";
+		html += "<div style=\"margin-top:15px;margin-bottom:15px;\">";
 		html += "<input type=\"button\" id=\"add-structure-markup-protein-button\" value=\"Add\">";
 		html += "<input type=\"button\" id=\"cancel-add-structure-markup-button\" value=\"Cancel\">";
 		html += "</div>";
