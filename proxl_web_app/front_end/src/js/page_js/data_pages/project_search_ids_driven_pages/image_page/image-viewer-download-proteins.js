@@ -131,6 +131,23 @@ export class DownloadProteins {
             });
         }
         {
+            const $link = $("#download-protein-xiview");
+            $link.click( function( event ) {
+                try {
+
+                    const customFields = new Map();
+                    customFields.set("format", "xiview");
+
+                    objectThis.submitDownloadForParams({ clickedThis : this, downloadStrutsAction : "downloadMergedProteinsCLMS_CSV.do", customFields } );
+                    event.preventDefault();
+                } catch( e ) {
+                    reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+                    throw e;
+                }
+            });
+        }
+
+        {
             const $link = $("#download-protein-lengths");
             $link.click( function( event ) { 
                 try {
@@ -375,7 +392,7 @@ export class DownloadProteins {
 	 * It is assumed jquery is loaded.
 	 * 
 	 */
-	submitDownloadForParams({ downloadStrutsAction }) {
+	submitDownloadForParams({ downloadStrutsAction, customFields }) {
 
         const projectSearchIds = imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_projectSearchIds();
 
@@ -415,6 +432,18 @@ export class DownloadProteins {
                 $( queryJSONField ).text( psmPeptideCutoffsForProjectSearchIds_JSONString );
 
                 form.appendChild( queryJSONField );
+            }
+
+            // add custom fields
+            if(customFields !== undefined) {
+                for(let [key,value] of customFields) {
+                    const field = document.createElement( "textarea" );
+                    field.setAttribute("name", key);
+
+                    $( field ).text( value );
+
+                    form.appendChild( field );
+                }
             }
 
 			if ( selectedCrosslinksLooplinksMonolinks ) {

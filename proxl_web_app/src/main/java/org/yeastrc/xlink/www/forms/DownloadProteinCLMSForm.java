@@ -29,7 +29,15 @@ public class DownloadProteinCLMSForm extends DownloadMergedSearchViewProteinsFor
 	}
 
 
+	public String getFormat() {
+		return format;
+	}
 
+	public void setFormat(String format) {
+		this.format = format;
+	}
 
 	private boolean crosslinksOnly = false;
+	private String format = "xinet";
+
 }

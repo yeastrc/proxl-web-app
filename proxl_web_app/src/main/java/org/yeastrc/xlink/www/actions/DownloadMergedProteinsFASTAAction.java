@@ -160,7 +160,7 @@ public class DownloadMergedProteinsFASTAAction extends Action {
 				DateTime dt = new DateTime();
 				DateTimeFormatter fmt = DateTimeFormat.forPattern( "yyyy-MM-dd");
 				filename += "-" + fmt.print( dt );
-				filename += ".fa";
+				filename += ".fasta";
 				response.setContentType("application/x-download");
 				response.setHeader("Content-Disposition", "attachment; filename=" + filename);
 				ServletOutputStream out = response.getOutputStream();

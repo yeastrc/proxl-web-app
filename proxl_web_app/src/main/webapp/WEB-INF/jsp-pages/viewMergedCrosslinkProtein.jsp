@@ -222,14 +222,17 @@
 										>Export peptides for Skyline PRM (Chavez et al)</a>
 								</c:if>
 								
-								<br><span style="font-size:15px;">xiNET export</span><br>
+								<br><span style="font-size:15px;">xiNET / xiVIEW export</span><br>
 								<a data-tooltip="Download FASTA file for proteins found in cross-links or loop-links." id="download-protein-udrs" class="download-option tool_tip_attached_jq" 
 									href="downloadMergedProteinsFASTA.do?<bean:write name="queryString" />"
 									>Download FASTA file</a>
 								<a data-tooltip="View CLMS-CSV formatted data for use in xiNET (http://crosslinkviewer.org/)" id="download-protein-xinet" class="download-option tool_tip_attached_jq" 
 									href="downloadMergedProteinsCLMS_CSV.do?<bean:write name="queryString" />"
 									>Export data for xiNET visualization</a>
-								
+								<a data-tooltip="View CLMS-CSV formatted data for use in xiVIEW (http://crosslinkviewer.org/)" id="download-protein-xinet" class="download-option tool_tip_attached_jq"
+								   href="downloadMergedProteinsCLMS_CSV.do?<bean:write name="queryString" />&format=xiview"
+								>Export data for xiVIEW visualization</a>
+
 								<br><span style="font-size:15px;">xVis export</span><br>
 								<a data-tooltip="Export protein lengths file for cross-links and loop-links. For use in xVis (https://xvis.genzentrum.lmu.de/)" id="download-protein-lengths" class="download-option tool_tip_attached_jq" 
 									href="downloadMergedProteinsLengths.do?<bean:write name="queryString" />"

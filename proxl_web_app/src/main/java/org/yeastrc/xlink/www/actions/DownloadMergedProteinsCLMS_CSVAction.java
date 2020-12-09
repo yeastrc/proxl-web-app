@@ -44,9 +44,9 @@ import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAut
  *
  */
 public class DownloadMergedProteinsCLMS_CSVAction extends Action {
-	
+
 	private static final Logger log = LoggerFactory.getLogger( DownloadMergedSearchProteinsAction.class);
-	
+
 	@Override
 	public ActionForward execute( ActionMapping mapping,
 			  ActionForm actionForm,
@@ -83,7 +83,7 @@ public class DownloadMergedProteinsCLMS_CSVAction extends Action {
 				return mapping.findForward( StrutsGlobalForwardNames.INVALID_REQUEST_SEARCHES_ACROSS_PROJECTS );
 			}
 			int projectId = projectIdsFromSearchIds.get( 0 );
-			request.setAttribute( "projectId", projectId ); 
+			request.setAttribute( "projectId", projectId );
 			///////////////////////
 			GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result accessAndSetupWebSessionResult =
 					GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.getSinglesonInstance().getAccessAndSetupWebSessionWithProjectId( projectId, request, response );
@@ -98,7 +98,7 @@ public class DownloadMergedProteinsCLMS_CSVAction extends Action {
 				return mapping.findForward( StrutsGlobalForwardNames.INSUFFICIENT_ACCESS_PRIVILEGE );
 			}
 			request.setAttribute( WebConstants.REQUEST_AUTH_ACCESS_LEVEL, authAccessLevel );
-			
+
 			///    Done Processing Auth Check and Auth Level
 			//////////////////////////////
 
@@ -107,7 +107,7 @@ public class DownloadMergedProteinsCLMS_CSVAction extends Action {
 			int[] searchIdsArray = new int[ projectSearchIdsListDeduppedSorted.size() ];
 			int searchIdsArrayIndex = 0;
 			List<Integer> searchIds = new ArrayList<>( projectSearchIdsListDeduppedSorted.size() );
-			
+
 			for( int projectSearchId : projectSearchIdsListDeduppedSorted ) {
 				SearchDTO search = SearchDAO.getInstance().getSearchFromProjectSearchId( projectSearchId );
 				if ( search == null ) {
@@ -132,126 +132,237 @@ public class DownloadMergedProteinsCLMS_CSVAction extends Action {
 				}
 			});
 			Collections.sort( searchIds );
-			
-			OutputStreamWriter writer = null;
-			try {
-				ProteinsMergedCommonPageDownloadResult proteinsMergedCommonPageDownloadResult =
-						ProteinsMergedCommonPageDownload.getInstance()
-						.getCrosslinksAndLooplinkWrapped(
-								form,
-								null, // ProteinQueryJSONRoot proteinQueryJSONRoot_Param
-								ProteinsMergedCommonPageDownload.ForCrosslinksOrLooplinkOrBoth.BOTH_CROSSLINKS_AND_LOOPLINKS,
-								projectId,
-								projectSearchIdsListDeduppedSorted,
-								searches, searchesMapOnSearchId  );
 
-				if ( StringUtils.isNoneEmpty( form.getSelectedCrosslinksLooplinksMonolinksJSON() ) ) {
-					FilterProteinsOnSelectedLinks.getInstance()
-					.filterProteinsOnSelectedLinks( 
-							proteinsMergedCommonPageDownloadResult, form.getSelectedCrosslinksLooplinksMonolinksJSON() );
-				}
-				
-				List<MergedSearchProteinCrosslink> crosslinks = proteinsMergedCommonPageDownloadResult.getCrosslinks();
-				List<MergedSearchProteinLooplink> looplinks = proteinsMergedCommonPageDownloadResult.getLooplinks();
-				
-				// generate file name
-				String filename = "proxl-xinet-clms-";
-				filename += StringUtils.join( searchIdsArray, '-' );
-				DateTime dt = new DateTime();
-				DateTimeFormatter fmt = DateTimeFormat.forPattern( "yyyy-MM-dd");
-				filename += "-" + fmt.print( dt );
-				filename += ".csv";
-				response.setContentType("application/x-download");
-				response.setHeader("Content-Disposition", "attachment; filename=" + filename);
-				ServletOutputStream out = response.getOutputStream();
-				BufferedOutputStream bos = new BufferedOutputStream(out);
-				writer = new OutputStreamWriter( bos , ServletOutputStreamCharacterSetConstant.outputStreamCharacterSet );
+			ProteinsMergedCommonPageDownloadResult proteinsMergedCommonPageDownloadResult =
+					ProteinsMergedCommonPageDownload.getInstance()
+							.getCrosslinksAndLooplinkWrapped(
+									form,
+									null, // ProteinQueryJSONRoot proteinQueryJSONRoot_Param
+									ProteinsMergedCommonPageDownload.ForCrosslinksOrLooplinkOrBoth.BOTH_CROSSLINKS_AND_LOOPLINKS,
+									projectId,
+									projectSearchIdsListDeduppedSorted,
+									searches, searchesMapOnSearchId  );
 
-
-				Collection<String> outputLines = new HashSet<>();
-				
-				writer.write( "Protein1,LinkPos1,Protein2,LinkPos2\n");
-				
-				
-				for( MergedSearchProteinCrosslink link : crosslinks ) {
-
-					String name = link.getProtein1().getName();
-					name = name.replaceAll( "\\,", "-" );
-					
-					String line = name + ",";					// Protein1
-					//line += ",";								// PepPos1
-					//line += ",";								// PepSeq1
-					line += link.getProtein1Position() + ",";	// LinkPos1
-					
-					name = link.getProtein2().getName();
-					name = name.replaceAll( "\\,", "-" );
-					
-					line += name + ",";							// Protein2
-					//line += ",";								// PepPos2
-					//line += ",";								// PepSeq2
-					line += link.getProtein2Position() + ",";	// LinkPos2
-					
-					//line += ",";								// Score
-					//line += ",";								// Id
-					
-					line += "\n";
-					
-					if( !outputLines.contains( line ) ) {
-						writer.write( line );
-						outputLines.add( line );
-					}
-										
-				}
-				
-				if( !form.isCrosslinksOnly() ) {
-					for( MergedSearchProteinLooplink link : looplinks ) {
-	
-						String name = link.getProtein().getName();
-						name = name.replaceAll( "\\,", "-" );
-						
-						String line = name + ",";					// Protein1
-						//line += ",";								// PepPos1
-						//line += ",";								// PepSeq1
-						line += link.getProteinPosition1() + ",";	// LinkPos1
-						
-						line += ",";								// Protein2 (excluded for loop-links)
-						//line += ",";								// PepPos2
-						//line += ",";								// PepSeq2
-						line += link.getProteinPosition2() + ",";	// LinkPos2
-						
-						//line += ",";								// Score
-						//line += ",";								// Id
-						
-						line += "\n";
-						
-						if( !outputLines.contains( line ) ) {
-							writer.write( line );
-							outputLines.add( line );
-						}
-
-					}
-				}
-				
-			} finally {
-				try {
-					if ( writer != null ) {
-						writer.close();
-					}
-				} catch ( Exception ex ) {
-					log.error( "writer.close():Exception " + ex.toString(), ex );
-				}
-				try {
-					response.flushBuffer();
-				} catch ( Exception ex ) {
-					log.error( "response.flushBuffer():Exception " + ex.toString(), ex );
-				}
+			if ( StringUtils.isNoneEmpty( form.getSelectedCrosslinksLooplinksMonolinksJSON() ) ) {
+				FilterProteinsOnSelectedLinks.getInstance()
+						.filterProteinsOnSelectedLinks(
+								proteinsMergedCommonPageDownloadResult, form.getSelectedCrosslinksLooplinksMonolinksJSON() );
 			}
+
+			List<MergedSearchProteinCrosslink> crosslinks = proteinsMergedCommonPageDownloadResult.getCrosslinks();
+			List<MergedSearchProteinLooplink> looplinks = proteinsMergedCommonPageDownloadResult.getLooplinks();
+
+			if(form.getFormat().equals( "xinet" )) {
+				this.writeOutputForXiNet(searchIdsArray, crosslinks, looplinks, form, response);
+			} else if(form.getFormat().equals( "xiview" )) {
+				this.writeOutputForXiView(searchIdsArray, crosslinks, looplinks, form, response);
+			}
+
+
 			return null;
 		} catch ( Exception e ) {
-			String msg = "Exception:  RemoteAddr: " + request.getRemoteAddr()  
+			String msg = "Exception:  RemoteAddr: " + request.getRemoteAddr()
 					+ ", Exception caught: " + e.toString();
 			log.error( msg, e );
 			throw e;
 		}
 	}
+
+	private void writeOutputForXiView(
+			int[] searchIdsArray,
+			List<MergedSearchProteinCrosslink> crosslinks,
+			List<MergedSearchProteinLooplink> looplinks,
+			DownloadProteinCLMSForm form,
+			HttpServletResponse response
+
+	) throws Exception {
+
+		OutputStreamWriter writer = null;
+
+		try {
+
+			// generate file name
+			String filename = "proxl-xiview-clms-";
+			filename += StringUtils.join( searchIdsArray, '-' );
+			DateTime dt = new DateTime();
+			DateTimeFormatter fmt = DateTimeFormat.forPattern( "yyyy-MM-dd");
+			filename += "-" + fmt.print( dt );
+			filename += ".csv";
+			response.setContentType("application/x-download");
+			response.setHeader("Content-Disposition", "attachment; filename=" + filename);
+			ServletOutputStream out = response.getOutputStream();
+			BufferedOutputStream bos = new BufferedOutputStream(out);
+			writer = new OutputStreamWriter( bos , ServletOutputStreamCharacterSetConstant.outputStreamCharacterSet );
+
+			Collection<String> outputLines = new HashSet<>();
+
+			writer.write( "AbsPos1,AbsPos2,Protein1,Protein2,Decoy1,Decoy2,Score\n");
+
+			for( MergedSearchProteinCrosslink link : crosslinks ) {
+
+				String name1 = link.getProtein1().getName();
+				name1 = name1.replaceAll( "\\,", "-" );
+
+				String name2 = link.getProtein2().getName();
+				name2 = name2.replaceAll( "\\,", "-" );
+
+				String line = link.getProtein1Position() + ",";
+				line += link.getProtein2Position() + ",";
+
+				line += name1 + ",";
+				line += name2 + ",";
+				line += "FALSE,FALSE,0\n";
+
+				if( !outputLines.contains( line ) ) {
+					writer.write( line );
+					outputLines.add( line );
+				}
+
+			}
+
+			if( !form.isCrosslinksOnly() ) {
+				for( MergedSearchProteinLooplink link : looplinks ) {
+
+					String name = link.getProtein().getName();
+					name = name.replaceAll( "\\,", "-" );
+
+					String line = link.getProteinPosition1() + ",";
+					line += link.getProteinPosition2() + ",";
+
+					line += name + ",";
+					line += name + ",";
+					line += "FALSE,FALSE,0\n";
+
+					if( !outputLines.contains( line ) ) {
+						writer.write( line );
+						outputLines.add( line );
+					}
+
+				}
+			}
+
+		} finally {
+			try {
+				if ( writer != null ) {
+					writer.close();
+				}
+			} catch ( Exception ex ) {
+				log.error( "writer.close():Exception " + ex.toString(), ex );
+			}
+			try {
+				response.flushBuffer();
+			} catch ( Exception ex ) {
+				log.error( "response.flushBuffer():Exception " + ex.toString(), ex );
+			}
+		}
+	}
+
+	private void writeOutputForXiNet(
+			int[] searchIdsArray,
+			List<MergedSearchProteinCrosslink> crosslinks,
+			List<MergedSearchProteinLooplink> looplinks,
+			DownloadProteinCLMSForm form,
+			HttpServletResponse response
+
+	) throws Exception {
+
+		OutputStreamWriter writer = null;
+
+		try {
+
+
+			// generate file name
+			String filename = "proxl-xinet-clms-";
+			filename += StringUtils.join( searchIdsArray, '-' );
+			DateTime dt = new DateTime();
+			DateTimeFormatter fmt = DateTimeFormat.forPattern( "yyyy-MM-dd");
+			filename += "-" + fmt.print( dt );
+			filename += ".csv";
+			response.setContentType("application/x-download");
+			response.setHeader("Content-Disposition", "attachment; filename=" + filename);
+			ServletOutputStream out = response.getOutputStream();
+			BufferedOutputStream bos = new BufferedOutputStream(out);
+			writer = new OutputStreamWriter( bos , ServletOutputStreamCharacterSetConstant.outputStreamCharacterSet );
+
+
+			Collection<String> outputLines = new HashSet<>();
+
+			writer.write( "Protein1,LinkPos1,Protein2,LinkPos2\n");
+
+
+			for( MergedSearchProteinCrosslink link : crosslinks ) {
+
+				String name = link.getProtein1().getName();
+				name = name.replaceAll( "\\,", "-" );
+
+				String line = name + ",";					// Protein1
+				//line += ",";								// PepPos1
+				//line += ",";								// PepSeq1
+				line += link.getProtein1Position() + ",";	// LinkPos1
+
+				name = link.getProtein2().getName();
+				name = name.replaceAll( "\\,", "-" );
+
+				line += name + ",";							// Protein2
+				//line += ",";								// PepPos2
+				//line += ",";								// PepSeq2
+				line += link.getProtein2Position() + ",";	// LinkPos2
+
+				//line += ",";								// Score
+				//line += ",";								// Id
+
+				line += "\n";
+
+				if( !outputLines.contains( line ) ) {
+					writer.write( line );
+					outputLines.add( line );
+				}
+
+			}
+
+			if( !form.isCrosslinksOnly() ) {
+				for( MergedSearchProteinLooplink link : looplinks ) {
+
+					String name = link.getProtein().getName();
+					name = name.replaceAll( "\\,", "-" );
+
+					String line = name + ",";					// Protein1
+					//line += ",";								// PepPos1
+					//line += ",";								// PepSeq1
+					line += link.getProteinPosition1() + ",";	// LinkPos1
+
+					line += ",";								// Protein2 (excluded for loop-links)
+					//line += ",";								// PepPos2
+					//line += ",";								// PepSeq2
+					line += link.getProteinPosition2() + ",";	// LinkPos2
+
+					//line += ",";								// Score
+					//line += ",";								// Id
+
+					line += "\n";
+
+					if( !outputLines.contains( line ) ) {
+						writer.write( line );
+						outputLines.add( line );
+					}
+
+				}
+			}
+
+		} finally {
+			try {
+				if ( writer != null ) {
+					writer.close();
+				}
+			} catch ( Exception ex ) {
+				log.error( "writer.close():Exception " + ex.toString(), ex );
+			}
+			try {
+				response.flushBuffer();
+			} catch ( Exception ex ) {
+				log.error( "response.flushBuffer():Exception " + ex.toString(), ex );
+			}
+		}
+	}
+
 }

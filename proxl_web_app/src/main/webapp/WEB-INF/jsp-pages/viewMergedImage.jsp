@@ -397,7 +397,7 @@
 										>Export peptides for Skyline PRM (Chavez et al)</a>
 								</c:if>
 								
-								<br><span style="font-size:15px;">xiNET export</span><br>
+								<br><span style="font-size:15px;">xiNET / xiVIEW export</span><br>
 								<%-- downloadMergedProteinsFASTA.do?...  --%>
 								<a id="download-fasta-file" class="download-option tool_tip_attached_jq" href="javascript:"
 									data-tooltip="Download FASTA file for proteins found in cross-links or loop-links."
@@ -406,6 +406,10 @@
 								<a id="download-protein-xinet" class="download-option tool_tip_attached_jq" href="javascript:"
 									data-tooltip="View CLMS-CSV formatted data for use in xiNET (http://crosslinkviewer.org/)" 
 									>Export data for xiNET visualization</a>
+
+								<a id="download-protein-xiview" class="download-option tool_tip_attached_jq" href="javascript:"
+								   data-tooltip="View CLMS-CSV formatted data for use in xiVIEW (https://xiview.org/)"
+								>Export data for xiVIEW visualization</a>
 								
 								<br><span style="font-size:15px;">xVis export</span><br>
 								<%--  downloadMergedProteinsLengths.do?... --%>
