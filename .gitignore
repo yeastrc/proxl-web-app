@@ -1,2 +1,14 @@
 _site
 .project
+
+/proxl-shared-code/
+/proxl_importer/
+/proxl_importer_run_importer_shared/
+/proxl_run_importer/
+/proxl_submit_import/
+/proxl_web_app/
+
+/aa_ant__build_all_proxl_config.properties
+
+/.idea/
+/deploy/
