@@ -44,18 +44,6 @@
 	</div>
 	<div id="proxl_xml_file_upload_overlay_body" class="proxl-xml-file-upload-overlay-body" style="text-align:left; position: relative;" >
 
-						<%-- overlay div to provide Submit in progress --%>
-		<div id="proxl_xml_file_upload_submit_in_progress" >
-			<%--  grey out under spinner --%>
-			<div style="position:absolute;left:0;right:0;top:0;bottom:0;background-color:grey;opacity:0.5;" 
-					class="tool_tip_attached_jq "
-					data-tooltip="Submit in progress" >
-					
-			</div>
-				<%-- id of next div as used by code in spinner.js --%>
-			<div style="opacity:1.0;position:absolute;left:20%;top:100px; z-index: 20001" id="coverage-map-loading-spinner" style="" ></div>
-		</div>
-		
 		<h3>
 			Upload a Proxl XML file 
 			<c:if test="${ configSystemValues.scanFileImportAllowedViaWebSubmit }" >
@@ -232,6 +220,18 @@
 		 </tr>
 		</table> 
 
+						<%-- overlay div to provide Submit in progress --%>
+		<div id="proxl_xml_file_upload_submit_in_progress" >
+			<%--  grey out under spinner --%>
+			<div style="position:absolute;left:0;right:0;top:0;bottom:0;background-color:grey;opacity:0.5;" 
+					class="tool_tip_attached_jq "
+					data-tooltip="Submit in progress" >
+					
+			</div>
+				<%-- id of next div as used by code in spinner.js --%>
+			<div style="opacity:1.0;position:absolute;left:20%;top:100px; z-index: 20001" id="coverage-map-loading-spinner" style="" ></div>
+		</div>
+		
 	</div>  <%--  END  <div id="proxl_xml_file_upload_overlay_body" --%>
 </div>
 
