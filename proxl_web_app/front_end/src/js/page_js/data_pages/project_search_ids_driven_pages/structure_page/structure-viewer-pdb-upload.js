@@ -123,6 +123,11 @@ window.uploadPDBFile = function() {
 	
 	// get file to upload
 	var fileToUpload = document.getElementById("pdb-file-field").files[ 0 ];
+	
+	if ( ! fileToUpload ) {
+		
+		return;  //  NO File Selected
+	}
 
 	var pdbUserDescription = $("#pdb-file-description").val();
 
