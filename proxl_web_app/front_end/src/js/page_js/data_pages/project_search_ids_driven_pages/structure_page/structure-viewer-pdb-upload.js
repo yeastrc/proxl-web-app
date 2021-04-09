@@ -109,8 +109,19 @@ function attachPDBFileUploadHandlers() {
 
 	// enable upload button if they select a file
 	$fileField.change( function( eventObject ) {
-
-		$uploadButton.prop("disabled", false );
+		
+		// get file to upload
+		var fileToUpload = document.getElementById("pdb-file-field").files[ 0 ];
+		
+		if ( fileToUpload ) {
+			
+			//  Have file to upload
+			$uploadButton.prop("disabled", false );
+		} else {
+			// No file to upload
+			$uploadButton.prop("disabled", true );
+		}
+		
 	});
 	
 	// upload button defaults to disabled
