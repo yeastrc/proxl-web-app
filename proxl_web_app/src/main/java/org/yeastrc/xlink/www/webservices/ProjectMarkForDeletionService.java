@@ -78,7 +78,7 @@ public class ProjectMarkForDeletionService {
 						);
 			}
 			int authUserId = userSession.getAuthUserId();
-			projectDAO.updateSetEnabledZeroAndMarkToDeleteOne( projectId, authUserId ); 
+			projectDAO.updateSet_EnabledZero_MarkToDeleteOne_ShortNameToNull( projectId, authUserId ); 
 			Cached_ProjectTblSubPartsForProjectLists.getInstance().invalidateProjectId( projectId );
 			genericWebserviceResult.setStatus(true);
 			return genericWebserviceResult;

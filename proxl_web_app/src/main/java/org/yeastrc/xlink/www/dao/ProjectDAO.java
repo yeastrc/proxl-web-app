@@ -450,15 +450,15 @@ public class ProjectDAO {
 	}
 	
 	/**
-	 * Update enabled = 0, marked_for_deletion = 1
+	 * Update enabled = 0, marked_for_deletion = 1, short_name = null
 	 * @param id
 	 * @throws Exception
 	 */
-	public void updateSetEnabledZeroAndMarkToDeleteOne( int id, int authUserId ) throws Exception {
+	public void updateSet_EnabledZero_MarkToDeleteOne_ShortNameToNull( int id, int authUserId ) throws Exception {
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
-		final String sql = "UPDATE project SET enabled = 0, marked_for_deletion = 1, marked_for_deletion_auth_user_id = ?, marked_for_deletion_timestamp = NOW() WHERE id = ?";
+		final String sql = "UPDATE project SET enabled = 0, marked_for_deletion = 1, short_name = null, marked_for_deletion_auth_user_id = ?, marked_for_deletion_timestamp = NOW() WHERE id = ?";
 		try {
 			conn = DBConnectionFactory.getConnection( DBConnectionFactory.PROXL );
 			pstmt = conn.prepareStatement( sql );
