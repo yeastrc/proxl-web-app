@@ -439,7 +439,7 @@ var ImagePagePrimaryRootCodeClass = function() {
 	/*
 	* The version number to pass along in the JSON for check for compatibility
 	*/
-	var _JSON_VERSION_NUMBER = 2;
+	var _JSON_VERSION_NUMBER = 3;
 	/**
 	 * Default exclude link type "No Links"
 	 */
@@ -590,6 +590,7 @@ var ImagePagePrimaryRootCodeClass = function() {
 			"link_exclusion_data_current" : "A",
 			"removeNonUniquePSMs" : "B",
 			"minPSMs" : "C",
+			"onlyShowLinksInAllSearches" : "D",
 			
 			//  For future additions, please continue the single character approach instead of using mnemonic or acronym
 			//    1)  It will keep the overall JSON string shorter
@@ -1113,6 +1114,9 @@ var ImagePagePrimaryRootCodeClass = function() {
 		}
 		if ( $( "input#shade-by-counts" ).is( ':checked' ) ) {
 			hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES["shade-by-counts"], true );
+		}
+		if ( $( "input#only-show-links-in-all-searches" ).is( ':checked' ) ) {
+			hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES["onlyShowLinksInAllSearches"], true );
 		}
 		if ( $( "input#view-as-circle-plot" ).is( ':checked' ) ) {
 			hashObjectManager.setOnHashObject( HASH_OBJECT_PROPERTIES["view-as-circle-plot"], true );
@@ -2136,6 +2140,11 @@ var ImagePagePrimaryRootCodeClass = function() {
 		}
 		if( 'shade-by-counts' in json ) {
 			$( "input#shade-by-counts" ).prop('checked', json[ 'shade-by-counts' ] );
+		}
+		if( 'onlyShowLinksInAllSearches' in json ) {
+			$( "input#only-show-links-in-all-searches" ).prop('checked', json[ 'shade-by-counts' ] );
+		} else {
+			$( "input#only-show-links-in-all-searches" ).prop('checked', false );
 		}
 		// handle the scale factor visibility items
 		if ( json[ 'automatic-sizing' ] != undefined && json[ 'automatic-sizing' ] === false ) {
@@ -4625,6 +4634,15 @@ var ImagePagePrimaryRootCodeClass = function() {
 						var fromPp = fromProteinPositionInt;
 						var toPp = toProteinPositionInt;
 						var lsearches = _proteinLinkPositions[ fromProteinId ][ toProteinId ][ fromProteinPosition ][ toProteinPosition ];
+
+						// skip this link if the users has selected to only include links found in all searches
+						// and this wasn't found in all searches
+						if ( $( "input#only-show-links-in-all-searches" ).is( ':checked' ) ) {
+							if(lsearches.length !== _projectSearchIds.length) {
+								continue;
+							}
+						}
+
 						// for display to user
 						var searchIdArray = convertProjectSearchIdArrayToSearchIdArray( lsearches );
 						var getCrosslinkLineColorParams = { 
@@ -4768,6 +4786,15 @@ var ImagePagePrimaryRootCodeClass = function() {
 					var fromPp = fromProteinPositionInt;
 					var toPp = toProteinPositionInt;
 					var lsearches = _proteinLinkPositions[ proteinBarProteinId ][ proteinBarProteinId ][ fromProteinPosition ][ toProteinPosition ];
+
+					// skip this link if the users has selected to only include links found in all searches
+					// and this wasn't found in all searches
+					if ( $( "input#only-show-links-in-all-searches" ).is( ':checked' ) ) {
+						if(lsearches.length !== _projectSearchIds.length) {
+							continue;
+						}
+					}
+
 					// for display to user
 					var searchIdArray = convertProjectSearchIdArrayToSearchIdArray( lsearches );
 					var link = { 
@@ -4881,6 +4908,15 @@ var ImagePagePrimaryRootCodeClass = function() {
 					var fromPp = fromProteinPositionInt;
 					var toPp = toProteinPositionInt;
 					var lsearches = _proteinLooplinkPositions[ proteinBarProteinId ][ proteinBarProteinId ][ fromProteinPosition ][ toProteinPosition ];
+
+					// skip this link if the users has selected to only include links found in all searches
+					// and this wasn't found in all searches
+					if ( $( "input#only-show-links-in-all-searches" ).is( ':checked' ) ) {
+						if(lsearches.length !== _projectSearchIds.length) {
+							continue;
+						}
+					}
+
 					// for display to user
 					var searchIdArray = convertProjectSearchIdArrayToSearchIdArray( lsearches );
 					var link = {
@@ -4989,6 +5025,15 @@ var ImagePagePrimaryRootCodeClass = function() {
 				var fromP = _proteinNames[ proteinBarProteinId ];
 				var fromPp = proteinPositionInt;
 				var lsearches = _proteinMonolinkPositions[ proteinBarProteinId ][ proteinPosition ];
+
+				// skip this link if the users has selected to only include links found in all searches
+				// and this wasn't found in all searches
+				if ( $( "input#only-show-links-in-all-searches" ).is( ':checked' ) ) {
+					if(lsearches.length !== _projectSearchIds.length) {
+						continue;
+					}
+				}
+
 				var searchIdArray = convertProjectSearchIdArrayToSearchIdArray( lsearches );
 				var link = {
 						type : 'monolink',
@@ -5842,6 +5887,15 @@ var ImagePagePrimaryRootCodeClass = function() {
 			}
 		});
 		$( "input#show-tryptic-cleavage-positions" ).change( function() {
+			try {
+				updateURLHash( false /* useSearchForm */ );
+				drawSvg();
+			} catch( e ) {
+				reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
+				throw e;
+			}
+		});
+		$( "input#only-show-links-in-all-searches" ).change( function() {
 			try {
 				updateURLHash( false /* useSearchForm */ );
 				drawSvg();

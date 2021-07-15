@@ -697,7 +697,16 @@ circlePlotViewer.prototype.drawMonolinks = function( svgRootSnapSVGObject ) {
 			link.protein1 = proteinId;
 			link.position1 = parseInt( position );				// looks like monolink positions are strings?
 			link.uid1 = imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_indexManager().getUIDForIndex( i );
-			
+
+			var lsearches = imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_proteinMonolinkPositions()[ link.protein1 ][ link.position1 ];
+
+			// skip this link if the users has selected to only include links found in all searches
+			// and this wasn't found in all searches
+			if ( $( "input#only-show-links-in-all-searches" ).is( ':checked' ) ) {
+				if(lsearches.length !== imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_projectSearchIds().length) {
+					continue;
+				}
+			}
 			
 			this.drawMonolink( i, link, svgRootSnapSVGObject );
 		}
@@ -821,7 +830,17 @@ circlePlotViewer.prototype.drawLooplinks = function( svgRootSnapSVGObject ) {
 				link.position1 = fromPosition;
 				link.position2 = toPosition;
 				link.uid1 = imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_indexManager().getUIDForIndex( i );
-				
+
+				var lsearches = imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_proteinLooplinkPositions()[ link.protein1 ][ link.protein1 ][ link.position1 ][ link.position2 ];
+
+				// skip this link if the users has selected to only include links found in all searches
+				// and this wasn't found in all searches
+				if ( $( "input#only-show-links-in-all-searches" ).is( ':checked' ) ) {
+					if(lsearches.length !== imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_projectSearchIds().length) {
+						continue;
+					}
+				}
+
 				var looplink = this.drawCrosslink( i, fromPosition, i, toPosition, link, svgRootSnapSVGObject );
 				looplink.attr( { "stroke-dasharray":"4,2" });
 			}
@@ -868,7 +887,17 @@ circlePlotViewer.prototype.drawCrosslinks = function( svgRootSnapSVGObject ) {
 					link.position2 = toPosition;
 					link.uid1 = imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_indexManager().getUIDForIndex( i );
 					link.uid2 = imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_indexManager().getUIDForIndex( j );
-					
+
+					var lsearches = imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_proteinLinkPositions()[ link.protein1 ][ link.protein2 ][ link.position1 ][ link.position2 ];
+
+					// skip this link if the users has selected to only include links found in all searches
+					// and this wasn't found in all searches
+					if ( $( "input#only-show-links-in-all-searches" ).is( ':checked' ) ) {
+						if(lsearches.length !== imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_projectSearchIds().length) {
+							continue;
+						}
+					}
+
 					this.drawCrosslink( i, fromPosition, j, toPosition, link, svgRootSnapSVGObject );				
 				}
 				
@@ -928,7 +957,17 @@ circlePlotViewer.prototype.drawSelfCrosslinks = function( svgRootSnapSVGObject )
 				link.position2 = toPosition;
 				link.uid1 = imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_indexManager().getUIDForIndex( i );
 				link.uid2 = link.uid1;
-				
+
+				var lsearches = imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_proteinLinkPositions()[ link.protein1 ][ link.protein2 ][ link.position1 ][ link.position2 ];
+
+				// skip this link if the users has selected to only include links found in all searches
+				// and this wasn't found in all searches
+				if ( $( "input#only-show-links-in-all-searches" ).is( ':checked' ) ) {
+					if(lsearches.length !== imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_projectSearchIds().length) {
+						continue;
+					}
+				}
+
 				this.drawCrosslink( i, fromPosition, i, toPosition, link, svgRootSnapSVGObject );				
 			}
 			

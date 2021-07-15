@@ -247,6 +247,11 @@
 							><input type="checkbox" id="view-as-circle-plot" 
 								>View as Circle Plot</span></label>
 
+					<label><span style="white-space:nowrap;"
+								 class="tool_tip_attached_jq" data-tooltip="If checked, only links found in all searches will be shown"
+					><input type="checkbox" id="only-show-links-in-all-searches"
+					>Only Show Links in All Searches</span></label>
+
 					<%--  Select for "color by" with options of by search or by region  --%>
 					&nbsp;&nbsp;&nbsp;&nbsp;
 					<span style="white-space: nowrap;">
