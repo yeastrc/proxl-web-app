@@ -757,17 +757,24 @@ customRegionManager.prototype.loadProteinSequenceDataForProtein = function( para
 			//   So proteinIdsToGetSequence array is passed as "proteinIdsToGetSequence=<value>" which is what Jersey expects
 	        success: function(data)	{
 	        	try {
+                    const proteinSequences = imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_proteinSequences();
+                    if ( ! proteinSequences ) {
+                        const msg = "imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_proteinSequences(); returned nothing."
+                        console.warn(msg);
+                        throw Error(msg);
+                    }
 
 	        		var returnedProteinIdsAndSequences = data;  //  The property names are the protein ids and the property values are the sequences
 	        		// copy the returned sequences into the global object
 	        		var returnedProteinIdsAndSequences_Keys = Object.keys( returnedProteinIdsAndSequences );
 	        		for ( var keysIndex = 0; keysIndex < returnedProteinIdsAndSequences_Keys.length; keysIndex++ ) {
 	        			var proteinId = returnedProteinIdsAndSequences_Keys[ keysIndex ];
-	        			_proteinSequences[ proteinId ] = returnedProteinIdsAndSequences[ proteinId ];
+	        			proteinSequences[ proteinId ] = returnedProteinIdsAndSequences[ proteinId ];
 	        			imagePagePrimaryRootCodeObject_LocalCopy.getVariable__v_proteinLengths().setProteinLength( proteinId, returnedProteinIdsAndSequences[ proteinId ].length )
 	        		}
 
 	        		callback( params );
+
 	        	} catch( e ) {
 	        		reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
 	        		throw e;
