@@ -1,0 +1,67 @@
+name: Release Workflow
+
+on:
+  release:
+    types: [released]
+    tags:
+      - 'v*'
+
+env:
+  DOCKER_REPO_WEBAPP: "mriffle/proxl-webapp"
+  DOCKER_REPO_IMPORTER: "mriffle/proxl-importer"
+
+jobs:
+  dockerhub:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Run build in Docker container	    
+      uses: docker://mriffle/build-proxl:latest
+      with:
+        entrypoint: ant
+        args: -f ant__build_all_proxl.xml
+    - name: Copy binaries into place
+      run: |
+        cp deploy/importProxlXML.jar docker/importer/
+        cp deploy/runImportProxlXML.jar docker/importer/
+        cp deploy/proxl.war docker/webapp/
+    - name: Login to DockerHub
+      uses: docker/login-action@v1 
+      with:
+        username: ${{ secrets.DOCKER_USER }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+    - name: Docker meta for webapp
+      id: meta_webapp
+      uses: docker/metadata-action@v3
+      with:
+        images: |
+          ${{ env.DOCKER_REPO_WEBAPP }}
+        tags: |
+          type=semver,pattern={{version}}
+          type=semver,pattern={{major}}
+    - name: Build and push webapp
+      id: docker_build_webapp
+      uses: docker/build-push-action@v2
+      with:
+        context: docker/webapp
+        push: true
+        tags: ${{ steps.meta_webapp.outputs.tags }}
+    - name: Docker meta for importer
+      id: meta_importer
+      uses: docker/metadata-action@v3
+      with:
+        images: |
+          ${{ env.DOCKER_REPO_IMPORTER }}
+        tags: |
+          type=semver,pattern={{version}}
+          type=semver,pattern={{major}}
+    - name: Build and push importer
+      id: docker_build_importer
+      uses: docker/build-push-action@v2
+      with:
+        context: docker/importer
+        push: true
+        tags: ${{ steps.meta_importer.outputs.tags }}
