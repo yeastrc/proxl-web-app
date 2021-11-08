@@ -28,13 +28,13 @@
 
 	<echo>Using Config file ${config_file_with_path}</echo>
 	
-	<fail message="ERROR: '${config_file}' file not found, check the path. filename with path: ${config_file_with_path}">
-		<condition>
-		    <not>
-		    	<available file="${config_file_with_path}" />
-		    </not>
-		</condition>
-	</fail>
+<!--	<fail message="ERROR: '${config_file}' file not found, check the path. filename with path: ${config_file_with_path}">-->
+<!--		<condition>-->
+<!--		    <not>-->
+<!--		    	<available file="${config_file_with_path}" />-->
+<!--		    </not>-->
+<!--		</condition>-->
+<!--	</fail>-->
 	
 	<echo>config_file_with_path: ${config_file_with_path}</echo>
 	
@@ -43,7 +43,17 @@
 	
 	<echo>Properties after read config file:</echo>
 	<echo>npm.executable: ${npm.executable}</echo>
-	
+
+	<!-- Set Properties if not set in config -->
+	<condition property="npm.executable" value="npm">
+		<not>
+			<isset property="npm.executable"/>
+		</not>
+	</condition>
+
+	<echo>Properties after read config file and then set defaults:</echo>
+
+	<echo>npm.executable: ${npm.executable}</echo>
 
 	<!--  -->
 	<target name="clean" >
