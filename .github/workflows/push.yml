@@ -1,0 +1,18 @@
+name: Proxl Build CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  docker-build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Run build in Docker container	    
+      uses: docker://mriffle/build-proxl:latest
+      with:
+        entrypoint: ant
+        args: -f ant__build_all_proxl.xml
