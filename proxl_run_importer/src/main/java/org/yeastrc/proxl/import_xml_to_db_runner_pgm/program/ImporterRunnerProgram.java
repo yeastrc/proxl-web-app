@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
 import org.yeastrc.proxl.import_xml_to_db.dao.ConfigSystemDAO;
-import org.yeastrc.proxl.import_xml_to_db.db.DBConnectionParametersProviderFromPropertiesFile;
+import org.yeastrc.proxl.import_xml_to_db.db.DBConnectionParametersProviderFromPropertiesFileEnvironmentVariables;
 import org.yeastrc.proxl.import_xml_to_db.db.DBConnectionParametersProviderPropertiesFileErrorException;
 import org.yeastrc.proxl.import_xml_to_db.db.ImportDBConnectionFactory;
 import org.yeastrc.proxl.import_xml_to_db_runner_pgm.config.ProcessImporterRunnerConfigFile;
@@ -105,7 +105,7 @@ public class ImporterRunnerProgram {
 				}
 			}			
 			
-			DBConnectionParametersProviderFromPropertiesFile dbConnectionParametersProvider = null;
+			DBConnectionParametersProviderFromPropertiesFileEnvironmentVariables dbConnectionParametersProvider = null;
 			try {
 				if ( log.isDebugEnabled() ) {
 					log.debug( "processing config file from command line: " + configFileFromCommandLine.getAbsolutePath() );

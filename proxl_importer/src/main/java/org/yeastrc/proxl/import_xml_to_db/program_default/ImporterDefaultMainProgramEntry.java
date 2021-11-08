@@ -39,7 +39,7 @@ import org.yeastrc.proxl.import_xml_to_db.constants.ScanFilenameConstants;
 import org.yeastrc.proxl.import_xml_to_db.dao.ConfigSystemDAO;
 import org.yeastrc.proxl.import_xml_to_db.dao.ProxlXMLFileImportTrackingRun_For_ImporterRunner_DAO;
 import org.yeastrc.proxl.import_xml_to_db.database_update_with_transaction_services.UpdateTrackingTrackingRunRecordsDBTransaction;
-import org.yeastrc.proxl.import_xml_to_db.db.DBConnectionParametersProviderFromPropertiesFile;
+import org.yeastrc.proxl.import_xml_to_db.db.DBConnectionParametersProviderFromPropertiesFileEnvironmentVariables;
 import org.yeastrc.proxl.import_xml_to_db.db.DBConnectionParametersProviderPropertiesFileContentsErrorException;
 import org.yeastrc.proxl.import_xml_to_db.db.DBConnectionParametersProviderPropertiesFileErrorException;
 import org.yeastrc.proxl.import_xml_to_db.db.ImportDBConnectionFactory;
@@ -324,7 +324,7 @@ public class ImporterDefaultMainProgramEntry {
 			Runtime runtime = Runtime.getRuntime();
 			runtime.addShutdownHook( importProgramShutdownThread );
 			if ( createDatabaseConnectionFactory ) {
-				DBConnectionParametersProviderFromPropertiesFile dbConnectionParametersProvider = new DBConnectionParametersProviderFromPropertiesFile();
+				DBConnectionParametersProviderFromPropertiesFileEnvironmentVariables dbConnectionParametersProvider = new DBConnectionParametersProviderFromPropertiesFileEnvironmentVariables();
 				if ( dbConfigFile != null ) {
 					dbConnectionParametersProvider.setConfigFile( dbConfigFile );
 				}

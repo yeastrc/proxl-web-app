@@ -13,7 +13,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
-import org.yeastrc.proxl.import_xml_to_db.db.DBConnectionParametersProviderFromPropertiesFile;
+import org.yeastrc.proxl.import_xml_to_db.db.DBConnectionParametersProviderFromPropertiesFileEnvironmentVariables;
 import org.yeastrc.proxl.import_xml_to_db_runner_pgm.exceptions.ConfigPropertiesFileErrorException;
 
 
@@ -25,6 +25,11 @@ import org.yeastrc.proxl.import_xml_to_db_runner_pgm.exceptions.ConfigProperties
 public class ProcessImporterRunnerConfigFile {
 
 	private static final Logger log = LoggerFactory.getLogger(  ProcessImporterRunnerConfigFile.class );
+	
+
+	private static final String ENVIRONMENT_VARIABLE_NAME__JAVA_EXECUTABLE_PARAMETERS = "PROXL_JAVA_EXECUTE_PARAMS";
+
+	private static final String ENVIRONMENT_VARIABLE__PROXL_WEB_APP_BASE_URL = "PROXL_WEB_APP_BASE_URL";
 	
 
 	private static final String NO_PROPERTIES_FILE_ERROR_MESSAGE = "No DB Connection Properties file found.";
@@ -43,7 +48,7 @@ public class ProcessImporterRunnerConfigFile {
 	public static final String PROPERTY_NAME__IMPORTER_PID_FILE_WITH_PATH = "importer.pid.file.with.path";
 	
 	private static final String PROPERTY_NAME__PROXL_WEB_APP_BASE_URL = "proxl.web.app.base.url";
-	
+
 	private static final String PROPERTY_NAME__COMMAND_RUN_ON_SUCCESSFUL_IMPORT = "command.run.successful.import";
 	private static final String PROPERTY_NAME__COMMAND_RUN_ON_SUCCESSFUL_IMPORT_SYSOUT_SYSERR_DIR = "command.run.successful.import.sysout.syserr.dir";
 	
@@ -69,9 +74,18 @@ public class ProcessImporterRunnerConfigFile {
 	 * @return
 	 * @throws Exception 
 	 */
-	public DBConnectionParametersProviderFromPropertiesFile processConfigFile( File configFileFromCommandLine ) throws Exception {
+	public DBConnectionParametersProviderFromPropertiesFileEnvironmentVariables processConfigFile( File configFileFromCommandLine ) throws Exception {
 		
 		try {
+			//  First get from Environment Variables
+
+			//  Do Not set PROPERTY_NAME__PROXL_WEB_APP_BASE_URL to Not send email on import completion 
+			String proxlWebAppBaseURL = System.getenv( ENVIRONMENT_VARIABLE__PROXL_WEB_APP_BASE_URL );
+
+			String javaExecutableParametersString = System.getenv( ENVIRONMENT_VARIABLE_NAME__JAVA_EXECUTABLE_PARAMETERS );
+			
+			//  Then where still null get from config file
+			
 			Properties configProps = null;
 			InputStream propertiesFileAsStream = null;
 			
@@ -136,7 +150,12 @@ public class ProcessImporterRunnerConfigFile {
 			String waitTimeForNextCheckForImportToProcess_InSecondsString = configProps.getProperty( PROPERTY_NAME__WAIT_TIME_FOR_NEXT_CHECK_FOR_IMPORT_TO_PROCESS );
 			
 			String javaExecutableWithPath = configProps.getProperty( PROPERTY_NAME__JAVA_EXECUTABLE_WITH_PATH );
-			String javaExecutableParametersString = configProps.getProperty( PROPERTY_NAME__JAVA_EXECUTABLE_PARAMETERS );
+
+			if ( proxlWebAppBaseURL == null ) {
+				//  Not set in enviroment variable so get from config file
+				javaExecutableParametersString = configProps.getProperty( PROPERTY_NAME__JAVA_EXECUTABLE_PARAMETERS );
+			}
+			
 			
 			String importerJarWithPath = configProps.getProperty( PROPERTY_NAME__IMPORTER_JAR_WITH_PATH );
 			String importerDbConfigWithPath = configProps.getProperty( PROPERTY_NAME__IMPORTER_DB_CONFIG_WITH_PATH );
@@ -144,7 +163,11 @@ public class ProcessImporterRunnerConfigFile {
 			String importerPidFileWithPath = configProps.getProperty( PROPERTY_NAME__IMPORTER_PID_FILE_WITH_PATH );
 			
 			//  Do Not set PROPERTY_NAME__PROXL_WEB_APP_BASE_URL to Not send email on import completion 
-			String proxlWebAppBaseURL = configProps.getProperty( PROPERTY_NAME__PROXL_WEB_APP_BASE_URL );
+			
+			if ( proxlWebAppBaseURL == null ) {
+				//  Not set in enviroment variable so get from config file
+				proxlWebAppBaseURL = configProps.getProperty( PROPERTY_NAME__PROXL_WEB_APP_BASE_URL );
+			}
 			
 			String commandToRunOnSuccessfulImport = configProps.getProperty( PROPERTY_NAME__COMMAND_RUN_ON_SUCCESSFUL_IMPORT );
 			String commandToRunOnSuccessfulImportSyoutSyserrDir = configProps.getProperty( PROPERTY_NAME__COMMAND_RUN_ON_SUCCESSFUL_IMPORT_SYSOUT_SYSERR_DIR );
@@ -178,13 +201,13 @@ public class ProcessImporterRunnerConfigFile {
 
 				//  Do Not set PROPERTY_NAME__PROXL_WEB_APP_BASE_URL to Not send email on import completion 
 
-				String msg = "INFO::  For config file: parameter '" + PROPERTY_NAME__PROXL_WEB_APP_BASE_URL 
+				String msg = "INFO::  Enviroment Variable '" + ENVIRONMENT_VARIABLE__PROXL_WEB_APP_BASE_URL + "' OR config file: parameter '" + PROPERTY_NAME__PROXL_WEB_APP_BASE_URL 
 						+ "' is not provided or is empty string.  Not calling server to send email on import completion.";
 				log.warn( msg );
 			} else {
 
-				String msg = "INFO::  Config file: parameter '" + PROPERTY_NAME__PROXL_WEB_APP_BASE_URL 
-						+ "' is provided so calling server to send email on import completion.";
+				String msg = "INFO:: Enviroment Variable '" + ENVIRONMENT_VARIABLE__PROXL_WEB_APP_BASE_URL + "' OR  Config file: parameter '" + PROPERTY_NAME__PROXL_WEB_APP_BASE_URL 
+						+ "' is provided so calling server to send email on import completion.  URL Used: " + proxlWebAppBaseURL;
 				log.warn( msg );
 			}
 
@@ -207,12 +230,18 @@ public class ProcessImporterRunnerConfigFile {
 				String[] javaExecutableParametersArray = javaExecutableParametersString.split( " " );
 				List<String> javaExecutableParametersLocal = new ArrayList<>( javaExecutableParametersArray.length );
 				for ( String javaExecutableParameter : javaExecutableParametersArray ) {
-					if ( StringUtils.isNotEmpty(javaExecutableParameter) ) {
-						javaExecutableParametersLocal.add( javaExecutableParameter );
+					String javaExecutableParameter_Trimmed = javaExecutableParameter.trim();
+					if ( StringUtils.isNotEmpty(javaExecutableParameter_Trimmed) ) {
+						javaExecutableParametersLocal.add( javaExecutableParameter_Trimmed );
 					}
 				}
 				if ( ! javaExecutableParametersLocal.isEmpty() ) {
 					ImporterRunnerConfigData.setJavaExecutableParameters( javaExecutableParametersLocal );
+
+					String msg = "INFO::  Enviroment Variable: '" + ENVIRONMENT_VARIABLE_NAME__JAVA_EXECUTABLE_PARAMETERS 
+							+ "' OR Config file: parameter '" + PROPERTY_NAME__JAVA_EXECUTABLE_PARAMETERS 
+							+ "' so these parameters will be passed to java executable.  values:  " + StringUtils.join( javaExecutableParametersLocal, " " );
+					log.warn( msg );
 				}
 			}
 			
@@ -258,8 +287,8 @@ public class ProcessImporterRunnerConfigFile {
 			ImporterRunnerConfigData.setConfigured(true);
 			
 
-			DBConnectionParametersProviderFromPropertiesFile dbConnectionParametersProviderFromPropertiesFile =
-					new DBConnectionParametersProviderFromPropertiesFile();
+			DBConnectionParametersProviderFromPropertiesFileEnvironmentVariables dbConnectionParametersProviderFromPropertiesFile =
+					new DBConnectionParametersProviderFromPropertiesFileEnvironmentVariables();
 
 			dbConnectionParametersProviderFromPropertiesFile.getConfigPropertiesFromPropertiesObj( configProps );
 

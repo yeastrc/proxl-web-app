@@ -148,7 +148,7 @@ public class ImportDBConnectionFactory implements IDBConnectionFactory {
 		
 		if ( dbConnectionParametersProvider == null ) {
 			
-			dbConnectionParametersProvider = new DBConnectionParametersProviderFromPropertiesFile();
+			dbConnectionParametersProvider = new DBConnectionParametersProviderFromPropertiesFileEnvironmentVariables();
 			
 			dbConnectionParametersProvider.init();
 			
