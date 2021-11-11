@@ -90,14 +90,44 @@
 			data-config-key="<%= ConfigSystemsKeysConstants.EMAIL_FROM_ADDRESS_URL_KEY %>">
 	  </div>
 	</div>
-					
-
-	<div style="margin-bottom: 10px;" >
-	  <div style="margin-bottom: 3px;">
-		SMTP Server URL for emails sent: 
-		<input type="text" class=" config_text_inputs_jq " id="input_email_smtp_server_url" style="width: 450px;"
-			data-config-key="<%= ConfigSystemsKeysConstants.EMAIL_SMTP_SERVER_URL_KEY %>"> 
-	  </div> 
+			
+	<div style="margin-bottom: 10px;">
+		<div style="margin-bottom: 3px;">
+			<div style="margin-bottom: 3px;">
+				SMTP Server Configuration for emails sent:
+			</div>
+			<div style="margin-left: 20px;">
+				<div style="margin-bottom: 3px;">
+					Host: <input type="text"
+						class=" config_text_inputs_jq " id="input_email_smtp_server_url"
+						style="width: 450px;"
+						data-config-key="<%=ConfigSystemsKeysConstants.EMAIL_SMTP_SERVER_HOST_URL_KEY%>">
+				</div>
+				<div style="margin-bottom: 3px;">
+					Port (uses default if not set): <input type="text"
+						class=" config_text_inputs_jq " id="input_email_smtp_server_url"
+						style="width: 450px;"
+						data-config-key="<%=ConfigSystemsKeysConstants.EMAIL_SMTP_SERVER_PORT_KEY%>">
+				</div>
+				<div style="margin-bottom: 3px; margin-top: 5px;">
+					SMTP Server Authentication (not always required). Not used if either not configured):
+				</div>
+				<div style="margin-left: 20px;">
+					<div style="margin-bottom: 3px;">
+						Authentication Username: <input
+							type="text" class=" config_text_inputs_jq "
+							id="input_email_smtp_server_url" style="width: 450px;"
+							data-config-key="<%=ConfigSystemsKeysConstants.EMAIL_SMTP_SERVER_AUTH_USERNAME_KEY%>">
+					</div>
+					<div style="margin-bottom: 3px;">
+						Authentication Password: <input
+							type="text" class=" config_text_inputs_jq "
+							id="input_email_smtp_server_url" style="width: 450px;"
+							data-config-key="<%= ConfigSystemsKeysConstants.EMAIL_SMTP_SERVER_AUTH_PASSWORD_KEY %>">
+					</div>
+				</div>
+			</div>
+		</div>
 	</div>
 	
 	<div style="margin-bottom: 10px;" >
