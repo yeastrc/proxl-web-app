@@ -41,7 +41,7 @@
                   password="${PROXL_MYSQL_PASSWORD}"
                   driverClassName="com.mysql.jdbc.Driver"
 
-                  url="jdbc:mysql://db:3306/${PROXL_DATABASE_NAME}?autoReconnect=true&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;characterSetResults=UTF-8"
+                  url="jdbc:mysql://db:3306/${PROXL_DATABASE_NAME}?autoReconnect=true&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;characterSetResults=UTF-8&amp;useSSL=false&amp;allowPublicKeyRetrieval=true"
     />
 
 </Context>
