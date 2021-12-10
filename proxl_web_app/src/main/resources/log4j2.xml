@@ -7,7 +7,7 @@
   
   <!--  
     <Console name="STDOUT" target="SYSTEM_OUT">
-      <PatternLayout pattern="%d %-5p [%t] %C{2} (%F:%L)  %c - %m%n"/>
+      <PatternLayout pattern="%d %-5p [%t] %C{2} (%F:%L)  %c - %m{nolookups}%n"/>
     </Console>
    -->
    
@@ -24,7 +24,7 @@
       					Log4j2 will compress the file when it rolls over the file since '.gz' is at end of  -->
       <FilePattern>${sys:catalina.base}/logs/proxl-%d{yyyy-MM-dd}.log.gz</FilePattern>
       <PatternLayout>
-        <Pattern>%d{yyyy-MMM-dd HH:mm:ss a} [%t] %-5level %logger{36} - %msg%n</Pattern>
+        <Pattern>%d{yyyy-MMM-dd HH:mm:ss a} [%t] %-5level %logger{36} - %m{nolookups}%n</Pattern>
       </PatternLayout>
       <Policies>
       		<!-- Roll over the log file based on time  -->
