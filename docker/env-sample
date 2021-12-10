@@ -7,6 +7,12 @@ MYSQL_PASSWORD=change_this_password
 # Can change the mysql user proxl uses, but not necessary
 MYSQL_USER=proxl_db_user
 
+# name of the proxl database
+PROXL_DATABASE_NAME=proxl
+
+# Used by importer
+PROXL_WEB_APP_BASE_URL=http://proxl:8080/proxl/
+
 # This manages the memory usage of components of proxl
 IMPORTER_JAVA_OPTIONS=-Xmx3g -Xms500m
 WEBAPP_JAVA_OPTIONS=-Xms2024m -Xmx2024m

@@ -13,7 +13,7 @@ services:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-      MYSQL_DATABASE: proxl
+      MYSQL_DATABASE: ${PROXL_DATABASE_NAME}
   spectr:
     image: mriffle/spectr:1
     container_name: proxl-spectr
@@ -35,8 +35,9 @@ services:
       proxl_DB_PASSWORD: ${MYSQL_PASSWORD}
       proxl_DB_HOST_ADDRESS: db
       proxl_DB_HOST_PORT: 3306
-      proxl_DB_NAME: proxl
+      PROXL_DB_NAME: ${PROXL_DATABASE_NAME}
       proxl_JAVA_EXECUTE_PARAMS: ${IMPORTER_JAVA_OPTIONS}
+      PROXL_WEB_APP_BASE_URL: ${PROXL_WEB_APP_BASE_URL}
   proxl:
     image: mriffle/proxl-webapp:2
     container_name: proxl-webapp
@@ -48,6 +49,7 @@ services:
     environment:
       proxl_MYSQL_USER: ${MYSQL_USER}
       proxl_MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      PROXL_DATABASE_NAME: ${PROXL_DATABASE_NAME}
     ports:
       - 8080:8080
   smtp:

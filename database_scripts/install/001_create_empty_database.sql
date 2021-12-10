@@ -1682,7 +1682,7 @@ CREATE TABLE  proxl_xml_file_import_tracking_status_history (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   proxl_xml_file_import_tracking_id INT UNSIGNED NOT NULL,
   status_id TINYINT UNSIGNED NOT NULL,
-  status_timestamp TIMESTAMP NOT NULL,
+  status_timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (id),
   CONSTRAINT prxl_xml_fl_imprt_trkng_stats_hist_id
     FOREIGN KEY (proxl_xml_file_import_tracking_id)
