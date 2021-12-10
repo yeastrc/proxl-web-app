@@ -25,12 +25,13 @@ SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL,ALLOW_INVALID_DATES';
 -- -----------------------------------------------------
 -- Schema proxl
 -- -----------------------------------------------------
-DROP SCHEMA IF EXISTS proxl ;
 
--- -----------------------------------------------------
--- Schema proxl
--- -----------------------------------------------------
-CREATE SCHEMA  proxl DEFAULT CHARACTER SET utf8 COLLATE utf8_bin ;
+--   !!!  IMPORTANT:  Replace "CREATE SCHEMA ..."  with these 2 lines.  Required for Docker implementation where proxl db already created.
+
+CREATE SCHEMA IF NOT EXISTS proxl;
+ALTER DATABASE proxl CHARACTER SET utf8 COLLATE utf8_bin;
+
+
 USE proxl ;
 
 -- -----------------------------------------------------

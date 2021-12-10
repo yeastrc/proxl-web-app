@@ -1,5 +1,5 @@
 
---  ONLY USE after file create_empty_database.sql
+--  ONLY USE after file 001_create_empty_database.sql
 
 USE proxl ;
 

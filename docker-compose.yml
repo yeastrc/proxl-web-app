@@ -1,0 +1,67 @@
+version: "3.9"
+
+volumes:
+  mysqldb:
+  spectr_upload:
+  spectr_storage:
+  proxl_upload:
+
+services:
+  db:
+    image: mysql:8.0
+    container_name: proxl-mysql
+    restart: always
+    command: ${MYSQL_OPTIONS}
+    volumes:
+      - mysqldb:/var/lib/mysql
+      - ./database_scripts/install:/docker-entrypoint-initdb.d
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_DATABASE: proxl
+  spectr:
+    image: mriffle/spectr:1
+    container_name: proxl-spectr
+    restart: always
+    volumes:
+      - spectr_upload:/data/upload
+      - spectr_storage:/data/storage
+      - proxl_upload:/data/proxl_upload
+  importer:
+    image: mriffle/proxl-importer:2
+    container_name: proxl-importer
+    restart: always
+    depends_on:
+      - db
+    volumes:
+      - proxl_upload:/data/proxl_upload
+    environment:
+      proxl_DB_USER: ${MYSQL_USER}
+      proxl_DB_PASSWORD: ${MYSQL_PASSWORD}
+      proxl_DB_HOST_ADDRESS: db
+      proxl_DB_HOST_PORT: 3306
+      proxl_DB_NAME: proxl
+      proxl_JAVA_EXECUTE_PARAMS: ${IMPORTER_JAVA_OPTIONS}
+  proxl:
+    image: mriffle/proxl-webapp:2
+    container_name: proxl-webapp
+    restart: always
+    depends_on:
+      - db
+    volumes:
+      - proxl_upload:/data/proxl_upload
+    environment:
+      proxl_MYSQL_USER: ${MYSQL_USER}
+      proxl_MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    ports:
+      - 8080:8080
+  smtp:
+    image: bytemark/smtp
+    container_name: proxl-smtp
+    restart: always
+    environment:
+      RELAY_HOST: ${SMTP_HOST}
+      RELAY_PORT: ${SMTP_PORT}
+      RELAY_USERNAME: ${SMTP_USERNAME}
+      RELAY_PASSWORD: ${SMTP_PASSWORD}

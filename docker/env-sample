@@ -1,0 +1,21 @@
+# .env file for supplying settings to initializing proxl using docker-compose
+
+# Change these passwords.
+MYSQL_ROOT_PASSWORD=change_this_password
+MYSQL_PASSWORD=change_this_password
+
+# Can change the mysql user proxl uses, but not necessary
+MYSQL_USER=proxl_db_user
+
+# This manages the memory usage of components of proxl
+IMPORTER_JAVA_OPTIONS=-Xmx3g -Xms500m
+WEBAPP_JAVA_OPTIONS=-Xms2024m -Xmx2024m
+
+# This manages optimization settings for MySQL
+MYSQL_OPTIONS=--max-connections=500 --skip-ssl
+
+# Settings for setting up sending of emails by proxl
+SMTP_HOST=smtp.example.com
+SMTP_PORT=587
+SMTP_USERNAME=smtp_username
+SMTP_PASSWORD=smtp_password

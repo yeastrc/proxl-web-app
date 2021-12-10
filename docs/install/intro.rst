@@ -41,10 +41,10 @@ All database creation and population scripts are in the ``database_scripts/insta
 
 Execute the following sql scripts in this order.
 
-    * ``create_empty_database.sql``
-    * ``create_empty_database_add_tables.sql``
-    * ``insert_initial_data.sql``
-    * ``insert_initial_user.sql``
+    * ``001_create_empty_database.sql``
+    * ``002_create_empty_database_add_tables.sql``
+    * ``004_insert_initial_data.sql``
+    * ``005_insert_initial_user.sql``
     
 
 To run these SQL scripts, do one of the following:
