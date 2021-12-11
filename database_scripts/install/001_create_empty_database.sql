@@ -1,4 +1,9 @@
 
+-- This is generated from Proxl_Database_MySQL_Workbench_Model.mwb
+
+-- Proxl_Database_MySQL_Workbench_Model.mwb is considered the master.  Check update dates and refer to the mwb file for differences
+
+
 --  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 --  WARNING:  When regenerate this content:
@@ -11,27 +16,42 @@
 	-- remove 'USE proxl;' before TRIGGER
 	-- remove 'USE proxl$$' around 'TRIGGER'
 	-- remove 'proxl.' in 'TRIGGER'
-
+	
+	-- replace ' VISIBLE;' with ';'  --  Added by MySQL Workbench Version 8
 
 --  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 
+--   !!!  IMPORTANT !!!!   
+
+--          Restore the following after do the 'Removes' above since they are INCORRECTLY Altered to remove 'IF NOT EXIS...'
+
+--   !!!  IMPORTANT:  Replace "CREATE SCHEMA ..."  with these 3 lines.  Required for Docker implementation where proxl db already created.
+
+-- CREATE SCHEMA IF NOT EXISTS proxl;
+-- ALTER DATABASE proxl CHARACTER SET utf8 COLLATE utf8_bin;
+-- USE proxl ;
+
+
+--  SQL from MySQL Workbench Forward Engineering
 -- MySQL Workbench Forward Engineering
 
 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
-SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL,ALLOW_INVALID_DATES';
+SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
 
 -- -----------------------------------------------------
 -- Schema proxl
 -- -----------------------------------------------------
+DROP SCHEMA IF EXISTS proxl ;
 
---   !!!  IMPORTANT:  Replace "CREATE SCHEMA ..."  with these 2 lines.  Required for Docker implementation where proxl db already created.
+
+--   !!!!  IMPORTANT:  When Regenerate: Restore these lines to replace "CREATE SCHEMA ..."
+
+--   !!!  IMPORTANT:  Replace "CREATE SCHEMA ..."  with these 3 lines.  Required for Docker implementation where proxl db already created.
 
 CREATE SCHEMA IF NOT EXISTS proxl;
 ALTER DATABASE proxl CHARACTER SET utf8 COLLATE utf8_bin;
-
-
 USE proxl ;
 
 -- -----------------------------------------------------
@@ -778,7 +798,7 @@ CREATE TABLE  unified_rep_pep_dynamic_mod_lookup (
   position INT(10) UNSIGNED NOT NULL,
   mass DOUBLE NOT NULL,
   mass_rounded DOUBLE NOT NULL,
-  mass_rounded_string VARCHAR(200) COLLATE 'latin1_general_ci' NOT NULL,
+  mass_rounded_string VARCHAR(200) NOT NULL,
   mass_rounding_places SMALLINT NOT NULL,
   mod_order SMALLINT NOT NULL,
   is_n_terminal TINYINT(1) UNSIGNED NOT NULL DEFAULT 0,
