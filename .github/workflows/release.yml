@@ -65,3 +65,32 @@ jobs:
         context: docker/importer
         push: true
         tags: ${{ steps.meta_importer.outputs.tags }}
+
+  github_deploy:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Create docker-compose archive
+        run: |
+          tar -cvzf ./docker-compose-files.tgz docker-compose.yml docker-compose-custom-data.yml database_scripts/install/* docker/env-sample docker/env-custom-sample
+          zip ./docker-compose-files.zip docker-compose.yml docker-compose-custom-data.yml database_scripts/install/* docker/env-sample docker/env-custom-sample
+      - name: Upload docker-compose tar to github release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: ./docker-compose-files.tgz
+          asset_name: docker-compose-files.tgz
+          tag: ${{ github.ref }}
+          overwrite: true
+          body: ""
+      - name: Upload docker-compose zip to github release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: ./docker-compose-files.zip
+          asset_name: docker-compose-files.zip
+          tag: ${{ github.ref }}
+          overwrite: true
