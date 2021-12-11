@@ -61,13 +61,16 @@ Now, download the Proxl Docker Compose files:
     If you prefer to download a ZIP file or if you prefer to download the file another way, the latest
     release can be found on GitHub at https://github.com/yeastrc/proxl-web-app/releases/latest
 
-4. (Optional) Configure Proxl
+4. Configure Proxl
 =============================
 Copy the sample configuration file into place:
 
     .. code-block:: bash
 
        cp docker/env-sample ./.env
+
+What follows below in this step is optional. Your installation of proxl will be more secure if you change the default passwords.
+The instructions below describe how to do this.
 
 The ``.env`` file holds all of the necessary configuration for Proxl. It is recommended (but not required)
 that you change the first two lines of the file, which contain passwords to be used for the MySQL database.
@@ -170,9 +173,10 @@ Login with Default User
 ------------------------
 By default, you can log in using ``admin`` as the username and ``changeme`` as the password.
 
-Change Default User Information
----------------------------------
-To change the default log in information click on the Account Settings icon in the top right of the page:
+(Optional) Change Default User Information
+------------------------------------------
+For security reasons, you should change the default log in information of the admin user.
+To change the default information click on the Account Settings icon in the top right of the page:
 
 Change the name, username, and password in the form to your liking.
 
