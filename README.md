@@ -6,7 +6,9 @@ databases.
 ## More Information
 * You can learn more about proxl's features at http://proxl-ms.org/.
 * Comprehensive documentation for proxl can be found at http://www.yeastrc.org/proxl_docs/.
-* The proxl publication can be found at [PubMed](https://www.ncbi.nlm.nih.gov/pubmed/?term=27302480).
+* The proxl publications can be found at PubMed
+  [here](https://pubmed.ncbi.nlm.nih.gov/27302480/) and
+  [here](https://pubmed.ncbi.nlm.nih.gov/30525651/).
 
 ## Using Proxl
 A server has been set up at https://www.yeastrc.org/proxl_public/ for general use. Anyone can make
