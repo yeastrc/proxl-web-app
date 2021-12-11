@@ -56,3 +56,5 @@ _build
 /proxl_web_app/jar_this_project_webapp_and_shared_src_code
 docs/.project
 /proxl_web_app/src_local
+
+/docs/_build/

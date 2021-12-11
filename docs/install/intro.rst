@@ -1,169 +1,193 @@
+===================================
+Installing Proxl
+===================================
+
+Follow these steps to set up your own installation of Proxl on your own computer. These instructions
+include running Proxl with default settings and require only minimal configuration by the user. If you already
+have access to Proxl (e.g. at https://www.yeastrc.org/proxl_public/), you do not need to do this to use Proxl.
+
+This tutorial assumes you have Docker installed on your system. Please see our
+`Docker Installation Tutorial <https://limelight-ms.readthedocs.io/en/latest/tutorials/install-docker.html>`_
+to get Docker installed.
+
+.. important::
+    System Requirements: Proxl will consume a large amount of RAM, particularly when uploading data.
+    You should have at least 6 gigabytes of RAM available on your system.
+
+1. Open a Terminal
+===========================
+On Linux and MacOS, open a normal terminal. On Windows, if you followed our instructions for installing Docker,
+follow the directions on our `Docker Installation Tutorial <https://limelight-ms.readthedocs.io/en/latest/tutorials/install-docker.html>`_ to open a Linux terminal.
+
+2. Install Docker Compose
+=============================
+Docker Compose is an official add-on to Docker that greatly simplifies running applications that have multiple parts. Proxl
+has several parts, including a database, multiple web applications, and running programs. Docker Compose allows you to
+run a single command to launch and correctly stitch all of those components together into a working system. This all
+happens inside of Docker and does not install the software elsewhere on your computer.
+
+If you are on MacOS, you will likely already have Docker Compose installed. If you are on Linux (including
+Windows users who installed Docker according to our instructions), test if Docker Compose is installed
+by typing ``docker-compose``.  If the command is not found, please install Docker Compose by typing the following:
+
+    .. code-block:: bash
+
+       sudo curl -L "https://github.com/docker/compose/releases/download/1.29.1/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+       sudo chmod +x /usr/local/bin/docker-compose
+
+If you run into any trouble installing Docker Compose, `please see Docker's official Docker Compose installation instructions <https://docs.docker.com/compose/install/>`_.
+
+
+3. Download Proxl Install Files
 ===========================================
-Proxl Installation Guide
+First set up a Proxl project directory:
+
+    .. code-block:: bash
+
+       mkdir ~/proxl
+       cd ~/proxl
+
+Now, download the Proxl Docker Compose files:
+
+    .. code-block:: bash
+
+       # Download Proxl Docker Compose files
+       curl -L "https://github.com/yeastrc/proxl-web-app/releases/latest/download/docker-compose-files.tgz" -o docker-compose-files.tgz
+
+       # Expand the archive
+       tar -xvzf docker-compose-files.tgz
+
+.. note::
+    If you prefer to download a ZIP file or if you prefer to download the file another way, the latest
+    release can be found on GitHub at https://github.com/yeastrc/proxl-web-app/releases/latest
+
+4. Configure Proxl
+===========================
+Copy the sample configuration file into place:
+
+    .. code-block:: bash
+
+       cp docker/env-sample ./.env
+
+The ``.env`` file holds all of the necessary configuration for Proxl. It is recommended (but not required)
+that you change the first two lines of the file, which contain passwords to be used for the MySQL database.
+
+The ``.env`` file should look something like this:
+
+    .. code-block:: none
+
+        # .env file for supplying settings to initializing proxl using docker-compose
+
+        # Change these passwords.
+        MYSQL_ROOT_PASSWORD=change_this_password
+        MYSQL_PASSWORD=change_this_password
+
+        # Can change the mysql user proxl uses, but not necessary
+        MYSQL_USER=proxl_db_user
+
+        # name of the proxl database
+        PROXL_DATABASE_NAME=proxl
+
+        # Used by importer
+        PROXL_WEB_APP_BASE_URL=http://proxl:8080/proxl/
+
+        # This manages the memory usage of components of proxl
+        IMPORTER_JAVA_OPTIONS=-Xmx3g -Xms500m
+        WEBAPP_JAVA_OPTIONS=-Xms2024m -Xmx2024m
+
+        # This manages optimization settings for MySQL
+        MYSQL_OPTIONS=--max-connections=500 --skip-ssl
+
+        # Settings for setting up sending of emails by proxl
+        SMTP_HOST=smtp.example.com
+        SMTP_PORT=587
+        SMTP_USERNAME=smtp_username
+        SMTP_PASSWORD=smtp_password
+
+
+These can be changed using your favorite text editor. On Linux (including Docker on Windows), we'll assume
+that is ``nano``. To edit the file, type:
+
+    .. code-block:: bash
+
+       nano .env
+
+Change the passwords and type ``Control-o``, ``<ENTER>``, and ``Control-x`` to save and exit.
+
+
+5. Starting and Stopping Proxl
+===================================
+At this point, starting and stopping Proxl should be straight forward.
+
+To start Proxl:
+
+    .. code-block:: bash
+
+       sudo docker-compose up --detach
+
+To stop Proxl:
+
+    .. code-block:: bash
+
+       sudo docker-compose down
+
+.. note::
+   If you are using **Windows**, ensure Docker is running by typing:
+
+   .. code-block:: bash
+
+      sudo service docker start
+
+   You should now be able to start Proxl.
+
+.. note::
+   The first time you start Proxl, all of the components will download and the database will
+   initialize. This may take a few minutes, depending on your download speed. Subsequent startups
+   of Proxl will not require these steps and will be faster.
+
+.. note::
+   These commands must be typed while you are in the project code directory. If you followed these
+   instructions, you can ensure you are in this directory by typing:
+
+   .. code-block:: bash
+
+       cd ~/proxl
+
+
+6. Connect to Your Proxl Installation
 ===========================================
+Point your web browser to |proxl_link| to access Proxl running on your own computer!
 
-This is a guide for downloading and installing your own copy of proxl, running on
-you own server. proxl is relatively simple to install and set up, but does require
-some working proficiency with the command line and some knowledge of databases
-(preferably MySQL).
+.. |proxl_link| raw:: html
 
-Proxl comprises a database component and a web application component. Downloading,
-installing, and configuring these components are described below.
+   <a href="http://localhost:8080/proxl/" target="_blank" class="reference external">http://localhost:8080/proxl/</a>
 
-1. Install MySQL, Java, and Apache Tomcat (if necessary)
-==========================================================
+.. note::
+   If this is the first time bringing up Proxl, it may take a minute for the database to initialize. If you see message
+   saying there was a problem with your request, try again in about a minute.
 
-This documentation assumes that `Java <http://www.oracle.com/technetwork/java/javase/downloads/index.html>`_ (JDK version, 1.8 or later) and the
-`Apache Tomcat <http://tomcat.apache.org/>`_ (8 or later) servlet container are installed on the same
-computer on which you are installing proxl.
+Login with Default User
+------------------------
+By default, you can log in using ``admin`` as the username and ``changeme`` as the password.
 
-This documentation also assumes that `MySQL <http://www.mysql.com/>`_ (5.6 or later) has been
-installed and is accessible by the installation of Apache Tomcat. This does not need to be on the
-same machine as Apache Tomcat.
+Change Default User Information
+---------------------------------
+To change the default log in information click on the Account Settings icon in the top right of the page:
 
-Proxl should work equally well on any operating system for which
-MySQL and Java are available (MS Windows, Apple OS X, or Linux). Other servlet containers and database
-server software may work as well, though these have not been tested.
+Change the name, username, and password in the form to your liking.
 
-After Apache Tomcat is installed, you will need to download and install the MySQL JDBC driver. This is available free of charge from the 
-`MySQL Connector/J <http://dev.mysql.com/downloads/connector/j/>`_ website. To install, copy
-the downloaded jar file into lib directory of Apache Tomcat  (e.g. /usr/local/apache-tomcat-7.0.65/lib)
-and restart Tomcat.
+Start Using Proxl
+----------------------
+That's it, you are ready to use Proxl!
 
-2. Download the latest release of proxl
-==========================================================
-Download the latest release at `<https://github.com/yeastrc/proxl-web-app/releases>`_. Unzip
-the contents of the zip file to the directory of your choice.
+..
+    7. Optional - Set up SMTP For Emails
+    ===========================================
+    Some functions of Proxl require sending email to users. Examples of this include
+    inviting new users to projects, resetting forgotten passwords, and notifications that
+    data uploads have been completed. Although it's not required that you set up SMTP,
+    the above features will not be enabled unless you do. If you would like to enable these
+    features, please see our :doc:`install-limelight-smtp`.
 
-3. Set up the proxl database
-==========================================================
-All database creation and population scripts are in the ``database_scripts/install`` directory of the zip file.
-
-Execute the following sql scripts in this order.
-
-    * ``create_empty_database.sql``
-    * ``create_empty_database_add_tables.sql``
-    * ``insert_initial_data.sql``
-    * ``insert_initial_user.sql``
-    
-
-To run these SQL scripts, do one of the following:
-    * Log into your MySQL server and paste in the file contents.
-    * Source the file by logging into MySQL and typing the following at the MySQL prompt: ``source /location/to/script_name.sql``. (Be sure MYSQL has read access to the file).
-    * At the command line (on macos or linux): ``cat /location/to/script_name.sql | mysql -u your_username -p``
-
-(Optional) Populate the ``taxonomy`` table.
--------------------------------------------------------
-In order to provide functionality based on taxonomy (such as filtering searches based on taxonomy of hit proteins), the
-``taxonomy`` table must be populated. To populate this table, execute the ``create_taxonomy_table.sql`` SQL script.
-
-4. Install and configure the web application
-==========================================================
-
-Add MySQL user for Tomcat access
-------------------------------------------
-Follow these instructions to set up access for Tomcat to access the MySQL databases.
-
-|	Log in to MySQL as root:
-|	``shell> mysql -u root -p``
-|	
-|	Create the MySQL user:
-|	``mysql> CREATE USER 'proxl_user'@'localhost' IDENTIFIED BY 'password';``	
-|
-|	Replace ``proxl_user`` with the username you would prefer, ``localhost`` with the
-|	relative hostname of the machine connecting to the MySQL database (usually localhost),
-|	and ``password`` with your preferred password.
-|
-|	Grant the necessary privileges in MySQL:
-|	``GRANT ALL ON proxl.* TO 'proxl_user'@'localhost'``	
-|
-|	Replace ``proxl_user`` and ``localhost`` with the username and hostname you used
-|	when creating the user.
-|
-
-Configure Tomcat to access proxl database
----------------------------------------------------------
-
-Add the following to ``$CATALINA_HOME/conf/context.xml``, inside the ``<Context></Context>`` root
-element. Be sure to change ``proxl_user`` and ``password`` to the username and password you set
-up above. If necessary, change ``localhost`` and ``3306`` to the hostname and port of your
-MySQL server.
-	
-.. code-block:: xml
-	
-          <Resource     name="jdbc/proxl"
-                        auth="Container"
-                        type="javax.sql.DataSource"
-                        factory="org.apache.commons.dbcp2.BasicDataSourceFactory"
-                        maxTotal="100"
-                        maxIdle="30"
-                        maxWaitMillis="10000"
-                        username="proxl_user"
-                        password="password"
-                        driverClassName="com.mysql.jdbc.Driver"
-
-                        minEvictableIdleTimeMillis="14400000"
-                        timeBetweenEvictionRunsMillis="3600000"
-                        numTestsPerEvictionRun="100"
-
-                        url="jdbc:mysql://localhost:3306/proxl?autoReconnect=true&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;characterSetResults=UTF-8"/>
-
-
-
-Install proxl.war
-------------------------------
-Copy ``proxl.war`` in the top directory of the zip file into the
-``webapps`` directory of your Tomcat installation. It should automatically deploy (you should
-see a ``proxl`` directory created in the webapps directory. If it does not automatically deploy,
-restart Tomcat to force it to deploy.
-
-5. Start using proxl
-==========================================================
-Your web application should now be available at http://your.host:8080/proxl/.
-If you have a firewall running, may need to allow access through this port.
-You should be able to log in with username: ``initial_proxl_user`` and
-password: ``FJS483792nzmv,xc4#&@(!VMKSDL``  You should change this information at your soonest
-convenience by logging in and clicking the "Manage Account" icon at the top-right of any page
-(person-shaped icon). You may add initial users by creating projects and inviting users to those projects.
-
-For information about uploading data and using proxl, please see the documentation at `<http://proxl-web-app.readthedocs.org/en/latest/>`_.
-
-6. Install and configure the import manager
-==========================================================
-The import manager is software that runs on the same computer as the proxl web application. It is responsible for processing data uploaded
-through proxl and saving it to the database. Follow these steps to set up and run the import manager:
-
-Set up upload directory
--------------------------
-Create a directory for storing uploaded files. For example ``/var/lib/proxl/upload`` or ``C:\proxl\upload``. Ensure the user running the Tomcat process above
-has write access to this directory. We will call this ``UPLOAD_DIRECTORY`` here.
-
-Log into the proxl web application, click on the gear icon at the top-right for system configuration. Enter the full path for ``UPLOAD_DIRECTORY`` for the ``Run Importer Workspace`` field and click "Save".
-
-Set up run directory
--------------------------
-Create a directory where the upload manager runs and creates files. For example ``/var/lib/proxl/run`` or ``C:\\proxl\\run``. We will call this ``RUN_DIRECTORY`` here.
-
-In this directory place the following files from the release zip file:
-
-    * ``runImportProxlXML.jar``
-    * ``run_importer_config_file.properties`` (in the ``proxl_importer/config_sample_files_RUN_proxl_xml_importer_PGM`` directory)
-    * ``importProxlXML.jar``
-    * ``db_config_file.properties`` (in the ``proxl_importer/config_sample_files_proxl_xml_importer`` directory)
-
-Update run_importer_config_file.properties and db_config_file.properties with setting for your server.
-
-Run the import manager process
---------------------------------
-This program must be running to import data via the proxl web application. To start it:
-
-``java -jar ``RUN_DIRECTORY/runImportProxlXML.jar --config=run_importer_config_file.properties``
-
-Note, the user running this process must have read access to ``UPLOAD_DIRECTORY`` and write access to ``RUN_DIRECTORY``.  On linux this can be accomplished
-with a command similar to:
-
-``su -c "java -jar ``RUN_DIRECTORY/runImportProxlXML.jar --config=run_importer_config_file.properties" -s /bin/bash tomcat``
-
-Where the user ``tomcat`` has the necessary permissions.
-
-
+    If you do not set up SMTP, you must use the administrative interface to add new users
+    to Limelight. See our :ref:`guide for managing users <Manage Users (Add, Disable, Permissions)>`.

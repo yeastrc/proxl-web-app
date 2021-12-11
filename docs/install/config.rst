@@ -27,11 +27,11 @@ below are set, a reCAPTCHA block will be presented to users who register.
 
 Site key
 ^^^^^^^^^^^^
-Upon registering your site with reCAPTCH, enter your site key here.
+Upon registering your site with reCAPTCHA, enter your site key here.
 
 Secret key
 ^^^^^^^^^^^^^^^^
-Upon registering your site with reCAPTCH, enter your secret key here. Do not share this.
+Upon registering your site with reCAPTCHA, enter your secret key here. Do not share this.
 
     
 HTML to put at center of bottom of web page

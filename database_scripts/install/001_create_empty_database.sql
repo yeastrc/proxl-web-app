@@ -25,12 +25,13 @@ SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL,ALLOW_INVALID_DATES';
 -- -----------------------------------------------------
 -- Schema proxl
 -- -----------------------------------------------------
-DROP SCHEMA IF EXISTS proxl ;
 
--- -----------------------------------------------------
--- Schema proxl
--- -----------------------------------------------------
-CREATE SCHEMA  proxl DEFAULT CHARACTER SET utf8 COLLATE utf8_bin ;
+--   !!!  IMPORTANT:  Replace "CREATE SCHEMA ..."  with these 2 lines.  Required for Docker implementation where proxl db already created.
+
+CREATE SCHEMA IF NOT EXISTS proxl;
+ALTER DATABASE proxl CHARACTER SET utf8 COLLATE utf8_bin;
+
+
 USE proxl ;
 
 -- -----------------------------------------------------
@@ -1681,7 +1682,7 @@ CREATE TABLE  proxl_xml_file_import_tracking_status_history (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   proxl_xml_file_import_tracking_id INT UNSIGNED NOT NULL,
   status_id TINYINT UNSIGNED NOT NULL,
-  status_timestamp TIMESTAMP NOT NULL,
+  status_timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (id),
   CONSTRAINT prxl_xml_fl_imprt_trkng_stats_hist_id
     FOREIGN KEY (proxl_xml_file_import_tracking_id)
