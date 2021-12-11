@@ -61,7 +61,7 @@ Now, download the Proxl Docker Compose files:
     If you prefer to download a ZIP file or if you prefer to download the file another way, the latest
     release can be found on GitHub at https://github.com/yeastrc/proxl-web-app/releases/latest
 
-4. Configure Proxl (Optional)
+4. (Optional) Configure Proxl
 =============================
 Copy the sample configuration file into place:
 
@@ -180,14 +180,14 @@ Start Using Proxl
 ----------------------
 That's it, you are ready to use Proxl!
 
-..
-    7. Optional - Set up SMTP For Emails
-    ===========================================
-    Some functions of Proxl require sending email to users. Examples of this include
-    inviting new users to projects, resetting forgotten passwords, and notifications that
-    data uploads have been completed. Although it's not required that you set up SMTP,
-    the above features will not be enabled unless you do. If you would like to enable these
-    features, please see our :doc:`install-limelight-smtp`.
+7. (Optional) Set up SMTP For Emails
+===========================================
+Some functions of Proxl require sending email to users. Examples of this include
+inviting new users to projects, resetting forgotten passwords, and notifications that
+data uploads have been completed. Although it's not required that you set up SMTP,
+the above features will not be enabled unless you do. If you would like to enable these
+features, please see our :doc:`install-proxl-smtp`.
 
-    If you do not set up SMTP, you must use the administrative interface to add new users
-    to Limelight. See our :ref:`guide for managing users <Manage Users (Add, Disable, Permissions)>`.
+If you do not set up SMTP, you must use the administrative interface to add new users
+to proxl. The manage users icon can be found at the top-right after logging in
+as an administrative user.
