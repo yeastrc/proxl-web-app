@@ -61,8 +61,8 @@ Now, download the Proxl Docker Compose files:
     If you prefer to download a ZIP file or if you prefer to download the file another way, the latest
     release can be found on GitHub at https://github.com/yeastrc/proxl-web-app/releases/latest
 
-4. Configure Proxl
-===========================
+4. Configure Proxl (Optional)
+=============================
 Copy the sample configuration file into place:
 
     .. code-block:: bash
