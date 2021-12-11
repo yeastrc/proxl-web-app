@@ -30,7 +30,7 @@ Converters for several major protein cross-linking mass spectrometry pipelines h
 For your convenience, links to the respective importers are provided below. Please be sure to review
 the [import documentation](http://proxl-web-app.readthedocs.io/en/latest/using/upload_data.html) for more information.
 
-* [Trans Proteomics Pipeline or TPP](https://github.com/yeastrc/proxl-import-iprophet)
+* [Trans-Proteomic Pipeline or TPP](https://github.com/yeastrc/proxl-import-iprophet)
 * [Kojak](https://github.com/yeastrc/proxl-import-kojak)
 * [Crux](https://github.com/yeastrc/proxl-import-crux)
 * [pLink 1.x](https://github.com/yeastrc/proxl-import-plink) [pLink 2.x](https://github.com/yeastrc/proxl-import-plink2)
