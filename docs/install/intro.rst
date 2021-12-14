@@ -117,6 +117,10 @@ that is ``nano``. To edit the file, type:
 
 Change the passwords and type ``Control-o``, ``<ENTER>``, and ``Control-x`` to save and exit.
 
+.. important::
+    By default, Docker manages where data are stored on your disk. If you would like to customize where proxl
+    stores data, please follow our :doc:`install-proxl-custom-data-location` tutorial. This should be done before
+    continuing on to Step 6 below. Once that is complete, proceed to Step 6.
 
 5. Starting and Stopping Proxl
 ===================================

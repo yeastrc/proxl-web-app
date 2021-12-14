@@ -31,12 +31,12 @@ services:
     volumes:
       - ${PROXL_UPLOAD_DIRECTORY}:/data/proxl_upload
     environment:
-      proxl_DB_USER: ${MYSQL_USER}
-      proxl_DB_PASSWORD: ${MYSQL_PASSWORD}
-      proxl_DB_HOST_ADDRESS: db
-      proxl_DB_HOST_PORT: 3306
+      PROXL_DB_USER: ${MYSQL_USER}
+      PROXL_DB_PASSWORD: ${MYSQL_PASSWORD}
+      PROXL_DB_HOST_ADDRESS: db
+      PROXL_DB_HOST_PORT: 3306
       PROXL_DB_NAME: ${PROXL_DATABASE_NAME}
-      proxl_JAVA_EXECUTE_PARAMS: ${IMPORTER_JAVA_OPTIONS}
+      PROXL_JAVA_EXECUTE_PARAMS: ${IMPORTER_JAVA_OPTIONS}
       PROXL_WEB_APP_BASE_URL: ${PROXL_WEB_APP_BASE_URL}
   proxl:
     image: mriffle/proxl-webapp:2
@@ -47,8 +47,8 @@ services:
     volumes:
       - ${PROXL_UPLOAD_DIRECTORY}:/data/proxl_upload
     environment:
-      proxl_MYSQL_USER: ${MYSQL_USER}
-      proxl_MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      PROXL_MYSQL_USER: ${MYSQL_USER}
+      PROXL_MYSQL_PASSWORD: ${MYSQL_PASSWORD}
       PROXL_DATABASE_NAME: ${PROXL_DATABASE_NAME}
     ports:
       - 8080:8080

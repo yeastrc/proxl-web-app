@@ -38,6 +38,8 @@ Here you will find documentation for both using and installing proxl locally.
    :caption: Proxl Administration
    
    install/intro
+   install/install-proxl-custom-data-location
+   install/install-proxl-smtp
    install/config
    install/converter_guide
    install/paws

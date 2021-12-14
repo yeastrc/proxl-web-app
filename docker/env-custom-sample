@@ -25,3 +25,9 @@ SMTP_HOST=smtp.example.com
 SMTP_PORT=587
 SMTP_USERNAME=smtp_username
 SMTP_PASSWORD=smtp_password
+
+# Custom data locations, be sure to launch using docker-compose-custom-data.yml
+MYSQL_DATA_DIRECTORY=/data/proxl-data/mysql
+SPECTR_UPLOAD_DIRECTORY=/data/proxl-data/spectr-upload
+SPECTR_STORAGE_DIRECTORY=/data/proxl-data/spectr-storage
+PROXL_UPLOAD_DIRECTORY=/data/proxl-data/proxl-upload
