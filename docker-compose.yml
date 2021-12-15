@@ -5,6 +5,7 @@ volumes:
   spectr_upload:
   spectr_storage:
   proxl_upload:
+  proxl_cache:
 
 services:
   db:
@@ -52,6 +53,7 @@ services:
       - db
     volumes:
       - proxl_upload:/data/proxl_upload
+      - proxl_cache:/data/proxl_cache
     environment:
       PROXL_MYSQL_USER: ${MYSQL_USER}
       PROXL_MYSQL_PASSWORD: ${MYSQL_PASSWORD}

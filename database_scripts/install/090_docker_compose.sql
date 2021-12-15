@@ -10,3 +10,4 @@ INSERT INTO config_system (config_key, config_value) VALUES ('scan_file_import_a
 INSERT INTO config_system (config_key, config_value) VALUES ('import_delete_uploaded_files_after_import', 'true');
 INSERT INTO config_system (config_key, config_value) VALUES ('run_import_extra_emails_to_send_to', 'root@localhost');
 INSERT INTO config_system (config_key, config_value) VALUES ('admin_email_address', 'root@localhost');
+INSERT INTO config_system (config_key, config_value) VALUES ('cache_files_root_directory', '/data/proxl_cache');

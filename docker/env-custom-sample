@@ -31,3 +31,4 @@ MYSQL_DATA_DIRECTORY=/data/proxl-data/mysql
 SPECTR_UPLOAD_DIRECTORY=/data/proxl-data/spectr-upload
 SPECTR_STORAGE_DIRECTORY=/data/proxl-data/spectr-storage
 PROXL_UPLOAD_DIRECTORY=/data/proxl-data/proxl-upload
+PROXL_CACHE_DIRECTORY=/data/proxl-data/proxl-cache

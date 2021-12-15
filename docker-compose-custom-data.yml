@@ -46,6 +46,7 @@ services:
       - db
     volumes:
       - ${PROXL_UPLOAD_DIRECTORY}:/data/proxl_upload
+      - ${PROXL_CACHE_DIRECTORY}:/data/proxl_cache
     environment:
       PROXL_MYSQL_USER: ${MYSQL_USER}
       PROXL_MYSQL_PASSWORD: ${MYSQL_PASSWORD}

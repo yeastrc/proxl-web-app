@@ -15,12 +15,13 @@ customize where the data are stored for proxl, follow the steps below.
 
 1. Create data directories
 ================================================
-You will need to create four directories for proxl to store its data.
+You will need to create five directories for proxl to store its data.
 
     1. MySQL data directory. This is the directory used to store the database.
     2. Spectr upload directory. This the directory used for spectra processing.
     3. Spectr storage directory. This the directory used to store spectra.
     4. Proxl upload directory. This is the directory where uploads are temporarily stored.
+    5. Proxl cache directory. Cache some results on disk to speed up the web site.
 
 .. important::
     If you are using WSL2 on Windows, specifying a Windows filesystem drive (e.g., ``/mnt/d/``) for your
@@ -34,11 +35,12 @@ the following:
         # make a parent directory for proxl data
         sudo mkdir -p /data/proxl-data
 
-        # make the four directories for storing data
+        # make the five directories for storing data
         sudo mkdir /data/proxl-data/mysql
         sudo mkdir /data/proxl-data/spectr-upload
         sudo mkdir /data/proxl-data/spectr-storage
         sudo mkdir /data/proxl-data/proxl-upload
+        sudo mkdir /data/proxl-data/proxl-cache
 
 
 2. Update ``.env`` with data storage locations
@@ -64,6 +66,7 @@ you chose above. This example uses the example directory names:
        SPECTR_UPLOAD_DIRECTORY=/data/proxl-data/spectr-upload
        SPECTR_STORAGE_DIRECTORY=/data/proxl-data/spectr-storage
        PROXL_UPLOAD_DIRECTORY=/data/proxl-data/proxl-upload
+       PROXL_CACHE_DIRECTORY=/data/proxl-data/proxl-cache
 
 Type ``Control-o``, ``<ENTER>``, and ``Control-x`` to save and exit ``nano``.
 
