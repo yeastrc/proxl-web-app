@@ -1365,5 +1365,11 @@ const qcPageMain = new QCPageMain();
 
 qcPageMain.init();
 
+//  Put on 'window' for onclick handler
+window.qcPageMainPageObject = qcPageMain;
+
+
 //  Copy to standard page level JS Code Object
 //  Not currently supported  var standardFullPageCode = qcPageMain;
+
+

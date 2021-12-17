@@ -35,7 +35,7 @@ export class DataPages_LoggedInUser_CommonObjectsFactory {
 
 
     /**
-     * Create object of class SaveView_dataPages
+     * Create object of class SaveView_dataPages AND put it on the 'window' using 'window.saveView_dataPages'
      * 
      */
     instantiate_SaveView_dataPages() {

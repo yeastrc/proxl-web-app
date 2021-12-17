@@ -1468,5 +1468,8 @@ searchesChangeDisplayOrder.set_qcMergedPageMain( qcMergedPageMain );
 
 qcMergedPageMain.init();
 
+//  Put on 'window' for onclick handler
+window.qcMergedPageMainPageObject = qcMergedPageMain;
+
 //  Copy to standard page level JS Code Object
 //  Not currently supported  var standardFullPageCode = qcMergedPageMain;
