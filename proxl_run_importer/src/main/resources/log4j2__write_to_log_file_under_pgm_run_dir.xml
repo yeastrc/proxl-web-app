@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- 
+	log4j2__write_to_log_file_under_pgm_run_dir.xml
+
+	Write Log file to (under directory that the program is run in):  logs_RunImporter/proxl_RunImporter.log.current
+	
+	Use on command line to use this log file
+	
+	-Dlog4j.configurationFile=log4j2__write_to_log_file_under_pgm_run_dir.xml
+ -->
+
+<Configuration  status="info" >
+
+  <Appenders>
+  
+  <!--  
+    <Console name="STDOUT" target="SYSTEM_OUT">
+      <PatternLayout pattern="%d %-5p [%t] %C{2} (%F:%L)  %c - %m{nolookups}%n"/>
+    </Console>
+   -->
+   
+   <!-- This next appender is not working to create an output file -->
+   
+    <!-- Rolling File Appender -->
+    <RollingFile name="RollingFile">
+    	<!-- Compared to log4j, the system variable requires 'sys:' before it -->
+    			<!-- append '.current' to the filename so that Ubuntu does not compress the file (compresses files that end in .log).
+			Log4j2 will compress the file when it rolls over the file since '.gz' is at end of  -->
+		<!-- Filename used when create "current" file to log to  -->
+      <FileName>logs_RunImporter/proxl_RunImporter.log.current</FileName>
+      		<!-- Filename used when roll "current" file to and then create new "current" file.
+      					Log4j2 will compress the file when it rolls over the file since '.gz' is at end of  -->
+      <FilePattern>logs_RunImporter/proxl_RunImporter-%d{yyyy-MM-dd}.log.gz</FilePattern>
+      <PatternLayout pattern="%d %-5p [%t] %C{2} (%F:%L) - %m{nolookups}%n"/>
+      	<!-- WAS  <PatternLayout pattern="%d %-5p [%t] %C{2} (%F:%L) - %m{nolookups}%n"/> -->
+      <Policies>
+      		<!-- Roll over the log file based on time  -->
+        <TimeBasedTriggeringPolicy/>
+      </Policies>
+      <DefaultRolloverStrategy max="20" />
+    </RollingFile>
+        
+  </Appenders>
+  <Loggers>
+    <Logger name="org.apache.log4j.xml" level="info"/>
+    
+    <Root level="warn">
+      <AppenderRef ref="RollingFile"/>
+    </Root>
+  </Loggers>
+</Configuration>
