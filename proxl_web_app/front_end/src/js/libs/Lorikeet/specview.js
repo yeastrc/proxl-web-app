@@ -2306,10 +2306,7 @@ let addLorikeetToJquery = function( jquery ) {
 		+ '<label>X:<input id="'+getElementId(container, elementIds.zoom_x)+'" type="checkbox" value="X" checked="checked"/></label> '
 		+ '&nbsp;<label>Y:<input id="'+getElementId(container, elementIds.zoom_y)+'" type="checkbox" value="Y" /></label> '
 		+ '&nbsp;<input id="'+getElementId(container, elementIds.resetZoom)+'" type="button" value="Zoom Out" /> '
-
-        //        Change made in Limelight code Only:
-        //   Comment Out "Print" button since not work and gets JS error in Flot Library
-		//  + '&nbsp;<input id="'+getElementId(container, elementIds.printLink)+'" type="button" value="Print" /> '
+		+ '&nbsp;<input id="'+getElementId(container, elementIds.printLink)+'" type="button" value="Print" /> '
 		
 		+ '</nobr> '
 		
