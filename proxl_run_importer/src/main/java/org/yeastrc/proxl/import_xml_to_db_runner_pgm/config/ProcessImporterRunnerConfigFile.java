@@ -185,16 +185,20 @@ public class ProcessImporterRunnerConfigFile {
 							+ "' is provided but is not an integer.  Value in config file: "
 							+ waitTimeForNextCheckForImportToProcess_InSecondsString;
 					log.error( msg, e );
+					System.err.println(msg);
 					throw new ConfigPropertiesFileErrorException(msg);
 				}
 
 				ImporterRunnerConfigData.setWaitTimeForNextCheckForImportToProcess_InSeconds( waitTimeForNextCheckForImportToProcess_InSeconds );
 				
-				log.warn( "INFO: Config file property '" 
+				String msg_Warn = "INFO: Config file property '" 
 						+ PROPERTY_NAME__WAIT_TIME_FOR_NEXT_CHECK_FOR_IMPORT_TO_PROCESS
 						+ "' has value: " 
 						+ waitTimeForNextCheckForImportToProcess_InSeconds
-						+ " seconds" );
+						+ " seconds";
+				
+				log.warn( msg_Warn );
+				System.out.println( msg_Warn );
 			}
 
 			if ( StringUtils.isEmpty( proxlWebAppBaseURL ) ) {
@@ -204,17 +208,20 @@ public class ProcessImporterRunnerConfigFile {
 				String msg = "INFO::  Enviroment Variable '" + ENVIRONMENT_VARIABLE__PROXL_WEB_APP_BASE_URL + "' OR config file: parameter '" + PROPERTY_NAME__PROXL_WEB_APP_BASE_URL 
 						+ "' is not provided or is empty string.  Not calling server to send email on import completion.";
 				log.warn( msg );
+				System.out.println( msg );
 			} else {
 
 				String msg = "INFO:: Enviroment Variable '" + ENVIRONMENT_VARIABLE__PROXL_WEB_APP_BASE_URL + "' OR  Config file: parameter '" + PROPERTY_NAME__PROXL_WEB_APP_BASE_URL 
 						+ "' is provided so calling server to send email on import completion.  URL Used: " + proxlWebAppBaseURL;
 				log.warn( msg );
+				System.out.println( msg );
 			}
 
 			if ( StringUtils.isEmpty( importerJarWithPath ) ) {
 
 				String msg = "  ERROR:  For config file: parameter '" + PROPERTY_NAME__IMPORTER_JAR_WITH_PATH + "' is not provided or is empty string.";
 				log.error( msg );
+				System.err.println(msg);
 				throw new ConfigPropertiesFileErrorException(msg);
 			}
 
@@ -242,6 +249,7 @@ public class ProcessImporterRunnerConfigFile {
 							+ "' OR Config file: parameter '" + PROPERTY_NAME__JAVA_EXECUTABLE_PARAMETERS 
 							+ "' so these parameters will be passed to java executable.  values:  " + StringUtils.join( javaExecutableParametersLocal, " " );
 					log.warn( msg );
+					System.out.println( msg );
 				}
 			}
 			
@@ -263,6 +271,7 @@ public class ProcessImporterRunnerConfigFile {
 				String msg = "INFO::  PID file: parameter '" + PROPERTY_NAME__IMPORTER_PID_FILE_WITH_PATH 
 						+ "' is provided so deleting it when shut down using run control file.  value:  " + importerPidFileWithPath;
 				log.warn( msg );
+				System.out.println( msg );
 			}
 			
 			ImporterRunnerConfigData.setProxlWebAppBaseURL( proxlWebAppBaseURL );
@@ -273,6 +282,7 @@ public class ProcessImporterRunnerConfigFile {
 				String msg = "INFO::  Config file: parameter '" + PROPERTY_NAME__COMMAND_RUN_ON_SUCCESSFUL_IMPORT 
 						+ "' is provided so calling that program on Successful import.  value:  " + commandToRunOnSuccessfulImport;
 				log.warn( msg );
+				System.out.println( msg );
 			}
 			if ( StringUtils.isNotEmpty( commandToRunOnSuccessfulImportSyoutSyserrDir ) ) {
 				ImporterRunnerConfigData.setCommandToRunOnSuccessfulImportSyoutSyserrDir( commandToRunOnSuccessfulImportSyoutSyserrDir );
@@ -280,6 +290,7 @@ public class ProcessImporterRunnerConfigFile {
 				String msg = "INFO::  Config file: parameter '" + PROPERTY_NAME__COMMAND_RUN_ON_SUCCESSFUL_IMPORT_SYSOUT_SYSERR_DIR 
 						+ "' is provided so calling that program on Successful import.  value:  " + commandToRunOnSuccessfulImportSyoutSyserrDir;
 				log.warn( msg );
+				System.out.println( msg );
 			}
 			
 			
@@ -299,7 +310,9 @@ public class ProcessImporterRunnerConfigFile {
 
 		} catch ( RuntimeException e ) {
 
-			log.error( "In init(),   Properties file '" + CONFIG_FILENAME + "', exception: " + e.toString(), e );
+			String msg = "In init(),   Properties file '" + CONFIG_FILENAME + "', exception: " + e.toString();
+			log.error( msg, e );
+			System.err.println(msg);
 
 			throw e;
 		}
