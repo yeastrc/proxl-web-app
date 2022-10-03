@@ -10,8 +10,8 @@ Convert output to proxl XML
 Converters have been developed for several cross-linking proteomics pipelines. Click on the name of the
 software, below, to download and learn more about the respective converter.
 
-    * `iProphet (TPP) <https://github.com/yeastrc/proxl-import-iprophet>`_
-    * `Kojak <https://github.com/yeastrc/proxl-import-kojak>`_
+    * `Kojak + TPP <https://github.com/yeastrc/proxl-import-kojak-tpp>`_
+    * `Kojak + Percolator <https://github.com/yeastrc/proxl-import-kojak>`_
     * `Crux <https://github.com/yeastrc/proxl-import-crux>`_
     * `pLink 1.x <https://github.com/yeastrc/proxl-import-plink>`_ `pLink 2.x <https://github.com/yeastrc/proxl-import-plink2>`_
     * `StavroX <https://github.com/yeastrc/proxl-import-stavrox>`_

@@ -157,8 +157,8 @@ language, so long as valid proxl XML is produced.
 We have developed several open-source converters in Java, which may be used as examples. Follow
 the links below to access the source code associated with each converter:
 
-    * `iProphet (TPP) <https://github.com/yeastrc/proxl-import-iprophet>`_
-    * `Kojak <https://github.com/yeastrc/proxl-import-kojak>`_
+    * `Kojak + TPP <https://github.com/yeastrc/proxl-import-kojak-tpp>`_
+    * `Kojak + Percolator <https://github.com/yeastrc/proxl-import-kojak>`_
     * `Crux <https://github.com/yeastrc/proxl-import-crux>`_
     * `pLink 1.x <https://github.com/yeastrc/proxl-import-plink>`_ `pLink 2.x <https://github.com/yeastrc/proxl-import-plink2>`_
     * `StavroX <https://github.com/yeastrc/proxl-import-stavrox>`_
