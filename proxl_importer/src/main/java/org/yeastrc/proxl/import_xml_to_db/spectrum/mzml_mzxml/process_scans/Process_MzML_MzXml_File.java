@@ -126,6 +126,8 @@ public class Process_MzML_MzXml_File {
 				newScanFileRecord =
 						AddNewScanFileAndHeadersIfNeededDBTransactionService.getInstance()
 						.addNewScanFileAndHeadersDBTransactionService( scanFileDTO, scanFileSourceDTO, scanFileHeaderDTOList );
+			} catch ( ProxlImporterDataException e ) {
+				throw e;
 			} catch ( Exception t ) {
 				String msg = "failed to query or save mzML or MzXml file or file header. scanFileWithPath = " + scanFileWithPath.getAbsolutePath();
 				log.error( msg, t );
@@ -389,6 +391,8 @@ public class Process_MzML_MzXml_File {
 //			String msg = "Error IOException processing mzML or MzXml Scan file: " + scanFileWithPath.getAbsolutePath();
 //			log.error( msg, e );
 //			throw new ProxlImporterInteralException( msg, e );
+		} catch ( ProxlImporterDataException e ) {
+			throw e;
 		} catch ( Exception e ) {
 			String msg = "Error Exception processing mzML or mzXml Scan file: " 
 					+ scanFileWithPath.getAbsolutePath()

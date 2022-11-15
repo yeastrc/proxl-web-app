@@ -137,6 +137,8 @@ public class ValidateInputScanFile {
 //			String msg = "Error IOException processing mzML or MzXml Scan file: " + scanFileWithPath.getAbsolutePath();
 //			log.error( msg, e );
 //			throw new Exception( msg, e );
+		} catch ( ProxlImporterDataException e ) {
+			throw e;
 		} catch ( Exception e ) {
 			String msg = "Error Exception Validating mzML or mzXml.  uploaded scan filename: " + scanFilenameString
 					+ ", Scan file on disk: " + scanFile.getAbsolutePath()

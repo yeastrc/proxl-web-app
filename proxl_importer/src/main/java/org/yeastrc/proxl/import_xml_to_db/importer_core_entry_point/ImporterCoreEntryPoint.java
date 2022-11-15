@@ -115,6 +115,8 @@ public class ImporterCoreEntryPoint {
 			try {
 				inputStream = new FileInputStream( mainXMLFileToImport );
 				proxlInputForImport = deserializeProxlInputFromInputStream( inputStream );
+			} catch ( ProxlImporterDataException e ) {
+				throw e;
 			} catch ( Exception e ) {
 				System.out.println( "Exception in deserializing the primary input XML file" );
 				System.err.println( "Exception in deserializing the primary input XML file" );
@@ -198,6 +200,8 @@ public class ImporterCoreEntryPoint {
 				throw new Exception(msg);
 			}
 			proxlInputForImport = (ProxlInput) unmarshalledObject;
+		} catch ( ProxlImporterDataException e ) {
+			throw e;
 		} catch ( ProxlImporterProxlXMLDeserializeFailException e ) {
 			throw e;
 		} catch ( Exception e ) {
