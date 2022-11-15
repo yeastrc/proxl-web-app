@@ -358,7 +358,7 @@ public class ValidateAnnotationTypeRecords {
 			}
 			for ( FilterablePsmAnnotationType filterablePsmAnnotationType : filterablePsmAnnotationTypeList ) {
 				foundPsmFilterableAnnotationType = true;
-				if ( filterablePsmAnnotationType.isDefaultFilter() ) {
+				if ( filterablePsmAnnotationType.isDefaultFilter() != null && filterablePsmAnnotationType.isDefaultFilter().booleanValue() ) {
 					foundPsmDefaultFilterableAnnotationType = true;
 					break;
 				}
