@@ -154,6 +154,8 @@ public class Process_MzML_MzXml_File {
 			throw e;
 		} catch ( ProxlImporterConfigException e ) {
 			throw e;
+		} catch ( ProxlImporterDataException e ) {
+			throw e;
 		} catch ( ProxlImporterInteralException e ) {
 			throw e;
 		} catch ( ProxlImporterSpectralStorageServiceRetryExceededException e ) {
