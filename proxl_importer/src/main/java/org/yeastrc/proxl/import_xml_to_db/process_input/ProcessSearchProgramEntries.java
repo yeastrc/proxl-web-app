@@ -323,8 +323,12 @@ public class ProcessSearchProgramEntries {
 			String filterDirectionString = filterablePsmAnnotationType.getFilterDirection().value();
 			FilterDirectionType filterDirectionType = FilterDirectionType.fromValue( filterDirectionString );
 			annotationTypeFilterableDTO.setFilterDirectionType( filterDirectionType );
-			annotationTypeFilterableDTO.setDefaultFilter( filterablePsmAnnotationType.isDefaultFilter() );
-			annotationTypeFilterableDTO.setDefaultFilterAtDatabaseLoad( filterablePsmAnnotationType.isDefaultFilter() );
+			if ( filterablePsmAnnotationType.isDefaultFilter() != null ) {
+				annotationTypeFilterableDTO.setDefaultFilter( filterablePsmAnnotationType.isDefaultFilter().booleanValue() );
+			}
+			if ( filterablePsmAnnotationType.isDefaultFilter() != null ) {
+				annotationTypeFilterableDTO.setDefaultFilterAtDatabaseLoad( filterablePsmAnnotationType.isDefaultFilter().booleanValue() );
+			}
 			BigDecimal defaultFilterValue = filterablePsmAnnotationType.getDefaultFilterValue();
 			if ( defaultFilterValue != null ) {
 				annotationTypeFilterableDTO.setDefaultFilterValue( defaultFilterValue.doubleValue() );
