@@ -130,11 +130,43 @@ const mainConfig = {
 
 	module:{
 		rules:[
-			{ enforce: 'post', test: /fontkit[/\\]index.js$/, loader: "transform-loader?brfs" },				// for pdfkit
-			{ enforce: 'post', test: /unicode-properties[/\\]index.js$/, loader: "transform-loader?brfs" },		// for pdfkit
-			{ enforce: 'post', test: /linebreak[/\\]src[/\\]linebreaker.js/, loader: "transform-loader?brfs" },	// for pdfkit
+			
+			//  Upgrade pdfkit to webpack 5
+			
+			//   https://github.com/foliojs/pdfkit/tree/master/examples/webpack
+			//   https://github.com/blikblum/pdfkit-webpack-example/issues/9#issuecomment-754876467
+			//   https://github.com/foliojs/pdfkit/issues/1195
+			
+			// for pdfkit
+			{
+				enforce: 'post',
+				test: /fontkit[/\\]index.js$/,
+				use: {
+					loader: "transform-loader?brfs"
+				}
+			},
+			// for pdfkit
+			{
+				enforce: 'post',
+				test: /unicode-properties[/\\]index.js$/,
+				use: {
+					loader: "transform-loader?brfs"
+				}
+			},
+			// for pdfkit
+			{
+				enforce: 'post',
+				test: /linebreak[/\\]src[/\\]linebreaker.js/,
+				use: {
+					loader: "transform-loader?brfs"
+				}
+			},
+//			{ enforce: 'post', test: /fontkit[/\\]index.js$/, loader: "transform-loader?brfs" },				
+//			{ enforce: 'post', test: /unicode-properties[/\\]index.js$/, loader: "transform-loader?brfs" },		// for pdfkit
+//			{ enforce: 'post', test: /linebreak[/\\]src[/\\]linebreaker.js/, loader: "transform-loader?brfs" },	// for pdfkit
 
 			{
+				//  Output .css file is NOT Minimized
 				test:/\.scss$/,
 				use: [
 					{
@@ -149,7 +181,7 @@ const mainConfig = {
 					},
 					{
 						loader: 'css-loader',
-						options: { minimize: true }
+						options: {} //  WAS   { minimize: true }
 					},
 					{
 						loader: 'sass-loader'

@@ -26,12 +26,12 @@ buildscript {
     }
   }
   dependencies {
-    classpath "org.ajoberstar.grgit:grgit-gradle:3.1.1"
+    classpath "org.ajoberstar.grgit:grgit-gradle:4.1.1"
   }
 }
 
 plugins {
-	id 'com.github.johnrengelman.shadow' version '5.0.0'
+	id 'com.github.johnrengelman.shadow' version '8.1.1'
 	//  moved to 'buildscript'. See Notes above	id 'org.ajoberstar.grgit' version '3.1.1'
 }
 
@@ -65,43 +65,43 @@ dependencies {
 
 	//  Specify dependency on Proxl Shared Code
 	
-	compile project(":proxl-shared-code")
+	implementation project(":proxl-shared-code")
 
 	//  Specify dependency on proxl_importer_run_importer_shared
 
-	compile project(":proxl_importer_run_importer_shared")
+	implementation project(":proxl_importer_run_importer_shared")
 
 	/////////////////////////////////////
 	
 	//  New StringUtils
 	// https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
-	compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.9'
+	implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.9'
 	
 	// https://mvnrepository.com/artifact/org.apache.commons/commons-dbcp2
-	compile group: 'org.apache.commons', name: 'commons-dbcp2', version: '2.8.0'
+	implementation group: 'org.apache.commons', name: 'commons-dbcp2', version: '2.8.0'
 	
 	// https://mvnrepository.com/artifact/mysql/mysql-connector-java
-	compile group: 'mysql', name: 'mysql-connector-java', version: '8.0.26'
+	implementation group: 'mysql', name: 'mysql-connector-java', version: '8.0.26'
 	
 	
 	//  Logging
 	
-	compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.17.0'
-	compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.17.0'	
+	implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.17.0'
+	implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.17.0'	
 	
 	// https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-slf4j-impl
-	compile group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version: '2.17.0'
+	implementation group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version: '2.17.0'
 	
 	//  Jakarta Commons Logging to SLF4J
-	compile group: 'org.slf4j', name: 'jcl-over-slf4j', version: '1.7.25'
+	implementation group: 'org.slf4j', name: 'jcl-over-slf4j', version: '1.7.25'
 	
 	//  Log4j 1 to 2 bridge
-	compile group: 'org.apache.logging.log4j', name: 'log4j-1.2-api', version: '2.2'
+	implementation group: 'org.apache.logging.log4j', name: 'log4j-1.2-api', version: '2.2'
 		
 		
 		
 	// https://mvnrepository.com/artifact/joda-time/joda-time
-	compile group: 'joda-time', name: 'joda-time', version: '2.10.2'
+	implementation group: 'joda-time', name: 'joda-time', version: '2.10.2'
 	
 	
 	
@@ -119,18 +119,18 @@ dependencies {
 	
 	//     Took Gradle listing from https://mvnrepository.com/artifact/jargs/jargs/1.0
     // https://mvnrepository.com/artifact/jargs/jargs
-//	compile group: 'jargs', name: 'jargs', version: '1.0'
+//	implementation group: 'jargs', name: 'jargs', version: '1.0'
 
 	//////////////////////////////
 	
 	//  Jars from other Proxl Repos projects
-	compile fileTree(dir: '../libs_proxl_github_jars', include: ['*.jar'])
+	implementation fileTree(dir: '../libs_proxl_github_jars', include: ['*.jar'])
 	
 	//   jargs.jar
-	compile fileTree(dir: '../lib_importer_run_importer__and_importer_run_importer_shared_code', include: ['*.jar'])
+	implementation fileTree(dir: '../lib_importer_run_importer__and_importer_run_importer_shared_code', include: ['*.jar'])
 	
 	//  Jars from other Yeastrc projects
-	compile fileTree(dir: 'lib_spectal_storage_client_connector_code', include: ['*.jar'])
+	implementation fileTree(dir: 'lib_spectal_storage_client_connector_code', include: ['*.jar'])
 	
 }
 
@@ -179,15 +179,29 @@ jar {
     }
 }
 
+//  NOT NEEDED:  files from 'src/main/resources' copied to resulting jar without this.
+
 //  For creating runnable jar
-processResources {
-    from ('src/main/resources') {
-        include '**/*'
-    }
-}
+//  processResources {
+//    from ('src/main/resources') {
+//        include '**/*'
+//    }
+// }
+
+//   https://imperceptiblethoughts.com/shadow/configuration/#configuring-output-name
 
 shadowJar {
-    baseName = 'importProxlXML'
-    classifier = null
-    version = null
+
+    archiveBaseName = 'importProxlXML'
+    
+    // Required to output same as previous filename. 
+    //		Default is 'all' which will add '-all' to output filename before '.jar'
+    
+    archiveClassifier = '' 
+    
+    //  Default is empty string 
+    archiveVersion = ''
+    
+    //  For Log4J2
+    transform(com.github.jengelman.gradle.plugins.shadow.transformers.Log4j2PluginsCacheFileTransformer)
 }

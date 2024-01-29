@@ -867,6 +867,9 @@ task handlebarsPrecompile_dummy_template(type: NodeTask) {
 //  Change so dev runs  'npm install' separately since it takes so long
 
 task webpack(type: NodeTask ) { //  , dependsOn: 'npmInstall') {
+
+	println("Starting  task webpack(type: NodeTask ) ")
+
   def osName = System.getProperty("os.name").toLowerCase();
   if (osName.contains("windows")) {
     script = project.file('node_modules/webpack/bin/webpack.js')

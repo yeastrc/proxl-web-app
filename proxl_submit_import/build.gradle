@@ -27,12 +27,12 @@ buildscript {
     }
   }
   dependencies {
-    classpath "org.ajoberstar.grgit:grgit-gradle:3.1.1"
+    classpath "org.ajoberstar.grgit:grgit-gradle:4.1.1"
   }
 }
 
 plugins {
-	id 'com.github.johnrengelman.shadow' version '5.0.0'
+	id 'com.github.johnrengelman.shadow' version '8.1.1'
 	//  moved to 'buildscript'. See Notes above	id 'org.ajoberstar.grgit' version '3.1.1'
 }
 
@@ -55,51 +55,51 @@ dependencies {
 	
 	//  Logging
 	
-	compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.17.0'
-	compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.17.0'	
+	implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.17.0'
+	implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.17.0'	
 	
 	// https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-slf4j-impl
-	compile group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version: '2.17.0'
+	implementation group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version: '2.17.0'
 	
 	//  Jakarta Commons Logging to SLF4J
-	compile group: 'org.slf4j', name: 'jcl-over-slf4j', version: '1.7.25'
+	implementation group: 'org.slf4j', name: 'jcl-over-slf4j', version: '1.7.25'
 	
 	//  Log4j 1 to 2 bridge
-	compile group: 'org.apache.logging.log4j', name: 'log4j-1.2-api', version: '2.2'
+	implementation group: 'org.apache.logging.log4j', name: 'log4j-1.2-api', version: '2.2'
 	
 	
 	//  New StringUtils
 	// https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
-	compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.9'
+	implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.9'
 	
 	
 	
 	//   Apache HTPP Client
 
 	// https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient
-	compile group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.8'
+	implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.8'
 
 	// https://mvnrepository.com/artifact/org.apache.httpcomponents/httpcore
-	compile group: 'org.apache.httpcomponents', name: 'httpcore', version: '4.4.11'
+	implementation group: 'org.apache.httpcomponents', name: 'httpcore', version: '4.4.11'
  	
 
 	//  Jackson JSON parsing
 	
 	// https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core
-	compile group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.9.9'
+	implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.9.9'
 	
 	// https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
-	compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.9'
+	implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.9'
 
 
 	//  NOT FOUND  either jcenter() or mavenCentral()
 	
 	//     Took Gradle listing from https://mvnrepository.com/artifact/jargs/jargs/1.0
     // https://mvnrepository.com/artifact/jargs/jargs
-//	compile group: 'jargs', name: 'jargs', version: '1.0'
+//	implementation group: 'jargs', name: 'jargs', version: '1.0'
 
 	//  jargs.jar
-	compile fileTree(dir: 'lib', include: ['*.jar'])
+	implementation fileTree(dir: 'lib', include: ['*.jar'])
 	
 }
 
@@ -148,15 +148,30 @@ jar {
     }
 }
 
+
+//  NOT NEEDED:  files from 'src/main/resources' copied to resulting jar without this.
+
 //  For creating runnable jar
-processResources {
-    from ('src/main/resources') {
-        include '**/*'
-    }
-}
+//  processResources {
+//    from ('src/main/resources') {
+//        include '**/*'
+//    }
+// }
+
+//   https://imperceptiblethoughts.com/shadow/configuration/#configuring-output-name
 
 shadowJar {
-    baseName = 'submitProxlXMLImport'
-    classifier = null
-    version = null
+
+    archiveBaseName = 'submitProxlXMLImport'
+    
+    // Required to output same as previous filename. 
+    //		Default is 'all' which will add '-all' to output filename before '.jar'
+    
+    archiveClassifier = '' 
+    
+    //  Default is empty string 
+    archiveVersion = ''
+    
+    //  For Log4J2
+    transform(com.github.jengelman.gradle.plugins.shadow.transformers.Log4j2PluginsCacheFileTransformer)
 }

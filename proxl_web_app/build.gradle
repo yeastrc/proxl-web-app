@@ -59,7 +59,7 @@ configurations.all {
 	//  Exclude following since OLD
 	//  Included by DBCP 1
 	// https://mvnrepository.com/artifact/xerces/xerces
-	//   compile group: 'xerces', name: 'xerces', version: '2.0.2'
+	//   implementation group: 'xerces', name: 'xerces', version: '2.0.2'
 	//  exclude group: 'xerces', module: 'xerces'
 }
 
@@ -67,7 +67,7 @@ dependencies {
 
 	//  Specify dependency on Proxl Shared Code
 	
-	compile project(":proxl-shared-code") //  !! See Dependencies of proxl-shared-code
+	implementation project(":proxl-shared-code") //  !! See Dependencies of proxl-shared-code
 	
 	/////////////////////////////////////
 	
@@ -76,146 +76,146 @@ dependencies {
 	
 	//        latest version requires Java > 8
 	// https://mvnrepository.com/artifact/org.glassfish.jersey.core/jersey-server
-	// compile group: 'org.glassfish.jersey.core', name: 'jersey-server', version: '2.28'
+	// implementation group: 'org.glassfish.jersey.core', name: 'jersey-server', version: '2.28'
 	
 	// https://mvnrepository.com/artifact/org.glassfish.jersey.core/jersey-server
-	compile group: 'org.glassfish.jersey.core', name: 'jersey-server', version: '2.27'
+	implementation group: 'org.glassfish.jersey.core', name: 'jersey-server', version: '2.27'
 	
 	// https://mvnrepository.com/artifact/org.glassfish.jersey.containers/jersey-container-servlet-core
-	compile group: 'org.glassfish.jersey.containers', name: 'jersey-container-servlet-core', version: '2.27'
+	implementation group: 'org.glassfish.jersey.containers', name: 'jersey-container-servlet-core', version: '2.27'
 	
 	// https://mvnrepository.com/artifact/org.glassfish.jersey.inject/jersey-hk2
-	compile group: 'org.glassfish.jersey.inject', name: 'jersey-hk2', version: '2.27'
+	implementation group: 'org.glassfish.jersey.inject', name: 'jersey-hk2', version: '2.27'
 	
 	
 	// https://mvnrepository.com/artifact/org.glassfish.jersey.media/jersey-media-json-jackson
-	compile group: 'org.glassfish.jersey.media', name: 'jersey-media-json-jackson', version: '2.27'
+	implementation group: 'org.glassfish.jersey.media', name: 'jersey-media-json-jackson', version: '2.27'
 	
 	//  Java Advanced Imaging
 	
 	//   Since not find 'jai_imageio' in Maven Central or JCentral, use all JAI jars from local directory
 	
 	// https://mvnrepository.com/artifact/javax.media/jai_core
-	// compile group: 'javax.media', name: 'jai_core', version: '1.1.3'
+	// implementation group: 'javax.media', name: 'jai_core', version: '1.1.3'
 	
 	// https://mvnrepository.com/artifact/javax.media/jai_codec
-	// compile group: 'javax.media', name: 'jai_codec', version: '1.1.3'
+	// implementation group: 'javax.media', name: 'jai_codec', version: '1.1.3'
 	
 	//  Not found:   error msg: Could not find javax.media:jai_imageio:1.1.1.
 	// https://mvnrepository.com/artifact/javax.media/jai_imageio
-	// compile group: 'javax.media', name: 'jai_imageio', version: '1.1.1'
+	// implementation group: 'javax.media', name: 'jai_imageio', version: '1.1.1'
 	
 	//  Not found:   error msg: Could not find javax.media:jai_imageio:1.1.
 	// https://mvnrepository.com/artifact/javax.media/jai_imageio
-	// compile group: 'javax.media', name: 'jai_imageio', version: '1.1'
+	// implementation group: 'javax.media', name: 'jai_imageio', version: '1.1'
 	
 	
 	//  Mail
 	
 	// https://mvnrepository.com/artifact/javax.mail/mail
-	compile group: 'javax.mail', name: 'mail', version: '1.4.1'
+	implementation group: 'javax.mail', name: 'mail', version: '1.4.1'
 	
 	//  Later versions like this have license CDDL and GPL
 	// https://mvnrepository.com/artifact/javax.mail/javax.mail-api
-//	compile group: 'javax.mail', name: 'javax.mail-api', version: '1.6.1'
+//	implementation group: 'javax.mail', name: 'javax.mail-api', version: '1.6.1'
 
 	// https://mvnrepository.com/artifact/org.apache.commons/commons-dbcp2
-	compile group: 'org.apache.commons', name: 'commons-dbcp2', version: '2.2.0'
+	implementation group: 'org.apache.commons', name: 'commons-dbcp2', version: '2.2.0'
 	
 	
 	// https://mvnrepository.com/artifact/mysql/mysql-connector-java
-//	compile group: 'mysql', name: 'mysql-connector-java', version: '5.1.45'
+//	implementation group: 'mysql', name: 'mysql-connector-java', version: '5.1.45'
 	
 	//  Logging Log4j Version 2
 	
-	compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.17.0'
-	compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.17.0'
-	compile group: 'org.apache.logging.log4j', name: 'log4j-web', version: '2.17.0' //  Needed for Web app
+	implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.17.0'
+	implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.17.0'
+	implementation group: 'org.apache.logging.log4j', name: 'log4j-web', version: '2.17.0' //  Needed for Web app
 	
 	// https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-slf4j-impl
-	compile group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version: '2.17.0'
+	implementation group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version: '2.17.0'
 	
 	//  Jakarta Commons Logging to SLF4J
-	compile group: 'org.slf4j', name: 'jcl-over-slf4j', version: '1.7.25'
+	implementation group: 'org.slf4j', name: 'jcl-over-slf4j', version: '1.7.25'
 	
 	//  Log4j 1 to 2 bridge
-	compile group: 'org.apache.logging.log4j', name: 'log4j-1.2-api', version: '2.2'
+	implementation group: 'org.apache.logging.log4j', name: 'log4j-1.2-api', version: '2.2'
 		
 	
 	//  redirects log4j to slf4j, the opposite of how logging is set up
 	// https://mvnrepository.com/artifact/org.slf4j/log4j-over-slf4j
-//	compile group: 'org.slf4j', name: 'log4j-over-slf4j', version: '1.7.25'
+//	implementation group: 'org.slf4j', name: 'log4j-over-slf4j', version: '1.7.25'
 
 	
 	// Used by included yeastrc jar password management
 	// https://mvnrepository.com/artifact/org.springframework.security/spring-security-crypto
-	compile group: 'org.springframework.security', name: 'spring-security-crypto', version: '5.1.5.RELEASE'
+	implementation group: 'org.springframework.security', name: 'spring-security-crypto', version: '5.1.5.RELEASE'
 	
 	// https://mvnrepository.com/artifact/javax.servlet/jstl
-	compile group: 'javax.servlet', name: 'jstl', version: '1.2'
+	implementation group: 'javax.servlet', name: 'jstl', version: '1.2'
 	
 	
 	//   Apache Commons
 	
 	//  Old StringUtils
 	// https://mvnrepository.com/artifact/commons-lang/commons-lang
-	compile group: 'commons-lang', name: 'commons-lang', version: '2.6'
+	implementation group: 'commons-lang', name: 'commons-lang', version: '2.6'
 	
 	//  New StringUtils
 	// https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
-	compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.9'
+	implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.9'
 	
 	// https://mvnrepository.com/artifact/commons-io/commons-io
-	compile group: 'commons-io', name: 'commons-io', version: '2.6'
+	implementation group: 'commons-io', name: 'commons-io', version: '2.6'
 	
 	// https://mvnrepository.com/artifact/org.apache.commons/commons-math3
-	compile group: 'org.apache.commons', name: 'commons-math3', version: '3.6.1'
+	implementation group: 'org.apache.commons', name: 'commons-math3', version: '3.6.1'
 	
 	
 	//   Apache HTPP Client
 
 	// https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient
-	compile group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.8' // Was using 4.1.2
+	implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.8' // Was using 4.1.2
 
 	// https://mvnrepository.com/artifact/org.apache.httpcomponents/httpcore
-	compile group: 'org.apache.httpcomponents', name: 'httpcore', version: '4.4.11' // Was using 4.1.2
+	implementation group: 'org.apache.httpcomponents', name: 'httpcore', version: '4.4.11' // Was using 4.1.2
  	
 	
 	// https://mvnrepository.com/artifact/com.google.guava/guava
-	compile group: 'com.google.guava', name: 'guava', version: '27.1-jre'
+	implementation group: 'com.google.guava', name: 'guava', version: '27.1-jre'
 	
 	// https://mvnrepository.com/artifact/joda-time/joda-time
-	compile group: 'joda-time', name: 'joda-time', version: '2.10.2'
+	implementation group: 'joda-time', name: 'joda-time', version: '2.10.2'
 	
 	//  Jackson JSON parsing
 	
 	// https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core
-	compile group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.9.9'
+	implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.9.9'
 	
 	// https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
-	compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.9'
+	implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.9'
 	
 	//  BioJava
 	
 		//  version 5 exists for all jars:  https://mvnrepository.com/artifact/org.biojava/
 		
 	// https://mvnrepository.com/artifact/org.biojava/biojava-core
-	compile group: 'org.biojava', name: 'biojava-core', version: '4.2.12'
+	implementation group: 'org.biojava', name: 'biojava-core', version: '4.2.12'
 	
 	// https://mvnrepository.com/artifact/org.biojava/biojava-structure
-	compile group: 'org.biojava', name: 'biojava-structure', version: '4.2.12'
+	implementation group: 'org.biojava', name: 'biojava-structure', version: '4.2.12'
 	
 	// https://mvnrepository.com/artifact/org.biojava/biojava-alignment
-	compile group: 'org.biojava', name: 'biojava-alignment', version: '4.2.12'
+	implementation group: 'org.biojava', name: 'biojava-alignment', version: '4.2.12'
 	
 	
 	//  Struts 1.2.9
 	
 	// https://mvnrepository.com/artifact/struts/struts
-	compile group: 'struts', name: 'struts', version: '1.2.9'
+	implementation group: 'struts', name: 'struts', version: '1.2.9'
 		
 	// https://mvnrepository.com/artifact/struts/struts-el
-	compile group: 'struts', name: 'struts-el', version: '1.2.9'
+	implementation group: 'struts', name: 'struts-el', version: '1.2.9'
 		
 		
 	
@@ -232,17 +232,17 @@ dependencies {
 	//  Other Proxl Jars
 		
 	//  Jars built from other Proxl Github repositories
-	compile fileTree(dir: '../libs_proxl_github_jars', include: ['*.jar'])
+	implementation fileTree(dir: '../libs_proxl_github_jars', include: ['*.jar'])
 	
 	//  Other Yeastrc Jars
 	
 	//  Jars built from other Yeastrc Github repositories - Webapp only	
-	compile fileTree(dir: 'libs_webapp__yeastrc_github_jars', include: ['*.jar'])
+	implementation fileTree(dir: 'libs_webapp__yeastrc_github_jars', include: ['*.jar'])
 	
 	
 	//  Other Jars - Webapp only	
 	
-	compile fileTree(dir: 'libs_webapp__other', include: ['*.jar'])
+	implementation fileTree(dir: 'libs_webapp__other', include: ['*.jar'])
 	
 	
 	
@@ -272,7 +272,7 @@ processResources.dependsOn 'front_end:frontEndBuild'
 /*
  * Before the Gradle WAR processing creates the war, it deletes the output .war file to ensure it is always re-created 
  */
-processResources.dependsOn 'deleteExistingBuiltWar'
+// processResources.dependsOn 'deleteExistingBuiltWar'
 
 
 /*
@@ -280,6 +280,10 @@ processResources.dependsOn 'deleteExistingBuiltWar'
  */
 
 task deleteExistingBuiltWar(type: GradleBuild) {
+
+println("Task deleteExistingBuiltWar:  Return without doing anything !!!!!!!!!!!!!!!!!!!!!!!!!!")
+
+return
   	
   	println("Webapp Gradle build deleteExistingBuiltWar called - Before WAR created. Deletes the output .war file to ensure it is always re-created")
   	
@@ -299,6 +303,9 @@ task deleteExistingBuiltWar(type: GradleBuild) {
   	println("Deleting the output .war file " + warFileInBuildLibs )
   	  
 	delete warFileInBuildLibs
+	
+  	println("Delete Complete of the output .war file " + warFileInBuildLibs )
+  	  
 }
 
 
