@@ -31,7 +31,11 @@ import org.yeastrc.proxl.import_xml_to_db.pre_validate_xml.ValidateLinkers;
 import org.yeastrc.proxl.import_xml_to_db.pre_validate_xml.ValidateMatchedProteinSection;
 import org.yeastrc.proxl.import_xml_to_db.pre_validate_xml.ValidateModificationsOnReportedPeptides;
 import org.yeastrc.proxl.import_xml_to_db.pre_validate_xml.ValidatePsmPeptideRecordsUniqueIdOnPeptideRecord;
+import org.yeastrc.proxl.import_xml_to_db.pre_validate_xml.ValidateReportedPeptideMatchedProteins_SequencesAreValidCharacters;
 import org.yeastrc.proxl.import_xml_to_db.pre_validate_xml.ValidateScanFilenamesInXMLAreOnCommandLine;
+import org.yeastrc.proxl.import_xml_to_db.pre_validate_xml.Validate_AnnotationRecords_InAllPlaces_NoDuplicates_And_AllIn_AnnotationTypeRecords;
+import org.yeastrc.proxl.import_xml_to_db.pre_validate_xml.Validate_ReportedPeptideStrings_AllUnique;
+import org.yeastrc.proxl.import_xml_to_db.pre_validate_xml.Validate_StaticModEntries_Have_Unique_AminoAcidResidueLetters;
 import org.yeastrc.proxl.import_xml_to_db.process_input.ProcessProxlInput;
 import org.yeastrc.proxl.import_xml_to_db.project_importable_validation.IsImportingAllowForProject;
 import org.yeastrc.proxl_import.api.xml_dto.ProxlInput;
@@ -179,6 +183,10 @@ public class ImporterCoreEntryPoint {
 				SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI); 
 				Schema schema = sf.newSchema( xmlSchemaURL );
 				unmarshaller.setSchema(schema);
+			} else {
+				log.warn( "" );
+				log.warn( "NOT Performing XSD validation since is false Proxl_XSD_XML_Schema_Enabled_And_Filename_With_Path_Constant.PROXL_XSD_XML_SCHEMA_VALIDATION_ENABLED" );
+				log.warn( "" );
 			}
 			Object unmarshalledObject = null;
 			try {
@@ -255,8 +263,23 @@ public class ImporterCoreEntryPoint {
 		try {
 			//   Throws ProxlImporterDataException if data error found
 			ValidateLinkers.getInstance().validateLinkers( proxlInputForImport );
+
+			//   Throws ProxlImporterDataException if data error found
+			Validate_StaticModEntries_Have_Unique_AminoAcidResidueLetters.getInstance().validate_StaticModEntries_Have_Unique_AminoAcidResidueLetters(proxlInputForImport);
+
+			//   Throws ProxlImporterDataException if data error found
+			ValidateReportedPeptideMatchedProteins_SequencesAreValidCharacters.getInstance().validateReportedPeptideMatchedProteins_SequencesAreValidCharacters( proxlInputForImport );
+
+			
 			//   Throws ProxlImporterDataException if data error found
 			ValidateAnnotationTypeRecords.getInstance().validateAnnotationTypeRecords( proxlInputForImport );
+
+			//   Throws ProxlImporterDataException if data error found
+			Validate_AnnotationRecords_InAllPlaces_NoDuplicates_And_AllIn_AnnotationTypeRecords.getInstance().validate_AnnotationRecords_InAllPlaces_NoDuplicates_And_AllIn_AnnotationTypeRecords(proxlInputForImport);
+	
+			//   Throws ProxlImporterDataException if data error found
+			Validate_ReportedPeptideStrings_AllUnique.getInstance().validate_ReportedPeptideStrings_AllUnique( proxlInputForImport );
+			
 			//   Throws ProxlImporterDataException if data error found			
 			ValidateModificationsOnReportedPeptides.getInstance().validateModificationsOnReportedPeptides( proxlInputForImport );;
 			//   Throws ProxlImporterDataException if data error found
