@@ -19,6 +19,7 @@ import org.yeastrc.xlink.www.config_system_table.ConfigSystemCaching;
 import org.yeastrc.xlink.www.constants.WebConstants;
 import org.yeastrc.xlink.www.db_web.DBConnectionFactoryWeb;
 import org.yeastrc.xlink.www.db_web.DBSet_JNDI_Name_FromConfigFile;
+import org.yeastrc.xlink.www.file_import_proxl_xml_scans.constants.ProxlXMLFileUploadMaxFileSizeConstants;
 import org.yeastrc.xlink.www.log_error_after_webapp_undeploy_started.Log_Info_Error_AfterWebAppUndeploy_Started;
 import org.yeastrc.xlink.www.user_mgmt_webapp_access.UserMgmtCentralWebappWebserviceAccess;
 import org.yeastrc.xlink.www.no_data_validation.ThrowExceptionOnNoDataConfig;
@@ -121,6 +122,15 @@ public class ServletContextAppListener extends HttpServlet implements ServletCon
 			//  already logged
 			throw new RuntimeException( e );
 		} 
+		
+		try {
+			ProxlXMLFileUploadMaxFileSizeConstants.getValuesAndLog();
+		} catch (Throwable e) {
+			//  Eat Exception
+//			log.error( "Exception in FileUploadMaxFileSize_Config_WithConstantsDefaults.getValuesAndLog():", e  );
+//			throw new RuntimeException( e );
+		} 
+		
 		
 		log.warn( "INFO:  !!!!!!!!!!!!!!!   Start up of web app  'Proxl' complete  !!!!!!!!!!!!!!!!!!!! " );
 		log.warn( "INFO: Application context:" + contextPath );

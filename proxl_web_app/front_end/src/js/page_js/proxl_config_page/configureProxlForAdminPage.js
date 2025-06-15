@@ -143,6 +143,54 @@ window.saveListConfiguration = function() {
 		
 		 return;  //  EARLY EXIT
 	}	
+
+	//////
+
+	//  Validate Integer fields and write those parsed numbers back into the input field
+
+	{
+		let foundNumberError = false;
+		$(".config_integer_input_validate_jq").each( function( index, element ) {
+			var $configInput = $(this);
+			var inputValue = $configInput.val();
+			inputValue = inputValue.trim();
+
+			let numberError = false;
+			let valueInteger = undefined
+
+			if ( inputValue === "" ) {
+				$configInput.val(inputValue)
+			} else {
+				valueInteger = Number.parseInt(inputValue)
+				if (Number.isNaN(valueInteger)) {
+					numberError = true
+				}
+			}
+			const $config_single_input_root_jq = $configInput.closest(".config_single_input_root_jq")
+			const $config_integer_input_error_jq = $config_single_input_root_jq.find(".config_integer_input_error_jq")
+			if ( numberError ) {
+				foundNumberError = true;
+				$config_integer_input_error_jq.show()
+			} else {
+				$config_integer_input_error_jq.hide()
+				if ( valueInteger !== undefined ) {
+					try {
+						$configInput.val(valueInteger.toString())
+					} catch (e) {
+						var z = 0
+						throw e
+					}
+				}
+			}
+		});
+
+		if ( foundNumberError ) {
+			return;
+		}
+	}
+
+
+	//////
 	
 	//  Process text inputs
 	var $config_text_inputs_jq = $(".config_text_inputs_jq");

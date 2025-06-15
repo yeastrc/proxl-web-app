@@ -8,6 +8,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.yeastrc.xlink.www.constants.StrutsGlobalForwardNames;
+import org.yeastrc.xlink.www.file_import_proxl_xml_scans.constants.ProxlXMLFileUploadMaxFileSizeConstants;
 import org.yeastrc.xlink.www.access_control.result_objects.WebSessionAuthAccessLevel;
 import org.yeastrc.xlink.www.user_session_management.UserSession;
 import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result;
@@ -22,12 +23,12 @@ public class ConfigureProxlForAdminPageInitAction extends Action {
 	@Override
 	public ActionForward execute( ActionMapping mapping,
 			  ActionForm form,
-			  HttpServletRequest request,
-			  HttpServletResponse response )
+			  HttpServletRequest httpServletRequest,
+			  HttpServletResponse httpServletResponse )
 					  throws Exception {
 		try {
 			GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result accessAndSetupWebSessionResult =
-					GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.getSinglesonInstance().getAccessAndSetupWebSessionNoProjectId( request, response );
+					GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.getSinglesonInstance().getAccessAndSetupWebSessionNoProjectId( httpServletRequest, httpServletResponse );
 			if ( accessAndSetupWebSessionResult.isNoSession() ) {
 				//  No User session 
 				return mapping.findForward( StrutsGlobalForwardNames.NO_USER_SESSION );
@@ -42,7 +43,19 @@ public class ConfigureProxlForAdminPageInitAction extends Action {
 				return mapping.findForward( StrutsGlobalForwardNames.INSUFFICIENT_ACCESS_PRIVILEGE );
 			}
 			
-			GetPageHeaderData.getInstance().getPageHeaderDataWithoutProjectId( request );
+
+
+			httpServletRequest.setAttribute( 
+					"ProxlXML_FileSize_From_Environment_Or_JVM_dashD_Property", 
+					ProxlXMLFileUploadMaxFileSizeConstants.get_Max_ProxlXML_FileSize_From_Environment_Or_JVM_dashD_Property() );
+			
+			
+			httpServletRequest.setAttribute( 
+					"Max_Scan_FileSize_From_Environment_Or_JVM_dashD_Property", 
+					ProxlXMLFileUploadMaxFileSizeConstants.get_Max_Scan_FileSize_From_Environment_Or_JVM_dashD_Property() );
+
+			
+			GetPageHeaderData.getInstance().getPageHeaderDataWithoutProjectId( httpServletRequest );
 			return mapping.findForward( "Success" );
 			
 		} catch ( Exception e ) {

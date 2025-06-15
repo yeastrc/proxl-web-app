@@ -186,11 +186,11 @@ public class UploadFileForImportWebserviceAction extends Action {
 				//  if not allow scan files, throw exception here with 400 error
 			}
 			if ( fileType == ProxlXMLFileImportFileType.PROXL_XML_FILE ) {
-				maxFileSize = ProxlXMLFileUploadMaxFileSizeConstants.MAX_PROXL_XML_FILE_UPLOAD_SIZE;
-				maxFileSizeFormatted = ProxlXMLFileUploadMaxFileSizeConstants.MAX_PROXL_XML_FILE_UPLOAD_SIZE_FORMATTED;
+				maxFileSize = ProxlXMLFileUploadMaxFileSizeConstants.get_PROXL_XML_MAX_FILE_UPLOAD_SIZE();
+				maxFileSizeFormatted = ProxlXMLFileUploadMaxFileSizeConstants.get_MAX_PROXL_XML_FILE_UPLOAD_SIZE_FORMATTED();
 			} else if ( fileType == ProxlXMLFileImportFileType.SCAN_FILE ) {
-				maxFileSize = ProxlXMLFileUploadMaxFileSizeConstants.MAX_SCAN_FILE_UPLOAD_SIZE;
-				maxFileSizeFormatted = ProxlXMLFileUploadMaxFileSizeConstants.MAX_SCAN_FILE_UPLOAD_SIZE_FORMATTED;
+				maxFileSize = ProxlXMLFileUploadMaxFileSizeConstants.get_SCAN_MAX_FILE_UPLOAD_SIZE();
+				maxFileSizeFormatted = ProxlXMLFileUploadMaxFileSizeConstants.get_MAX_SCAN_FILE_UPLOAD_SIZE_FORMATTED();
 			} else {
 				String msg = "Unknown value for fileType: " + fileType;
 				log.error( msg );

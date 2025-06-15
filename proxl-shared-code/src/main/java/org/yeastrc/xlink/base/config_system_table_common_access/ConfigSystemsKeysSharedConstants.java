@@ -30,6 +30,14 @@ public class ConfigSystemsKeysSharedConstants {
 
 	public static final String SCAN_FILE_IMPORT_ALLOWED_VIA_WEB_SUBMIT_KEY = "scan_file_import_allowed_via_web_submit";
 
+	
+
+	public static final String PROXL_XML_FILE_MAX_FILE_SIZE_IN_GB_KEY = "proxl_xml_file_max_file_size_in_gb";
+
+	public static final String SCAN_FILE_MAX_FILE_SIZE_IN_GB_KEY = "scan_file_max_file_size_in_gb";
+
+	
+	
 	////              Delete uploaded files after Import key  -  Specific Values allowed
 
 	public static final String IMPORT_DELETE_UPLOADED_FILES = "import_delete_uploaded_files_after_import";
@@ -49,6 +57,10 @@ public class ConfigSystemsKeysSharedConstants {
 		textConfigKeys.add( CACHE_FILES_ROOT_DIRECTORY );
 		textConfigKeys.add( SPECTRAL_STORAGE_SERVICE_ACCEPT_IMPORT_BASE_URL );
 		textConfigKeys.add( SPECTRAL_STORAGE_SERVICE_GET_DATA_BASE_URL );
+
+		textConfigKeys.add( PROXL_XML_FILE_MAX_FILE_SIZE_IN_GB_KEY );
+		textConfigKeys.add( SCAN_FILE_MAX_FILE_SIZE_IN_GB_KEY );
+
 		textConfigKeys.add( file_import_proxl_xml_scans_TEMP_DIR_KEY );
 		textConfigKeys.add( SCAN_FILE_IMPORT_ALLOWED_VIA_WEB_SUBMIT_KEY );
 		
