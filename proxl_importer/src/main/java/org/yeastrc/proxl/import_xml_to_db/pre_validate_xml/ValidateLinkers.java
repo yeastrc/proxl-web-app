@@ -239,6 +239,9 @@ public class ValidateLinkers {
 					
 					Set<String> residueSet = new HashSet<>();
 					for ( String residue : residueList ) {
+						
+						Validate_Value_Of_Type_AminoAcidResidue.validate_Value_Of_Type_AminoAcidResidue(residue, "<residue>", "  Linker Name: " + proxlInputLinkerName );
+						
 						if ( ! residueSet.add( residue ) ) {
 							String msg = "More than one <residue> under the same <residues> has the same values.  Linker Name: " + proxlInputLinkerName;
 							log.error( msg );
