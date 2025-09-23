@@ -55,6 +55,37 @@
 
 	<echo>npm.executable: ${npm.executable}</echo>
 
+	<!--
+		npm install depends on prepare
+		executes 'npm install' in the web app to populate 'node_modules' folder
+	 -->
+	<target name="node_npm_versions">
+
+		<echo>node version: node -v</echo>
+			
+		<!--  web app - node -v  -->		
+		<exec executable="node" failonerror="true" >
+			<arg value="-v" />
+			<!--   <arg value="XXXX" /> -->
+		</exec>
+
+		<echo>npm version: ${npm.executable} -v</echo>
+			
+		<!--  web app - npm -v  -->		
+		<exec executable="${npm.executable}" failonerror="true" >
+			<arg value="-v" />
+			<!--   <arg value="XXXX" /> -->
+		</exec>
+
+		<!--  The Gradle task 'npm_install' in "proxl_web_app/front_end/build.gradle" does not work in Windows so execute npm directly here -->
+		<!--
+		<exec executable="${gradleExecutableToRun_Root}" dir="proxl_web_app/front_end" failonerror="true" 
+		    resolveexecutable="true" >
+			<arg value="npm_install" />
+		</exec>
+		-->		
+	</target>
+	
 	<!--  -->
 	<target name="clean" >
 		<delete dir="deploy" />
@@ -126,7 +157,7 @@
 	<!--
 		createInstallables depends on compileAllSubmodules
 	-->
-	<target name="createInstallables" depends="compileAllSubmodules">
+	<target name="createInstallables" depends="node_npm_versions,compileAllSubmodules">
 
 		<!-- copy files from subdir 'deploy' to deploy -->
 		<copy file="proxl_web_app/build/libs/proxl.war" todir="deploy" />
