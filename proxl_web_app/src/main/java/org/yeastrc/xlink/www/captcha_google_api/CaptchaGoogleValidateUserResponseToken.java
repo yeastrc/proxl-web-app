@@ -96,7 +96,14 @@ public class CaptchaGoogleValidateUserResponseToken {
 			byte[] responseBytesJustData = Arrays.copyOf(responseBytes, totalBytesRead);
 			ObjectMapper jacksonJSON_Mapper = new ObjectMapper();  //  Jackson JSON library object
 //			validationResponse = jacksonJSON_Mapper.readValue( responseInputStream, ValidationResponse.class );
-			validationResponse = jacksonJSON_Mapper.readValue( responseBytesJustData, ValidationResponse.class );
+			
+			try {
+				validationResponse = jacksonJSON_Mapper.readValue( responseBytesJustData, ValidationResponse.class );
+			} catch (Exception e ) {
+				
+				log.error( "Fail parsing webservice response from Google ReCaptcha URL " + URL, e );
+				throw e;
+			}
 			if ( validationResponse.errorCodes != null && validationResponse.errorCodes.length > 0 ) {
 				//  errorCodes indicates 
 				StringBuilder allErrorCodesSB = new StringBuilder( 1000 );
@@ -159,6 +166,10 @@ public class CaptchaGoogleValidateUserResponseToken {
 		@JsonProperty("error-codes")
 		private String[] errorCodes;
 		@SuppressWarnings("unused")
+		@JsonProperty("migration-warning")
+		private String migrationWarning;
+		
+		@SuppressWarnings("unused")
 		public void setSuccess(boolean success) {
 			this.success = success;
 		}
@@ -174,9 +185,19 @@ public class CaptchaGoogleValidateUserResponseToken {
 		public void setErrorCodes(String[] errorCodes) {
 			this.errorCodes = errorCodes;
 		}
+
+		@SuppressWarnings("unused")
+		public String getMigrationWarning() {
+			return migrationWarning;
+		}
+		@SuppressWarnings("unused")
+		public void setMigrationWarning(String migrationWarning) {
+			this.migrationWarning = migrationWarning;
+		}
 //		"success": true|false,
 //		  "challenge_ts": timestamp,  // timestamp of the challenge load (ISO format yyyy-MM-dd'T'HH:mm:ssZZ)
 //		  "hostname": string,         // the hostname of the site where the reCAPTCHA was solved
-//		  "error-codes": [...]        // optional
+//		  "error-codes": [...],        // optional
+//		  "migration-warning": string
 	}
 }
