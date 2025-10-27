@@ -104,6 +104,9 @@ public class CaptchaGoogleValidateUserResponseToken {
 				log.error( "Fail parsing webservice response from Google ReCaptcha URL " + URL, e );
 				throw e;
 			}
+			if ( validationResponse.migrationWarning != null ) {
+				log.warn( "Google ReCaptcha response contains property 'migration-warning' with value: " + validationResponse.migrationWarning );
+			}
 			if ( validationResponse.errorCodes != null && validationResponse.errorCodes.length > 0 ) {
 				//  errorCodes indicates 
 				StringBuilder allErrorCodesSB = new StringBuilder( 1000 );
