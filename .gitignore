@@ -1,6 +1,9 @@
 *.class
 
 /.gradle/
+/.npm/
+/proxl_web_app/front_end/.npm/
+
 aa_ant__build_all_proxl_config.properties
 
 
