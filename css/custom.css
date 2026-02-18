@@ -42,6 +42,18 @@
     color: #a55353;
 }
 
+a:not(.btn):not(.navbar-brand) {
+    text-decoration-line: underline;
+    text-decoration-style: dashed;
+    text-decoration-color: currentColor;
+    text-underline-offset: 0.14em;
+}
+
+a:not(.btn):not(.navbar-brand):hover,
+a:not(.btn):not(.navbar-brand):focus {
+    text-decoration-style: solid;
+}
+
 .jumbotron {
 	background-color: #fff0f0;
 	border-top:#a55353;
