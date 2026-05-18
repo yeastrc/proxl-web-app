@@ -332,7 +332,7 @@ public class ValidateAnnotationTypeRecords {
 			}
 			for ( FilterablePeptideAnnotationType filterablePeptideAnnotationType : filterablePeptideAnnotationTypeList ) {
 				foundPeptideFilterableAnnotationType = true;
-				if ( filterablePeptideAnnotationType.isDefaultFilter() ) {
+				if ( filterablePeptideAnnotationType.isDefaultFilter() != null && filterablePeptideAnnotationType.isDefaultFilter().booleanValue() ) {
 					foundPeptideDefaultFilterableAnnotationType = true;
 					break;
 				}
