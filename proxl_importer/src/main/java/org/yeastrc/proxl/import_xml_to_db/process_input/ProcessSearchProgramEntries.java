@@ -167,8 +167,11 @@ public class ProcessSearchProgramEntries {
 			String filterDirectionString = filterablePeptideAnnotationType.getFilterDirection().value();
 			FilterDirectionType filterDirectionType = FilterDirectionType.fromValue(filterDirectionString);
 			annotationTypeFilterableDTO.setFilterDirectionType( filterDirectionType );
-			annotationTypeFilterableDTO.setDefaultFilter( filterablePeptideAnnotationType.isDefaultFilter() );
-			annotationTypeFilterableDTO.setDefaultFilterAtDatabaseLoad( filterablePeptideAnnotationType.isDefaultFilter() );
+			Boolean defaultFilter = filterablePeptideAnnotationType.isDefaultFilter();
+			if ( defaultFilter != null && defaultFilter.booleanValue() ) {
+				annotationTypeFilterableDTO.setDefaultFilter( true );
+				annotationTypeFilterableDTO.setDefaultFilterAtDatabaseLoad( true );
+			}
 			BigDecimal defaultFilterValue = filterablePeptideAnnotationType.getDefaultFilterValue();
 			if ( defaultFilterValue != null ) {
 				annotationTypeFilterableDTO.setDefaultFilterValue( defaultFilterValue.doubleValue() );
