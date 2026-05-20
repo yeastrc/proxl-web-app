@@ -245,7 +245,7 @@ public class DBConnectionParametersProviderFromPropertiesFileEnvironmentVariable
 			System.out.println( "Database connection parameters:");
 			
 			if ( StringUtils.isNotEmpty( username ) ) {
-				System.out.println( "Environment Variable '" + ENVIRONMENT_VARIABLE__DB_HOST 
+				System.out.println( "Environment Variable '" + ENVIRONMENT_VARIABLE__USERNAME
 						+ "' OR Database connection parameters file: parameter '" + PROPERTY_NAME__USERNAME + "' has a value" );
 			}
 			if ( StringUtils.isNotEmpty( password ) ) {

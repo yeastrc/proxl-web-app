@@ -5,3 +5,5 @@
 .classpath
 .project
 
+/proxl_get_import_last_check_status.txt
+/proxl_run_importer_run_control.txt
