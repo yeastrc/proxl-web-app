@@ -156,6 +156,14 @@ public class ScanFileToSpectralStorageService_Processing {
 //									+ scanFileWithPath.getCanonicalPath() );
 //							log.warn( "  ... addnl info: call sendScanFilenameWithPathToSpectralStorageService(...) returned statusSuccess False" );
 
+						} else if ( uploadScanFile_AddScanFileFromFilenameAndPath_Response.isUploadScanFileWithPath_FileNotFound() ) {
+
+							//  Already reported in called method
+//							log.warn( "Send of Scan file with path to Spectral Storage Service rejected.  Will next send scan file contents" );
+//							log.warn( "  ... addnl info: Proxl Importer configured to send Scan file path to Spectral Storage Service but for this specific scan file, the Scan file path was not allowed.  Scan File with path (Java Get Canonical file with Path): "
+//									+ scanFileWithPath.getCanonicalPath() );
+//							log.warn( "  ... addnl info: call sendScanFilenameWithPathToSpectralStorageService(...) returned statusSuccess False" );
+
 						} else {
 							String msg = "Send of Scan file with path to Spectral Storage Service Failed.";
 							log.warn( msg );
@@ -466,61 +474,63 @@ public class ScanFileToSpectralStorageService_Processing {
 						log.warn( "  ... addnl info: call sendScanFilenameWithPathToSpectralStorageService(...) returned statusSuccess False" );
 
 						return response; // EARLY EXIT
+					} else if ( response.isUploadScanFileWithPath_FileNotFound() ) {
+						String msg = "Send Scan File to Spectral Storage Service. Send Filename And Path. In sendScanFilenameWithPathToSpectralStorageService(): call_UploadScanFile_UploadScanFile_Service return UploadScanFileWithPath_FileNotFound true.  UploadScanFileTempKey: " 
+								+ uploadScanFile_Init_Response.getUploadScanFileTempKey()
+								+ ", Scan File: " + scanFileWithPath.getAbsolutePath();
+						log.warn( msg );
+						log.warn( "  ... addnl info: call sendScanFilenameWithPathToSpectralStorageService(...) returned statusSuccess False" );
+
+						return response; // EARLY EXIT
 					}
 					
 					if ( response.isUploadScanFileTempKey_NotFound() ) {
 						uploadScanFileTempKey_NotFound_ErrorResponse = true;
-						String msg = "Send Scan File to Spectral Storage Service. Actually send the file. In sendScanFilenameWithPathToSpectralStorageService(): call_UploadScanFile_UploadScanFile_Service return UploadScanFileTempKey_NotFound true.  UploadScanFileTempKey: " 
+						String msg = "Send Scan File to Spectral Storage Service. Send Filename And Path. In sendScanFilenameWithPathToSpectralStorageService(): call_UploadScanFile_UploadScanFile_Service return UploadScanFileTempKey_NotFound true.  UploadScanFileTempKey: " 
 								 + uploadScanFile_Init_Response.getUploadScanFileTempKey()
 								 + ", Scan File: " + scanFileWithPath.getAbsolutePath();
 						log.error( msg );
 					}
 
 					if ( response.isFilenameSuffixNotValid() ) {
-						String msg = "Send Scan File to Spectral Storage Service. Actually send the file. In sendScanFilenameWithPathToSpectralStorageService(): call_UploadScanFile_UploadScanFile_Service return FilenameSuffixNotValid true.  UploadScanFileTempKey: " 
+						String msg = "Send Scan File to Spectral Storage Service. Send Filename And Path. In sendScanFilenameWithPathToSpectralStorageService(): call_UploadScanFile_UploadScanFile_Service return FilenameSuffixNotValid true.  UploadScanFileTempKey: " 
 								 + uploadScanFile_Init_Response.getUploadScanFileTempKey()
 								 + ", Scan File: " + scanFileWithPath.getAbsolutePath();
 						log.error( msg );
 					}
 					if ( response.getFileSizeLimitExceeded() != null && response.getFileSizeLimitExceeded().booleanValue() ) {
-						String msg = "Send Scan File to Spectral Storage Service. Actually send the file. In sendScanFilenameWithPathToSpectralStorageService(): call_UploadScanFile_UploadScanFile_Service return FileSizeLimitExceeded true.  UploadScanFileTempKey: " 
+						String msg = "Send Scan File to Spectral Storage Service. Send Filename And Path. In sendScanFilenameWithPathToSpectralStorageService(): call_UploadScanFile_UploadScanFile_Service return FileSizeLimitExceeded true.  UploadScanFileTempKey: " 
 								 + uploadScanFile_Init_Response.getUploadScanFileTempKey()
 								 + ", Scan File: " + scanFileWithPath.getAbsolutePath();
 						log.error( msg );
 					}
 					if ( response.isUploadScanFileWithPath_NotMatch_SubmittedFileSize() ) {
-						String msg = "Send Scan File to Spectral Storage Service. Actually send the file. In sendScanFilenameWithPathToSpectralStorageService(): call_UploadScanFile_UploadScanFile_Service return UploadScanFileWithPath_NotMatch_SubmittedFileSize true.  UploadScanFileTempKey: " 
-								 + uploadScanFile_Init_Response.getUploadScanFileTempKey()
-								 + ", Scan File: " + scanFileWithPath.getAbsolutePath();
-						log.error( msg );
-					}
-					if ( response.isUploadScanFileWithPath_FileNotFound() ) {
-						String msg = "Send Scan File to Spectral Storage Service. Actually send the file. In sendScanFilenameWithPathToSpectralStorageService(): call_UploadScanFile_UploadScanFile_Service return UploadScanFileWithPath_FileNotFound true.  UploadScanFileTempKey: " 
+						String msg = "Send Scan File to Spectral Storage Service. Send Filename And Path. In sendScanFilenameWithPathToSpectralStorageService(): call_UploadScanFile_UploadScanFile_Service return UploadScanFileWithPath_NotMatch_SubmittedFileSize true.  UploadScanFileTempKey: " 
 								 + uploadScanFile_Init_Response.getUploadScanFileTempKey()
 								 + ", Scan File: " + scanFileWithPath.getAbsolutePath();
 						log.error( msg );
 					}
 					if ( response.isUploadScanFileWithPath_FilePathsAllowedNotConfigured() ) {
-						String msg = "Send Scan File to Spectral Storage Service. Actually send the file. In sendScanFilenameWithPathToSpectralStorageService(): call_UploadScanFile_UploadScanFile_Service return UploadScanFileWithPath_FilePathsAllowedNotConfigured true.  UploadScanFileTempKey: " 
+						String msg = "Send Scan File to Spectral Storage Service. Send Filename And Path. In sendScanFilenameWithPathToSpectralStorageService(): call_UploadScanFile_UploadScanFile_Service return UploadScanFileWithPath_FilePathsAllowedNotConfigured true.  UploadScanFileTempKey: " 
 								 + uploadScanFile_Init_Response.getUploadScanFileTempKey()
 								 + ", Scan File: " + scanFileWithPath.getAbsolutePath();
 						log.error( msg );
 					}
 					if ( response.isUploadScanFileWithPath_FilePathNotAllowed() ) {
-						String msg = "Send Scan File to Spectral Storage Service. Actually send the file. In sendScanFilenameWithPathToSpectralStorageService(): call_UploadScanFile_UploadScanFile_Service return UploadScanFileWithPath_FilePathNotAllowed true.  UploadScanFileTempKey: " 
+						String msg = "Send Scan File to Spectral Storage Service. Send Filename And Path. In sendScanFilenameWithPathToSpectralStorageService(): call_UploadScanFile_UploadScanFile_Service return UploadScanFileWithPath_FilePathNotAllowed true.  UploadScanFileTempKey: " 
 								 + uploadScanFile_Init_Response.getUploadScanFileTempKey()
 								 + ", Scan File: " + scanFileWithPath.getAbsolutePath();
 						log.error( msg );
 					}
 					if ( response.isUploadScanFileTempKey_Expired() ) {
-						String msg = "Send Scan File to Spectral Storage Service. Actually send the file. In sendScanFilenameWithPathToSpectralStorageService(): call_UploadScanFile_UploadScanFile_Service return UploadScanFileTempKey_Expired true.  UploadScanFileTempKey: " 
+						String msg = "Send Scan File to Spectral Storage Service. Send Filename And Path. In sendScanFilenameWithPathToSpectralStorageService(): call_UploadScanFile_UploadScanFile_Service return UploadScanFileTempKey_Expired true.  UploadScanFileTempKey: " 
 								 + uploadScanFile_Init_Response.getUploadScanFileTempKey()
 								 + ", Scan File: " + scanFileWithPath.getAbsolutePath();
 						log.error( msg );
 					}
 
 					
-					String msg = "Send Scan File to Spectral Storage Service. Actually send the file. In sendScanFilenameWithPathToSpectralStorageService(): call_UploadScanFile_UploadScanFile_Service return StatusSuccess false.  UploadScanFileTempKey: " 
+					String msg = "Send Scan File to Spectral Storage Service. Send Filename And Path. In sendScanFilenameWithPathToSpectralStorageService(): call_UploadScanFile_UploadScanFile_Service return StatusSuccess false.  UploadScanFileTempKey: " 
 							 + uploadScanFile_Init_Response.getUploadScanFileTempKey()
 							 + ", Scan File: " + scanFileWithPath.getAbsolutePath();
 					log.error( msg );
@@ -538,7 +548,7 @@ public class ScanFileToSpectralStorageService_Processing {
 							+ ", UploadScanFileTempKey: " + uploadScanFile_Init_Response.getUploadScanFileTempKey();
 					}
 					
-					String msg = "Send Scan File to Spectral Storage Service. Actually send the file. In sendScanFilenameWithPathToSpectralStorageService(): call_UploadScanFile_UploadScanFile_Service threw exception and failed for retryCount == SEND_FILE_RETRY_COUNT or uploadScanFileTempKey_NotFound_ErrorResponse is true. uploadScanFileTempKey_NotFound_ErrorResponse: " 
+					String msg = "Send Scan File to Spectral Storage Service. Send Filename And Path. In sendScanFilenameWithPathToSpectralStorageService(): call_UploadScanFile_UploadScanFile_Service threw exception and failed for retryCount == SEND_FILE_RETRY_COUNT or uploadScanFileTempKey_NotFound_ErrorResponse is true. uploadScanFileTempKey_NotFound_ErrorResponse: " 
 							+ uploadScanFileTempKey_NotFound_ErrorResponse
 							+ ", scanProcessStatusKeyResponsePar: " + scanProcessStatusKeyResponsePart
 							+ ", Scan File: " + scanFileWithPath.getAbsolutePath();
