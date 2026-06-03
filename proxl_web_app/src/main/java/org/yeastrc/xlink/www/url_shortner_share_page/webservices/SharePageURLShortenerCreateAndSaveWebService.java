@@ -1,6 +1,8 @@
 package org.yeastrc.xlink.www.url_shortner_share_page.webservices;
 
+import java.nio.ByteBuffer;
 import java.sql.SQLException;
+import java.util.Base64;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
@@ -25,8 +27,6 @@ import org.yeastrc.xlink.www.dto.URLShortenerDTO;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappInternalErrorException;
 import org.yeastrc.xlink.www.servlet_context.CurrentContext;
 import org.yeastrc.xlink.www.user_session_management.UserSession;
-import com.google.common.io.BaseEncoding;
-import com.google.common.primitives.Longs;
 
 /**
  * 
@@ -183,11 +183,12 @@ public class SharePageURLShortenerCreateAndSaveWebService {
 			throw e;
 		}
 	}
-	
+
 	/**
 	 * @return
 	 */
 	private String getShortenedKey() {
+
 		StringBuilder randomStringSB = new StringBuilder( 16 );
 
 		final int RETURN_LENGTH = 10;
@@ -200,20 +201,33 @@ public class SharePageURLShortenerCreateAndSaveWebService {
 				tosKeyMultiplier += 0.5;
 			}
 			long tosKeyLong = (long) ( System.currentTimeMillis() * tosKeyMultiplier );
-			// Google Guava classes BaseEncoding and Longs
-			String encodedLong = BaseEncoding.base64().encode( Longs.toByteArray(tosKeyLong) );
+			ByteBuffer tosKeyBuffer = ByteBuffer.allocate(Long.BYTES);
+			tosKeyBuffer.putLong( tosKeyLong );
+			
+			String encodedLong = Base64.getEncoder().encodeToString( tosKeyBuffer.array() );
 			// Drop first 6 characters and last character
 			String encodedLongExtract = encodedLong.substring( 6, encodedLong.length() - 1 );
 			
 			char[] encodedLongArray = encodedLongExtract.toCharArray();
 			
 			for ( char entry : encodedLongArray ) {
+				if ( // ( entry >= 'a' && entry <= 'z' )
+						// || 
+						( entry >= 'A' && entry <= 'Z' )
+						|| ( entry >= '1' && entry <= '9' ) ) {
+					//  Only take A-Z, 1-9.
+
+					if ( entry == 'a' || entry == 'e' || entry == 'i' || entry == 'o' || entry == 'u' || entry == 'y' 
+							|| entry == 'A' || entry == 'E' || entry == 'I' || entry == 'O' || entry == 'U' || entry == 'Y' ) {
+						// Skip all vowels so cannot spell words
+						continue;
+					}
+					
+					if ( entry == 'l' || entry == 'I' ) {
+						//  Not take lower case l and upper case I since in many fonts they look too similar
+						continue;
+					}
 				
-//				entry = '9';
-				
-				if ( ( entry >= 'a' && entry <= 'z' )
-						|| ( entry >= 'A' && entry <= 'Z' )
-						|| ( entry >= '0' && entry <= '9' ) ) {
 					randomStringSB.append( entry );
 					insertedCharacterCount++;
 					if ( insertedCharacterCount >= RETURN_LENGTH ) {
@@ -226,13 +240,13 @@ public class SharePageURLShortenerCreateAndSaveWebService {
 			}
 		}
 		if ( insertedCharacterCount < RETURN_LENGTH ) {
-			throw new RuntimeException("Not find enough letters and numbers for randomString. insertedCharacterCount: " + insertedCharacterCount );
+			throw new ProxlWebappInternalErrorException("Not find enough letters and numbers for randomString. insertedCharacterCount: " + insertedCharacterCount );
 		}
-
 		String randomString = randomStringSB.toString();
+
 		return randomString;
 	}
-	
+    
 	/**
 	 * Webservice request JSON Mapping
 	 *

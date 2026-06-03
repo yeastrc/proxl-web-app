@@ -13,6 +13,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
+import org.yeastrc.auth.utils.GenerateRandomStringForCode;
 import org.yeastrc.xlink.base.file_import_proxl_xml_scans.utils.Proxl_XML_ImporterWrkDirAndSbDrsCmmn;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.dao.ProjectDAO;
@@ -181,16 +182,7 @@ public class ProxlXMLFileImportUploadInitService {
 				//   Pass it the filename that will contain the key required when 
 				//        the submitter passes full filename paths to the files to process.
 				//  Generate a random string
-				StringBuilder submitterKeySB = new StringBuilder( 200 );
-				for ( int i = 0; i < 15; i++ ) {
-					double submitterKeyMultiplier = Math.random();
-					if ( submitterKeyMultiplier < 0.5 ) {
-						submitterKeyMultiplier += 0.5;
-					}
-					long submitterKeyLong = (long) ( System.currentTimeMillis() * submitterKeyMultiplier );
-					submitterKeySB.append( Long.toHexString( submitterKeyLong ) );
-				}
-				String submitterKey = submitterKeySB.toString();
+				String submitterKey = GenerateRandomStringForCode.getInstance().generateRandomStringForCode();
 				//   Write the string to the file
 				File submitterKeyFile = new File( 
 						createdSubDir, 
