@@ -1,8 +1,7 @@
 package org.yeastrc.xlink.www.url_shortner_share_page.webservices;
 
-import java.nio.ByteBuffer;
+import java.security.SecureRandom;
 import java.sql.SQLException;
-import java.util.Base64;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
@@ -38,6 +37,23 @@ public class SharePageURLShortenerCreateAndSaveWebService {
 	private static final Logger log = LoggerFactory.getLogger( SharePageURLShortenerCreateAndSaveWebService.class);
 	
 	private static final int RETRY_COUNT_MAX_ON_DUPLICATE_SHORT_KEY = 10;
+
+	/**
+	 *  Alphabet of allowed characters: digits 0-9 plus lower case consonants.
+	 *
+	 *  Vowels ( a e i o u y ) are excluded so codes cannot spell words.
+	 *  Lower case 'l' and upper case 'I' are excluded since they look alike in many fonts.
+	 *  Number 0 is excluded since can look like upper case 'O'.
+	 *  Number 1 is excluded since can look like lower case 'l'.
+	 *  Removed more letters and added capitol letters.
+	 *  All characters are URL / email safe (codes are placed in links).
+	 */
+	private static final char[] SHARE_CODE__ALLOWED_CHARS =
+			"23456789BCDFGHJKMNPRSTX".toCharArray();
+
+
+	private static final SecureRandom secureRandom = new SecureRandom();
+
 	
 	/**
 	 * @param webServiceRequest
@@ -189,60 +205,16 @@ public class SharePageURLShortenerCreateAndSaveWebService {
 	 */
 	private String getShortenedKey() {
 
-		StringBuilder randomStringSB = new StringBuilder( 16 );
-
 		final int RETURN_LENGTH = 10;
 		
-		int insertedCharacterCount = 0;
-		
-		for ( int j = 0; j < 200; j++ ) { // for loop just provides an upper bound
-			double tosKeyMultiplier = Math.random();
-			if ( tosKeyMultiplier < 0.5 ) {
-				tosKeyMultiplier += 0.5;
-			}
-			long tosKeyLong = (long) ( System.currentTimeMillis() * tosKeyMultiplier );
-			ByteBuffer tosKeyBuffer = ByteBuffer.allocate(Long.BYTES);
-			tosKeyBuffer.putLong( tosKeyLong );
-			
-			String encodedLong = Base64.getEncoder().encodeToString( tosKeyBuffer.array() );
-			// Drop first 6 characters and last character
-			String encodedLongExtract = encodedLong.substring( 6, encodedLong.length() - 1 );
-			
-			char[] encodedLongArray = encodedLongExtract.toCharArray();
-			
-			for ( char entry : encodedLongArray ) {
-				if ( // ( entry >= 'a' && entry <= 'z' )
-						// || 
-						( entry >= 'A' && entry <= 'Z' )
-						|| ( entry >= '1' && entry <= '9' ) ) {
-					//  Only take A-Z, 1-9.
+		StringBuilder randomStringSB = new StringBuilder( RETURN_LENGTH + 5 );
 
-					if ( entry == 'a' || entry == 'e' || entry == 'i' || entry == 'o' || entry == 'u' || entry == 'y' 
-							|| entry == 'A' || entry == 'E' || entry == 'I' || entry == 'O' || entry == 'U' || entry == 'Y' ) {
-						// Skip all vowels so cannot spell words
-						continue;
-					}
-					
-					if ( entry == 'l' || entry == 'I' ) {
-						//  Not take lower case l and upper case I since in many fonts they look too similar
-						continue;
-					}
-				
-					randomStringSB.append( entry );
-					insertedCharacterCount++;
-					if ( insertedCharacterCount >= RETURN_LENGTH ) {
-						break;
-					}
-				}
-			}
-			if ( insertedCharacterCount >= RETURN_LENGTH ) {
-				break;
-			}
+		for ( int i = 0; i < RETURN_LENGTH; i++ ) {
+			//  nextInt( bound ) is unbiased so each allowed character is equally likely
+			randomStringSB.append( SHARE_CODE__ALLOWED_CHARS[ secureRandom.nextInt( SHARE_CODE__ALLOWED_CHARS.length ) ] );
 		}
-		if ( insertedCharacterCount < RETURN_LENGTH ) {
-			throw new ProxlWebappInternalErrorException("Not find enough letters and numbers for randomString. insertedCharacterCount: " + insertedCharacterCount );
-		}
-		String randomString = randomStringSB.toString();
+
+		String randomString = randomStringSB.substring( 0, RETURN_LENGTH );
 
 		return randomString;
 	}
