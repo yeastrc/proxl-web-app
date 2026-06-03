@@ -15,6 +15,7 @@ import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 //import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.proxl_import.xsd_element_attr_names_constants.XSD_ElementAttributeNamesConstants;
+import org.yeastrc.xlink.base.XMLInputFactory_XXE_Safe_Creator.XMLInputFactory_XXE_Safe_Creator;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
 
 /**
@@ -54,7 +55,9 @@ public class Minimal_Validate_ProxlXMLFile_AndGetSearchNameIfInFile {
 		XMLEventReader xmlEventReader = null;
 		try {
 			proxlXMLFileInputStream = new FileInputStream( proxlXMLFile );
-			XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
+			
+			XMLInputFactory xmlInputFactory = XMLInputFactory_XXE_Safe_Creator.xmlInputFactory_XXE_Safe_Creator();
+			
 			xmlEventReader = xmlInputFactory.createXMLEventReader( proxlXMLFileInputStream );
 			while ( xmlEventReader.hasNext() ) {
 				XMLEvent event = xmlEventReader.nextEvent();
