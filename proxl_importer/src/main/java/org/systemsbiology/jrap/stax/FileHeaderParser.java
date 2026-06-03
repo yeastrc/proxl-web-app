@@ -73,7 +73,7 @@ public class FileHeaderParser{
     {
 	
 	try{
-	    XMLInputFactory inputFactory = XMLInputFactory.newInstance();
+	    XMLInputFactory inputFactory = Z_Create_XMLInputFactory_XXE_Safe.create_XMLInputFactory_XXE_Safe();
 	    XMLStreamReader xmlSR = inputFactory.createXMLStreamReader(new FileInputStream(inputMZXMLfile));
 
 	    parseXMLFileHeader(xmlSR);
@@ -219,7 +219,7 @@ public class FileHeaderParser{
     {
 
 	try{
-	    XMLInputFactory inputFactory = XMLInputFactory.newInstance();
+	    XMLInputFactory inputFactory = Z_Create_XMLInputFactory_XXE_Safe.create_XMLInputFactory_XXE_Safe();
 	    XMLStreamReader xmlSR = inputFactory.createXMLStreamReader(new FileInputStream(inputMZXMLfile));
 
 	    parseMLFileHeader(xmlSR);

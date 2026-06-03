@@ -118,7 +118,7 @@ public class MLScanAndHeaderParser
     {
         XMLStreamReader xmlSR = null;
         try{
-            XMLInputFactory inputFactory = XMLInputFactory.newInstance();
+            XMLInputFactory inputFactory = Z_Create_XMLInputFactory_XXE_Safe.create_XMLInputFactory_XXE_Safe();
             xmlSR = inputFactory.createXMLStreamReader(fileIN,"ISO-8859-1");
 
             parseMLScanAndHeader(xmlSR);

@@ -69,7 +69,7 @@ public class MSXMLSequentialParser {
         chrogramIndex = indexParser.getChrogramIndex();
 
         inputStr = new FileInputStream(fileName);
-        XMLInputFactory inputFactory = XMLInputFactory.newInstance();
+        XMLInputFactory inputFactory = Z_Create_XMLInputFactory_XXE_Safe.create_XMLInputFactory_XXE_Safe();
         xmlSR = inputFactory.createXMLStreamReader(inputStr);
 
         //  djaschob  7-25-2014   

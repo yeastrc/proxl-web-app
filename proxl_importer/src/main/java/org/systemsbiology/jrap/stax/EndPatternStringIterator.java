@@ -23,7 +23,7 @@ import java.io.IOException;
 
 public class EndPatternStringIterator implements Iterator {
 
-    private static XMLInputFactory inputfactory = XMLInputFactory.newInstance();
+    private static XMLInputFactory inputfactory = Z_Create_XMLInputFactory_XXE_Safe.create_XMLInputFactory_XXE_Safe();
 
     private LineIterator li;
 
