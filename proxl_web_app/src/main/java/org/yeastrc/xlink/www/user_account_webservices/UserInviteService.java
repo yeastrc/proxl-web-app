@@ -29,7 +29,7 @@ import org.yeastrc.xlink.www.dto.ProjectDTO;
 import org.yeastrc.xlink.www.dto.ZzUserDataMirrorDTO;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappInternalErrorException;
 import org.yeastrc.xlink.www.access_control.result_objects.WebSessionAuthAccessLevel;
-import org.yeastrc.xlink.www.constants.StrutsActionPathsConstants;
+import org.yeastrc.xlink.www.constants.SpringMvcActionPathsConstants;
 import org.yeastrc.xlink.www.constants.WebConstants;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.send_email.GetEmailConfig;
@@ -518,7 +518,7 @@ public class UserInviteService {
 	throws Exception {
 		//  Does NOT include slash after web app context
 		String requestURLIncludingWebAppContext = (String) request.getAttribute( WebConstants.REQUEST_URL_ONLY_UP_TO_WEB_APP_CONTEXT );
-		String newURL = requestURLIncludingWebAppContext + StrutsActionPathsConstants.USER_INVITE_PROCESS_CODE
+		String newURL = requestURLIncludingWebAppContext + SpringMvcActionPathsConstants.USER_INVITE_PROCESS_CODE
 				+ "?" + WebConstants.PARAMETER_INVITE_CODE + "=" + authUserInviteTrackingDTO.getInviteTrackingCode();
 		// set the message body
 		String text = 

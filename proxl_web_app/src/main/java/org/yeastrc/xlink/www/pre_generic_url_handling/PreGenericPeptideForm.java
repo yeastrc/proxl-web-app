@@ -1,13 +1,12 @@
 package org.yeastrc.xlink.www.pre_generic_url_handling;
 
-import org.apache.struts.action.ActionForm;
 import org.yeastrc.xlink.www.constants.PeptideViewLinkTypesConstants;
 
 /**
  * This form is for processing old URLs before change to Generic
  *
  */
-public class PreGenericPeptideForm extends ActionForm {
+public class PreGenericPeptideForm {
 
 	private static final long serialVersionUID = 1L;
 

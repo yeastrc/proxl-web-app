@@ -209,16 +209,13 @@ dependencies {
 	implementation group: 'org.biojava', name: 'biojava-alignment', version: '4.2.12'
 	
 	
-	//  Struts 1.2.9
-	
-	// https://mvnrepository.com/artifact/struts/struts
-	implementation group: 'struts', name: 'struts', version: '1.2.9'
-		
-	// https://mvnrepository.com/artifact/struts/struts-el
-	implementation group: 'struts', name: 'struts-el', version: '1.2.9'
-		
-		
-	
+	//  Spring Web MVC (5.3.x - last 'javax.*' / Servlet 3.1+ line; replacing Struts incrementally)
+	//  Brings in spring-web, spring-context, spring-beans, spring-core, spring-expression, spring-aop transitively.
+	// https://mvnrepository.com/artifact/org.springframework/spring-webmvc
+	implementation group: 'org.springframework', name: 'spring-webmvc', version: '5.3.39'
+
+
+
 	// JAXB dependencies (Required for Java 11+)
 	// https://mvnrepository.com/artifact/jakarta.xml.bind/jakarta.xml.bind-api
 	implementation group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '2.3.2'

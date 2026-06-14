@@ -4,12 +4,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
-import org.apache.struts.action.Action;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.ActionMessage;
-import org.apache.struts.action.ActionMessages;
+import org.yeastrc.xlink.www.spring_controllers.SpringActionMessages;
 import org.yeastrc.xlink.base.config_system_table_common_access.ConfigSystemsKeysSharedConstants;
 import org.yeastrc.xlink.base.config_system_table_common_access.ConfigSystemsValuesSharedConstants;
 import org.yeastrc.xlink.www.config_system_table.ConfigSystemCaching;
@@ -22,14 +17,11 @@ import org.yeastrc.xlink.www.user_web_utils.ValidateUserInviteTrackingCode;
  * 
  *
  */
-public class UserInviteCreateNewUserInitPageAction extends Action {
+public class UserInviteCreateNewUserInitPageAction {
 
 	private static final Logger log = LoggerFactory.getLogger( UserInviteCreateNewUserInitPageAction.class);
 
-	@Override
-	public ActionForward execute( ActionMapping mapping,
-			  ActionForm actionForm,
-			  HttpServletRequest request,
+	public String execute( HttpServletRequest request,
 			  HttpServletResponse response )
 					  throws Exception {
 
@@ -42,12 +34,10 @@ public class UserInviteCreateNewUserInitPageAction extends Action {
 			if ( ! validateUserInviteTrackingCode.validateInviteTrackingCode() ) {
 
 				String errorMsgKey = validateUserInviteTrackingCode.getErrorMsgKey();
-	
-				ActionMessages messages = new ActionMessages();
-				messages.add( ActionMessages.GLOBAL_MESSAGE, new ActionMessage( errorMsgKey ) );
-				saveErrors( request, messages );
-				
-				return mapping.findForward("Failure");
+
+				SpringActionMessages.setErrorMessageKey( request, errorMsgKey );
+
+				return "Failure";
 			}
 			
 			//  Is terms of service enabled?
@@ -61,7 +51,7 @@ public class UserInviteCreateNewUserInitPageAction extends Action {
 				request.setAttribute( "termsOfServiceTextVersion", termsOfServiceTextVersionsDTO );
 			}
 			
-			return mapping.findForward("Success");
+			return "Success";
 			
 		} catch ( Exception e ) {
 			

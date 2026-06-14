@@ -1,7 +1,6 @@
 
 <%--  redirect_pre_generic_image_structure_ToGenericURL.jsp --%>
 
-<%@ include file="/WEB-INF/jsp-includes/strutsTaglibImport.jsp" %>
 <%@ include file="/WEB-INF/jsp-includes/jstlTaglibImport.jsp" %>
 
 

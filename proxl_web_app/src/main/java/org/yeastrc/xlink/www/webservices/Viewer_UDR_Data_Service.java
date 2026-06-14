@@ -548,7 +548,7 @@ public class Viewer_UDR_Data_Service {
 			//              Process Crosslinks or Looplinks, depending on which page is being displayed
 //			List<SearchProteinCrosslink> crosslinks = null;
 			if ( ! wrappedCrosslinks.isEmpty() ) {
-//			if ( ! Struts_Config_Parameter_Values_Constants.STRUTS__PARAMETER__CROSSLINK.equals( strutsActionMappingParameter ) ) {
+//			if ( ! SpringMvc_Config_Parameter_Values_Constants.PARAMETER__CROSSLINK.equals( actionMappingParameter ) ) {
 //
 //
 //				//  NOT Crosslink page:    Struts config action mapping:    NOT parameter="crosslink"
@@ -668,7 +668,7 @@ public class Viewer_UDR_Data_Service {
 			//////////////////   Get Looplinks data
 			if ( ! wrappedLooplinks.isEmpty() ) {
 //			List<SearchProteinLooplink> looplinks = null;
-//			if ( ! Struts_Config_Parameter_Values_Constants.STRUTS__PARAMETER__LOOPLINK.equals( strutsActionMappingParameter ) ) {
+//			if ( ! SpringMvc_Config_Parameter_Values_Constants.PARAMETER__LOOPLINK.equals( actionMappingParameter ) ) {
 //
 //				//  NOT Looplink page:    Struts config action mapping:    NOT parameter="looplink"
 //				

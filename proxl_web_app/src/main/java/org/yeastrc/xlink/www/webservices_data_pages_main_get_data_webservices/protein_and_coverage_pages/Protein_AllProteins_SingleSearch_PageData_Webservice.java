@@ -29,10 +29,10 @@ import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValue
 import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId;
 import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result;
 import org.yeastrc.xlink.www.access_control.result_objects.WebSessionAuthAccessLevel;
-import org.yeastrc.xlink.www.actions.ProteinsAllCommonAll;
-import org.yeastrc.xlink.www.actions.ProteinsMergedProteinsCommon;
-import org.yeastrc.xlink.www.actions.ProteinsAllCommonAll.ProteinSingleEntry;
-import org.yeastrc.xlink.www.actions.ProteinsAllCommonAll.ProteinsAllCommonAllResult;
+import org.yeastrc.xlink.www.spring_controllers__helpers.ProteinsAllCommonAll;
+import org.yeastrc.xlink.www.spring_controllers__helpers.ProteinsMergedProteinsCommon;
+import org.yeastrc.xlink.www.spring_controllers__helpers.ProteinsAllCommonAll.ProteinSingleEntry;
+import org.yeastrc.xlink.www.spring_controllers__helpers.ProteinsAllCommonAll.ProteinsAllCommonAllResult;
 import org.yeastrc.xlink.www.annotation.sort_display_records_on_annotation_values.SrtOnBestAnnValsPopAnnValListsRetnTblHeadrsSinglSrchId;
 import org.yeastrc.xlink.www.annotation.sort_display_records_on_annotation_values.SrtOnBestAnnValsPopAnnValListsRetnTblHeadrsSinglSrchIdReslt;
 import org.yeastrc.xlink.www.annotation_utils.GetAnnotationTypeData;

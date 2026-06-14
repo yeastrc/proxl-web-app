@@ -4,11 +4,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 //import javax.servlet.http.HttpSession;
 import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
-import org.apache.struts.action.Action;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
-import org.yeastrc.xlink.www.constants.StrutsGlobalForwardNames;
+import org.yeastrc.xlink.www.constants.SpringMvcGlobalForwardNames;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappInternalErrorException;
 import org.yeastrc.xlink.www.user_mgmt_webapp_access.UserMgmtCentralWebappWebserviceAccess;
 import org.yeastrc.xlink.www.user_mgmt_webapp_access.UserMgmtSessionKeyAliveWebserviceRequest;
@@ -23,30 +19,25 @@ import org.yeastrc.xlink.www.web_utils.TestIsUserSignedIn;
  * 
  *
  */
-public class AccountPageInitAction extends Action {
+public class AccountPageInitAction {
 	
 	private static final Logger log = LoggerFactory.getLogger( AccountPageInitAction.class);
 	
 	/* (non-Javadoc)
-	 * @see org.apache.struts.action.Action#execute(org.apache.struts.action.ActionMapping, org.apache.struts.action.ActionForm, javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
 	 */
-	@Override
-	public ActionForward execute( ActionMapping mapping,
-			  ActionForm form,
-			  HttpServletRequest request,
-			  HttpServletResponse response )
+		public String execute( HttpServletRequest request, HttpServletResponse response )
 					  throws Exception {
 		try {
 			GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result accessAndSetupWebSessionResult =
 					GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.getSinglesonInstance().getAccessAndSetupWebSessionNoProjectId( request, response );
 			if ( accessAndSetupWebSessionResult.isNoSession() ) {
 				//  No User session 
-				return mapping.findForward( StrutsGlobalForwardNames.NO_USER_SESSION );
+				return SpringMvcGlobalForwardNames.NO_USER_SESSION;
 			}
 			UserSession userSession = accessAndSetupWebSessionResult.getUserSession();
 			if ( ! TestIsUserSignedIn.getInstance().testIsUserSignedIn( userSession ) ) {
 				//  No User session 
-				return mapping.findForward( StrutsGlobalForwardNames.NO_USER_SESSION );
+				return SpringMvcGlobalForwardNames.NO_USER_SESSION;
 			}
 			{
 				UserMgmtSessionKeyAliveWebserviceRequest userMgmtSessionKeyAliveWebserviceRequest = new UserMgmtSessionKeyAliveWebserviceRequest();
@@ -62,7 +53,7 @@ public class AccountPageInitAction extends Action {
 					UserSessionManager.getSinglesonInstance().invalidateUserSession( request );
 
 					// Send to login page
-					return mapping.findForward( StrutsGlobalForwardNames.NO_USER_SESSION );
+					return SpringMvcGlobalForwardNames.NO_USER_SESSION;
 				}
 			
 				if ( ! userMgmtSessionKeyAliveWebserviceResponse.isSuccess() ) {
@@ -79,7 +70,7 @@ public class AccountPageInitAction extends Action {
 			userDataForPage.username = userSession.getUsername();
 			
 			request.setAttribute( "loggedInUser", userDataForPage );
-			return mapping.findForward( "Success" );
+			return "Success";
 		} catch ( Exception e ) {
 			String msg = "Exception caught: " + e.toString();
 			log.error( msg, e );

@@ -13,7 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.yeastrc.xlink.www.access_control.common.AccessControl_GetUserSession_RefreshAccessEnabled;
 import org.yeastrc.xlink.www.browser_type_checking.IsBrowserIsInternetExplorer;
-import org.yeastrc.xlink.www.constants.StrutsActionPathsConstants;
+import org.yeastrc.xlink.www.constants.SpringMvcActionPathsConstants;
 import org.yeastrc.xlink.www.constants.WebConstants;
 import org.yeastrc.xlink.www.servlet_context.CurrentContext;
 import org.yeastrc.xlink.www.user_session_management.UserSession;
@@ -73,11 +73,11 @@ public class InitialServletFilter implements Filter {
 			// Only do for struts actions
 			if ( IsBrowserIsInternetExplorer.getSingletonInstance().isBrowserIsInternetExplorer( request ) ) {
 
-				if ( ! requestURL.contains( StrutsActionPathsConstants.BROWSER_INTERNET_EXPLORER_NOT_SUPPORTED_MESSAGE_PAGE ) )  {
+				if ( ! requestURL.contains( SpringMvcActionPathsConstants.BROWSER_INTERNET_EXPLORER_NOT_SUPPORTED_MESSAGE_PAGE ) )  {
 					//  Only if URL not what redirecting to
 					final String redirectURL = 
 							httpRequest.getContextPath() 
-							+ StrutsActionPathsConstants.BROWSER_INTERNET_EXPLORER_NOT_SUPPORTED_MESSAGE_PAGE;
+							+ SpringMvcActionPathsConstants.BROWSER_INTERNET_EXPLORER_NOT_SUPPORTED_MESSAGE_PAGE;
 					httpResponse.sendRedirect( redirectURL );
 					return;
 				}

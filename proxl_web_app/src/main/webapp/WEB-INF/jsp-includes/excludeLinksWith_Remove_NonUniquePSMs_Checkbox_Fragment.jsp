@@ -2,7 +2,6 @@
 <%--  excludeLinksWith_Remove_NonUniquePSMs_Checkbox_Fragment.jsp
 
 --%>
-<%@ include file="/WEB-INF/jsp-includes/strutsTaglibImport.jsp" %>
 <%@ include file="/WEB-INF/jsp-includes/jstlTaglibImport.jsp" %>
 
  <c:choose>

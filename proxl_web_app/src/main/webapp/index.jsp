@@ -1,4 +1,4 @@
-<%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %><logic:forward name="welcome"/>
+<%-- welcome page: forward to /home.do (was Struts <logic:forward name="welcome"/>; global-forward welcome -> /home.do redirect=false) --%><jsp:forward page="/home.do"/>
 
 <%-- 
 <%@ page language="java" import="java.util.*" pageEncoding="ISO-8859-1"%>

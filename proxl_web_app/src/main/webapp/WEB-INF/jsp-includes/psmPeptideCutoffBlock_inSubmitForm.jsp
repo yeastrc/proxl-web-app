@@ -10,7 +10,6 @@
 <%--   In the Merged Image and Merged Structure Pages, this will not be in any form  --%>
 
 <%-- 
-<%@ include file="/WEB-INF/jsp-includes/strutsTaglibImport.jsp" %>
 <%@ include file="/WEB-INF/jsp-includes/jstlTaglibImport.jsp" %>
 --%>
 

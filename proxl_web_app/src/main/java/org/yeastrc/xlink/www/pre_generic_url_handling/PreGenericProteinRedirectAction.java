@@ -8,13 +8,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
-import org.apache.struts.action.Action;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
 import org.yeastrc.xlink.dto.AnnotationTypeDTO;
 import org.yeastrc.xlink.www.annotation_utils.GetAnnotationTypeData;
-import org.yeastrc.xlink.www.constants.StrutsGlobalForwardNames;
+import org.yeastrc.xlink.www.constants.SpringMvcGlobalForwardNames;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
 import org.yeastrc.xlink.www.form_query_json_objects.CutoffValuesAnnotationLevel;
 import org.yeastrc.xlink.www.form_query_json_objects.CutoffValuesRootLevel;
@@ -29,29 +25,22 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * 
  *
  */
-public class PreGenericProteinRedirectAction extends Action {
+public class PreGenericProteinRedirectAction {
 
 	private static final Logger log = LoggerFactory.getLogger( PreGenericPeptideRedirectAction.class);
 
-	@Override
-	public ActionForward execute( ActionMapping mapping,
-			ActionForm actionForm,
+	public String execute( String actionURLToRedirectTo,
+			PreGenericProteinForm form,
 			HttpServletRequest request,
 			HttpServletResponse response )
 					throws Exception {
 
 
 		try {
-			PreGenericProteinForm form = (PreGenericProteinForm) actionForm;
-
-			//  Detect which Struts action mapping was called by examining the value of the "parameter" attribute
-			//     accessed by calling mapping.getParameter()
-
-			String strutsActionURLToRedirectTo = mapping.getParameter();
 
 			boolean mergedAction = false;
 
-			if ( strutsActionURLToRedirectTo.contains( "erged" ) ) {
+			if ( actionURLToRedirectTo.contains( "erged" ) ) {
 
 				mergedAction = true;
 			}
@@ -63,13 +52,13 @@ public class PreGenericProteinRedirectAction extends Action {
 			StringBuilder redirectURLSB = new StringBuilder( 1000 );
 			
 			redirectURLSB.append( CurrentContext.getCurrentWebAppContext() );
-			redirectURLSB.append( strutsActionURLToRedirectTo ); 
+			redirectURLSB.append( actionURLToRedirectTo ); 
 			redirectURLSB.append( ".do?" );		
 					
 
 			if ( form.getSearchIds() == null ) {
 
-				String msg = "form.getSearchIds() == null for strutsActionURLToRedirectTo: " + strutsActionURLToRedirectTo;
+				String msg = "form.getSearchIds() == null for actionURLToRedirectTo: " + actionURLToRedirectTo;
 				log.error( msg );
 				throw new ProxlWebappDataException(msg);
 			}
@@ -195,7 +184,7 @@ public class PreGenericProteinRedirectAction extends Action {
 
 			log.error( msg, e );
 
-			return mapping.findForward( StrutsGlobalForwardNames.GENERAL_ERROR );
+			return SpringMvcGlobalForwardNames.GENERAL_ERROR;
 		}
 
 		return null;  // nothing to forward to since setting redirect here

@@ -1,6 +1,5 @@
 <%@ include file="/WEB-INF/jsp-includes/pageEncodingDirective.jsp" %>
 
-<%@ include file="/WEB-INF/jsp-includes/strutsTaglibImport.jsp" %>
 <%@ include file="/WEB-INF/jsp-includes/jstlTaglibImport.jsp" %>
 
  <c:set var="pageTitle">Protein Coverage - <c:out value="${ headerProject.projectTblData.title }"></c:out></c:set>
@@ -75,9 +74,9 @@
 				
 				<%@ include file="/WEB-INF/jsp-includes/qc_NavLinks.jsp" %>
 										
-				[<a class="tool_tip_attached_jq" data-tooltip="View peptides" href="${ peptideNav }.do?<bean:write name="queryString" />">Peptide View</a>]
+				[<a class="tool_tip_attached_jq" data-tooltip="View peptides" href="${ peptideNav }.do?<c:out value="${ queryString }" />">Peptide View</a>]
 		
-				[<a class="tool_tip_attached_jq" data-tooltip="View proteins" href="${ proteinNav }.do?<bean:write name="queryString" />">Protein View</a>]
+				[<a class="tool_tip_attached_jq" data-tooltip="View proteins" href="${ proteinNav }.do?<c:out value="${ queryString }" />">Protein View</a>]
 				
 				<%-- Navigation links to Merged Image and Merged Structure --%>
 				
@@ -104,11 +103,11 @@
 		 
 			<form action="mergedProteinCoverageReport.do" method="get" id="form_get_for_updated_parameters_multiple_searches">
 
-				<logic:iterate name="searches" id="search">
+				<c:forEach var="search" items="${ searches }">
 					<input type="hidden" name="projectSearchId"
 						class=" project_search_id_in_update_form_jq "
-						value="<bean:write name="search" property="projectSearchId" />">
-				</logic:iterate>
+						value="<c:out value="${ search.projectSearchId }" />">
+				</c:forEach>
 
 				<input type="hidden" name="queryJSON" class="query_json_field_jq"   value="<c:out value="${ queryJSONToForm }" ></c:out>" />
 							
@@ -120,11 +119,11 @@
 
 			<form action="proteinCoverageReport.do" method="get" id="form_get_for_updated_parameters_single_search">
 									
-				<logic:iterate name="searches" id="search">
+				<c:forEach var="search" items="${ searches }">
 					<input type="hidden" name="projectSearchId"
 						class=" project_search_id_in_update_form_jq "
-						value="<bean:write name="search" property="projectSearchId" />">
-				</logic:iterate>
+						value="<c:out value="${ search.projectSearchId }" />">
+				</c:forEach>
 			
 				<input type="hidden" name="queryJSON" class="query_json_field_jq"  value="<c:out value="${ queryJSONToForm }" ></c:out>" />
 			
@@ -206,7 +205,7 @@
 				<h3 style="display:inline;">Protein Coverage Report:</h3>
 	
 				<div style="display:inline;">
-					[<a class="tool_tip_attached_jq" data-tooltip="Download as tab-delimited text" href="downloadProteinCoverageReport.do?<bean:write name="queryString" />">Download Coverage Report</a>]
+					[<a class="tool_tip_attached_jq" data-tooltip="Download as tab-delimited text" href="downloadProteinCoverageReport.do?<c:out value="${ queryString }" />">Download Coverage Report</a>]
 				</div>
 	
 				<c:set var="coveragePageForAnnDispMgmt" value="${ true }"/>

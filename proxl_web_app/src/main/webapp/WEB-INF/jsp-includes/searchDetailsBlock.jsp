@@ -10,7 +10,6 @@
 
 <%@page import="org.yeastrc.xlink.www.forms.PeptideProteinCommonForm"%>
 <%@page import="org.yeastrc.xlink.enum_classes.FilterDirectionType"%>
-<%@ include file="/WEB-INF/jsp-includes/strutsTaglibImport.jsp" %>
 <%@ include file="/WEB-INF/jsp-includes/jstlTaglibImport.jsp" %>
 
 
@@ -106,7 +105,7 @@
 			  		><a href="javascript:"
 					onclick="toggleVisibility(this)"
 					 class="tool_tip_attached_jq" data-tooltip="Show or hide search details"
-					toggle_visibility_associated_element_id="search_details_<bean:write name="search" property="projectSearchId" />"
+					toggle_visibility_associated_element_id="search_details_<c:out value="${search.projectSearchId}"/>"
 			  		><span class="toggle_visibility_expansion_span_jq" 
 							><img src="images/icon-expand-small.png" 
 								class=" <%--  icon-expand-contract-in-data-table --%> "
@@ -121,9 +120,9 @@
 		 <table class="table-no-border-no-cell-spacing-no-cell-padding" style="border-width:0px;" >
 		  <tr>
 		   <td style="<c:if test="${ not singleSearch }" > padding-bottom: 2px;</c:if>">
-			<div class=" search_details_name_search_id_string_jq "><bean:write name="search" property="name" />&nbsp;(<bean:write name="search" property="searchId" />)</div>
+			<div class=" search_details_name_search_id_string_jq "><c:out value="${search.name}"/>&nbsp;(<c:out value="${search.searchId}"/>)</div>
 
-			<div id="search_details_<bean:write name="search" property="projectSearchId" />"
+			<div id="search_details_<c:out value="${search.projectSearchId}"/>"
 					 
 			  	>						
 			</div>
@@ -133,7 +132,7 @@
 				   <c:if test="${ not empty search.path }" >
 					<tr>
 						<td>Path:</td>
-						<td><bean:write name="search" property="path" /></td>
+						<td><c:out value="${search.path}"/></td>
 					</tr>
 				   </c:if>
 				  </c:if>
@@ -180,11 +179,11 @@
 		
 					<tr>
 						<td>Upload&nbsp;date:</td>
-						<td><bean:write name="search" property="formattedLoadTime" /></td>
+						<td><c:out value="${search.formattedLoadTime}"/></td>
 					</tr>
 					<tr>
 						<td style="white-space: nowrap;">FASTA file:</td>
-						<td><bean:write name="search" property="fastaFilename" /></td>
+						<td><c:out value="${search.fastaFilename}"/></td>
 					</tr>
 					
 					<c:if test="${ not empty search_details.cutoffsAppliedOnImportList }">

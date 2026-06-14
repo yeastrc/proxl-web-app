@@ -188,7 +188,7 @@ public class SavedView_SaveView_Service {
 			////////////////////
 			
 			String urlAfterWebappServletContext = GetURLAfterWebappServletContextFromPageURL.getInstance().getURLAfterWebappServletContextFromPageURL( pageCurrentURL );
-			String pageName = GetURLAfterWebappServletContextFromPageURL.getInstance().getPageNameFromStrutsActionInURL( pageCurrentURL );
+			String pageName = GetURLAfterWebappServletContextFromPageURL.getInstance().getPageNameFromActionInURL( pageCurrentURL );
 			
 			DataPageSavedViewDTO dataPageSavedViewDTO = new DataPageSavedViewDTO();
 			

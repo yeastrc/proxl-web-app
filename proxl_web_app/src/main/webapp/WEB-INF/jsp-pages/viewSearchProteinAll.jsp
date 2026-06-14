@@ -1,7 +1,7 @@
 <%@page import="org.yeastrc.xlink.www.constants.PeptideViewLinkTypesConstants"%>
 <%@ include file="/WEB-INF/jsp-includes/pageEncodingDirective.jsp" %>
 
-<%@ include file="/WEB-INF/jsp-includes/strutsTaglibImport.jsp" %>
+<%@ include file="/WEB-INF/jsp-includes/proxlTaglibImport.jsp" %>
 <%@ include file="/WEB-INF/jsp-includes/jstlTaglibImport.jsp" %>
 
  <c:set var="pageTitle">Proteins - <c:out value="${ headerProject.projectTblData.title }"></c:out></c:set>
@@ -77,13 +77,12 @@
 				
 				[<a class="tool_tip_attached_jq" data-tooltip="View peptides" 
 					href="<proxl:defaultPageUrl pageName="/peptide" projectSearchId="${ search.projectSearchId }"
-						>peptide.do?projectSearchId=<bean:write name="search" property="projectSearchId" 
-						/>&queryJSON=<c:out value="${ peptidePageQueryJSON }" escapeXml="false" 
+						>peptide.do?projectSearchId=<c:out value="${ search.projectSearchId }" />&queryJSON=<c:out value="${ peptidePageQueryJSON }" escapeXml="false" 
 						></c:out></proxl:defaultPageUrl>"
 						>Peptide View</a>]
 						 
 				[<a class="tool_tip_attached_jq" data-tooltip="View protein coverage report" 
-					href="<proxl:defaultPageUrl pageName="/proteinCoverageReport" projectSearchId="${ search.projectSearchId }">proteinCoverageReport.do?<bean:write name="queryString" /></proxl:defaultPageUrl>"
+					href="<proxl:defaultPageUrl pageName="/proteinCoverageReport" projectSearchId="${ search.projectSearchId }">proteinCoverageReport.do?<c:out value="${ queryString }" /></proxl:defaultPageUrl>"
 						>Coverage Report</a>]
 						
 						
@@ -105,7 +104,7 @@
 			<script type="text/text" id="form_get_for_updated_parameters__id_to_use">form_get_for_updated_parameters_single_search</script>
 
 			<%--  Single search version, used by add/remove searches JS code --%>
-			<html:form action="allProtein" method="get" styleId="form_get_for_updated_parameters_single_search" >
+			<form action="allProtein.do" method="get" id="form_get_for_updated_parameters_single_search" >
 						
 				<input type="hidden" name="projectSearchId" class=" project_search_id_in_update_form_jq " 
 					value="${ search.projectSearchId }">
@@ -116,16 +115,16 @@
 				<%--  A block in the submitted form for PSM Peptide cutoff JS code --%> <%--  Currently empty --%>
 				<%@ include file="/WEB-INF/jsp-includes/psmPeptideCutoffBlock_inSubmitForm.jsp" %>
 
-			</html:form>			
+			</form>			
 				
-			<html:form action="mergedAllProtein" method="get" styleId="form_get_for_updated_parameters_multiple_searches" >
+			<form action="mergedAllProtein.do" method="get" id="form_get_for_updated_parameters_multiple_searches" >
 						
 				<input type="hidden" name="queryJSON" value="<c:out value="${ queryJSONToForm }" ></c:out>"  />
 				
 				<%--  A block in the submitted form for PSM Peptide cutoff JS code --%>
 				<%@ include file="/WEB-INF/jsp-includes/psmPeptideCutoffBlock_inSubmitForm.jsp" %>
 
-			</html:form>
+			</form>
 				
 			
 			
@@ -232,13 +231,13 @@
 				<h3 style="display:inline;">Proteins (<span id="numProteins_copy1" ></span>):</h3>
 				<div style="display:inline;">
 					[<a class="tool_tip_attached_jq" data-tooltip="View crosslinks" 
-							href="<proxl:defaultPageUrl pageName="/crosslinkProtein" projectSearchId="${ search.projectSearchId }">crosslinkProtein.do?<bean:write name="queryString" /></proxl:defaultPageUrl>"
+							href="<proxl:defaultPageUrl pageName="/crosslinkProtein" projectSearchId="${ search.projectSearchId }">crosslinkProtein.do?<c:out value="${ queryString }" /></proxl:defaultPageUrl>"
 							>View Crosslinks</a>]
 					[<a class="tool_tip_attached_jq" data-tooltip="View looplinks" 
-							href="<proxl:defaultPageUrl pageName="/looplinkProtein" projectSearchId="${ search.projectSearchId }">looplinkProtein.do?<bean:write name="queryString" /></proxl:defaultPageUrl>"
+							href="<proxl:defaultPageUrl pageName="/looplinkProtein" projectSearchId="${ search.projectSearchId }">looplinkProtein.do?<c:out value="${ queryString }" /></proxl:defaultPageUrl>"
 							>View Looplinks</a>]
 					[<a class="tool_tip_attached_jq" data-tooltip="Download all proteins as tab-delimited text" 
-						href="downloadMergedProteinsAll.do?<bean:write name="queryString" />"
+						href="downloadMergedProteinsAll.do?<c:out value="${ queryString }" />"
 						>Download Data (<span id="numProteins_copy2" ></span>)</a>]
 				</div>
 				

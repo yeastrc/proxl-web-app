@@ -1,6 +1,5 @@
 <%@ include file="/WEB-INF/jsp-includes/pageEncodingDirective.jsp" %><%-- Always put this directive at the very top of the page --%>
 
-<%@ include file="/WEB-INF/jsp-includes/strutsTaglibImport.jsp" %>
 
 <%@ include file="/WEB-INF/jsp-includes/jstlTaglibImport.jsp" %>
 

@@ -6,7 +6,7 @@
 
 --%>
 
-<%@ include file="/WEB-INF/jsp-includes/strutsTaglibImport.jsp" %>
+<%@ include file="/WEB-INF/jsp-includes/jstlTaglibImport.jsp" %>
 
 
 <html>
@@ -48,14 +48,11 @@
   		<br>
   		
   		<div >
-		  	<logic:messagesPresent message="false">
-		  		
-			     <html:messages id="message" >
+		  	<c:forEach var="message" items="${ springMVC_Controller_ErrorMessages }">
 			     	<div>
-			         <bean:write name="message" filter="false"/>
+			         <c:out value="${ message }" escapeXml="false"/>
 			        </div>
-			     </html:messages>
-		 	</logic:messagesPresent>
+		 	</c:forEach>
   		</div>
 	</div>
 	

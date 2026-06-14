@@ -41,7 +41,7 @@ public class GetURLAfterWebappServletContextFromPageURL {
 	 * @param pageUrl
 	 * @return
 	 */
-	public String getPageNameFromStrutsActionInURL( String pageUrl ) {
+	public String getPageNameFromActionInURL( String pageUrl ) {
 		String defaultPageViewURL = getURLAfterWebappServletContextFromPageURL( pageUrl);
 		String pageName = defaultPageViewURL; 
 		int questionMarkSeparator = defaultPageViewURL.indexOf( "?" );
@@ -53,9 +53,9 @@ public class GetURLAfterWebappServletContextFromPageURL {
 			pageName = defaultPageViewURL.substring( 0, semiColonSeparator );
 		}
 		//  Remove the trailing Struts ".do" and add leading "/" to match Struts action path
-		String STRUTS_DOT_DO_SUFFIX = ".do";
-		if ( pageName.endsWith( STRUTS_DOT_DO_SUFFIX ) ) {
-			pageName = pageName.substring(0, pageName.length() - STRUTS_DOT_DO_SUFFIX.length() );
+		String DOT_DO_SUFFIX = ".do";
+		if ( pageName.endsWith( DOT_DO_SUFFIX ) ) {
+			pageName = pageName.substring(0, pageName.length() - DOT_DO_SUFFIX.length() );
 		}
 		pageName = "/" + pageName;
 		return pageName;

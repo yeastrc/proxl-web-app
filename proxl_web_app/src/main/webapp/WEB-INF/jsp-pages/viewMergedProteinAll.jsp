@@ -2,7 +2,6 @@
 <%@ include file="/WEB-INF/jsp-includes/pageEncodingDirective.jsp" %>
 <%@page import="org.yeastrc.xlink.www.constants.PeptideViewLinkTypesConstants"%>
 
-<%@ include file="/WEB-INF/jsp-includes/strutsTaglibImport.jsp" %>
 <%@ include file="/WEB-INF/jsp-includes/jstlTaglibImport.jsp" %>
 
 <%--  viewMergedProteinAll.jsp  --%>
@@ -86,9 +85,9 @@
 				<%@ include file="/WEB-INF/jsp-includes/qc_NavLinks.jsp" %>
 				
 				[<a class="tool_tip_attached_jq" data-tooltip="View peptides" 
-						href="mergedPeptide.do?<bean:write name="queryString" />">Peptide View</a>]
+						href="mergedPeptide.do?<c:out value="${ queryString }" />">Peptide View</a>]
 				[<a class="tool_tip_attached_jq" data-tooltip="View protein coverage report" 
-						href="mergedProteinCoverageReport.do?<bean:write name="queryString" />">Coverage Report</a>]
+						href="mergedProteinCoverageReport.do?<c:out value="${ queryString }" />">Coverage Report</a>]
 				<%-- Navigation links to Merged Image and Merged Structure --%>
 				<%@ include file="/WEB-INF/jsp-includes/imageAndStructureNavLinks.jsp" %>
 			</div>
@@ -101,30 +100,30 @@
 			<%@ include file="/WEB-INF/jsp-includes/psmPeptideCutoffBlock_outsideAnyForm.jsp" %>
 
 	
-			<html:form action="mergedAllProtein" method="get" styleId="form_get_for_updated_parameters_multiple_searches" >
+			<form action="mergedAllProtein.do" method="get" id="form_get_for_updated_parameters_multiple_searches" >
 			
-				<logic:iterate name="searches" id="search">
+				<c:forEach var="search" items="${ searches }">
 					<input type="hidden" name="projectSearchId"
 						class=" project_search_id_in_update_form_jq "
-						value="<bean:write name="search" property="projectSearchId" />">
-				</logic:iterate>
+						value="<c:out value="${ search.projectSearchId }" />">
+				</c:forEach>
 
 				<input type="hidden" name="queryJSON" id="query_json_field"  value="<c:out value="${ queryJSONToForm }" ></c:out>" />
 				
 				<%--  A block in the submitted form for PSM Peptide cutoff JS code --%>
 				<%@ include file="/WEB-INF/jsp-includes/psmPeptideCutoffBlock_inSubmitForm.jsp" %>
 
-			</html:form>
+			</form>
 
 			<%--  Single search version, used by add/remove searches JS code --%>
-			<html:form action="allProtein" method="get" styleId="form_get_for_updated_parameters_single_search" >
+			<form action="allProtein.do" method="get" id="form_get_for_updated_parameters_single_search" >
 						
 				<input type="hidden" name="queryJSON"  value="<c:out value="${ queryJSONToForm }" ></c:out>" />
 				
 				<%--  A block in the submitted form for PSM Peptide cutoff JS code --%> <%--  Currently empty --%>
 				<%@ include file="/WEB-INF/jsp-includes/psmPeptideCutoffBlock_inSubmitForm.jsp" %>
 
-			</html:form>			
+			</form>			
 							
 			<table id="search_details_and_main_filter_criteria_main_page_root" style=" border-width: 0px; display: none; ">
 			
@@ -190,10 +189,10 @@
 					<h3 style="display:inline;">Merged Proteins: <span id="numProteins_1" ></span>
 					</h3>			
 					<div style="display:inline;">
-						[<a class="tool_tip_attached_jq" data-tooltip="View crosslinks" href="mergedCrosslinkProtein.do?<bean:write name="queryString" />">View Crosslinks</a>]
-						[<a class="tool_tip_attached_jq" data-tooltip="View looplinks" href="mergedLooplinkProtein.do?<bean:write name="queryString" />">View Looplinks</a>]
+						[<a class="tool_tip_attached_jq" data-tooltip="View crosslinks" href="mergedCrosslinkProtein.do?<c:out value="${ queryString }" />">View Crosslinks</a>]
+						[<a class="tool_tip_attached_jq" data-tooltip="View looplinks" href="mergedLooplinkProtein.do?<c:out value="${ queryString }" />">View Looplinks</a>]
 						[<a class="tool_tip_attached_jq" data-tooltip="Download all proteins as tab-delimited text" 
-							href="downloadMergedProteinsAll.do?<bean:write name="queryString" />"
+							href="downloadMergedProteinsAll.do?<c:out value="${ queryString }" />"
 							>Download Data (<span id="numProteins_2" ></span>)</a>]
 					</div>
 				</div>

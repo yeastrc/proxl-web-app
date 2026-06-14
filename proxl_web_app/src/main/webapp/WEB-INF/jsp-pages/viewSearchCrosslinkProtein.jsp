@@ -1,7 +1,7 @@
 <%@page import="org.yeastrc.xlink.www.webapp_timing.WebappTiming"%>
 <%@ include file="/WEB-INF/jsp-includes/pageEncodingDirective.jsp" %>
 
-<%@ include file="/WEB-INF/jsp-includes/strutsTaglibImport.jsp" %>
+<%@ include file="/WEB-INF/jsp-includes/proxlTaglibImport.jsp" %>
 <%@ include file="/WEB-INF/jsp-includes/jstlTaglibImport.jsp" %>
 
  <c:set var="pageTitle">Crosslink Proteins - <c:out value="${ headerProject.projectTblData.title }"></c:out></c:set>
@@ -76,13 +76,12 @@
 								
 				[<a class="tool_tip_attached_jq" data-tooltip="View peptides" 
 					href="<proxl:defaultPageUrl pageName="/peptide" projectSearchId="${ search.projectSearchId }"
-						>peptide.do?projectSearchId=<bean:write name="search" property="projectSearchId" 
-						/>&queryJSON=<c:out value="${ peptidePageQueryJSON }" escapeXml="false" 
+						>peptide.do?projectSearchId=<c:out value="${ search.projectSearchId }" />&queryJSON=<c:out value="${ peptidePageQueryJSON }" escapeXml="false" 
 						></c:out></proxl:defaultPageUrl>"
 						>Peptide View</a>]
 						 
 				[<a class="tool_tip_attached_jq" data-tooltip="View protein coverage report" 
-					href="<proxl:defaultPageUrl pageName="/proteinCoverageReport" projectSearchId="${ search.projectSearchId }">proteinCoverageReport.do?<bean:write name="queryString" /></proxl:defaultPageUrl>"
+					href="<proxl:defaultPageUrl pageName="/proteinCoverageReport" projectSearchId="${ search.projectSearchId }">proteinCoverageReport.do?<c:out value="${ queryString }" /></proxl:defaultPageUrl>"
 						>Coverage Report</a>]
 						
 						
@@ -104,7 +103,7 @@
 			<script type="text/text" id="form_get_for_updated_parameters__id_to_use">form_get_for_updated_parameters_single_search</script>
 
 			<%--  Single search version, used by add/remove searches JS code --%>
-			<html:form action="crosslinkProtein" method="get" styleId="form_get_for_updated_parameters_single_search" >
+			<form action="crosslinkProtein.do" method="get" id="form_get_for_updated_parameters_single_search" >
 						
 				<input type="hidden" name="projectSearchId" class=" project_search_id_in_update_form_jq " 
 					value="${ search.projectSearchId }">
@@ -115,16 +114,16 @@
 				<%--  A block in the submitted form for PSM Peptide cutoff JS code --%> <%--  Currently empty --%>
 				<%@ include file="/WEB-INF/jsp-includes/psmPeptideCutoffBlock_inSubmitForm.jsp" %>
 
-			</html:form>			
+			</form>			
 				
-			<html:form action="mergedCrosslinkProtein" method="get" styleId="form_get_for_updated_parameters_multiple_searches" >
+			<form action="mergedCrosslinkProtein.do" method="get" id="form_get_for_updated_parameters_multiple_searches" >
 						
 				<input type="hidden" name="queryJSON" value="<c:out value="${ queryJSONToForm }" ></c:out>"  />
 				
 				<%--  A block in the submitted form for PSM Peptide cutoff JS code --%>
 				<%@ include file="/WEB-INF/jsp-includes/psmPeptideCutoffBlock_inSubmitForm.jsp" %>
 
-			</html:form>
+			</form>
 				
 			
 			<table id="search_details_and_main_filter_criteria_main_page_root" style=" border-width: 0px; display: none; ">
@@ -194,10 +193,10 @@
 				<h3 style="display:inline;">Crosslinks (<span id="numCrosslinks"></span>):</h3>
 				<div style="display:inline;">
 					[<a class="tool_tip_attached_jq" data-tooltip="View looplinks (instead of crosslinks)" 
-							href="<proxl:defaultPageUrl pageName="/looplinkProtein" projectSearchId="${ search.projectSearchId }">looplinkProtein.do?<bean:write name="queryString" /></proxl:defaultPageUrl>"
+							href="<proxl:defaultPageUrl pageName="/looplinkProtein" projectSearchId="${ search.projectSearchId }">looplinkProtein.do?<c:out value="${ queryString }" /></proxl:defaultPageUrl>"
 							>View Looplinks (<span id="numLooplinks"></span>)</a>]
 					[<a class="tool_tip_attached_jq" data-tooltip="View Protein List" 
-							href="<proxl:defaultPageUrl pageName="/allProtein" projectSearchId="${ search.projectSearchId }">allProtein.do?<bean:write name="queryString" /></proxl:defaultPageUrl>"
+							href="<proxl:defaultPageUrl pageName="/allProtein" projectSearchId="${ search.projectSearchId }">allProtein.do?<c:out value="${ queryString }" /></proxl:defaultPageUrl>"
 							>Protein List</a>]
 					
 					
@@ -209,27 +208,27 @@
 									
 								<span id="data-download-options">
 									Choose file format:
-									<a data-tooltip="Download all cross-links and mono-links as a tab-delimited file." id="download-protein-data" class="download-option tool_tip_attached_jq" href="downloadMergedProteins.do?<bean:write name="queryString" />" style="margin-top:5px;"
+									<a data-tooltip="Download all cross-links and mono-links as a tab-delimited file." id="download-protein-data" class="download-option tool_tip_attached_jq" href="downloadMergedProteins.do?<c:out value="${ queryString }" />" style="margin-top:5px;"
 										>Download all cross-links and mono-links (<span id="numLinks"></span>)</a>
-									<a data-tooltip="Download all distinct unique distance restraints (cross-links and loop-links) as tab-delimited text." id="download-protein-udrs" class="download-option tool_tip_attached_jq" href="downloadMergedProteinUDRs.do?<bean:write name="queryString" />"
+									<a data-tooltip="Download all distinct unique distance restraints (cross-links and loop-links) as tab-delimited text." id="download-protein-udrs" class="download-option tool_tip_attached_jq" href="downloadMergedProteinUDRs.do?<c:out value="${ queryString }" />"
 										>Download distinct UDRs (<span id="numDistinctLinks"></span>)</a>
 									
 									<c:if test="${ showDownloadLinks_Skyline}">
 										<br><span style="font-size:15px;">Skyline export</span><br>
 										<c:if test="${ showDownloadLink_SkylineShulman }">
-											<a data-tooltip="Export peptides for listed proteins for import into Skyline quant. tool. (Shulman et al)" id="download-protein-shulman" class="download-option tool_tip_attached_jq" href="downloadMergedProteinsPeptidesSkylineShulman.do?<bean:write name="queryString" />">Export peptides for Skyline quant (Shulman et al)</a>
+											<a data-tooltip="Export peptides for listed proteins for import into Skyline quant. tool. (Shulman et al)" id="download-protein-shulman" class="download-option tool_tip_attached_jq" href="downloadMergedProteinsPeptidesSkylineShulman.do?<c:out value="${ queryString }" />">Export peptides for Skyline quant (Shulman et al)</a>
 										</c:if>
-										<a data-tooltip="Export peptides for listed proteins for Skyline PRM analysis. (Chavez et al)" id="download-protein-shulman" class="download-option tool_tip_attached_jq" href="downloadMergedProteinsPeptidesSkylineEng.do?<bean:write name="queryString" />">Export peptides for Skyline PRM (Chavez et al)</a>
+										<a data-tooltip="Export peptides for listed proteins for Skyline PRM analysis. (Chavez et al)" id="download-protein-shulman" class="download-option tool_tip_attached_jq" href="downloadMergedProteinsPeptidesSkylineEng.do?<c:out value="${ queryString }" />">Export peptides for Skyline PRM (Chavez et al)</a>
 									</c:if>
 									
 									<br><span style="font-size:15px;">xiNET / xiVIEW export</span><br>
-									<a data-tooltip="Download FASTA file for proteins found in cross-links or loop-links." id="download-protein-udrs" class="download-option tool_tip_attached_jq" href="downloadMergedProteinsFASTA.do?<bean:write name="queryString" />">Download FASTA file</a>
-									<a data-tooltip="View CLMS-CSV formatted data for use in xiNET (http://crosslinkviewer.org/)" id="download-protein-xinet" class="download-option tool_tip_attached_jq" href="downloadMergedProteinsCLMS_CSV.do?<bean:write name="queryString" />">Export data for xiNET visualization</a>
-									<a data-tooltip="View CLMS-CSV formatted data for use in xiVIEW (http://crosslinkviewer.org/)" id="download-protein-xinet" class="download-option tool_tip_attached_jq" href="downloadMergedProteinsCLMS_CSV.do?<bean:write name="queryString" />&format=xiview">Export data for xiVIEW visualization</a>
+									<a data-tooltip="Download FASTA file for proteins found in cross-links or loop-links." id="download-protein-udrs" class="download-option tool_tip_attached_jq" href="downloadMergedProteinsFASTA.do?<c:out value="${ queryString }" />">Download FASTA file</a>
+									<a data-tooltip="View CLMS-CSV formatted data for use in xiNET (http://crosslinkviewer.org/)" id="download-protein-xinet" class="download-option tool_tip_attached_jq" href="downloadMergedProteinsCLMS_CSV.do?<c:out value="${ queryString }" />">Export data for xiNET visualization</a>
+									<a data-tooltip="View CLMS-CSV formatted data for use in xiVIEW (http://crosslinkviewer.org/)" id="download-protein-xinet" class="download-option tool_tip_attached_jq" href="downloadMergedProteinsCLMS_CSV.do?<c:out value="${ queryString }" />&format=xiview">Export data for xiVIEW visualization</a>
 
 									<br><span style="font-size:15px;">xVis export</span><br>
-									<a data-tooltip="Export protein lengths file for cross-links and loop-links. For use in xVis (https://xvis.genzentrum.lmu.de/)" id="download-protein-lengths" class="download-option tool_tip_attached_jq" href="downloadMergedProteinsLengths.do?<bean:write name="queryString" />">Export protein lengths for use in xVis.</a>
-									<a data-tooltip="Export cross-links and loop-links for use in xVis (https://xvis.genzentrum.lmu.de/)" id="download-links-for-xvis" class="download-option tool_tip_attached_jq" href="downloadMergedProteinsXvis.do?<bean:write name="queryString" />">Download cross-links and loop-links for use in xVis.</a>
+									<a data-tooltip="Export protein lengths file for cross-links and loop-links. For use in xVis (https://xvis.genzentrum.lmu.de/)" id="download-protein-lengths" class="download-option tool_tip_attached_jq" href="downloadMergedProteinsLengths.do?<c:out value="${ queryString }" />">Export protein lengths for use in xVis.</a>
+									<a data-tooltip="Export cross-links and loop-links for use in xVis (https://xvis.genzentrum.lmu.de/)" id="download-links-for-xvis" class="download-option tool_tip_attached_jq" href="downloadMergedProteinsXvis.do?<c:out value="${ queryString }" />">Download cross-links and loop-links for use in xVis.</a>
 								</span>
 							</span>
 				</div>

@@ -5,7 +5,6 @@
 		Protein, merged protein, Coverage, Image, Structure
 
 --%>
-<%@ include file="/WEB-INF/jsp-includes/strutsTaglibImport.jsp" %>
 <%@ include file="/WEB-INF/jsp-includes/jstlTaglibImport.jsp" %>
 
 <!-- In Page fragment -->

@@ -4,7 +4,7 @@ import java.security.InvalidParameterException;
 import java.util.List;
 
 import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
-import org.yeastrc.xlink.www.actions.ProteinsMergedCommonPageDownload.ForCrosslinksOrLooplinkOrBoth;
+import org.yeastrc.xlink.www.spring_controllers__helpers.ProteinsMergedCommonPageDownload.ForCrosslinksOrLooplinkOrBoth;
 import org.yeastrc.xlink.www.cached_data_in_file.CachedDataInFileMgmt;
 import org.yeastrc.xlink.www.cached_data_in_file.CachedDataInFileMgmtRegistration;
 import org.yeastrc.xlink.www.cached_data_in_file.CachedDataInFileMgmtRegistrationIF;

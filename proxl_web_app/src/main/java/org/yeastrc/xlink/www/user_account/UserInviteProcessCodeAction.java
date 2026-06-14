@@ -4,13 +4,7 @@ import java.sql.SQLException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
-import org.apache.struts.action.Action;
-import org.apache.struts.action.ActionErrors;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.ActionMessage;
-import org.apache.struts.action.ActionMessages;
+import org.yeastrc.xlink.www.spring_controllers.SpringActionMessages;
 import org.yeastrc.auth.dao.AuthSharedObjectUsersDAO;
 import org.yeastrc.auth.dao.AuthUserInviteTrackingDAO;
 import org.yeastrc.auth.dto.AuthSharedObjectUsersDTO;
@@ -25,17 +19,11 @@ import org.yeastrc.xlink.www.web_utils.TestIsUserSignedIn;
  * 
  *
  */
-public class UserInviteProcessCodeAction extends Action {
-	
+public class UserInviteProcessCodeAction {
+
 	private static final Logger log = LoggerFactory.getLogger( UserInviteProcessCodeAction.class);
-	
-	/* (non-Javadoc)
-	 * @see org.apache.struts.action.Action#execute(org.apache.struts.action.ActionMapping, org.apache.struts.action.ActionForm, javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
-	 */
-	@Override
-	public ActionForward execute( ActionMapping mapping,
-			  ActionForm actionForm,
-			  HttpServletRequest request,
+
+	public String execute( HttpServletRequest request,
 			  HttpServletResponse response )
 					  throws Exception {
 		try {
@@ -44,10 +32,8 @@ public class UserInviteProcessCodeAction extends Action {
 			ValidateUserInviteTrackingCode validateUserInviteTrackingCode = ValidateUserInviteTrackingCode.getInstance( inviteTrackingCode );
 			if ( ! validateUserInviteTrackingCode.validateInviteTrackingCode() ) {
 				String errorMsgKey = validateUserInviteTrackingCode.getErrorMsgKey();
-				ActionMessages messages = new ActionMessages();
-				messages.add( ActionMessages.GLOBAL_MESSAGE, new ActionMessage( errorMsgKey ) );
-				saveErrors( request, messages );
-				return mapping.findForward("Failure");
+				SpringActionMessages.setErrorMessageKey( request, errorMsgKey );
+				return "Failure";
 			}
 			AuthUserInviteTrackingDTO authUserInviteTrackingDTO =  validateUserInviteTrackingCode.getAuthUserInviteTrackingDTO();
 			authUserInviteTrackingDTO.setUseIP( userIP );
@@ -82,12 +68,12 @@ public class UserInviteProcessCodeAction extends Action {
 									log.warn( msg );
 									int authUserIdUsingInvite = userSession.getAuthUserId();
 									AuthUserInviteTrackingDAO.getInstance().updateUsedInviteFields( authUserInviteTrackingDTO.getId(), authUserIdUsingInvite, userIP );
-									return mapping.findForward("GoToProjectList");
+									return "GoToProjectList";
 //									ActionErrors errors = new ActionErrors();
 //									errors.add("username", new ActionMessage("error.invite.existing.user.already.have.access"));
 //									saveErrors( request, errors );
 //									
-//									return mapping.findForward("Failure");
+//									return "Failure";
 								}
 							}
 						} else {
@@ -96,7 +82,7 @@ public class UserInviteProcessCodeAction extends Action {
 							throw sqlException;
 						}
 					}
-					return mapping.findForward("GoToProjectList");
+					return "GoToProjectList";
 				} else {
 					//   Logged in and NO Project Id
 					//  Do Nothing
@@ -105,23 +91,21 @@ public class UserInviteProcessCodeAction extends Action {
 					log.warn( msg );
 					int authUserIdUsingInvite = userSession.getAuthUserId();
 					AuthUserInviteTrackingDAO.getInstance().updateUsedInviteFields( authUserInviteTrackingDTO.getId(), authUserIdUsingInvite, userIP );
-					return mapping.findForward("GoToProjectList");
+					return "GoToProjectList";
 				}
 			}   
 			//  Not Logged In
 			if ( authUserInviteTrackingDTO.getInvitedSharedObjectId() != null ) {
 				//  Not logged in and processing a project id
-				return mapping.findForward("ProjectInviteLandingPage");
+				return "ProjectInviteLandingPage";
 			}
 			//  Not Logged in and No project Id 
-			return mapping.findForward("AddNewUser");
+			return "AddNewUser";
 		} catch ( Exception e ) {
 			String msg = "Exception caught: " + e.toString();
 			log.error( msg, e );
-			ActionErrors errors = new ActionErrors();
-			errors.add("username", new ActionMessage("error.invite.process.code.general"));
-			saveErrors( request, errors );
-			return mapping.findForward("Failure");
+			SpringActionMessages.setErrorMessageKey( request, "error.invite.process.code.general" );
+			return "Failure";
 		}
 	}
 }

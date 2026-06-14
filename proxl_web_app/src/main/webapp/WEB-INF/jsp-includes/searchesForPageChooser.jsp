@@ -1,15 +1,14 @@
-<%@page import="org.yeastrc.xlink.www.constants.StrutsActionPathsConstants"%>
+<%@page import="org.yeastrc.xlink.www.constants.SpringMvcActionPathsConstants"%>
 
 <%--   searchesForPageChooser.jsp  --%>
 
-<%@ include file="/WEB-INF/jsp-includes/strutsTaglibImport.jsp" %>
 <%@ include file="/WEB-INF/jsp-includes/jstlTaglibImport.jsp" %>
 
 		<%--  Searches For Page Chooser Overlay,   Overlay for user choosing which searches to merge --%>
 			
-		<script type="text/text" id="searches_for_page_chooser_modal_dialog_overlay_image_uri_path"><%= StrutsActionPathsConstants.IMAGE_PAGE_ACTION %></script> 		
-		<script type="text/text" id="searches_for_page_chooser_modal_dialog_overlay_structure_uri_path"><%= StrutsActionPathsConstants.STRUCTURE_PAGE_ACTION %></script> 		
-		<script type="text/text" id="searches_for_page_chooser_modal_dialog_overlay_qc_data_uri_path"><%= StrutsActionPathsConstants.QC_DATA_PAGE_ACTION %></script> 		
+		<script type="text/text" id="searches_for_page_chooser_modal_dialog_overlay_image_uri_path"><%= SpringMvcActionPathsConstants.IMAGE_PAGE_ACTION %></script> 		
+		<script type="text/text" id="searches_for_page_chooser_modal_dialog_overlay_structure_uri_path"><%= SpringMvcActionPathsConstants.STRUCTURE_PAGE_ACTION %></script> 		
+		<script type="text/text" id="searches_for_page_chooser_modal_dialog_overlay_qc_data_uri_path"><%= SpringMvcActionPathsConstants.QC_DATA_PAGE_ACTION %></script> 		
 		
 <%--   Searches For Page Chooser Overlay Background --%>
 

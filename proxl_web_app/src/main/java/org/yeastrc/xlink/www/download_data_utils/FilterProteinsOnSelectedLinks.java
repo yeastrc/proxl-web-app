@@ -11,7 +11,7 @@ import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.yeastrc.xlink.www.actions.ProteinsMergedCommonPageDownload.ProteinsMergedCommonPageDownloadResult;
+import org.yeastrc.xlink.www.spring_controllers__helpers.ProteinsMergedCommonPageDownload.ProteinsMergedCommonPageDownloadResult;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDataException;
 import org.yeastrc.xlink.www.objects.MergedSearchProteinCrosslink;
 import org.yeastrc.xlink.www.objects.MergedSearchProteinLooplink;

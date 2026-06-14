@@ -6,7 +6,6 @@
 
 <%--  The section at the top of the page with the cutoffs --%>
 
-<%@ include file="/WEB-INF/jsp-includes/strutsTaglibImport.jsp" %>
 <%@ include file="/WEB-INF/jsp-includes/jstlTaglibImport.jsp" %>
 
 

@@ -3,10 +3,6 @@ package org.yeastrc.xlink.www.user_account;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
-import org.apache.struts.action.Action;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
 import org.yeastrc.xlink.www.config_system_table.ConfigSystemCaching;
 import org.yeastrc.xlink.www.constants.ConfigSystemsKeysConstants;
 import org.yeastrc.xlink.www.user_session_management.UserSession;
@@ -18,18 +14,14 @@ import org.yeastrc.xlink.www.user_session_management.UserSessionManager;
  *  If user in session and user disabled, forwards to /account_disabled.do
  *
  */
-public class UserInsufficientAccessPrivilegePageInitAction extends Action {
+public class UserInsufficientAccessPrivilegePageInitAction {
 
 	private static final Logger log = LoggerFactory.getLogger( UserInsufficientAccessPrivilegePageInitAction.class);
 	
 	private static final String REQUEST_ADMIN_EMAIL_ADDRESS = "adminEmailAddress";
 	
 
-	@Override
-	public ActionForward execute( ActionMapping mapping,
-			  ActionForm form,
-			  HttpServletRequest request,
-			  HttpServletResponse response )
+		public String execute( HttpServletRequest request, HttpServletResponse response )
 					  throws Exception {
 				
 		try {
@@ -43,7 +35,7 @@ public class UserInsufficientAccessPrivilegePageInitAction extends Action {
 				
 					//  User is Disabled 
 
-					return mapping.findForward( "UserDisabled" );
+					return "UserDisabled";
 				}
 				
 				request.setAttribute( "userLoggedIn", true );
@@ -54,7 +46,7 @@ public class UserInsufficientAccessPrivilegePageInitAction extends Action {
 					.getConfigValueForConfigKey( ConfigSystemsKeysConstants.ADMIN_EMAIL_ADDRESS_KEY );
 			request.setAttribute( REQUEST_ADMIN_EMAIL_ADDRESS, adminEmailAddress );
 
-			return mapping.findForward( "Success" );
+			return "Success";
 			
 		} catch ( Exception e ) {
 			

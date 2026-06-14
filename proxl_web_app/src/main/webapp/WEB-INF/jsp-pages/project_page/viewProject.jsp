@@ -1,11 +1,10 @@
 <%@page import="org.yeastrc.xlink.www.constants.FieldLengthConstants"%>
 <%@page import="org.yeastrc.xlink.base.file_import_proxl_xml_scans.enum_classes.ProxlXMLFileImportStatus"%>
 <%@ include file="/WEB-INF/jsp-includes/pageEncodingDirective.jsp" %>
-<%@page import="org.yeastrc.xlink.www.constants.StrutsActionPathsConstants"%>
+<%@page import="org.yeastrc.xlink.www.constants.SpringMvcActionPathsConstants"%>
 <%@page import="org.yeastrc.xlink.www.constants.WebConstants"%>
 <%@page import="org.yeastrc.xlink.www.constants.AuthAccessLevelConstants"%>
 
-<%@ include file="/WEB-INF/jsp-includes/strutsTaglibImport.jsp" %>
 <%@ include file="/WEB-INF/jsp-includes/jstlTaglibImport.jsp" %>
 
 
@@ -1079,8 +1078,8 @@
 							</div>
 	
 							<div id="project_public_access_code_template_div" style="display: none;" 
-								><bean:write name="<%= WebConstants.REQUEST_URL_ONLY_UP_TO_WEB_APP_CONTEXT %>" 
-								/><%= StrutsActionPathsConstants.PROJECT_READ_PROCESS_CODE %>?<%= WebConstants.PARAMETER_PROJECT_READ_CODE %>=</div>
+								><c:out value="${ requestScope['intialIncomingURLUpToWebAppContext'] }"
+								/><%= SpringMvcActionPathsConstants.PROJECT_READ_PROCESS_CODE %>?<%= WebConstants.PARAMETER_PROJECT_READ_CODE %>=</div>
 							
 							<br>
 						</div>

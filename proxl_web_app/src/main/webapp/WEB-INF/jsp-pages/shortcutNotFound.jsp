@@ -1,5 +1,4 @@
 <%@ include file="/WEB-INF/jsp-includes/pageEncodingDirective.jsp" %>
-<%@ include file="/WEB-INF/jsp-includes/strutsTaglibImport.jsp" %>
 <%@ include file="/WEB-INF/jsp-includes/jstlTaglibImport.jsp" %>
 
 <%--  shortcutNotFound.jsp --%>

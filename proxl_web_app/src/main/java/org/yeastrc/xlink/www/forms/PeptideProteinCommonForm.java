@@ -1,12 +1,11 @@
 package org.yeastrc.xlink.www.forms;
 
-import org.apache.struts.action.ActionForm;
 
 /**
  * Common for MergedSearchViewProteinsForm and SearchViewProteinsForm
  *
  */
-public class PeptideProteinCommonForm  extends ActionForm {
+public class PeptideProteinCommonForm {
 
 	private static final long serialVersionUID = 1L;
 	

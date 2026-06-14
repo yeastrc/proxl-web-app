@@ -5,25 +5,31 @@
                              http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd" version="3.1">
 	
 	<display-name />
+
+	<!-- The Struts ActionServlet (mapped to *.do, config /WEB-INF/struts-config.xml) has been
+	     removed: all actions are migrated to the Spring MVC DispatcherServlet below, no JSP uses
+	     Struts taglibs, and message resources are loaded directly by StrutsActionMessagesResolver.
+	     struts-config.xml is no longer loaded. -->
+
+	<!-- Spring MVC DispatcherServlet - replaced Struts. Handles all *.do requests
+	     (every former Struts action is now a @Controller). WebMvcConfig sets
+	     UrlPathHelper.alwaysUseFullPath=true so the handler lookup path is the full
+	     path within the app (e.g. /peptide.do), matching @RequestMapping("/peptide.do"). -->
 	<servlet>
-		<servlet-name>action</servlet-name>
-		<servlet-class>org.apache.struts.action.ActionServlet</servlet-class>
+		<servlet-name>springDispatcher</servlet-name>
+		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
 		<init-param>
-			<param-name>config</param-name>
-			<param-value>/WEB-INF/struts-config.xml</param-value>
+			<param-name>contextClass</param-name>
+			<param-value>org.springframework.web.context.support.AnnotationConfigWebApplicationContext</param-value>
 		</init-param>
 		<init-param>
-			<param-name>debug</param-name>
-			<param-value>3</param-value>
+			<param-name>contextConfigLocation</param-name>
+			<param-value>org.yeastrc.xlink.www.spring_config.WebMvcConfig</param-value>
 		</init-param>
-		<init-param>
-			<param-name>detail</param-name>
-			<param-value>3</param-value>
-		</init-param>
-		<load-on-startup>0</load-on-startup>
+		<load-on-startup>2</load-on-startup>
 	</servlet>
 	<servlet-mapping>
-		<servlet-name>action</servlet-name>
+		<servlet-name>springDispatcher</servlet-name>
 		<url-pattern>*.do</url-pattern>
 	</servlet-mapping>
 	<welcome-file-list>

@@ -3,7 +3,7 @@
 <%@ include file="/WEB-INF/jsp-includes/pageEncodingDirective.jsp" %>
 <%@page import="org.yeastrc.xlink.www.constants.PeptideViewLinkTypesConstants"%>
 
-<%@ include file="/WEB-INF/jsp-includes/strutsTaglibImport.jsp" %>
+<%@ include file="/WEB-INF/jsp-includes/proxlTaglibImport.jsp" %>
 <%@ include file="/WEB-INF/jsp-includes/jstlTaglibImport.jsp" %>
 
  <c:set var="peptidePage" value="${ true }" />
@@ -81,12 +81,12 @@
 				
 				[<a class="tool_tip_attached_jq" data-tooltip="View proteins" 
 					href="<proxl:defaultPageUrl pageName="/crosslinkProtein" projectSearchId="${ viewSearchPeptidesPageDataRoot.projectSearchId }"
-							>crosslinkProtein.do?<bean:write name="queryString" /></proxl:defaultPageUrl>"
+							>crosslinkProtein.do?<c:out value="${ queryString }" /></proxl:defaultPageUrl>"
 					>Protein View</a>]
 					
 				[<a class="tool_tip_attached_jq" data-tooltip="View protein coverage report" 
 					href="<proxl:defaultPageUrl pageName="/proteinCoverageReport" projectSearchId="${ viewSearchPeptidesPageDataRoot.projectSearchId }"
-							>proteinCoverageReport.do?<bean:write name="queryString" /></proxl:defaultPageUrl>"
+							>proteinCoverageReport.do?<c:out value="${ queryString }" /></proxl:defaultPageUrl>"
 													
 					>Coverage Report</a>]
 
@@ -103,7 +103,7 @@
 
 
 			<%--  Single search version, used by add/remove searches JS code --%>
-			<html:form action="peptide" method="get" styleId="form_get_for_updated_parameters_single_search" >
+			<form action="peptide.do" method="get" id="form_get_for_updated_parameters_single_search" >
 
 				<input type="hidden" name="projectSearchId" 
 					class=" project_search_id_in_update_form_jq "
@@ -115,17 +115,17 @@
 				<%--  A block in the submitted form for PSM Peptide cutoff JS code --%> <%--  Currently empty --%>
 				<%@ include file="/WEB-INF/jsp-includes/psmPeptideCutoffBlock_inSubmitForm.jsp" %>
 
-			</html:form>			
-						
-			<html:form action="mergedPeptide" method="get" styleId="form_get_for_updated_parameters_multiple_searches" >
+			</form>
+
+			<form action="mergedPeptide.do" method="get" id="form_get_for_updated_parameters_multiple_searches" >
 						
 				<input type="hidden" name="queryJSON" value="<c:out value="${ viewSearchPeptidesPageDataRoot.queryJSONToForm }" ></c:out>"  />
 				
 				<%--  A block in the submitted form for PSM Peptide cutoff JS code --%> <%--  Currently empty --%>
 				<%@ include file="/WEB-INF/jsp-includes/psmPeptideCutoffBlock_inSubmitForm.jsp" %>
 
-			</html:form>
-					
+			</form>
+
 
 			<table id="search_details_and_main_filter_criteria_main_page_root" 
 				style=" border-width: 0px; display: none; ">
@@ -176,16 +176,16 @@
 						No modifications
 					  </label>
 					  
-						<logic:iterate id="modMassFilter" name="viewSearchPeptidesPageDataRoot" property="modMassFilterList">
-						
+						<c:forEach var="modMassFilter" items="${ viewSearchPeptidesPageDataRoot.modMassFilterList }">
+
 						 <label style="white-space: nowrap" >
-							<input type="checkbox" class=" mod_mass_filter_jq " 
+							<input type="checkbox" class=" mod_mass_filter_jq "
 								onchange="if ( window.defaultPageView ) { window.defaultPageView.searchFormChanged_ForDefaultPageView(); } ; if ( window.saveView_dataPages ) { window.saveView_dataPages.searchFormChanged_ForSaveView(); }"
-						  		value="<bean:write name="modMassFilter" />" > 
-						   <bean:write name="modMassFilter" />
+						  		value="<c:out value="${ modMassFilter }" />" >
+						   <c:out value="${ modMassFilter }" />
 						 </label>
-						  
-						</logic:iterate>				
+
+						</c:forEach>
 					</td>
 				</tr>				
 
@@ -242,12 +242,12 @@
 								
 							<span id="data-download-options">
 								Choose file format:
-								<a data-tooltip="Download peptide results as tab-delimited text." id="download-peptide-tld" class="download-option tool_tip_attached_jq" href="downloadMergedPeptides.do?<bean:write name="queryString" />" style="margin-top:5px;">Tab-delimited peptide data</a>
-								<a data-tooltip="Download all PSMs and associated statistics." id="download-peptide-psm" class="download-option tool_tip_attached_jq" href="downloadMergedPSMsForPeptides.do?<bean:write name="queryString" />">Tab-delimited PSM data</a>
+								<a data-tooltip="Download peptide results as tab-delimited text." id="download-peptide-tld" class="download-option tool_tip_attached_jq" href="downloadMergedPeptides.do?<c:out value="${ queryString }" />" style="margin-top:5px;">Tab-delimited peptide data</a>
+								<a data-tooltip="Download all PSMs and associated statistics." id="download-peptide-psm" class="download-option tool_tip_attached_jq" href="downloadMergedPSMsForPeptides.do?<c:out value="${ queryString }" />">Tab-delimited PSM data</a>
 								<c:if test="${ showDownloadLinks_Skyline}">
-									<a data-tooltip="Download peptide list for Skyline PRM methods (Chavez et al)." id="download-peptide-skyline" class="download-option tool_tip_attached_jq" href="downloadMergedPeptidesForSkylinePRM.do?<bean:write name="queryString" />">Peptides for Skyline PRM methods (Chavez et al)</a>
+									<a data-tooltip="Download peptide list for Skyline PRM methods (Chavez et al)." id="download-peptide-skyline" class="download-option tool_tip_attached_jq" href="downloadMergedPeptidesForSkylinePRM.do?<c:out value="${ queryString }" />">Peptides for Skyline PRM methods (Chavez et al)</a>
 									<c:if test="${ showDownloadLink_SkylineShulman }">
-										<a data-tooltip="Download peptide list for Skyline Quantitation (Shulman et al)." id="download-peptide-shulman" class="download-option tool_tip_attached_jq" href="downloadMergedPeptidesForSkylineShulman.do?<bean:write name="queryString" />">Peptides for Skyline Quantitation (Shulman et al)</a>
+										<a data-tooltip="Download peptide list for Skyline Quantitation (Shulman et al)." id="download-peptide-shulman" class="download-option tool_tip_attached_jq" href="downloadMergedPeptidesForSkylineShulman.do?<c:out value="${ queryString }" />">Peptides for Skyline Quantitation (Shulman et al)</a>
 									</c:if>
 								</c:if>
 							</span>

@@ -2,7 +2,7 @@
 <%@page import="org.yeastrc.xlink.www.constants.PeptideViewLinkTypesConstants"%>
 <%@ include file="/WEB-INF/jsp-includes/pageEncodingDirective.jsp" %>
 
-<%@ include file="/WEB-INF/jsp-includes/strutsTaglibImport.jsp" %>
+<%@ include file="/WEB-INF/jsp-includes/proxlTaglibImport.jsp" %>
 <%@ include file="/WEB-INF/jsp-includes/jstlTaglibImport.jsp" %>
 
 <%-- viewQC.jsp --%>
@@ -176,16 +176,16 @@
 						No modifications
 					  </label>
 					  
-						<logic:iterate id="modMassFilter" name="modMassFilterList">
+						<c:forEach var="modMassFilter" items="${ modMassFilterList }">
 						
 						 <label style="white-space: nowrap" >
 							<input type="checkbox" class=" mod_mass_filter_jq " 
 								onchange="if ( window.saveView_dataPages ) { window.saveView_dataPages.searchFormChanged_ForSaveView(); }" 
-						  		value="<bean:write name="modMassFilter" />" > 
-						   <bean:write name="modMassFilter" />
+						  		value="<c:out value="${ modMassFilter }" />" > 
+						   <c:out value="${ modMassFilter }" />
 						 </label>
 						  
-						</logic:iterate>
+						</c:forEach>
 					</td>
 				</tr>				
 				<tr>
@@ -560,9 +560,9 @@ The total ion current in the bin is indicated by color, as indicated by the lege
 	 		    
 	 		    
 	 		    
-	 		    <%--   Only show following for now if request attribute 'strutsParameterAlex' is true --%>
+	 		    <%--   Only show following for now if request attribute 'parameterAlex' is true --%>
 	 		    
-	 		    <c:if test="${ strutsParameterAlex }">  
+	 		    <c:if test="${ parameterAlex }">  
 	
 					<div style="margin-top: 10px;">
 						--------------------------------------------------------------
@@ -664,7 +664,7 @@ The total ion current in the bin is indicated by color, as indicated by the lege
 				
 				
 				
-				</c:if>  <%--   <c:if test="${ strutsParameterAlex }">   --%>
+				</c:if>  <%--   <c:if test="${ parameterAlex }">   --%>
 				
 				
 				

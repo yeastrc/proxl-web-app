@@ -1,6 +1,6 @@
 <%@page import="org.yeastrc.xlink.www.constants.PageLinkTextAndTooltipConstants"%>
 <%@ include file="/WEB-INF/jsp-includes/pageEncodingDirective.jsp" %>
-<%@ include file="/WEB-INF/jsp-includes/strutsTaglibImport.jsp" %>
+<%@ include file="/WEB-INF/jsp-includes/proxlTaglibImport.jsp" %>
 <%@ include file="/WEB-INF/jsp-includes/jstlTaglibImport.jsp" %>
 
  <c:set var="pageTitle">View Structural Analysis - <c:out value="${ headerProject.projectTblData.title }"></c:out></c:set>

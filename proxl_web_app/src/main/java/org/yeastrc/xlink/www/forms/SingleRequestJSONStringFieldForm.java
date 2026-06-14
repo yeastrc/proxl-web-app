@@ -1,6 +1,5 @@
 package org.yeastrc.xlink.www.forms;
 
-import org.apache.struts.action.ActionForm;
 
 /**
  * Standard form that contains single property for a single request JSON string
@@ -8,7 +7,7 @@ import org.apache.struts.action.ActionForm;
  * Used for downloads and maybe other uses where only a POST of a single JSON string needs to be supported
  *
  */
-public class SingleRequestJSONStringFieldForm extends ActionForm {
+public class SingleRequestJSONStringFieldForm {
 	
 	private static final long serialVersionUID = 1L;
 

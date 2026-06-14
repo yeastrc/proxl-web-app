@@ -8,7 +8,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
-import org.yeastrc.xlink.www.actions.ProteinsMergedCommonPageDownload.ForCrosslinksOrLooplinkOrBoth;
+import org.yeastrc.xlink.www.spring_controllers__helpers.ProteinsMergedCommonPageDownload.ForCrosslinksOrLooplinkOrBoth;
 
 /**
  * Protein Crosslink Multiple Searches Page Main List of Proteins and statistics above the List

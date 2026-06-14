@@ -1,5 +1,9 @@
 *.class
 
+**.claude
+
+**.claude/
+
 /.gradle/
 /.npm/
 /proxl_web_app/front_end/.npm/

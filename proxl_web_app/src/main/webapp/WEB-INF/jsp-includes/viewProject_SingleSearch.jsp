@@ -6,40 +6,40 @@
 <%--   Incoming page variable 'search_wrapper' --%>
 
 <%@page import="org.yeastrc.xlink.www.constants.PageLinkTextAndTooltipConstants"%>
-<%@ include file="/WEB-INF/jsp-includes/strutsTaglibImport.jsp" %>
+<%@ include file="/WEB-INF/jsp-includes/proxlTaglibImport.jsp" %>
 <%@ include file="/WEB-INF/jsp-includes/jstlTaglibImport.jsp" %>
 
    <c:set var="search" value="${ search_wrapper.searchDTO }" />
 							
-  <div id="single_search_entry__project_search_id_<bean:write name="search" property="projectSearchId" />"
-  	data-project_search_id="<bean:write name="search" property="projectSearchId" />" class=" search_row_jq " >
+  <div id="single_search_entry__project_search_id_<c:out value="${search.projectSearchId}"/>"
+  	data-project_search_id="<c:out value="${search.projectSearchId}"/>" class=" search_row_jq " >
 	<table style="padding:0px;margin-top:0px;margin-bottom:0px;width:100%;">
-		<tr data-project_search_id="<bean:write name="search" property="projectSearchId" />" class=" search_root_jq ">
+		<tr data-project_search_id="<c:out value="${search.projectSearchId}"/>" class=" search_root_jq ">
 			<td style="width:10px;" valign="top" class="search-checkbox-cell">
-				<input id="search-checkbox-<bean:write name="search" property="projectSearchId" />" 
-					onChange="javascript:checkSearchCheckboxes(<bean:write name="search" property="projectSearchId" />)" 
+				<input id="search-checkbox-<c:out value="${search.projectSearchId}"/>" 
+					onChange="javascript:checkSearchCheckboxes(<c:out value="${search.projectSearchId}"/>)" 
 					class="search-checkbox" type="checkbox" 
 					name="projectSearchId" 
-					value="<bean:write name="search" property="projectSearchId" />"/>
+					value="<c:out value="${search.projectSearchId}"/>"/>
 			</td>
 			<td>
 			  <div style="float: right;" >
 				[<a data-tooltip="<%= PageLinkTextAndTooltipConstants.QC_LINK_TOOLTIP %>" class="tool_tip_attached_jq" 
-					href="qc.do?projectSearchId=<bean:write name="search" property="projectSearchId" />"
+					href="qc.do?projectSearchId=<c:out value="${search.projectSearchId}"/>"
 						><%= PageLinkTextAndTooltipConstants.QC_LINK_TEXT %></a>]
 				[<a data-tooltip="View peptides found in search" class="tool_tip_attached_jq" 
-					href="<proxl:defaultPageUrl pageName="/peptide" projectSearchId="${ search.projectSearchId }">peptide.do?projectSearchId=<bean:write name="search" property="projectSearchId" /></proxl:defaultPageUrl>"
+					href="<proxl:defaultPageUrl pageName="/peptide" projectSearchId="${ search.projectSearchId }">peptide.do?projectSearchId=<c:out value="${search.projectSearchId}"/></proxl:defaultPageUrl>"
 						>Peptides</a>]
 				[<a data-tooltip="View proteins found in search" class="tool_tip_attached_jq" 
-					href="<proxl:defaultPageUrl pageName="/crosslinkProtein" projectSearchId="${ search.projectSearchId }">crosslinkProtein.do?projectSearchId=<bean:write name="search" property="projectSearchId" /></proxl:defaultPageUrl>"
+					href="<proxl:defaultPageUrl pageName="/crosslinkProtein" projectSearchId="${ search.projectSearchId }">crosslinkProtein.do?projectSearchId=<c:out value="${search.projectSearchId}"/></proxl:defaultPageUrl>"
 						>Proteins</a>]
 				[<a data-tooltip="Graphical view of links between proteins" class="tool_tip_attached_jq" 
-					href="<proxl:defaultPageUrl pageName="/image" projectSearchId="${ search.projectSearchId }">image.do?projectSearchId=<bean:write name="search" property="projectSearchId" /></proxl:defaultPageUrl>"
+					href="<proxl:defaultPageUrl pageName="/image" projectSearchId="${ search.projectSearchId }">image.do?projectSearchId=<c:out value="${search.projectSearchId}"/></proxl:defaultPageUrl>"
 						>Image</a>]
 				<c:choose>
 				 <c:when test="${ showStructureLink }">
 					[<a data-tooltip="View data on 3D structures" class="tool_tip_attached_jq" 
-						href="<proxl:defaultPageUrl pageName="/structure" projectSearchId="${ search.projectSearchId }">structure.do?projectSearchId=<bean:write name="search" property="projectSearchId" /></proxl:defaultPageUrl>"
+						href="<proxl:defaultPageUrl pageName="/structure" projectSearchId="${ search.projectSearchId }">structure.do?projectSearchId=<c:out value="${search.projectSearchId}"/></proxl:defaultPageUrl>"
 							>Structure</a>]
 				 </c:when>
 				 <c:otherwise>
@@ -48,43 +48,43 @@
 				</c:choose>
 				<c:if test="${authAccessLevel.searchDeleteAllowed}" >
 					<a href="javascript:" data-tooltip="Delete search" class="tool_tip_attached_jq delete_search_link_jq"
-					 		<%-- WAS  href="javascript:confirmDelete(<bean:write name="search" property="projectSearchId" />)"  --%>
+					 		<%-- WAS  href="javascript:confirmDelete(<c:out value="${search.projectSearchId}"/>)"  --%>
 						><img src="images/icon-delete-small.png" ></a>
 				</c:if>
 			  </div>
 			  <div>
 				<a class="tool_tip_attached_jq expand-link" data-tooltip="Show or hide more details" 
-					id="search-details-link-<bean:write name="search" property="projectSearchId" />" 
+					id="search-details-link-<c:out value="${search.projectSearchId}"/>" 
 					style="font-size:80%;color:#4900d4;text-decoration:none;" 
-					href="javascript:showSearchDetails(<bean:write name="search" property="projectSearchId" />)"
+					href="javascript:showSearchDetails(<c:out value="${search.projectSearchId}"/>)"
 					><img src="images/icon-expand-small.png" <%-- This image src is changed in the Javascript --%>
 					></a>
-				<span id="search-name-normal-<bean:write name="search" property="projectSearchId" />"
+				<span id="search-name-normal-<c:out value="${search.projectSearchId}"/>"
 					><span class="search-name-display  search_name_display_jq" 
-						id="search-name-display-<bean:write name="search" property="projectSearchId" />"
-						><bean:write name="search" property="name" /></span
+						id="search-name-display-<c:out value="${search.projectSearchId}"/>"
+						><c:out value="${search.name}"/></span
 					 > <span class="search-name-display search_number_in_parens_display_jq "
-					 			>(<bean:write name="search" property="searchId" />)</span
+					 			>(<c:out value="${search.searchId}"/>)</span
 					 			><c:if test="${authAccessLevel.writeAllowed}" 
 					 				><a class="tool_tip_attached_jq" data-tooltip="Edit name of search" 
-					 					href="javascript:showSearchNameForm(<bean:write name="search" property="projectSearchId" />)"
+					 					href="javascript:showSearchNameForm(<c:out value="${search.projectSearchId}"/>)"
 										><img class="edit-icon" src="images/icon-edit-small.png" 
 											></a></c:if></span>
-				<span style="display:none;" id="search-name-edit-<bean:write name="search" property="projectSearchId" />"
-					><input id="search-name-value-<bean:write name="search" property="projectSearchId" />" 
-						type="text" style="width:200px;" value="<bean:write name="search" property="name" />"
+				<span style="display:none;" id="search-name-edit-<c:out value="${search.projectSearchId}"/>"
+					><input id="search-name-value-<c:out value="${search.projectSearchId}"/>" 
+						type="text" style="width:200px;" value="<c:out value="${search.name}"/>"
 						><input class="submit-button" type="button" value="Save" 
-							onClick="saveName(<bean:write name="search" property="projectSearchId" />)"
+							onClick="saveName(<c:out value="${search.projectSearchId}"/>)"
 							><input class="submit-button" type="button" value="Cancel" 
-								onClick="cancelNameEdit(<bean:write name="search" property="projectSearchId" />)"></span>
+								onClick="cancelNameEdit(<c:out value="${search.projectSearchId}"/>)"></span>
 			  </div>
 			  <div style="clear: right;"  class="search-details-container-div">
-				<table class="search-details" id="search-details-<bean:write name="search" property="projectSearchId" />" style="display:none;margin-left:15px;">
+				<table class="search-details" id="search-details-<c:out value="${search.projectSearchId}"/>" style="display:none;margin-left:15px;">
 				  <c:if test="${ authAccessLevel.writeAllowed or authAccessLevel.assistantProjectOwnerIfProjectNotLockedAllowed }" >
 				   <c:if test="${ not empty search.path }" >
 					<tr>
 						<td>Path:</td>
-						<td><bean:write name="search" property="path" /></td>
+						<td><c:out value="${search.path}"/></td>
 					</tr>
 				   </c:if>
 				  </c:if>
@@ -122,11 +122,11 @@
 					</tr>								  
 					<tr>
 						<td>Upload:</td>
-						<td><bean:write name="search" property="formattedLoadTime" /></td>
+						<td><c:out value="${search.formattedLoadTime}"/></td>
 					</tr>
 					<tr>
 						<td style="white-space: nowrap;">FASTA file:</td>
-						<td><bean:write name="search" property="fastaFilename" /></td>
+						<td><c:out value="${search.fastaFilename}"/></td>
 					</tr>
 					<%--  Copy  'search_wrapper' to 'search_details' to use here --%>
 					<c:set var="search_details" value="${ search_wrapper }"/>
@@ -164,10 +164,10 @@
 							<%--  Hide this block if no Web Links and user unable to add Web Links --%>
 					<tr>
 						<td valign="top">Raw MS data files:</td>
-						<td id="search-web-links-<bean:write name="search" property="projectSearchId" />">
+						<td id="search-web-links-<c:out value="${search.projectSearchId}"/>">
 							<div style="position: relative;">			 
 						  		<div class="error-message-container error_message_container_jq" 
-						  				id="error_message_web_link_url_invalid_<bean:write name="search" property="projectSearchId" />"
+						  				id="error_message_web_link_url_invalid_<c:out value="${search.projectSearchId}"/>"
 						  				style="width: 600px;">
 						  			<div class="error-message-inner-container" >
 						  				<div class="error-message-close-x error_message_close_x_jq">X</div>
@@ -175,43 +175,43 @@
 						  			</div>
 							  	</div>	
 							  </div>
-							<logic:iterate name="search" property="webLinks" id="webLink" >
+							<c:forEach var="webLink" items="${search.webLinks}">
 								<%--  Keep this block in sync with the Template just below --%>
-								<div id="web-links-<bean:write name="webLink" property="id" />"
+								<div id="web-links-<c:out value="${webLink.id}"/>"
 									class="search_web_link_root_jq"
-									searchwebLinkId="<bean:write name="webLink" property="id" />" 
+									searchwebLinkId="<c:out value="${webLink.id}"/>" 
 									style="margin-bottom:5px; margin-top:0px;">
 									<c:if test="${authAccessLevel.writeAllowed}" >
-										<a id="web-links-delete-<bean:write name="webLink" property="id" />" 
+										<a id="web-links-delete-<c:out value="${webLink.id}"/>" 
 											style="color:#d40000;font-size:80%;" 
 											class="tool_tip_attached_jq delete_search_webLink_link_jq"
 											data-tooltip="Delete link to RAW file"
 											href="javascript:"
 												><img src="images/icon-delete-small.png"></a>
 									</c:if>
-									<a  target="_blank" href="<bean:write name="webLink" property="linkUrl" />" 
-										><bean:write name="webLink" property="linkLabel" /></a>
+									<a  target="_blank" href="<c:out value="${webLink.linkUrl}"/>" 
+										><c:out value="${webLink.linkLabel}"/></a>
 								</div>
-							</logic:iterate>
+							</c:forEach>
 							<c:if test="${authAccessLevel.writeAllowed}" >
 							 <div >
-								<div id="add-web-links-link-span-<bean:write name="search" property="projectSearchId" />"
-									>[<a id="add-web-link-link-<bean:write name="search" property="projectSearchId" />" 
+								<div id="add-web-links-link-span-<c:out value="${search.projectSearchId}"/>"
+									>[<a id="add-web-link-link-<c:out value="${search.projectSearchId}"/>" 
 										style="font-size:80%;text-decoration:none;" 
-										href="javascript:showAddWebLink(<bean:write name="search" property="projectSearchId" />)"
+										href="javascript:showAddWebLink(<c:out value="${search.projectSearchId}"/>)"
 										class="tool_tip_attached_jq" data-tooltip="Add URL for a RAW file">+Link to Raw file</a>]</div>
-								<div style="display:none;" id="add-web-links-form-span-<bean:write name="search" property="projectSearchId" />" >
+								<div style="display:none;" id="add-web-links-form-span-<c:out value="${search.projectSearchId}"/>" >
 								 <div>
 								  URL:
-								  <input id="web-links-url-input-<bean:write name="search" property="projectSearchId" />" 
+								  <input id="web-links-url-input-<c:out value="${search.projectSearchId}"/>" 
 										type="text" style="font-size:80%;width:200px;">
 								  Label:
-								  <input id="web-links-label-input-<bean:write name="search" property="projectSearchId" />" 
+								  <input id="web-links-label-input-<c:out value="${search.projectSearchId}"/>" 
 										type="text" style="font-size:80%;width:200px;">
 								  <input style="font-size:80%;" class="submit-button" type="button" value="Add Web Link" 
-											onClick="addWebLink(<bean:write name="search" property="projectSearchId" />)">
+											onClick="addWebLink(<c:out value="${search.projectSearchId}"/>)">
 								  <input style="font-size:80%;" class="submit-button" type="button" value="Cancel" 
-										 	onClick="cancelWebLink(<bean:write name="search" property="projectSearchId" />)" >
+										 	onClick="cancelWebLink(<c:out value="${search.projectSearchId}"/>)" >
 								  </div>
 								  <div style="font-size: 80%;">
 								  	The URL must start with "http://", "https://", "ftp://" or some other transport protocal
@@ -243,14 +243,14 @@
 					  <tr>
 						<td valign="top">Additional files:</td>
 						<td >
-						  <logic:iterate name="search" property="files" id="searchFile" >
+						  <c:forEach var="searchFile" items="${search.files}">
 							<div class=" display_search_filename_outer_container_jq " search_file_id="${ searchFile.id }" search_id="${ search.projectSearchId }"> 
 							 <div class="display_search_filename_container_jq">
 							  <%--  Normal display of link with filename --%>
-							  <a href="downloadSearchFile.do?fileId=<bean:write name="searchFile" property="id" />" 
+							  <a href="downloadSearchFile.do?fileId=<c:out value="${searchFile.id}"/>" 
 							  	class="tool_tip_attached_jq search_file_link_for_tooltip_jq" data-tooltip="Download file">
 							  	<span class="search_filename_jq">
-									<bean:write name="searchFile" property="displayFilename" />
+									<c:out value="${searchFile.displayFilename}"/>
 								</span>
 							  </a>
 							  <c:if test="${authAccessLevel.projectOwnerAllowed}"> 
@@ -262,14 +262,14 @@
 						  	<c:if test="${authAccessLevel.assistantProjectOwnerAllowed}" >
 							 <div class=" edit_search_filename_container_jq " style="display: none;">
 							  <%--  Edit filename --%>
-								<input type="text" style="width:200px;" value="<bean:write name="searchFile" property="displayFilename" />"
+								<input type="text" style="width:200px;" value="<c:out value="${searchFile.displayFilename}"/>"
 									class=" edit_search_filename_input_field_jq "
 									><input class="submit-button" type="button" value="Save" onClick="saveSearchFilename( this )"
 									><input class="submit-button" type="button" value="Cancel" onClick="cancelSearchFilenameEdit( this )">													 
 							 </div>
 							</c:if>  <%--  END <c:if test="${authAccessLevel.assistantProjectOwnerAllowed}" > --%>
 							</div>
-						  </logic:iterate>
+						  </c:forEach>
 						</td>
 					  </tr>
 					</c:if>
@@ -277,12 +277,12 @@
 							<%--  Hide this block if no comments and user unable to add comments --%>
 					  <tr>
 						<td valign="top">Comments:</td>
-						<td id="search-comments-<bean:write name="search" property="projectSearchId" />">
-							<logic:iterate name="search" property="comments" id="comment" >
+						<td id="search-comments-<c:out value="${search.projectSearchId}"/>">
+							<c:forEach var="comment" items="${search.comments}">
 								<%--  Keep this block in sync with the Template just below --%>
-								<div id="comment-<bean:write name="comment" property="id" />"
+								<div id="comment-<c:out value="${comment.id}"/>"
 									class="search_comment_root_jq"
-									searchCommentId="<bean:write name="comment" property="id" />" 
+									searchCommentId="<c:out value="${comment.id}"/>" 
 									style="margin-bottom:5px; margin-top:0px;">
 								  <div class=" search_comment_display_jq ">
 									<c:if test="${authAccessLevel.writeAllowed}" >
@@ -292,15 +292,14 @@
 												><img src="images/icon-delete-small.png"></a>
 									</c:if>
 									<span class=" search_comment_string_jq "
-										><bean:write name="comment" property="comment" 
-									/></span>
+										><c:out value="${comment.comment}"/></span>
 									<c:if test="${authAccessLevel.writeAllowed}" >
 									  <a class="tool_tip_attached_jq" data-tooltip="Edit comment"  onclick="showSearchCommentEditForm( this ); return false;" href="javascript:" >
 										<img class="edit-icon" src="images/icon-edit-small.png">
 									  </a> 
 									</c:if>
 									(<span class=" search_comment_date_jq "
-										><bean:write name="comment" property="dateTimeString" /></span>)
+										><c:out value="${comment.dateTimeString}"/></span>)
 								  </div>
 								  <c:if test="${authAccessLevel.writeAllowed}" >
 								  	<%--  For editing the comment value --%>
@@ -313,7 +312,7 @@
 								  	</div>
 								  </c:if>
 								</div>
-							</logic:iterate>
+							</c:forEach>
 							<c:if test="${authAccessLevel.writeAllowed}" >
 								<%--  Template for search comments added by Javascript --%>
 								<div id="search_comment_template" style="display: none;">
@@ -350,13 +349,13 @@
 									  </c:if>
 									</div>
 								</div>													
-								<span id="add-comment-link-span-<bean:write name="search" property="projectSearchId" />"
-									>[<a class="tool_tip_attached_jq" data-tooltip="Add a comment" id="add-comment-link-<bean:write name="search" property="projectSearchId" />" style="font-size:80%;text-decoration:none;" href="javascript:showAddComment(<bean:write name="search" property="projectSearchId" />)"
+								<span id="add-comment-link-span-<c:out value="${search.projectSearchId}"/>"
+									>[<a class="tool_tip_attached_jq" data-tooltip="Add a comment" id="add-comment-link-<c:out value="${search.projectSearchId}"/>" style="font-size:80%;text-decoration:none;" href="javascript:showAddComment(<c:out value="${search.projectSearchId}"/>)"
 										>+Comment</a>]</span>
-								<span style="display:none;" id="add-comment-form-span-<bean:write name="search" property="projectSearchId" />"
-									><input id="comment-input-<bean:write name="search" property="projectSearchId" />" type="text" style="font-size:80%;width:200px;"
-									><input style="font-size:80%;" class="submit-button" type="button" value="Add Comment" onClick="addComment(<bean:write name="search" property="projectSearchId" />)"
-									><input style="font-size:80%;" class="submit-button" type="button" value="Cancel" onClick="cancelComment(<bean:write name="search" property="projectSearchId" />)"
+								<span style="display:none;" id="add-comment-form-span-<c:out value="${search.projectSearchId}"/>"
+									><input id="comment-input-<c:out value="${search.projectSearchId}"/>" type="text" style="font-size:80%;width:200px;"
+									><input style="font-size:80%;" class="submit-button" type="button" value="Add Comment" onClick="addComment(<c:out value="${search.projectSearchId}"/>)"
+									><input style="font-size:80%;" class="submit-button" type="button" value="Cancel" onClick="cancelComment(<c:out value="${search.projectSearchId}"/>)"
 									></span>
 							</c:if>
 						</td>

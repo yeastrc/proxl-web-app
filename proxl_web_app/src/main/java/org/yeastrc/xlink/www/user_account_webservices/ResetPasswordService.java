@@ -18,7 +18,7 @@ import org.yeastrc.auth.dao.AuthUserDAO;
 import org.yeastrc.auth.dto.AuthForgotPasswordTrackingDTO;
 import org.yeastrc.auth.services.AuthGenerateSaveForgotPasswordCode;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappInternalErrorException;
-import org.yeastrc.xlink.www.constants.StrutsActionPathsConstants;
+import org.yeastrc.xlink.www.constants.SpringMvcActionPathsConstants;
 import org.yeastrc.xlink.www.constants.WebConstants;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.objects.ResetPasswordChangePasswordResult;
@@ -171,7 +171,7 @@ public class ResetPasswordService {
 	throws Exception {
 		//  Does NOT include slash after web app context
 		String requestURLIncludingWebAppContext = (String) request.getAttribute( WebConstants.REQUEST_URL_ONLY_UP_TO_WEB_APP_CONTEXT );
-		String newURL = requestURLIncludingWebAppContext + StrutsActionPathsConstants.USER_RESET_PASSWORD_PROCESS_CODE
+		String newURL = requestURLIncludingWebAppContext + SpringMvcActionPathsConstants.USER_RESET_PASSWORD_PROCESS_CODE
 				+ "?" + WebConstants.PARAMETER_RESET_PASSWORD_CODE + "=" + authCode;
 		// set the message body
 		String text = "Click this link to change your password: " + newURL + "\n\n"

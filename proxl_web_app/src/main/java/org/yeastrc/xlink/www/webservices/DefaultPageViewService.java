@@ -129,7 +129,7 @@ public class DefaultPageViewService {
 			}
 			String defaultURLFromPageURLString = GetDefaultURLFromPageURL.getInstance().getDefaultURLFromPageURL( pageUrl );
 			if ( StringUtils.isEmpty(pageName)) {
-				pageName = GetDefaultURLFromPageURL.getInstance().getPageNameFromStrutsActionInURL( pageUrl );
+				pageName = GetDefaultURLFromPageURL.getInstance().getPageNameFromActionInURL( pageUrl );
 			}
 			DefaultPageViewGenericDTO defaultPageViewDTO = new DefaultPageViewGenericDTO();
 			defaultPageViewDTO.setPageName( pageName );

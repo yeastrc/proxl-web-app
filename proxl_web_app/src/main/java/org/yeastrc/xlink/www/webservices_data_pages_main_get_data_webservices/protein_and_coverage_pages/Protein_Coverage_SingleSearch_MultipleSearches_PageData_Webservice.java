@@ -27,7 +27,7 @@ import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValue
 import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId;
 import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result;
 import org.yeastrc.xlink.www.access_control.result_objects.WebSessionAuthAccessLevel;
-import org.yeastrc.xlink.www.actions.ProteinsMergedProteinsCommon;
+import org.yeastrc.xlink.www.spring_controllers__helpers.ProteinsMergedProteinsCommon;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
 import org.yeastrc.xlink.www.dao.SearchDAO;
 import org.yeastrc.xlink.www.dto.SearchDTO;

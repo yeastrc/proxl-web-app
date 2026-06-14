@@ -3,13 +3,7 @@ package org.yeastrc.xlink.www.user_account;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
-import org.apache.struts.action.Action;
-import org.apache.struts.action.ActionErrors;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.ActionMessage;
-import org.apache.struts.action.ActionMessages;
+import org.yeastrc.xlink.www.spring_controllers.SpringActionMessages;
 import org.yeastrc.auth.dto.AuthUserInviteTrackingDTO;
 import org.yeastrc.xlink.www.dao.ProjectDAO;
 import org.yeastrc.xlink.www.dto.ProjectDTO;
@@ -19,19 +13,13 @@ import org.yeastrc.xlink.www.constants.WebConstants;
  * 
  *
  */
-public class UserInviteLandingPageInitAction extends Action {
-	
+public class UserInviteLandingPageInitAction {
+
 	private static final Logger log = LoggerFactory.getLogger( UserInviteLandingPageInitAction.class);
-	
+
 	private static final int MAX_TITLE_DISPLAY_LENGTH = 40;
-	
-	/* (non-Javadoc)
-	 * @see org.apache.struts.action.Action#execute(org.apache.struts.action.ActionMapping, org.apache.struts.action.ActionForm, javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
-	 */
-	@Override
-	public ActionForward execute( ActionMapping mapping,
-			  ActionForm actionForm,
-			  HttpServletRequest request,
+
+	public String execute( HttpServletRequest request,
 			  HttpServletResponse response )
 					  throws Exception {
 		try {
@@ -39,10 +27,8 @@ public class UserInviteLandingPageInitAction extends Action {
 			ValidateUserInviteTrackingCode validateUserInviteTrackingCode = ValidateUserInviteTrackingCode.getInstance( inviteTrackingCode );
 			if ( ! validateUserInviteTrackingCode.validateInviteTrackingCode() ) {
 				String errorMsgKey = validateUserInviteTrackingCode.getErrorMsgKey();
-				ActionMessages messages = new ActionMessages();
-				messages.add( ActionMessages.GLOBAL_MESSAGE, new ActionMessage( errorMsgKey ) );
-				saveErrors( request, messages );
-				return mapping.findForward("Failure");
+				SpringActionMessages.setErrorMessageKey( request, errorMsgKey );
+				return "Failure";
 			}
 			AuthUserInviteTrackingDTO authUserInviteTrackingDTO =  validateUserInviteTrackingCode.getAuthUserInviteTrackingDTO();
 			Integer inviteSharedObjectId = authUserInviteTrackingDTO.getInvitedSharedObjectId();
@@ -50,17 +36,13 @@ public class UserInviteLandingPageInitAction extends Action {
 				//  Get the project title
 				ProjectDTO project = ProjectDAO.getInstance().getProjectDTOForAuthShareableObjectId( inviteSharedObjectId );
 				if ( project == null ) {
-					ActionErrors errors = new ActionErrors();
-					errors.add("username", new ActionMessage("error.invite.process.project.not.exist"));
-					saveErrors( request, errors );
-					return mapping.findForward("Failure");
+					SpringActionMessages.setErrorMessageKey( request, "error.invite.process.project.not.exist" );
+					return "Failure";
 				}
 				String titleDisplay = project.getTitle();
 				if ( titleDisplay == null ) {
-					ActionErrors errors = new ActionErrors();
-					errors.add("username", new ActionMessage("error.invite.process.code.general"));
-					saveErrors( request, errors );
-					return mapping.findForward("Failure");
+					SpringActionMessages.setErrorMessageKey( request, "error.invite.process.code.general" );
+					return "Failure";
 				}
 				if ( titleDisplay.length() > MAX_TITLE_DISPLAY_LENGTH ) {
 					titleDisplay = titleDisplay.substring( 0, MAX_TITLE_DISPLAY_LENGTH );
@@ -68,7 +50,7 @@ public class UserInviteLandingPageInitAction extends Action {
 				request.setAttribute( "titleDisplay", titleDisplay );
 			}
 			request.setAttribute( "inviteCode", inviteTrackingCode );
-			return mapping.findForward("Success");
+			return "Success";
 		} catch ( Exception e ) {
 			String msg = "Exception caught: " + e.toString();
 			log.error( msg, e );

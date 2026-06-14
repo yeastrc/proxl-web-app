@@ -5,7 +5,6 @@
 
 <%--  The section at the top of the page with the cutoffs --%>
 
-<%@ include file="/WEB-INF/jsp-includes/strutsTaglibImport.jsp" %>
 <%@ include file="/WEB-INF/jsp-includes/jstlTaglibImport.jsp" %>
 
 
@@ -14,7 +13,7 @@
 <c:if test="${ not empty annotationCutoffDataList }" >
 	<tr style=" vertical-align: top;"
 		class=" cutoff_per_search_block_tr_jq "
-		data-associated_overlay_container_id="${ filterTypeHTML_Id }_cutoffs_overlay_container__search_id_<bean:write name="search" property="projectSearchId" />"
+		data-associated_overlay_container_id="${ filterTypeHTML_Id }_cutoffs_overlay_container__search_id_<c:out value="${search.projectSearchId}"/>"
 	>
 		<td style="  line-height: 1.3em; white-space: nowrap; <c:if test="${ not singleSearch }" > <%-- padding-top: 3px; padding-bottom: 3px; --%> width: 125px;</c:if> ">
 		  <span style=" cursor: pointer;" class="tool_tip_attached_jq" data-tooltip="Edit filter values" 
@@ -25,7 +24,7 @@
 		</td>
 		<td style=" line-height: 1.3em; <c:if test="${ not singleSearch }" > <%-- padding-top: 3px; padding-bottom: 3px; --%> </c:if>">
 			<%--  div updated with values from overlay --%>
-			<div id="${ filterTypeHTML_Id }_cutoffs_search_id_<bean:write name="search" property="projectSearchId" />" class=" ${ filterTypeHTML_Id }_cutoffs_jq "></div>
+			<div id="${ filterTypeHTML_Id }_cutoffs_search_id_<c:out value="${search.projectSearchId}"/>" class=" ${ filterTypeHTML_Id }_cutoffs_jq "></div>
 		</td>
 	</tr>
 	
@@ -34,7 +33,7 @@
 		<td class="table-no-border-no-cell-spacing-no-cell-padding">  <%--  Cutoffs Overlay Holder --%>
 
 			<%--  div that contains the overlay --%>
-			<div id="${ filterTypeHTML_Id }_cutoffs_overlay_container__search_id_<bean:write name="search" property="projectSearchId" />" 
+			<div id="${ filterTypeHTML_Id }_cutoffs_overlay_container__search_id_<c:out value="${search.projectSearchId}"/>" 
 				class=" cutoffs_overlay_container_jq  ${ filterTypeHTML_Id }_cutoffs_overlay_container_jq "
 				style="position: relative; ">
 
@@ -63,7 +62,7 @@
 						<%--  This div encloses the fields and the buttons and marks what is part of this overlay --%>
 						<div 
 							class=" cutoff_overlay_enclosing_block_jq "  <%--  filterTypeHTML_Id == 'psm' or 'peptide' --%>
-							 data-associated_cutoffs_display_block_id="${ filterTypeHTML_Id }_cutoffs_search_id_<bean:write name="search" property="projectSearchId" />">
+							 data-associated_cutoffs_display_block_id="${ filterTypeHTML_Id }_cutoffs_search_id_<c:out value="${search.projectSearchId}"/>">
 									 
 						<table >
 			<%-- 

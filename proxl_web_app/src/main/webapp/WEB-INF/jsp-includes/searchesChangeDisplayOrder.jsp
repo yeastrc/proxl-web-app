@@ -1,8 +1,7 @@
-<%@page import="org.yeastrc.xlink.www.constants.StrutsActionPathsConstants"%>
+<%@page import="org.yeastrc.xlink.www.constants.SpringMvcActionPathsConstants"%>
 
 <%--   searchesChangeDisplayOrder.jsp  --%>
 
-<%@ include file="/WEB-INF/jsp-includes/strutsTaglibImport.jsp" %>
 <%@ include file="/WEB-INF/jsp-includes/jstlTaglibImport.jsp" %>
 
 		<%--  Searches Change Display Order Overlay,   Overlay for user changes order searches are displayed --%>
