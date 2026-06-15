@@ -26,6 +26,7 @@ services:
     image: mriffle/proxl-importer:2
     container_name: proxl-importer
     restart: always
+    stop_grace_period: 60s
     depends_on:
       - db
     volumes:
@@ -42,6 +43,7 @@ services:
     image: mriffle/proxl-webapp:2
     container_name: proxl-webapp
     restart: always
+    stop_grace_period: 60s
     depends_on:
       - db
     volumes:
