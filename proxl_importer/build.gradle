@@ -48,6 +48,11 @@ java {
 
 repositories {
     mavenCentral()
+
+    //  Published proxl-import-api jar (git-based Maven repo on the 'repository' branch)
+    maven {
+        url 'https://raw.githubusercontent.com/yeastrc/proxl-import-api/repository/'
+    }
 }
 
 //  Set default task for this build.gradle file
@@ -62,6 +67,12 @@ configurations.all {
    exclude group:'org.apache.logging.log4j', module: 'log4j-to-slf4j'
 //   exclude group:'org.apache.logging.log4j', module: 'log4j-api'
 }
+
+//  Proxl Import API version - single source of truth at the repo root, so bumping the version
+//  touches one file and the webapp + importer modules stay in lockstep.
+String proxl_import_api_version = project.file('../Gradle_proxl-import-api_version_for_Gradle.txt').getText('UTF-8').trim()
+String proxl_import_api = 'org.yeastrc:proxl-import-api:' + proxl_import_api_version
+println("compile for 'org.yeastrc:proxl-import-api': " + proxl_import_api)
 
 dependencies {
 	
@@ -109,11 +120,26 @@ dependencies {
 	
 	
 	
-	// JAXB dependencies (Required for Java 11+)
+	// JAXB 4.0 (jakarta.xml.bind) - the deserializer runtime. A 4.0 runtime binds both the
+	// published proxl-import-api jakarta classes (built at JAXB 3.0) and the local jakarta
+	// RunImporterToImporterFile classes.
 	// https://mvnrepository.com/artifact/jakarta.xml.bind/jakarta.xml.bind-api
-	implementation group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '2.3.2'
+	implementation group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '4.0.2'
 	// https://mvnrepository.com/artifact/org.glassfish.jaxb/jaxb-runtime
-	implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '2.3.2'
+	implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '4.0.5'
+
+	//  javax JAXB 2 (javax.xml.bind) - still required by the bundled spectral-storage accept-import
+	//  client connector jar, which marshals/unmarshals its webservice request/response objects with
+	//  javax JAXB. This is internal importer<->spectral-storage comms (trusted), not the internet-facing
+	//  Proxl XML (which uses jakarta JAXB 4 above). Uses the OLD javax.xml.bind:jaxb-api coordinate and
+	//  the com.sun.xml.bind:jaxb-impl runtime so it coexists with the jakarta jaxb-runtime above
+	//  (distinct Maven coordinates => both runtimes on the classpath, no version collision).
+	implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
+	implementation group: 'com.sun.xml.bind', name: 'jaxb-impl', version: '2.3.1'
+
+	//  Proxl Import API (Proxl XML JAXB classes) - pulled from the published jakarta jar
+	//  instead of a bundled jar under libs_proxl_github_jars.
+	implementation proxl_import_api
 	
 	
 	
@@ -126,9 +152,8 @@ dependencies {
 
 	//////////////////////////////
 	
-	//  Jars from other Proxl Repos projects
-	implementation fileTree(dir: '../libs_proxl_github_jars', include: ['*.jar'])
-	
+	//  (proxl-import-api now comes from the published Maven jar above, not libs_proxl_github_jars)
+
 	//   jargs.jar
 	implementation fileTree(dir: '../lib_importer_run_importer__and_importer_run_importer_shared_code', include: ['*.jar'])
 	

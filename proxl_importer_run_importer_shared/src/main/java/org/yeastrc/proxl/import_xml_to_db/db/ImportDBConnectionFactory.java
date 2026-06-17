@@ -189,7 +189,9 @@ public class ImportDBConnectionFactory implements IDBConnectionFactory {
 
 			_dataSources = new HashMap<String, BasicDataSource>();
 
-			Class.forName("com.mysql.jdbc.Driver");
+			//  No manual driver load: MySQL Connector/J 8 auto-registers via the JDBC SPI and DBCP2
+			//  resolves the driver from the JDBC URL. (Class.forName("com.mysql.jdbc.Driver") was
+			//  removed - that class name is deprecated in Connector/J 8 and the load is unnecessary.)
 		}
 		
 		

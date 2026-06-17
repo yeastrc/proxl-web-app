@@ -38,11 +38,12 @@ dependencies {
 	// https://mvnrepository.com/artifact/org.apache.commons/commons-dbcp2
 	compileOnly group: 'org.apache.commons', name: 'commons-dbcp2', version: '2.2.0'
 	
-	// JAXB dependencies (Required for Java 11+)
+	// JAXB 4.0 (jakarta.xml.bind) - compile-time annotations for the RunImporterToImporterFile
+	// JAXB classes; the runtime is provided by the consuming modules (importer / run_importer).
 	// https://mvnrepository.com/artifact/jakarta.xml.bind/jakarta.xml.bind-api
-	compileOnly group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '2.3.2'
+	compileOnly group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '4.0.2'
 	// https://mvnrepository.com/artifact/org.glassfish.jaxb/jaxb-runtime
-	compileOnly group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '2.3.2'
+	compileOnly group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '4.0.5'
 	
 }
 

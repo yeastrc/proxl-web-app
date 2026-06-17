@@ -72,6 +72,11 @@ repositories {
     maven {
         url "https://repo.osgeo.org/repository/release/"
     }
+
+    //  Published proxl-import-api jar (git-based Maven repo on the 'repository' branch)
+    maven {
+        url 'https://raw.githubusercontent.com/yeastrc/proxl-import-api/repository/'
+    }
 }
 
 //  Default Task
@@ -101,6 +106,12 @@ configurations.all {
 	//   implementation group: 'xerces', name: 'xerces', version: '2.0.2'
 	//  exclude group: 'xerces', module: 'xerces'
 }
+
+//  Proxl Import API version - single source of truth at the repo root, so bumping the version
+//  touches one file and the webapp + importer modules stay in lockstep.
+String proxl_import_api_version = project.file('../Gradle_proxl-import-api_version_for_Gradle.txt').getText('UTF-8').trim()
+String proxl_import_api = 'org.yeastrc:proxl-import-api:' + proxl_import_api_version
+println("compile for 'org.yeastrc:proxl-import-api': " + proxl_import_api)
 
 dependencies {
 
@@ -273,11 +284,12 @@ dependencies {
 	
 		///////////
 		
-	//  Other Proxl Jars
-		
-	//  Jars built from other Proxl Github repositories
-	implementation fileTree(dir: '../libs_proxl_github_jars', include: ['*.jar'])
-	
+	//  Proxl Import API - pulled from the published jar (jakarta, v2.x) instead of a bundled jar.
+	//  The webapp uses only the XSD_ElementAttributeNamesConstants class (StAX validation of the
+	//  start of an uploaded Proxl XML file); it does not JAXB-bind any Proxl Import API class, so
+	//  no jakarta JAXB runtime is needed here for it.
+	implementation proxl_import_api
+
 	//  Other Yeastrc Jars
 	
 	//  Jars built from other Yeastrc Github repositories - Webapp only	
