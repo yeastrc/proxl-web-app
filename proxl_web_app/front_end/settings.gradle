@@ -15,4 +15,5 @@ include 'api'
 include 'services:webservice'
 */
 
-include 'FrontEnd'
+//  (removed stale 'include FrontEnd' - the 'FrontEnd' subdir does not exist and Gradle 9
+//   errors on includes pointing at a missing directory. This is a single-project build.)

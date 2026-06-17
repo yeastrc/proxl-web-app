@@ -1,14 +1,14 @@
 package org.yeastrc.xlink.www.send_email;
 
 import java.util.Properties;
-import javax.mail.Address;
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.SendFailedException;
-import javax.mail.Transport;
-import javax.mail.internet.AddressException;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
+import jakarta.mail.Address;
+import jakarta.mail.Message;
+import jakarta.mail.MessagingException;
+import jakarta.mail.SendFailedException;
+import jakarta.mail.Transport;
+import jakarta.mail.internet.AddressException;
+import jakarta.mail.internet.InternetAddress;
+import jakarta.mail.internet.MimeMessage;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.www.constants.ConfigSystemsKeysConstants;
@@ -69,7 +69,7 @@ public class SendEmail {
 			
 			
 			// create a JavaMail session
-			javax.mail.Session mailSession = javax.mail.Session.getInstance(properties, null);
+			jakarta.mail.Session mailSession = jakarta.mail.Session.getInstance(properties, null);
 			// create a new MIME message
 			MimeMessage message = new MimeMessage(mailSession);
 			// set the from address
@@ -176,7 +176,7 @@ public class SendEmail {
 //		Properties properties = System.getProperties();
 //		properties.put( "mail.smtp.host", GetEmailConfig.getSmtpServerURL() );
 //		// create a JavaMail session
-//		javax.mail.Session mSession = javax.mail.Session.getInstance(properties, null);
+//		jakarta.mail.Session mSession = jakarta.mail.Session.getInstance(properties, null);
 //		// create a new MIME message
 //		MimeMessage message = new MimeMessage(mSession);
 //		// set the from address

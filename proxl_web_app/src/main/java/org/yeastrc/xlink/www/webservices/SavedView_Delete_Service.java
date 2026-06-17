@@ -1,14 +1,14 @@
 package org.yeastrc.xlink.www.webservices;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.www.access_control.result_objects.WebSessionAuthAccessLevel;
 import org.yeastrc.xlink.www.constants.WebServiceErrorMessageConstants;
@@ -46,7 +46,7 @@ public class SavedView_Delete_Service {
 			String msg = "No Request body";
 			log.error( msg );
 		    throw new WebApplicationException(
-		    	      Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+		    	      Response.status(jakarta.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
 		    	        .entity( msg )
 		    	        .build()
 		    	        );
@@ -64,7 +64,7 @@ public class SavedView_Delete_Service {
 				String msg = "Provided projectSearchIds is not provided or is zero";
 				log.error( msg );
 			    throw new WebApplicationException(
-			    	      Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+			    	      Response.status(jakarta.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
 			    	        .entity( msg )
 			    	        .build()
 			    	        );
@@ -74,7 +74,7 @@ public class SavedView_Delete_Service {
     		if ( dataPageSavedViewDTO == null ) {
     			log.warn( "Id (savedViewId) not in DB: " + savedViewId );
 			    throw new WebApplicationException(
-			    	      Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+			    	      Response.status(jakarta.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
 			    	        // .entity( msg )
 			    	        .build()
 			    	        );

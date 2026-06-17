@@ -1,4 +1,4 @@
-FROM amazoncorretto:11-alpine-jdk
+FROM eclipse-temurin:25-jre
 
 COPY db_config_file.properties  /usr/local/bin/
 COPY run_importer_config_file.properties  /usr/local/bin/

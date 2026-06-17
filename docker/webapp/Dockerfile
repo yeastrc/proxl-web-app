@@ -1,4 +1,4 @@
-FROM tomcat:9-jdk11-corretto
+FROM tomcat:11.0-jdk25-temurin-noble
 MAINTAINER Michael Riffle <mriffle@uw.edu>
 
 COPY mysql-connector-java-8.0.26.jar /usr/local/tomcat/lib

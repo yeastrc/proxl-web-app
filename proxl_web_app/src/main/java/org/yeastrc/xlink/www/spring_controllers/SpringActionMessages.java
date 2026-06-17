@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * Struts-free replacement for the {@code Action.saveErrors(request, ActionMessages)} mechanism used

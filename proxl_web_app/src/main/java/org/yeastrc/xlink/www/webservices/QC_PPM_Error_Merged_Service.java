@@ -8,15 +8,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.www.access_control.result_objects.WebSessionAuthAccessLevel;
@@ -52,7 +52,7 @@ public class QC_PPM_Error_Merged_Service {
 			String msg = "requestJSONBytes is null or requestJSONBytes is empty";
 			log.error( msg );
 		    throw new WebApplicationException(
-		    	      Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+		    	      Response.status(jakarta.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
 //		    	        .entity(  )
 		    	        .build()
 		    	        );
@@ -65,7 +65,7 @@ public class QC_PPM_Error_Merged_Service {
 			String msg = "parse request failed";
 			log.warn( msg );
 		    throw new WebApplicationException(
-		    	      Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+		    	      Response.status(jakarta.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
 //		    	        .entity(  )
 		    	        .build()
 		    	        );
@@ -78,7 +78,7 @@ public class QC_PPM_Error_Merged_Service {
 			String msg = "Provided project_search_id is null or project_search_id is missing";
 			log.error( msg );
 		    throw new WebApplicationException(
-		    	      Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+		    	      Response.status(jakarta.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
 		    	        .entity( msg )
 		    	        .build()
 		    	        );
@@ -87,7 +87,7 @@ public class QC_PPM_Error_Merged_Service {
 			String msg = "qcPageQueryJSONRoot is null or qcPageQueryJSONRoot is missing";
 			log.error( msg );
 			throw new WebApplicationException(
-					Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+					Response.status(jakarta.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
 					.entity( msg )
 					.build()
 					);
@@ -164,7 +164,7 @@ public class QC_PPM_Error_Merged_Service {
 						log.warn( msg );
 						//  Search not found, the data on the page they are requesting does not exist.
 					    throw new WebApplicationException(
-					    	      Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+					    	      Response.status(jakarta.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
 					    	        .entity( msg )
 					    	        .build()
 					    	        );			
@@ -192,7 +192,7 @@ public class QC_PPM_Error_Merged_Service {
 			String msg = "Exception processing request data, msg: " + e.toString();
 			log.error( msg, e );
 		    throw new WebApplicationException(
-		    	      Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+		    	      Response.status(jakarta.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
 		    	        .entity( msg )
 		    	        .build()
 		    	        );			

@@ -2,7 +2,7 @@ package org.yeastrc.xlink.www.web_utils;
 
 import java.util.Collection;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.yeastrc.xlink.www.dto.SearchDTO;
 

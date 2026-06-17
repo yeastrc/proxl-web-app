@@ -26,12 +26,12 @@ buildscript {
     }
   }
   dependencies {
-    classpath "org.ajoberstar.grgit:grgit-gradle:4.1.1"
+    classpath "org.ajoberstar.grgit:grgit-gradle:5.3.0"
   }
 }
 
 plugins {
-	id 'com.github.johnrengelman.shadow' version '8.1.1'
+	id 'com.gradleup.shadow' version '9.4.2'
 	//  moved to 'buildscript'. See Notes above	id 'org.ajoberstar.grgit' version '3.1.1'
 }
 
@@ -39,12 +39,15 @@ apply plugin: 'java'
 
 apply plugin: "org.ajoberstar.grgit"
 
-sourceCompatibility = 1.8      //    defaults to currently installed JVM
-// targetCompatibility  = 1.8  //    defaults to sourceCompatibility
+//  Java 25 via toolchain (Gradle 9 + JDK 25)
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
+}
 
 repositories {
     mavenCentral()
-    jcenter()
 }
 
 //  Set default task for this build.gradle file

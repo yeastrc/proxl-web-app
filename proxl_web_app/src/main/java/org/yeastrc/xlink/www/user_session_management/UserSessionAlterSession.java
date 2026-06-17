@@ -17,7 +17,7 @@
 */
 package org.yeastrc.xlink.www.user_session_management;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * Alter User Session

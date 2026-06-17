@@ -12,15 +12,15 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
@@ -80,7 +80,7 @@ public class ProxlXMLFileImportUploadSubmitService {
 				String msg = "missing projectId ";
 				log.error( msg );
 			    throw new WebApplicationException(
-			    	      Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+			    	      Response.status(jakarta.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
 			    	        .entity( msg )
 			    	        .build()
 			    	        );
@@ -89,7 +89,7 @@ public class ProxlXMLFileImportUploadSubmitService {
 				String msg = "Provided projectId is zero";
 				log.error( msg );
 			    throw new WebApplicationException(
-			    	      Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+			    	      Response.status(jakarta.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
 			    	        .entity( msg )
 			    	        .build()
 			    	        );
@@ -99,7 +99,7 @@ public class ProxlXMLFileImportUploadSubmitService {
 				String msg = "missing uploadKey ";
 				log.error( msg );
 			    throw new WebApplicationException(
-			    	      Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+			    	      Response.status(jakarta.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
 			    	        .entity( msg )
 			    	        .build()
 			    	        );
@@ -111,7 +111,7 @@ public class ProxlXMLFileImportUploadSubmitService {
 				String msg = "Provided uploadKey is invalid";
 				log.error( msg );
 			    throw new WebApplicationException(
-			    	      Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+			    	      Response.status(jakarta.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
 			    	        .entity( msg )
 			    	        .build()
 			    	        );
@@ -121,7 +121,7 @@ public class ProxlXMLFileImportUploadSubmitService {
 				String msg = "submitterKey cannot be empty if submitterSameMachine is true";
 				log.warn( msg );
 			    throw new WebApplicationException(
-			    	      Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+			    	      Response.status(jakarta.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
 			    	        .entity( msg )
 			    	        .build()
 			    	        );
@@ -153,7 +153,7 @@ public class ProxlXMLFileImportUploadSubmitService {
 				String msg = "Proxl XML File Import is NOT Fully Configured ";
 				log.error( msg );
 			    throw new WebApplicationException(
-			    	      Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+			    	      Response.status(jakarta.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
 			    	        .entity( msg )
 			    	        .build()
 			    	        );
@@ -165,7 +165,7 @@ public class ProxlXMLFileImportUploadSubmitService {
 				String msg = "Project id is not in database " + projectId;
 				log.warn( msg );
 			    throw new WebApplicationException(
-			    	      Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+			    	      Response.status(jakarta.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
 			    	        .entity( msg )
 			    	        .build()
 			    	        );
@@ -174,7 +174,7 @@ public class ProxlXMLFileImportUploadSubmitService {
 				String msg = "Project id is disabled or marked for deletion: " + projectId;
 				log.warn( msg );
 			    throw new WebApplicationException(
-			    	      Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+			    	      Response.status(jakarta.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
 			    	        .entity( msg )
 			    	        .build()
 			    	        );
@@ -213,7 +213,7 @@ public class ProxlXMLFileImportUploadSubmitService {
 				}
 				String webErrorMsg = "No Data for uploadKey: " + uploadKey;
 			    throw new WebApplicationException(
-			    	      Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+			    	      Response.status(jakarta.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
 			    	        .entity( webErrorMsg )
 			    	        .build()
 			    	        );
@@ -234,7 +234,7 @@ public class ProxlXMLFileImportUploadSubmitService {
 			String msg = "Exception processing request data, msg: " + e.toString();
 			log.error( msg, e );
 		    throw new WebApplicationException(
-		    	      Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+		    	      Response.status(jakarta.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
 		    	        .entity( msg )
 		    	        .build()
 		    	        );			
@@ -278,7 +278,7 @@ public class ProxlXMLFileImportUploadSubmitService {
 			String msg = "No files in request";
 			log.warn( msg );
 		    throw new WebApplicationException(
-		    	      Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+		    	      Response.status(jakarta.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
 		    	        .entity( msg )
 		    	        .build()
 		    	        );
@@ -291,7 +291,7 @@ public class ProxlXMLFileImportUploadSubmitService {
 				String msg = "requestFileItem.fileIndex == null";
 				log.warn( msg );
 			    throw new WebApplicationException(
-			    	      Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+			    	      Response.status(jakarta.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
 			    	        .entity( msg )
 			    	        .build()
 			    	        );
@@ -300,7 +300,7 @@ public class ProxlXMLFileImportUploadSubmitService {
 				String msg = "requestFileItem.fileType == null";
 				log.warn( msg );
 			    throw new WebApplicationException(
-			    	      Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+			    	      Response.status(jakarta.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
 			    	        .entity( msg )
 			    	        .build()
 			    	        );
@@ -310,7 +310,7 @@ public class ProxlXMLFileImportUploadSubmitService {
 					String msg = "More than one Proxl XML file";
 					log.warn( msg );
 				    throw new WebApplicationException(
-				    	      Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+				    	      Response.status(jakarta.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
 				    	        .entity( msg )
 				    	        .build()
 				    	        );
@@ -326,7 +326,7 @@ public class ProxlXMLFileImportUploadSubmitService {
 				String msg = "File Type is unknown: " + requestFileItem.getFileType().intValue();
 				log.warn( msg );
 			    throw new WebApplicationException(
-			    	      Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+			    	      Response.status(jakarta.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
 			    	        .entity( msg )
 			    	        .build()
 			    	        );
@@ -335,7 +335,7 @@ public class ProxlXMLFileImportUploadSubmitService {
 				String msg = "requestFileItem.uploadedFilename == null";
 				log.warn( msg );
 			    throw new WebApplicationException(
-			    	      Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+			    	      Response.status(jakarta.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
 			    	        .entity( msg )
 			    	        .build()
 			    	        );
@@ -344,7 +344,7 @@ public class ProxlXMLFileImportUploadSubmitService {
 				String msg = "Duplicate filename: " + requestFileItem.uploadedFilename;
 				log.warn( msg );
 			    throw new WebApplicationException(
-			    	      Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+			    	      Response.status(jakarta.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
 			    	        .entity( msg )
 			    	        .build()
 			    	        );
@@ -403,7 +403,7 @@ public class ProxlXMLFileImportUploadSubmitService {
 				String msg = "Submitter Key Not Valid";
 				log.warn( msg );
 			    throw new WebApplicationException(
-			    	      Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+			    	      Response.status(jakarta.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
 			    	        .entity( msg )
 			    	        .build()
 			    	        );
@@ -418,7 +418,7 @@ public class ProxlXMLFileImportUploadSubmitService {
 					String msg = "File Type is unknown: " + fileItem.fileType;
 					log.warn( msg );
 					throw new WebApplicationException(
-							Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+							Response.status(jakarta.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
 							.entity( msg )
 							.build()
 							);
@@ -428,7 +428,7 @@ public class ProxlXMLFileImportUploadSubmitService {
 					String msg = "File not found: " + fileItemFile.getCanonicalPath();
 					log.warn( msg );
 					throw new WebApplicationException(
-							Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+							Response.status(jakarta.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
 							.entity( msg )
 							.build()
 							);
@@ -584,7 +584,7 @@ public class ProxlXMLFileImportUploadSubmitService {
 					String msg = "More than one Proxl XML file";
 					log.warn( msg );
 				    throw new WebApplicationException(
-				    	      Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+				    	      Response.status(jakarta.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
 				    	        .entity( msg )
 				    	        .build()
 				    	        );
@@ -596,7 +596,7 @@ public class ProxlXMLFileImportUploadSubmitService {
 			String msg = "Missing Proxl XML file";
 			log.warn( msg );
 		    throw new WebApplicationException(
-		    	      Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+		    	      Response.status(jakarta.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
 		    	        .entity( msg )
 		    	        .build()
 		    	        );

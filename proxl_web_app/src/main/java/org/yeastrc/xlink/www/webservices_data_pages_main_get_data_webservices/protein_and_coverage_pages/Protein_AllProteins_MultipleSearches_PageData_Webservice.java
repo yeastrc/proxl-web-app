@@ -11,15 +11,15 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 
 import org.apache.commons.lang.mutable.MutableInt;
 import org.apache.commons.lang3.StringUtils;
@@ -81,7 +81,7 @@ public class Protein_AllProteins_MultipleSearches_PageData_Webservice {
 			String msg = "requestJSONBytes is null or requestJSONBytes is empty";
 			log.error( msg );
 			throw new WebApplicationException(
-					Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+					Response.status(jakarta.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
 					//		    	        .entity(  )
 					.build()
 					);
@@ -99,7 +99,7 @@ public class Protein_AllProteins_MultipleSearches_PageData_Webservice {
 			String msg = "Provided projectSearchIds is null or projectSearchIds is missing";
 			log.error( msg );
 			throw new WebApplicationException(
-					Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+					Response.status(jakarta.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
 					.entity( msg )
 					.build()
 					);
@@ -109,7 +109,7 @@ public class Protein_AllProteins_MultipleSearches_PageData_Webservice {
 			String msg = "proteinQueryJSONRoot is null or proteinQueryJSONRoot is missing";
 			log.error( msg );
 			throw new WebApplicationException(
-					Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+					Response.status(jakarta.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
 					.entity( msg )
 					.build()
 					);
@@ -221,7 +221,7 @@ public class Protein_AllProteins_MultipleSearches_PageData_Webservice {
 						String msg = "projectSearchId '" + projectSearchId + "' not found in the database. 400 Error.";
 						log.warn( msg );
 						throw new WebApplicationException(
-								Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+								Response.status(jakarta.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
 								.entity( "projectSearchId error" )
 								.build()
 								);
@@ -464,7 +464,7 @@ public class Protein_AllProteins_MultipleSearches_PageData_Webservice {
 			String msg = "Exception processing request data, msg: " + e.toString();
 			log.error( msg, e );
 			throw new WebApplicationException(
-					Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+					Response.status(jakarta.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
 					.entity( msg )
 					.build()
 					);			

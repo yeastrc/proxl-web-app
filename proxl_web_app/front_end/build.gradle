@@ -24,18 +24,15 @@
 buildscript {
     repositories {
         mavenCentral()
-         jcenter()
          
       maven {
      	 url "https://plugins.gradle.org/m2/"
     	}
     }
     dependencies {
-        classpath "com.moowork.gradle:gradle-node-plugin:1.2.0"
     }
 }
 
-apply plugin: "com.moowork.node"
 
 
 apply plugin: 'eclipse'
@@ -192,7 +189,7 @@ task createHandlebarsOutputDirs {
 
 //  Handlebars Precompile for input handlebars_templates/image_structure_pages_shared
 
-task handlebarsPrecompile_image_structure_pages_shared(type: NodeTask) {
+task handlebarsPrecompile_image_structure_pages_shared(type: Exec) {
 
   def precompile_Input_Directory = "handlebars_templates/image_structure_pages_shared"
   def precompile_Output_File = "handlebars_templates_precompiled/image_structure_pages_shared/image_structure_pages_shared_template-bundle.js"
@@ -202,22 +199,14 @@ task handlebarsPrecompile_image_structure_pages_shared(type: NodeTask) {
   outputs.file( precompile_Output_File )
 
   def osName = System.getProperty("os.name").toLowerCase();
-  if (osName.contains("windows")) {
-    script = project.file('node_modules/handlebars/bin/handlebars')
-  } else {
-    script = project.file('node_modules/.bin/handlebars')
-  }
-  args = [ '--amd' , // parameters must be before file list
-  '--min',
-  '-f', precompile_Output_File,
-   precompile_Input_Directory
-   ]
+  def handlebarsScript = osName.contains("windows") ? 'node_modules/handlebars/bin/handlebars' : 'node_modules/.bin/handlebars'
+  commandLine 'node', handlebarsScript, '--amd', '--min', '-f', precompile_Output_File, precompile_Input_Directory
 }
 
 
 //  Handlebars Precompile for input handlebars_templates/merged_pages_shared
 
-task handlebarsPrecompile_merged_pages_shared(type: NodeTask) {
+task handlebarsPrecompile_merged_pages_shared(type: Exec) {
 
   def precompile_Input_Directory = "handlebars_templates/merged_pages_shared"
   def precompile_Output_File = "handlebars_templates_precompiled/merged_pages_shared/merged_pages_shared_template-bundle.js"
@@ -227,21 +216,13 @@ task handlebarsPrecompile_merged_pages_shared(type: NodeTask) {
   outputs.file( precompile_Output_File )
 
   def osName = System.getProperty("os.name").toLowerCase();
-  if (osName.contains("windows")) {
-    script = project.file('node_modules/handlebars/bin/handlebars')
-  } else {
-    script = project.file('node_modules/.bin/handlebars')
-  }
-  args = [ '--amd' , // parameters must be before file list
-  '--min',
-  '-f', precompile_Output_File,
-   precompile_Input_Directory
-   ]
+  def handlebarsScript = osName.contains("windows") ? 'node_modules/handlebars/bin/handlebars' : 'node_modules/.bin/handlebars'
+  commandLine 'node', handlebarsScript, '--amd', '--min', '-f', precompile_Output_File, precompile_Input_Directory
 }
 
 //  Handlebars Precompile for input handlebars_templates/peptide_page
 
-task handlebarsPrecompile_peptide_page(type: NodeTask) {
+task handlebarsPrecompile_peptide_page(type: Exec) {
 
   def precompile_Input_Directory = "handlebars_templates/peptide_page"
   def precompile_Output_File = "handlebars_templates_precompiled/peptide_page/peptide_page_template-bundle.js"
@@ -251,21 +232,13 @@ task handlebarsPrecompile_peptide_page(type: NodeTask) {
   outputs.file( precompile_Output_File )
 
   def osName = System.getProperty("os.name").toLowerCase();
-  if (osName.contains("windows")) {
-    script = project.file('node_modules/handlebars/bin/handlebars')
-  } else {
-    script = project.file('node_modules/.bin/handlebars')
-  }
-  args = [ '--amd' , // parameters must be before file list
-  '--min',
-  '-f', precompile_Output_File,
-   precompile_Input_Directory
-   ]
+  def handlebarsScript = osName.contains("windows") ? 'node_modules/handlebars/bin/handlebars' : 'node_modules/.bin/handlebars'
+  commandLine 'node', handlebarsScript, '--amd', '--min', '-f', precompile_Output_File, precompile_Input_Directory
 }
 
 //  Handlebars Precompile for input handlebars_templates/protein_page
 
-task handlebarsPrecompile_protein_page(type: NodeTask) {
+task handlebarsPrecompile_protein_page(type: Exec) {
 
   def precompile_Input_Directory = "handlebars_templates/protein_page"
   def precompile_Output_File = "handlebars_templates_precompiled/protein_page/protein_page_template-bundle.js"
@@ -275,21 +248,13 @@ task handlebarsPrecompile_protein_page(type: NodeTask) {
   outputs.file( precompile_Output_File )
 
   def osName = System.getProperty("os.name").toLowerCase();
-  if (osName.contains("windows")) {
-    script = project.file('node_modules/handlebars/bin/handlebars')
-  } else {
-    script = project.file('node_modules/.bin/handlebars')
-  }
-  args = [ '--amd' , // parameters must be before file list
-  '--min',
-  '-f', precompile_Output_File,
-   precompile_Input_Directory
-   ]
+  def handlebarsScript = osName.contains("windows") ? 'node_modules/handlebars/bin/handlebars' : 'node_modules/.bin/handlebars'
+  commandLine 'node', handlebarsScript, '--amd', '--min', '-f', precompile_Output_File, precompile_Input_Directory
 }
 
 //  Handlebars Precompile for input handlebars_templates/protein_pages_coverage_report_shared
 
-task handlebarsPrecompile_protein_pages_coverage_report_shared(type: NodeTask) {
+task handlebarsPrecompile_protein_pages_coverage_report_shared(type: Exec) {
 
   def precompile_Input_Directory = "handlebars_templates/protein_pages_coverage_report_shared"
   def precompile_Output_File = "handlebars_templates_precompiled/protein_pages_coverage_report_shared/protein_pages_coverage_report_shared_template-bundle.js"
@@ -299,21 +264,13 @@ task handlebarsPrecompile_protein_pages_coverage_report_shared(type: NodeTask) {
   outputs.file( precompile_Output_File )
 
   def osName = System.getProperty("os.name").toLowerCase();
-  if (osName.contains("windows")) {
-    script = project.file('node_modules/handlebars/bin/handlebars')
-  } else {
-    script = project.file('node_modules/.bin/handlebars')
-  }
-  args = [ '--amd' , // parameters must be before file list
-  '--min',
-  '-f', precompile_Output_File,
-   precompile_Input_Directory
-   ]
+  def handlebarsScript = osName.contains("windows") ? 'node_modules/handlebars/bin/handlebars' : 'node_modules/.bin/handlebars'
+  commandLine 'node', handlebarsScript, '--amd', '--min', '-f', precompile_Output_File, precompile_Input_Directory
 }
 
 //  Handlebars Precompile for input handlebars_templates/protein_pages_coverage_report_image_structure_pages_shared
 
-task handlebarsPrecompile_protein_pages_coverage_report_image_structure_pages_shared(type: NodeTask) {
+task handlebarsPrecompile_protein_pages_coverage_report_image_structure_pages_shared(type: Exec) {
 
   def precompile_Input_Directory = "handlebars_templates/protein_pages_coverage_report_image_structure_pages_shared"
   def precompile_Output_File = "handlebars_templates_precompiled/protein_pages_coverage_report_image_structure_pages_shared/protein_pages_coverage_report_image_structure_pages_shared_template-bundle.js"
@@ -323,21 +280,13 @@ task handlebarsPrecompile_protein_pages_coverage_report_image_structure_pages_sh
   outputs.file( precompile_Output_File )
 
   def osName = System.getProperty("os.name").toLowerCase();
-  if (osName.contains("windows")) {
-    script = project.file('node_modules/handlebars/bin/handlebars')
-  } else {
-    script = project.file('node_modules/.bin/handlebars')
-  }
-  args = [ '--amd' , // parameters must be before file list
-  '--min',
-  '-f', precompile_Output_File,
-   precompile_Input_Directory
-   ]
+  def handlebarsScript = osName.contains("windows") ? 'node_modules/handlebars/bin/handlebars' : 'node_modules/.bin/handlebars'
+  commandLine 'node', handlebarsScript, '--amd', '--min', '-f', precompile_Output_File, precompile_Input_Directory
 }
 
 //  Handlebars Precompile for input handlebars_templates/mod_view_page
 
-task handlebarsPrecompile_mod_view_page(type: NodeTask) {
+task handlebarsPrecompile_mod_view_page(type: Exec) {
 
   def precompile_Input_Directory = "handlebars_templates/mod_view_page"
   def precompile_Output_File = "handlebars_templates_precompiled/mod_view_page/mod_view_page_template-bundle.js"
@@ -347,20 +296,12 @@ task handlebarsPrecompile_mod_view_page(type: NodeTask) {
   outputs.file( precompile_Output_File )
 
   def osName = System.getProperty("os.name").toLowerCase();
-  if (osName.contains("windows")) {
-    script = project.file('node_modules/handlebars/bin/handlebars')
-  } else {
-    script = project.file('node_modules/.bin/handlebars')
-  }
-  args = [ '--amd' , // parameters must be before file list
-  '--min',
-  '-f', precompile_Output_File,
-   precompile_Input_Directory
-   ]
+  def handlebarsScript = osName.contains("windows") ? 'node_modules/handlebars/bin/handlebars' : 'node_modules/.bin/handlebars'
+  commandLine 'node', handlebarsScript, '--amd', '--min', '-f', precompile_Output_File, precompile_Input_Directory
 }
 
 //  Handlebars Precompile for input handlebars_templates/common
-task handlebarsPrecompile_common(type: NodeTask) {
+task handlebarsPrecompile_common(type: Exec) {
 
   def precompile_Input_Directory = "handlebars_templates/common"
   def precompile_Output_File = "handlebars_templates_precompiled/common/common_template-bundle.js"
@@ -370,20 +311,12 @@ task handlebarsPrecompile_common(type: NodeTask) {
   outputs.file( precompile_Output_File )
 
   def osName = System.getProperty("os.name").toLowerCase();
-  if (osName.contains("windows")) {
-    script = project.file('node_modules/handlebars/bin/handlebars')
-  } else {
-    script = project.file('node_modules/.bin/handlebars')
-  }
-  args = [ '--amd' , // parameters must be before file list
-  '--min',
-  '-f', precompile_Output_File,
-   precompile_Input_Directory
-   ]
+  def handlebarsScript = osName.contains("windows") ? 'node_modules/handlebars/bin/handlebars' : 'node_modules/.bin/handlebars'
+  commandLine 'node', handlebarsScript, '--amd', '--min', '-f', precompile_Output_File, precompile_Input_Directory
 }
 
 //  Handlebars Precompile for input handlebars_templates/save_view
-task handlebarsPrecompile_save_view(type: NodeTask) {
+task handlebarsPrecompile_save_view(type: Exec) {
 
   def precompile_Input_Directory = "handlebars_templates/save_view"
   def precompile_Output_File = "handlebars_templates_precompiled/save_view/save_view_template-bundle.js"
@@ -393,21 +326,13 @@ task handlebarsPrecompile_save_view(type: NodeTask) {
   outputs.file( precompile_Output_File )
 
   def osName = System.getProperty("os.name").toLowerCase();
-  if (osName.contains("windows")) {
-    script = project.file('node_modules/handlebars/bin/handlebars')
-  } else {
-    script = project.file('node_modules/.bin/handlebars')
-  }
-  args = [ '--amd' , // parameters must be before file list
-  '--min',
-  '-f', precompile_Output_File,
-   precompile_Input_Directory
-   ]
+  def handlebarsScript = osName.contains("windows") ? 'node_modules/handlebars/bin/handlebars' : 'node_modules/.bin/handlebars'
+  commandLine 'node', handlebarsScript, '--amd', '--min', '-f', precompile_Output_File, precompile_Input_Directory
 }
 
 //  Handlebars Precompile for input handlebars_templates/protein_sequence_formatted_display
 
-task handlebarsPrecompile_protein_sequence_formatted_display(type: NodeTask) {
+task handlebarsPrecompile_protein_sequence_formatted_display(type: Exec) {
 
   def precompile_Input_Directory = "handlebars_templates/protein_sequence_formatted_display"
   def precompile_Output_File = "handlebars_templates_precompiled/protein_sequence_formatted_display/protein_sequence_formatted_display_template-bundle.js"
@@ -417,21 +342,13 @@ task handlebarsPrecompile_protein_sequence_formatted_display(type: NodeTask) {
   outputs.file( precompile_Output_File )
 
   def osName = System.getProperty("os.name").toLowerCase();
-  if (osName.contains("windows")) {
-    script = project.file('node_modules/handlebars/bin/handlebars')
-  } else {
-    script = project.file('node_modules/.bin/handlebars')
-  }
-  args = [ '--amd' , // parameters must be before file list
-  '--min',
-  '-f', precompile_Output_File,
-   precompile_Input_Directory
-   ]
+  def handlebarsScript = osName.contains("windows") ? 'node_modules/handlebars/bin/handlebars' : 'node_modules/.bin/handlebars'
+  commandLine 'node', handlebarsScript, '--amd', '--min', '-f', precompile_Output_File, precompile_Input_Directory
 }
 
 //  Handlebars Precompile for input handlebars_templates/search_detail_section_main_page
 
-task handlebarsPrecompile_search_detail_section_main_page(type: NodeTask) {
+task handlebarsPrecompile_search_detail_section_main_page(type: Exec) {
 
   def precompile_Input_Directory = "handlebars_templates/search_detail_section_main_page"
   def precompile_Output_File = "handlebars_templates_precompiled/search_detail_section_main_page/search_detail_section_main_page_template-bundle.js"
@@ -441,22 +358,14 @@ task handlebarsPrecompile_search_detail_section_main_page(type: NodeTask) {
   outputs.file( precompile_Output_File )
 
   def osName = System.getProperty("os.name").toLowerCase();
-  if (osName.contains("windows")) {
-    script = project.file('node_modules/handlebars/bin/handlebars')
-  } else {
-    script = project.file('node_modules/.bin/handlebars')
-  }
-  args = [ '--amd' , // parameters must be before file list
-  '--min',
-  '-f', precompile_Output_File,
-   precompile_Input_Directory
-   ]
+  def handlebarsScript = osName.contains("windows") ? 'node_modules/handlebars/bin/handlebars' : 'node_modules/.bin/handlebars'
+  commandLine 'node', handlebarsScript, '--amd', '--min', '-f', precompile_Output_File, precompile_Input_Directory
 }
 
 
 //  Handlebars Precompile for input handlebars_templates/search_detail_section_user_input_section
 
-task handlebarsPrecompile_search_detail_section_user_input_section(type: NodeTask) {
+task handlebarsPrecompile_search_detail_section_user_input_section(type: Exec) {
 
   def precompile_Input_Directory = "handlebars_templates/search_detail_section_user_input_section"
   def precompile_Output_File = "handlebars_templates_precompiled/search_detail_section_user_input_section/search_detail_section_user_input_section_template-bundle.js"
@@ -466,23 +375,15 @@ task handlebarsPrecompile_search_detail_section_user_input_section(type: NodeTas
   outputs.file( precompile_Output_File )
 
   def osName = System.getProperty("os.name").toLowerCase();
-  if (osName.contains("windows")) {
-    script = project.file('node_modules/handlebars/bin/handlebars')
-  } else {
-    script = project.file('node_modules/.bin/handlebars')
-  }
-  args = [ '--amd' , // parameters must be before file list
-  '--min',
-  '-f', precompile_Output_File,
-   precompile_Input_Directory
-   ]
+  def handlebarsScript = osName.contains("windows") ? 'node_modules/handlebars/bin/handlebars' : 'node_modules/.bin/handlebars'
+  commandLine 'node', handlebarsScript, '--amd', '--min', '-f', precompile_Output_File, precompile_Input_Directory
 }
 
 
   
 //  Handlebars Precompile for input handlebars_templates/psm_list
 
-task handlebarsPrecompile_psm_list(type: NodeTask) {
+task handlebarsPrecompile_psm_list(type: Exec) {
 
   def precompile_Input_Directory = "handlebars_templates/psm_list"
   def precompile_Output_File = "handlebars_templates_precompiled/psm_list/psm_list_template-bundle.js"
@@ -492,21 +393,13 @@ task handlebarsPrecompile_psm_list(type: NodeTask) {
   outputs.file( precompile_Output_File )
 
   def osName = System.getProperty("os.name").toLowerCase();
-  if (osName.contains("windows")) {
-    script = project.file('node_modules/handlebars/bin/handlebars')
-  } else {
-    script = project.file('node_modules/.bin/handlebars')
-  }
-  args = [ '--amd' , // parameters must be before file list
-  '--min',
-  '-f', precompile_Output_File,
-   precompile_Input_Directory
-   ]
+  def handlebarsScript = osName.contains("windows") ? 'node_modules/handlebars/bin/handlebars' : 'node_modules/.bin/handlebars'
+  commandLine 'node', handlebarsScript, '--amd', '--min', '-f', precompile_Output_File, precompile_Input_Directory
 }
 
 //  Handlebars Precompile for input handlebars_templates/lorikeet_overlay
 
-task handlebarsPrecompile_lorikeet_overlay(type: NodeTask) {
+task handlebarsPrecompile_lorikeet_overlay(type: Exec) {
 
   def precompile_Input_Directory = "handlebars_templates/lorikeet_overlay"
   def precompile_Output_File = "handlebars_templates_precompiled/lorikeet_overlay/lorikeet_overlay_template-bundle.js"
@@ -516,21 +409,13 @@ task handlebarsPrecompile_lorikeet_overlay(type: NodeTask) {
   outputs.file( precompile_Output_File )
 
   def osName = System.getProperty("os.name").toLowerCase();
-  if (osName.contains("windows")) {
-    script = project.file('node_modules/handlebars/bin/handlebars')
-  } else {
-    script = project.file('node_modules/.bin/handlebars')
-  }
-  args = [ '--amd' , // parameters must be before file list
-  '--min',
-  '-f', precompile_Output_File,
-   precompile_Input_Directory
-   ]
+  def handlebarsScript = osName.contains("windows") ? 'node_modules/handlebars/bin/handlebars' : 'node_modules/.bin/handlebars'
+  commandLine 'node', handlebarsScript, '--amd', '--min', '-f', precompile_Output_File, precompile_Input_Directory
 }
 
 //  Handlebars Precompile for input handlebars_templates/project_page__project_info_section_all_users_interaction
 
-task handlebarsPrecompile_project_page__project_info_section_all_users_interaction(type: NodeTask) {
+task handlebarsPrecompile_project_page__project_info_section_all_users_interaction(type: Exec) {
 
   def precompile_Input_Directory = "handlebars_templates/project_page__project_info_section_all_users_interaction"
   def precompile_Output_File = "handlebars_templates_precompiled/project_page__project_info_section_all_users_interaction/project_page__project_info_section_all_users_interaction_template-bundle.js"
@@ -540,21 +425,13 @@ task handlebarsPrecompile_project_page__project_info_section_all_users_interacti
   outputs.file( precompile_Output_File )
 
   def osName = System.getProperty("os.name").toLowerCase();
-  if (osName.contains("windows")) {
-    script = project.file('node_modules/handlebars/bin/handlebars')
-  } else {
-    script = project.file('node_modules/.bin/handlebars')
-  }
-  args = [ '--amd' , // parameters must be before file list
-  '--min',
-  '-f', precompile_Output_File,
-   precompile_Input_Directory
-   ]
+  def handlebarsScript = osName.contains("windows") ? 'node_modules/handlebars/bin/handlebars' : 'node_modules/.bin/handlebars'
+  commandLine 'node', handlebarsScript, '--amd', '--min', '-f', precompile_Output_File, precompile_Input_Directory
 }
 
 //  Handlebars Precompile for input handlebars_templates/project_page__project_info_section_logged_in_users_interaction
 
-task handlebarsPrecompile_project_page__project_info_section_logged_in_users_interaction(type: NodeTask) {
+task handlebarsPrecompile_project_page__project_info_section_logged_in_users_interaction(type: Exec) {
 
   def precompile_Input_Directory = "handlebars_templates/project_page__project_info_section_logged_in_users_interaction"
   def precompile_Output_File = "handlebars_templates_precompiled/project_page__project_info_section_logged_in_users_interaction/project_page__project_info_section_logged_in_users_interaction_template-bundle.js"
@@ -564,21 +441,13 @@ task handlebarsPrecompile_project_page__project_info_section_logged_in_users_int
   outputs.file( precompile_Output_File )
 
   def osName = System.getProperty("os.name").toLowerCase();
-  if (osName.contains("windows")) {
-    script = project.file('node_modules/handlebars/bin/handlebars')
-  } else {
-    script = project.file('node_modules/.bin/handlebars')
-  }
-  args = [ '--amd' , // parameters must be before file list
-  '--min',
-  '-f', precompile_Output_File,
-   precompile_Input_Directory
-   ]
+  def handlebarsScript = osName.contains("windows") ? 'node_modules/handlebars/bin/handlebars' : 'node_modules/.bin/handlebars'
+  commandLine 'node', handlebarsScript, '--amd', '--min', '-f', precompile_Output_File, precompile_Input_Directory
 }
 
 //  Handlebars Precompile for input handlebars_templates/project_page_searches_section_all_users_interaction
 
-task handlebarsPrecompile_project_page_searches_section_all_users_interaction(type: NodeTask) {
+task handlebarsPrecompile_project_page_searches_section_all_users_interaction(type: Exec) {
 
   def precompile_Input_Directory = "handlebars_templates/project_page_searches_section_all_users_interaction"
   def precompile_Output_File = "handlebars_templates_precompiled/project_page_searches_section_all_users_interaction/project_page_searches_section_all_users_interaction_template-bundle.js"
@@ -588,21 +457,13 @@ task handlebarsPrecompile_project_page_searches_section_all_users_interaction(ty
   outputs.file( precompile_Output_File )
 
   def osName = System.getProperty("os.name").toLowerCase();
-  if (osName.contains("windows")) {
-    script = project.file('node_modules/handlebars/bin/handlebars')
-  } else {
-    script = project.file('node_modules/.bin/handlebars')
-  }
-  args = [ '--amd' , // parameters must be before file list
-  '--min',
-  '-f', precompile_Output_File,
-   precompile_Input_Directory
-   ]
+  def handlebarsScript = osName.contains("windows") ? 'node_modules/handlebars/bin/handlebars' : 'node_modules/.bin/handlebars'
+  commandLine 'node', handlebarsScript, '--amd', '--min', '-f', precompile_Output_File, precompile_Input_Directory
 }
 
 //  Handlebars Precompile for input handlebars_templates/project_page_searches_section_researcher_user_interaction
 
-task handlebarsPrecompile_project_page_searches_section_researcher_user_interaction(type: NodeTask) {
+task handlebarsPrecompile_project_page_searches_section_researcher_user_interaction(type: Exec) {
 
   def precompile_Input_Directory = "handlebars_templates/project_page_searches_section_researcher_user_interaction"
   def precompile_Output_File = "handlebars_templates_precompiled/project_page_searches_section_researcher_user_interaction/project_page_searches_section_researcher_user_interaction_template-bundle.js"
@@ -612,21 +473,13 @@ task handlebarsPrecompile_project_page_searches_section_researcher_user_interact
   outputs.file( precompile_Output_File )
 
   def osName = System.getProperty("os.name").toLowerCase();
-  if (osName.contains("windows")) {
-    script = project.file('node_modules/handlebars/bin/handlebars')
-  } else {
-    script = project.file('node_modules/.bin/handlebars')
-  }
-  args = [ '--amd' , // parameters must be before file list
-  '--min',
-  '-f', precompile_Output_File,
-   precompile_Input_Directory
-   ]
+  def handlebarsScript = osName.contains("windows") ? 'node_modules/handlebars/bin/handlebars' : 'node_modules/.bin/handlebars'
+  commandLine 'node', handlebarsScript, '--amd', '--min', '-f', precompile_Output_File, precompile_Input_Directory
 }
 
 //  Handlebars Precompile for input handlebars_templates/project_page_upload_data_section_project_owner_user_interaction
 
-task handlebarsPrecompile_project_page_upload_data_section_project_owner_user_interaction(type: NodeTask) {
+task handlebarsPrecompile_project_page_upload_data_section_project_owner_user_interaction(type: Exec) {
 
   def precompile_Input_Directory = "handlebars_templates/project_page_upload_data_section_project_owner_user_interaction"
   def precompile_Output_File = "handlebars_templates_precompiled/project_page_upload_data_section_project_owner_user_interaction/project_page_upload_data_section_project_owner_user_interaction_template-bundle.js"
@@ -636,21 +489,13 @@ task handlebarsPrecompile_project_page_upload_data_section_project_owner_user_in
   outputs.file( precompile_Output_File )
 
   def osName = System.getProperty("os.name").toLowerCase();
-  if (osName.contains("windows")) {
-    script = project.file('node_modules/handlebars/bin/handlebars')
-  } else {
-    script = project.file('node_modules/.bin/handlebars')
-  }
-  args = [ '--amd' , // parameters must be before file list
-  '--min',
-  '-f', precompile_Output_File,
-   precompile_Input_Directory
-   ]
+  def handlebarsScript = osName.contains("windows") ? 'node_modules/handlebars/bin/handlebars' : 'node_modules/.bin/handlebars'
+  commandLine 'node', handlebarsScript, '--amd', '--min', '-f', precompile_Output_File, precompile_Input_Directory
 }
 
 //  Handlebars Precompile for input handlebars_templates/project_page__saved_views_section
 
-task handlebarsPrecompile_project_page__saved_views_section(type: NodeTask) {
+task handlebarsPrecompile_project_page__saved_views_section(type: Exec) {
 
   def precompile_Input_Directory = "handlebars_templates/project_page__saved_views_section"
   def precompile_Output_File = "handlebars_templates_precompiled/project_page__saved_views_section/project_page__saved_views_section_template-bundle.js"
@@ -660,21 +505,13 @@ task handlebarsPrecompile_project_page__saved_views_section(type: NodeTask) {
   outputs.file( precompile_Output_File )
 
   def osName = System.getProperty("os.name").toLowerCase();
-  if (osName.contains("windows")) {
-    script = project.file('node_modules/handlebars/bin/handlebars')
-  } else {
-    script = project.file('node_modules/.bin/handlebars')
-  }
-  args = [ '--amd' , // parameters must be before file list
-  '--min',
-  '-f', precompile_Output_File,
-   precompile_Input_Directory
-   ]
+  def handlebarsScript = osName.contains("windows") ? 'node_modules/handlebars/bin/handlebars' : 'node_modules/.bin/handlebars'
+  commandLine 'node', handlebarsScript, '--amd', '--min', '-f', precompile_Output_File, precompile_Input_Directory
 }
 
 //  Handlebars Precompile for input handlebars_templates/project_page__saved_views_section_loggedin_users
 
-task handlebarsPrecompile_project_page__saved_views_section_loggedin_users(type: NodeTask) {
+task handlebarsPrecompile_project_page__saved_views_section_loggedin_users(type: Exec) {
 
   def precompile_Input_Directory = "handlebars_templates/project_page__saved_views_section_loggedin_users"
   def precompile_Output_File = "handlebars_templates_precompiled/project_page__saved_views_section_loggedin_users/project_page__saved_views_section_loggedin_users_template-bundle.js"
@@ -684,21 +521,13 @@ task handlebarsPrecompile_project_page__saved_views_section_loggedin_users(type:
   outputs.file( precompile_Output_File )
 
   def osName = System.getProperty("os.name").toLowerCase();
-  if (osName.contains("windows")) {
-    script = project.file('node_modules/handlebars/bin/handlebars')
-  } else {
-    script = project.file('node_modules/.bin/handlebars')
-  }
-  args = [ '--amd' , // parameters must be before file list
-  '--min',
-  '-f', precompile_Output_File,
-   precompile_Input_Directory
-   ]
+  def handlebarsScript = osName.contains("windows") ? 'node_modules/handlebars/bin/handlebars' : 'node_modules/.bin/handlebars'
+  commandLine 'node', handlebarsScript, '--amd', '--min', '-f', precompile_Output_File, precompile_Input_Directory
 }
 
 //  Handlebars Precompile for input handlebars_templates/project_page__share_data_section_loggedin_users
 
-task handlebarsPrecompile_project_page__share_data_section_loggedin_users(type: NodeTask) {
+task handlebarsPrecompile_project_page__share_data_section_loggedin_users(type: Exec) {
 
   def precompile_Input_Directory = "handlebars_templates/project_page__share_data_section_loggedin_users"
   def precompile_Output_File = "handlebars_templates_precompiled/project_page__share_data_section_loggedin_users/project_page__share_data_section_loggedin_users_template-bundle.js"
@@ -708,21 +537,13 @@ task handlebarsPrecompile_project_page__share_data_section_loggedin_users(type: 
   outputs.file( precompile_Output_File )
 
   def osName = System.getProperty("os.name").toLowerCase();
-  if (osName.contains("windows")) {
-    script = project.file('node_modules/handlebars/bin/handlebars')
-  } else {
-    script = project.file('node_modules/.bin/handlebars')
-  }
-  args = [ '--amd' , // parameters must be before file list
-  '--min',
-  '-f', precompile_Output_File,
-   precompile_Input_Directory
-   ]
+  def handlebarsScript = osName.contains("windows") ? 'node_modules/handlebars/bin/handlebars' : 'node_modules/.bin/handlebars'
+  commandLine 'node', handlebarsScript, '--amd', '--min', '-f', precompile_Output_File, precompile_Input_Directory
 }
 
 //  Handlebars Precompile for input handlebars_templates/project_page__ann_cutoff_defaults_project_level
 
-task handlebarsPrecompile_project_page__ann_cutoff_defaults_project_level(type: NodeTask) {
+task handlebarsPrecompile_project_page__ann_cutoff_defaults_project_level(type: Exec) {
 
   def precompile_Input_Directory = "handlebars_templates/project_page__ann_cutoff_defaults_project_level"
   def precompile_Output_File = "handlebars_templates_precompiled/project_page__ann_cutoff_defaults_project_level/project_page__ann_cutoff_defaults_project_level_template-bundle.js"
@@ -732,21 +553,13 @@ task handlebarsPrecompile_project_page__ann_cutoff_defaults_project_level(type: 
   outputs.file( precompile_Output_File )
 
   def osName = System.getProperty("os.name").toLowerCase();
-  if (osName.contains("windows")) {
-    script = project.file('node_modules/handlebars/bin/handlebars')
-  } else {
-    script = project.file('node_modules/.bin/handlebars')
-  }
-  args = [ '--amd' , // parameters must be before file list
-  '--min',
-  '-f', precompile_Output_File,
-   precompile_Input_Directory
-   ]
+  def handlebarsScript = osName.contains("windows") ? 'node_modules/handlebars/bin/handlebars' : 'node_modules/.bin/handlebars'
+  commandLine 'node', handlebarsScript, '--amd', '--min', '-f', precompile_Output_File, precompile_Input_Directory
 }
 
 //  Handlebars Precompile for input handlebars_templates/project_list
 
-task handlebarsPrecompile_project_list(type: NodeTask) {
+task handlebarsPrecompile_project_list(type: Exec) {
 
   def precompile_Input_Directory = "handlebars_templates/project_list"
   def precompile_Output_File = "handlebars_templates_precompiled/project_list/project_list_template-bundle.js"
@@ -756,21 +569,13 @@ task handlebarsPrecompile_project_list(type: NodeTask) {
   outputs.file( precompile_Output_File )
 
   def osName = System.getProperty("os.name").toLowerCase();
-  if (osName.contains("windows")) {
-    script = project.file('node_modules/handlebars/bin/handlebars')
-  } else {
-    script = project.file('node_modules/.bin/handlebars')
-  }
-  args = [ '--amd' , // parameters must be before file list
-  '--min',
-  '-f', precompile_Output_File,
-   precompile_Input_Directory
-   ]
+  def handlebarsScript = osName.contains("windows") ? 'node_modules/handlebars/bin/handlebars' : 'node_modules/.bin/handlebars'
+  commandLine 'node', handlebarsScript, '--amd', '--min', '-f', precompile_Output_File, precompile_Input_Directory
 }
 
 //  Handlebars Precompile for input handlebars_templates/user_account_create_account
 
-task handlebarsPrecompile_user_account_create_account(type: NodeTask) {
+task handlebarsPrecompile_user_account_create_account(type: Exec) {
 
   def precompile_Input_Directory = "handlebars_templates/user_account_create_account"
   def precompile_Output_File = "handlebars_templates_precompiled/user_account_create_account/user_account_create_account_template-bundle.js"
@@ -780,21 +585,13 @@ task handlebarsPrecompile_user_account_create_account(type: NodeTask) {
   outputs.file( precompile_Output_File )
 
   def osName = System.getProperty("os.name").toLowerCase();
-  if (osName.contains("windows")) {
-    script = project.file('node_modules/handlebars/bin/handlebars')
-  } else {
-    script = project.file('node_modules/.bin/handlebars')
-  }
-  args = [ '--amd' , // parameters must be before file list
-  '--min',
-  '-f', precompile_Output_File,
-   precompile_Input_Directory
-   ]
+  def handlebarsScript = osName.contains("windows") ? 'node_modules/handlebars/bin/handlebars' : 'node_modules/.bin/handlebars'
+  commandLine 'node', handlebarsScript, '--amd', '--min', '-f', precompile_Output_File, precompile_Input_Directory
 }
 
 //  Handlebars Precompile for input handlebars_templates/user_account_login_forgot_password
 
-task handlebarsPrecompile_user_account_login_forgot_password(type: NodeTask) {
+task handlebarsPrecompile_user_account_login_forgot_password(type: Exec) {
 
   def precompile_Input_Directory = "handlebars_templates/user_account_login_forgot_password"
   def precompile_Output_File = "handlebars_templates_precompiled/user_account_login_forgot_password/user_account_login_forgot_password_template-bundle.js"
@@ -804,21 +601,13 @@ task handlebarsPrecompile_user_account_login_forgot_password(type: NodeTask) {
   outputs.file( precompile_Output_File )
 
   def osName = System.getProperty("os.name").toLowerCase();
-  if (osName.contains("windows")) {
-    script = project.file('node_modules/handlebars/bin/handlebars')
-  } else {
-    script = project.file('node_modules/.bin/handlebars')
-  }
-  args = [ '--amd' , // parameters must be before file list
-  '--min',
-  '-f', precompile_Output_File,
-   precompile_Input_Directory
-   ]
+  def handlebarsScript = osName.contains("windows") ? 'node_modules/handlebars/bin/handlebars' : 'node_modules/.bin/handlebars'
+  commandLine 'node', handlebarsScript, '--amd', '--min', '-f', precompile_Output_File, precompile_Input_Directory
 }
 
 //  Handlebars Precompile for input handlebars_templates/user_invite_processing
 
-task handlebarsPrecompile_user_invite_processing(type: NodeTask) {
+task handlebarsPrecompile_user_invite_processing(type: Exec) {
 
   def precompile_Input_Directory = "handlebars_templates/user_invite_processing"
   def precompile_Output_File = "handlebars_templates_precompiled/user_invite_processing/user_invite_processing_template-bundle.js"
@@ -828,21 +617,13 @@ task handlebarsPrecompile_user_invite_processing(type: NodeTask) {
   outputs.file( precompile_Output_File )
 
   def osName = System.getProperty("os.name").toLowerCase();
-  if (osName.contains("windows")) {
-    script = project.file('node_modules/handlebars/bin/handlebars')
-  } else {
-    script = project.file('node_modules/.bin/handlebars')
-  }
-  args = [ '--amd' , // parameters must be before file list
-  '--min',
-  '-f', precompile_Output_File,
-   precompile_Input_Directory
-   ]
+  def handlebarsScript = osName.contains("windows") ? 'node_modules/handlebars/bin/handlebars' : 'node_modules/.bin/handlebars'
+  commandLine 'node', handlebarsScript, '--amd', '--min', '-f', precompile_Output_File, precompile_Input_Directory
 }
 
 //  Handlebars Precompile for input handlebars_templates/dummy_template
 
-task handlebarsPrecompile_dummy_template(type: NodeTask) {
+task handlebarsPrecompile_dummy_template(type: Exec) {
 
   def precompile_Input_Directory = "handlebars_templates/dummy_template"
   def precompile_Output_File = "handlebars_templates_precompiled/dummy_template/dummy_template_template-bundle.js"
@@ -852,32 +633,22 @@ task handlebarsPrecompile_dummy_template(type: NodeTask) {
   outputs.file( precompile_Output_File )
 
   def osName = System.getProperty("os.name").toLowerCase();
-  if (osName.contains("windows")) {
-    script = project.file('node_modules/handlebars/bin/handlebars')
-  } else {
-    script = project.file('node_modules/.bin/handlebars')
-  }
-  args = [ '--amd' , // parameters must be before file list
-  '--min',
-  '-f', 'handlebars_templates_precompiled/dummy_template/dummy_template_template-bundle.js',
-   'handlebars_templates/dummy_template'
-   ]
+  def handlebarsScript = osName.contains("windows") ? 'node_modules/handlebars/bin/handlebars' : 'node_modules/.bin/handlebars'
+  commandLine 'node', handlebarsScript, '--amd', '--min', '-f', precompile_Output_File, precompile_Input_Directory
 }
 
 //  Change so dev runs  'npm install' separately since it takes so long
 
-task webpack(type: NodeTask ) { //  , dependsOn: 'npmInstall') {
+task webpack(type: Exec) { //  , dependsOn: 'npmInstall') {
 
-	println("Starting  task webpack(type: NodeTask ) ")
+	println("Starting  task webpack(type: Exec) ")
 
   def osName = System.getProperty("os.name").toLowerCase();
-  if (osName.contains("windows")) {
-    script = project.file('node_modules/webpack/bin/webpack.js')
-  } else {
-    script = project.file('node_modules/.bin/webpack')
-  }
-  //  specify mode development, defaults to production
-  args = [ '--mode=development' ] // --mode=development does no minification
+  def webpackScript = osName.contains("windows") ? 'node_modules/webpack/bin/webpack.js' : 'node_modules/.bin/webpack'
+  //  '--max_old_space_size=4096': Increase max memory of Node process running webpack.
+  environment 'NODE_OPTIONS', '--max_old_space_size=4096'
+  //  specify mode development, defaults to production. --mode=development does no minification
+  commandLine 'node', webpackScript, '--mode=development'
 }
 
 /*

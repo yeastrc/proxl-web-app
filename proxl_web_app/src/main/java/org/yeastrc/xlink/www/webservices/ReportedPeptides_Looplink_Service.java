@@ -4,15 +4,15 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.searcher_psm_peptide_cutoff_objects.SearcherCutoffValuesSearchLevel;
@@ -78,7 +78,7 @@ public class ReportedPeptides_Looplink_Service {
 			String msg = "Provided project_search_id is null or project_search_id is missing";
 			log.error( msg );
 		    throw new WebApplicationException(
-		    	      Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+		    	      Response.status(jakarta.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
 		    	        .entity( msg )
 		    	        .build()
 		    	        );
@@ -87,7 +87,7 @@ public class ReportedPeptides_Looplink_Service {
 			String msg = "Provided psmPeptideCutoffsForProjectSearchId is null or psmPeptideCutoffsForProjectSearchId is missing";
 			log.error( msg );
 			throw new WebApplicationException(
-					Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+					Response.status(jakarta.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
 					.entity( msg )
 					.build()
 					);
@@ -97,7 +97,7 @@ public class ReportedPeptides_Looplink_Service {
 			String msg = "Provided protein_id is null or protein_id is missing";
 			log.error( msg );
 		    throw new WebApplicationException(
-		    	      Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+		    	      Response.status(jakarta.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
 		    	        .entity( msg )
 		    	        .build()
 		    	        );
@@ -106,7 +106,7 @@ public class ReportedPeptides_Looplink_Service {
 			String msg = "Provided protein_position_1 is null or protein_position_1 is missing";
 			log.error( msg );
 		    throw new WebApplicationException(
-		    	      Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+		    	      Response.status(jakarta.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
 		    	        .entity( msg )
 		    	        .build()
 		    	        );
@@ -115,7 +115,7 @@ public class ReportedPeptides_Looplink_Service {
 			String msg = "Provided protein_position_2 is null or protein_position_2 is missing";
 			log.error( msg );
 		    throw new WebApplicationException(
-		    	      Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+		    	      Response.status(jakarta.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
 		    	        .entity( msg )
 		    	        .build()
 		    	        );
@@ -240,7 +240,7 @@ public class ReportedPeptides_Looplink_Service {
 			String msg = "Exception processing request data, msg: " + e.toString();
 			log.error( msg, e );
 		    throw new WebApplicationException(
-		    	      Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+		    	      Response.status(jakarta.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
 		    	        .entity( msg )
 		    	        .build()
 		    	        );			

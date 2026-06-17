@@ -16,8 +16,10 @@ import java.util.Arrays;
 import java.util.Map;
 
 import javax.imageio.ImageIO;
-import javax.media.jai.InterpolationBilinear;
-import javax.media.jai.JAI;
+//  Eclipse ImageN (maintained successor to JAI) - same 'scale' operator algorithm as legacy javax.media.jai,
+//  so the rendered heatmap matches the historical JAI output.  See build.gradle for the dependency notes.
+import org.eclipse.imagen.ImageN;
+import org.eclipse.imagen.InterpolationBilinear;
 import java.awt.image.renderable.ParameterBlock;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
@@ -254,7 +256,7 @@ public class MS1_All_IntensityHeatmapImage {
 			pb.add(0.0F);           // The y translation
 			pb.add(new InterpolationBilinear()); // The interpolation
 
-			bufferedImageResized = JAI.create("scale", pb, null).getAsBufferedImage();
+			bufferedImageResized = ImageN.create("scale", pb, null).getAsBufferedImage();
 			int bufferedImageWidthAfterShrunk = bufferedImageResized.getWidth();
 			if ( increasingSize || bufferedImageWidthAfterShrunk <= newImageWidth ) {
 				break;

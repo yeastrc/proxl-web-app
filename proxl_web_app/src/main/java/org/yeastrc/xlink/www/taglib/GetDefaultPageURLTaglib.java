@@ -1,8 +1,8 @@
 package org.yeastrc.xlink.www.taglib;
 
-import javax.servlet.jsp.JspException;
-import javax.servlet.jsp.JspWriter;
-import javax.servlet.jsp.tagext.TagSupport;
+import jakarta.servlet.jsp.JspException;
+import jakarta.servlet.jsp.JspWriter;
+import jakarta.servlet.jsp.tagext.TagSupport;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.www.constants.DefaultPageViewConstants;
@@ -40,7 +40,7 @@ public class GetDefaultPageURLTaglib extends TagSupport {
 	private static final long serialVersionUID = 1L;
 	
 	/* (non-Javadoc)
-	 * @see javax.servlet.jsp.tagext.BodyTagSupport#doStartTag()
+	 * @see jakarta.servlet.jsp.tagext.BodyTagSupport#doStartTag()
 	 */
 	@Override
 	public int doStartTag() throws JspException { 

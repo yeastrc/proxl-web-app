@@ -1,7 +1,7 @@
 package org.yeastrc.xlink.www.webservices_utils;
 
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.core.Response;
 
 import org.yeastrc.xlink.www.web_utils.UnmarshalJSON_ToObject;
 
@@ -27,7 +27,7 @@ public class Unmarshal_RestRequest_JSON_ToObject {
 			return UnmarshalJSON_ToObject.getInstance().getObjectFromJSONByteArray( bytesJSON, valueType );
 		} catch ( Exception e ) {
 		    throw new WebApplicationException(
-		    	      Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+		    	      Response.status(jakarta.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
 //		    	        .entity(  )
 		    	        .build()
 		    	        );

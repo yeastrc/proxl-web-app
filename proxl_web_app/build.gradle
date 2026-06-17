@@ -19,7 +19,7 @@ buildscript {
     }
   }
   dependencies {
-    classpath "org.ajoberstar.grgit:grgit-gradle:4.1.1"
+    classpath "org.ajoberstar.grgit:grgit-gradle:5.3.0"
   }
 }
 
@@ -27,24 +27,63 @@ plugins {
 	id 'java'
 	id 'war'
 	id 'eclipse'
+    id 'eclipse-wtp' //  Required to manipulate Eclipse Web Tools Platform settings
 //	id "org.springframework.boot" version "2.0.1.RELEASE"
 //	id "io.spring.dependency-management" version "1.0.5.RELEASE"
 	//  moved to 'buildscript'. See Notes above	id 'org.ajoberstar.grgit' version '3.1.1'
 }
 
+//  Eclipse WTP facets - now on Servlet spec 6.0 (jakarta) + Java 25
+
+eclipse {
+    wtp {
+        facet {
+            // Pin the WTP facets for Eclipse to: Dynamic Web Module 6.0 (WTP's
+            // newest; jakarta namespace, matches our real Servlet 6.0 runtime)
+            // and Java 25.
+            //
+            // The eclipse-wtp plugin auto-injects facets (jst.web 6.0 from the
+            // jakarta.servlet-api dependency, jst.java 21) AFTER this block
+            // evaluates, so filtering 'facets' here does nothing. Instead, add
+            // the versions we want and strip the wrong-version duplicates at
+            // merge time (which runs last). Guard on version != null so the
+            // '<fixed facet="jst.java"/>' entry is preserved.
+            facet name: 'jst.web',  version: '6.0'
+            facet name: 'jst.java', version: '25'
+            file {
+                whenMerged { wtpFacet ->
+                    wtpFacet.facets.removeAll {
+                        it.version != null &&
+                        ( (it.name == 'jst.web'  && it.version != '6.0') ||
+                          (it.name == 'jst.java' && it.version != '25') )
+                    }
+                }
+            }
+        }
+    }
+}
+
 apply plugin: "org.ajoberstar.grgit"
 
 repositories {
-	jcenter()
     mavenCentral()
+
+    //  Eclipse ImageN (successor to JAI) is published to the OSGeo Nexus repo, not Maven Central
+    maven {
+        url "https://repo.osgeo.org/repository/release/"
+    }
 }
 
 //  Default Task
 //    Comment out since creates infinite loop of building
 //  defaultTasks 'build'
 
-sourceCompatibility = 1.8     //  defaults to currently installed JVM
-// targetCompatibility = 1.8  //  defaults to sourceCompatibility
+//  Java 25 via toolchain (Gradle 9 + JDK 25)
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
+}
 
 configurations.all {
 //  Need all these excludes if using Spring Boot
@@ -79,17 +118,17 @@ dependencies {
 	// implementation group: 'org.glassfish.jersey.core', name: 'jersey-server', version: '2.28'
 	
 	// https://mvnrepository.com/artifact/org.glassfish.jersey.core/jersey-server
-	implementation group: 'org.glassfish.jersey.core', name: 'jersey-server', version: '2.27'
+	implementation group: 'org.glassfish.jersey.core', name: 'jersey-server', version: '3.1.11'
 	
 	// https://mvnrepository.com/artifact/org.glassfish.jersey.containers/jersey-container-servlet-core
-	implementation group: 'org.glassfish.jersey.containers', name: 'jersey-container-servlet-core', version: '2.27'
+	implementation group: 'org.glassfish.jersey.containers', name: 'jersey-container-servlet-core', version: '3.1.11'
 	
 	// https://mvnrepository.com/artifact/org.glassfish.jersey.inject/jersey-hk2
-	implementation group: 'org.glassfish.jersey.inject', name: 'jersey-hk2', version: '2.27'
+	implementation group: 'org.glassfish.jersey.inject', name: 'jersey-hk2', version: '3.1.11'
 	
 	
 	// https://mvnrepository.com/artifact/org.glassfish.jersey.media/jersey-media-json-jackson
-	implementation group: 'org.glassfish.jersey.media', name: 'jersey-media-json-jackson', version: '2.27'
+	implementation group: 'org.glassfish.jersey.media', name: 'jersey-media-json-jackson', version: '3.1.11'
 	
 	//  Java Advanced Imaging
 	
@@ -108,12 +147,22 @@ dependencies {
 	//  Not found:   error msg: Could not find javax.media:jai_imageio:1.1.
 	// https://mvnrepository.com/artifact/javax.media/jai_imageio
 	// implementation group: 'javax.media', name: 'jai_imageio', version: '1.1'
-	
-	
+
+	//  Eclipse ImageN (maintained successor to JAI) - provides the image 'scale' op for the MS1 intensity heatmap.
+	//  Replaces the legacy javax.media.jai JARs, which reached into JDK-internal sun.awt.image classes
+	//  and break under Java 9+ strong module encapsulation (the QC MS1 heatmap threw on Java 17+).
+	//  Must use 'imagen-all' (shaded uber-jar containing the operators); 'imagen' is a pom-only parent with no classes.
+	//  ImageN 0.9.1 is Java 17 bytecode, which is fine on this project's Java 25 toolchain.
+	implementation 'org.eclipse.imagen:imagen-all:0.9.1'
+
+
 	//  Mail
 	
-	// https://mvnrepository.com/artifact/javax.mail/mail
-	implementation group: 'javax.mail', name: 'mail', version: '1.4.1'
+	// Jakarta Mail (jakarta.mail namespace) - API + Angus implementation
+	// https://mvnrepository.com/artifact/jakarta.mail/jakarta.mail-api
+	implementation group: 'jakarta.mail', name: 'jakarta.mail-api', version: '2.1.3'
+	// https://mvnrepository.com/artifact/org.eclipse.angus/angus-mail
+	implementation group: 'org.eclipse.angus', name: 'angus-mail', version: '2.0.3'
 	
 	//  Later versions like this have license CDDL and GPL
 	// https://mvnrepository.com/artifact/javax.mail/javax.mail-api
@@ -149,10 +198,13 @@ dependencies {
 	
 	// Used by included yeastrc jar password management
 	// https://mvnrepository.com/artifact/org.springframework.security/spring-security-crypto
-	implementation group: 'org.springframework.security', name: 'spring-security-crypto', version: '5.1.5.RELEASE'
+	implementation group: 'org.springframework.security', name: 'spring-security-crypto', version: '6.4.4'
 	
-	// https://mvnrepository.com/artifact/javax.servlet/jstl
-	implementation group: 'javax.servlet', name: 'jstl', version: '1.2'
+	// Jakarta JSTL (jakarta.tags.* taglibs) - API + Glassfish implementation
+	// https://mvnrepository.com/artifact/jakarta.servlet.jsp.jstl/jakarta.servlet.jsp.jstl-api
+	implementation group: 'jakarta.servlet.jsp.jstl', name: 'jakarta.servlet.jsp.jstl-api', version: '3.0.0'
+	// https://mvnrepository.com/artifact/org.glassfish.web/jakarta.servlet.jsp.jstl
+	implementation group: 'org.glassfish.web', name: 'jakarta.servlet.jsp.jstl', version: '3.0.1'
 	
 	
 	//   Apache Commons
@@ -194,7 +246,13 @@ dependencies {
 	
 	// https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
 	implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.9'
-	
+
+	//  Jackson Joda-Time datatype module. Jackson 2.x (pulled to 2.18.x by Jersey 3.1) does NOT
+	//  serialize org.joda.time types by default; several DTOs expose org.joda.time.DateTime (e.g.
+	//  PDBFileDTO.uploadDate). Registered with the JAX-RS ObjectMapper via ObjectMapperContextResolver.
+	// https://mvnrepository.com/artifact/com.fasterxml.jackson.datatype/jackson-datatype-joda
+	implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-joda', version: '2.18.0'
+
 	//  BioJava
 	
 		//  version 5 exists for all jars:  https://mvnrepository.com/artifact/org.biojava/
@@ -212,15 +270,20 @@ dependencies {
 	//  Spring Web MVC (5.3.x - last 'javax.*' / Servlet 3.1+ line; replacing Struts incrementally)
 	//  Brings in spring-web, spring-context, spring-beans, spring-core, spring-expression, spring-aop transitively.
 	// https://mvnrepository.com/artifact/org.springframework/spring-webmvc
-	implementation group: 'org.springframework', name: 'spring-webmvc', version: '5.3.39'
+	implementation group: 'org.springframework', name: 'spring-webmvc', version: '6.2.19'
 
 
 
-	// JAXB dependencies (Required for Java 11+)
-	// https://mvnrepository.com/artifact/jakarta.xml.bind/jakarta.xml.bind-api
-	implementation group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '2.3.2'
+	// JAXB 2 (javax.xml.bind) - kept for the precompiled yeastrc/proxl jars and this app's
+	// own javax.xml.bind code. Uses the OLD 'javax.xml.bind:jaxb-api' coordinate (not the
+	// 'jakarta.xml.bind:jakarta.xml.bind-api' coordinate) so it does NOT collide with the
+	// jakarta.xml.bind-api 4.x that Jersey 3.1 pulls in transitively - both packages
+	// (javax.xml.bind and jakarta.xml.bind) then coexist on the classpath. jaxb-runtime 2.3.1
+	// is the last release that still depends on the old javax coordinate.
+	// https://mvnrepository.com/artifact/javax.xml.bind/jaxb-api
+	implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
 	// https://mvnrepository.com/artifact/org.glassfish.jaxb/jaxb-runtime
-	implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '2.3.2'
+	implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '2.3.1'
 	
 	
 	
@@ -244,15 +307,16 @@ dependencies {
 	
 	
     // https://mvnrepository.com/artifact/org.apache.tomcat.embed/tomcat-embed-core
-    providedCompile group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '8.5.29'
+    providedCompile group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '11.0.9'
 
 	//  
-	// https://mvnrepository.com/artifact/javax.servlet/servlet-api
-	//  Most current servlet spec:
-	providedCompile group: 'javax.servlet', name: 'javax.servlet-api', version: '3.1.0'
-	
-	// https://mvnrepository.com/artifact/javax.servlet.jsp/javax.servlet.jsp-api
-	providedCompile group: 'javax.servlet.jsp', name: 'javax.servlet.jsp-api', version: '2.3.3'
+	// Jakarta Servlet 6.0 (Jakarta EE 10) - provided by the Tomcat 11 container
+	// https://mvnrepository.com/artifact/jakarta.servlet/jakarta.servlet-api
+	providedCompile group: 'jakarta.servlet', name: 'jakarta.servlet-api', version: '6.0.0'
+
+	// Jakarta Server Pages 3.1 (Jakarta EE 10)
+	// https://mvnrepository.com/artifact/jakarta.servlet.jsp/jakarta.servlet.jsp-api
+	providedCompile group: 'jakarta.servlet.jsp', name: 'jakarta.servlet.jsp-api', version: '3.1.1'
 	
 }
 

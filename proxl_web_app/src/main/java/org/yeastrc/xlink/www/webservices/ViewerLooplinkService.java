@@ -10,16 +10,16 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import javax.servlet.http.HttpServletRequest;
-//import javax.servlet.http.HttpSession;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import jakarta.servlet.http.HttpServletRequest;
+//import jakarta.servlet.http.HttpSession;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.www.dao.SearchDAO;
@@ -82,7 +82,7 @@ public class ViewerLooplinkService {
 			String msg = "Provided projectSearchId is null or empty, projectSearchId = " + projectSearchIdList;
 			log.error( msg );
 		    throw new WebApplicationException(
-		    	      Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+		    	      Response.status(jakarta.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
 		    	        .entity( msg )
 		    	        .build()
 		    	        );
@@ -91,7 +91,7 @@ public class ViewerLooplinkService {
 			String msg = "Provided psmPeptideCutoffsForProjectSearchIds is null or psmPeptideCutoffsForProjectSearchIds is missing";
 			log.error( msg );
 			throw new WebApplicationException(
-					Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+					Response.status(jakarta.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
 					.entity( msg )
 					.build()
 					);
@@ -100,7 +100,7 @@ public class ViewerLooplinkService {
 			String msg = "Provided minPSMs is null or minPSMs is missing";
 			log.error( msg );
 			throw new WebApplicationException(
-					Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+					Response.status(jakarta.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
 					.entity( msg )
 					.build()
 					);
@@ -262,7 +262,7 @@ public class ViewerLooplinkService {
 					String msg = "Provided search_id " + projectSearchId + " is not found in psm peptide cutoffs.";
 					log.error( msg );
 				    throw new WebApplicationException(
-				    	      Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+				    	      Response.status(jakarta.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
 				    	        .entity( msg )
 				    	        .build()
 				    	        );
@@ -375,7 +375,7 @@ public class ViewerLooplinkService {
 			String msg = "Exception processing request data, msg: " + e.toString();
 			log.error( msg, e );
 		    throw new WebApplicationException(
-		    	      Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+		    	      Response.status(jakarta.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
 		    	        .entity( msg )
 		    	        .build()
 		    	        );			
@@ -419,7 +419,7 @@ public class ViewerLooplinkService {
 			String msg = "Provided projectSearchId is null or empty, projectSearchId = " + projectSearchIdList;
 			log.error( msg );
 		    throw new WebApplicationException(
-		    	      Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+		    	      Response.status(jakarta.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
 		    	        .entity( msg )
 		    	        .build()
 		    	        );
@@ -428,7 +428,7 @@ public class ViewerLooplinkService {
 			String msg = "Provided psmPeptideCutoffsForProjectSearchIds is null or psmPeptideCutoffsForProjectSearchIds is missing";
 			log.error( msg );
 			throw new WebApplicationException(
-					Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+					Response.status(jakarta.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
 					.entity( msg )
 					.build()
 					);
@@ -437,7 +437,7 @@ public class ViewerLooplinkService {
 			String msg = "Provided minPSMs is null or minPSMs is missing";
 			log.error( msg );
 			throw new WebApplicationException(
-					Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+					Response.status(jakarta.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
 					.entity( msg )
 					.build()
 					);
@@ -608,7 +608,7 @@ public class ViewerLooplinkService {
 					String msg = "Provided search_id " + projectSearchId + " is not found in psm peptide cutoffs.";
 					log.error( msg );
 				    throw new WebApplicationException(
-				    	      Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+				    	      Response.status(jakarta.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
 				    	        .entity( msg )
 				    	        .build()
 				    	        );
@@ -717,7 +717,7 @@ public class ViewerLooplinkService {
 			String msg = "Exception processing request data, msg: " + e.toString();
 			log.error( msg, e );
 		    throw new WebApplicationException(
-		    	      Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
+		    	      Response.status(jakarta.ws.rs.core.Response.Status.BAD_REQUEST)  //  return 400 error
 		    	        .entity( msg )
 		    	        .build()
 		    	        );			

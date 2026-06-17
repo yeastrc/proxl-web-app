@@ -17,9 +17,14 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
+    - name: Verify Gradle sees both JDKs (8 and 25)
+      uses: docker://ghcr.io/yeastrc/proxl-build-docker:latest
+      with:
+        entrypoint: ./proxl_submit_import/gradlew
+        args: -p proxl_submit_import -q javaToolchains
     - name: Run build in Docker container	    
-      uses: docker://mriffle/build-proxl:latest
+      uses: docker://ghcr.io/yeastrc/proxl-build-docker:latest
       with:
         entrypoint: ant
         args: -f ant__build_all_proxl.xml
@@ -72,7 +77,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: Create docker-compose archive
         run: |
           tar -cvzf ./docker-compose-files.tgz docker-compose.yml docker-compose-custom-data.yml database_scripts/install/* docker/env-sample docker/env-custom-sample

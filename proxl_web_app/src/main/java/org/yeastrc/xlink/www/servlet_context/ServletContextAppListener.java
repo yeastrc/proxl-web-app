@@ -1,8 +1,8 @@
 package org.yeastrc.xlink.www.servlet_context;
 
 import java.util.Properties;
-import javax.servlet.*;
-import javax.servlet.http.*;
+import jakarta.servlet.*;
+import jakarta.servlet.http.*;
 import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.auth.db.AuthLibraryDBConnectionFactory;
 import org.yeastrc.session_mgmt.main.YRCSessionMgmtMain;
@@ -35,7 +35,7 @@ public class ServletContextAppListener extends HttpServlet implements ServletCon
 	private static final long serialVersionUID = 1L;
 	
 	/* (non-Javadoc)
-	 * @see javax.servlet.ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)
+	 * @see jakarta.servlet.ServletContextListener#contextInitialized(jakarta.servlet.ServletContextEvent)
 	 */
 	@Override
 	public void contextInitialized(ServletContextEvent event) {
@@ -137,7 +137,7 @@ public class ServletContextAppListener extends HttpServlet implements ServletCon
 	}
 	
 	/* (non-Javadoc)
-	 * @see javax.servlet.ServletContextListener#contextDestroyed(javax.servlet.ServletContextEvent)
+	 * @see jakarta.servlet.ServletContextListener#contextDestroyed(jakarta.servlet.ServletContextEvent)
 	 */
 	@Override
 	public void contextDestroyed(ServletContextEvent event) {

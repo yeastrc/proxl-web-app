@@ -1,6 +1,6 @@
 package org.yeastrc.xlink.www.nav_links_image_structure;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.www.constants.WebConstants;
