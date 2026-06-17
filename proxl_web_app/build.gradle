@@ -130,23 +130,7 @@ dependencies {
 	// https://mvnrepository.com/artifact/org.glassfish.jersey.media/jersey-media-json-jackson
 	implementation group: 'org.glassfish.jersey.media', name: 'jersey-media-json-jackson', version: '3.1.11'
 	
-	//  Java Advanced Imaging
-	
-	//   Since not find 'jai_imageio' in Maven Central or JCentral, use all JAI jars from local directory
-	
-	// https://mvnrepository.com/artifact/javax.media/jai_core
-	// implementation group: 'javax.media', name: 'jai_core', version: '1.1.3'
-	
-	// https://mvnrepository.com/artifact/javax.media/jai_codec
-	// implementation group: 'javax.media', name: 'jai_codec', version: '1.1.3'
-	
-	//  Not found:   error msg: Could not find javax.media:jai_imageio:1.1.1.
-	// https://mvnrepository.com/artifact/javax.media/jai_imageio
-	// implementation group: 'javax.media', name: 'jai_imageio', version: '1.1.1'
-	
-	//  Not found:   error msg: Could not find javax.media:jai_imageio:1.1.
-	// https://mvnrepository.com/artifact/javax.media/jai_imageio
-	// implementation group: 'javax.media', name: 'jai_imageio', version: '1.1'
+	//  Image processing (Eclipse ImageN - replaces the removed Java Advanced Imaging / JAI jars)
 
 	//  Eclipse ImageN (maintained successor to JAI) - provides the image 'scale' op for the MS1 intensity heatmap.
 	//  Replaces the legacy javax.media.jai JARs, which reached into JDK-internal sun.awt.image classes
@@ -300,9 +284,6 @@ dependencies {
 	implementation fileTree(dir: 'libs_webapp__yeastrc_github_jars', include: ['*.jar'])
 	
 	
-	//  Other Jars - Webapp only	
-	
-	implementation fileTree(dir: 'libs_webapp__other', include: ['*.jar'])
 	
 	
 	
