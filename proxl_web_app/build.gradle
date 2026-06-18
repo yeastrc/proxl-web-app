@@ -33,21 +33,22 @@ plugins {
 	//  moved to 'buildscript'. See Notes above	id 'org.ajoberstar.grgit' version '3.1.1'
 }
 
-//  Eclipse WTP facets - now on Servlet spec 6.0 (jakarta) + Java 25
+//  Eclipse WTP facets - pin jst.web to 6.0 even though the code compiles against Servlet 6.1
 
 eclipse {
     wtp {
         facet {
-            // Pin the WTP facets for Eclipse to: Dynamic Web Module 6.0 (WTP's
-            // newest; jakarta namespace, matches our real Servlet 6.0 runtime)
-            // and Java 25.
+            // Pin Eclipse's WTP facets to Dynamic Web Module 6.0 + Java 25, even though the
+            // project compiles against Servlet 6.1 (jakarta.servlet-api:6.1.0). Eclipse WTP has
+            // no validation support for Servlet 6.1 yet, so targeting 6.1 triggers import errors;
+            // 6.0 is the newest facet Eclipse accepts, and Tomcat 11 (Servlet 6.1) runs a
+            // 6.0-configured project fine.
             //
-            // The eclipse-wtp plugin auto-injects facets (jst.web 6.0 from the
-            // jakarta.servlet-api dependency, jst.java 21) AFTER this block
-            // evaluates, so filtering 'facets' here does nothing. Instead, add
-            // the versions we want and strip the wrong-version duplicates at
-            // merge time (which runs last). Guard on version != null so the
-            // '<fixed facet="jst.java"/>' entry is preserved.
+            // The eclipse-wtp plugin auto-injects a jst.web facet derived from the
+            // jakarta.servlet-api version (i.e. jst.web 6.1 from the 6.1.0 dep) AFTER this block
+            // evaluates, so filtering 'facets' here does nothing. Instead, add the versions we
+            // want and strip the wrong-version duplicates at merge time (which runs last). Guard
+            // on version != null so the '<fixed facet="jst.java"/>' entry is preserved.
             facet name: 'jst.web',  version: '6.0'
             facet name: 'jst.java', version: '25'
             file {
@@ -129,17 +130,19 @@ dependencies {
 	// implementation group: 'org.glassfish.jersey.core', name: 'jersey-server', version: '2.28'
 	
 	// https://mvnrepository.com/artifact/org.glassfish.jersey.core/jersey-server
-	implementation group: 'org.glassfish.jersey.core', name: 'jersey-server', version: '3.1.11'
+	implementation group: 'org.glassfish.jersey.core', name: 'jersey-server', version: '4.0.2'
 	
-	// https://mvnrepository.com/artifact/org.glassfish.jersey.containers/jersey-container-servlet-core
-	implementation group: 'org.glassfish.jersey.containers', name: 'jersey-container-servlet-core', version: '3.1.11'
+	//  Jersey 4.0 dropped 'jersey-container-servlet-core'; use 'jersey-container-servlet'
+	//  (full servlet integration, incl. web.xml / annotation-based registration).
+	// https://mvnrepository.com/artifact/org.glassfish.jersey.containers/jersey-container-servlet
+	implementation group: 'org.glassfish.jersey.containers', name: 'jersey-container-servlet', version: '4.0.2'
 	
 	// https://mvnrepository.com/artifact/org.glassfish.jersey.inject/jersey-hk2
-	implementation group: 'org.glassfish.jersey.inject', name: 'jersey-hk2', version: '3.1.11'
+	implementation group: 'org.glassfish.jersey.inject', name: 'jersey-hk2', version: '4.0.2'
 	
 	
 	// https://mvnrepository.com/artifact/org.glassfish.jersey.media/jersey-media-json-jackson
-	implementation group: 'org.glassfish.jersey.media', name: 'jersey-media-json-jackson', version: '3.1.11'
+	implementation group: 'org.glassfish.jersey.media', name: 'jersey-media-json-jackson', version: '4.0.2'
 	
 	//  Image processing (Eclipse ImageN - replaces the removed Java Advanced Imaging / JAI jars)
 
@@ -193,7 +196,7 @@ dependencies {
 	
 	// Used by included yeastrc jar password management
 	// https://mvnrepository.com/artifact/org.springframework.security/spring-security-crypto
-	implementation group: 'org.springframework.security', name: 'spring-security-crypto', version: '6.4.4'
+	implementation group: 'org.springframework.security', name: 'spring-security-crypto', version: '7.0.6'
 	
 	// Jakarta JSTL (jakarta.tags.* taglibs) - API + Glassfish implementation
 	// https://mvnrepository.com/artifact/jakarta.servlet.jsp.jstl/jakarta.servlet.jsp.jstl-api
@@ -237,16 +240,16 @@ dependencies {
 	//  Jackson JSON parsing
 	
 	// https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core
-	implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.9.9'
+	implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.19.1'
 	
 	// https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
-	implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.9'
+	implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.19.1'
 
 	//  Jackson Joda-Time datatype module. Jackson 2.x (pulled to 2.18.x by Jersey 3.1) does NOT
 	//  serialize org.joda.time types by default; several DTOs expose org.joda.time.DateTime (e.g.
 	//  PDBFileDTO.uploadDate). Registered with the JAX-RS ObjectMapper via ObjectMapperContextResolver.
 	// https://mvnrepository.com/artifact/com.fasterxml.jackson.datatype/jackson-datatype-joda
-	implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-joda', version: '2.18.0'
+	implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-joda', version: '2.19.1'
 
 	//  BioJava
 	
@@ -265,7 +268,7 @@ dependencies {
 	//  Spring Web MVC (5.3.x - last 'javax.*' / Servlet 3.1+ line; replacing Struts incrementally)
 	//  Brings in spring-web, spring-context, spring-beans, spring-core, spring-expression, spring-aop transitively.
 	// https://mvnrepository.com/artifact/org.springframework/spring-webmvc
-	implementation group: 'org.springframework', name: 'spring-webmvc', version: '6.2.19'
+	implementation group: 'org.springframework', name: 'spring-webmvc', version: '7.0.8'
 
 
 
@@ -303,13 +306,16 @@ dependencies {
     providedCompile group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '11.0.9'
 
 	//  
-	// Jakarta Servlet 6.0 (Jakarta EE 10) - provided by the Tomcat 11 container
+	// Jakarta Servlet 6.1 (Jakarta EE 11) - provided by the Tomcat 11 container.
+	// Code compiles against Servlet 6.1, but the Eclipse WTP facet is pinned to jst.web 6.0
+	// (see the eclipse{} block above) because Eclipse WTP has no Servlet 6.1 validation yet;
+	// Tomcat 11 (Servlet 6.1) runs a 6.0-configured project fine.
 	// https://mvnrepository.com/artifact/jakarta.servlet/jakarta.servlet-api
-	providedCompile group: 'jakarta.servlet', name: 'jakarta.servlet-api', version: '6.0.0'
+	providedCompile group: 'jakarta.servlet', name: 'jakarta.servlet-api', version: '6.1.0'
 
-	// Jakarta Server Pages 3.1 (Jakarta EE 10)
+	// Jakarta Server Pages 4.0 (Jakarta EE 11) - matches Servlet 6.1; provided by Tomcat 11.
 	// https://mvnrepository.com/artifact/jakarta.servlet.jsp/jakarta.servlet.jsp-api
-	providedCompile group: 'jakarta.servlet.jsp', name: 'jakarta.servlet.jsp-api', version: '3.1.1'
+	providedCompile group: 'jakarta.servlet.jsp', name: 'jakarta.servlet.jsp-api', version: '4.0.0'
 	
 }
 
