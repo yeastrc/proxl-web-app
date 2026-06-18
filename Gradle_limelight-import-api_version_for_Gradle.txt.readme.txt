@@ -1,0 +1,13 @@
+
+
+Readme for Gradle_Gradle_proxl-import-api_version_for_Gradle.txt
+
+contains the version number for the Gradle build line
+
+compile 'org.yeastrc:proxl-import-api:###'
+
+where ### is the string from file  "Gradle_proxl-import-api_version_for_Gradle.txt"
+
+Do NOT put a newline or comment in file "Gradle_proxl-import-api_version_for_Gradle.txt"
+
+Change Importer Java class 'Limelight_XSD_XML_Schema_Enabled_And_Filename_With_Path_Constant' when change this.
