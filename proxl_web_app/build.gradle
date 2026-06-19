@@ -100,12 +100,6 @@ configurations.all {
    exclude group:'org.apache.logging.log4j', module: 'log4j-to-slf4j'
 //   exclude group:'org.apache.logging.log4j', module: 'log4j-api'
 
-	//   NO longer exclude since switched to DBCP 2
-	//  Exclude following since OLD
-	//  Included by DBCP 1
-	// https://mvnrepository.com/artifact/xerces/xerces
-	//   implementation group: 'xerces', name: 'xerces', version: '2.0.2'
-	//  exclude group: 'xerces', module: 'xerces'
 }
 
 //  Proxl Import API version - single source of truth at the repo root, so bumping the version
@@ -125,9 +119,6 @@ dependencies {
 	
 	//  Jersey Server for webservices
 	
-	//        latest version requires Java > 8
-	// https://mvnrepository.com/artifact/org.glassfish.jersey.core/jersey-server
-	// implementation group: 'org.glassfish.jersey.core', name: 'jersey-server', version: '2.28'
 	
 	// https://mvnrepository.com/artifact/org.glassfish.jersey.core/jersey-server
 	implementation group: 'org.glassfish.jersey.core', name: 'jersey-server', version: '4.0.2'
@@ -162,31 +153,26 @@ dependencies {
 	// https://mvnrepository.com/artifact/org.eclipse.angus/angus-mail
 	implementation group: 'org.eclipse.angus', name: 'angus-mail', version: '2.0.3'
 	
-	//  Later versions like this have license CDDL and GPL
-	// https://mvnrepository.com/artifact/javax.mail/javax.mail-api
-//	implementation group: 'javax.mail', name: 'javax.mail-api', version: '1.6.1'
 
 	// https://mvnrepository.com/artifact/org.apache.commons/commons-dbcp2
 	implementation group: 'org.apache.commons', name: 'commons-dbcp2', version: '2.2.0'
 	
 	
-	// https://mvnrepository.com/artifact/mysql/mysql-connector-java
-//	implementation group: 'mysql', name: 'mysql-connector-java', version: '5.1.45'
 	
 	//  Logging Log4j Version 2
 	
-	implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.17.0'
-	implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.17.0'
-	implementation group: 'org.apache.logging.log4j', name: 'log4j-web', version: '2.17.0' //  Needed for Web app
+	implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.24.3'
+	implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.24.3'
+	implementation group: 'org.apache.logging.log4j', name: 'log4j-web', version: '2.24.3' //  Needed for Web app
 	
 	// https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-slf4j-impl
-	implementation group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version: '2.17.0'
+	implementation group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version: '2.24.3'
 	
 	//  Jakarta Commons Logging to SLF4J
 	implementation group: 'org.slf4j', name: 'jcl-over-slf4j', version: '1.7.25'
 	
 	//  Log4j 1 to 2 bridge
-	implementation group: 'org.apache.logging.log4j', name: 'log4j-1.2-api', version: '2.2'
+	implementation group: 'org.apache.logging.log4j', name: 'log4j-1.2-api', version: '2.24.3'
 		
 	
 	//  redirects log4j to slf4j, the opposite of how logging is set up
@@ -216,7 +202,7 @@ dependencies {
 	implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.9'
 	
 	// https://mvnrepository.com/artifact/commons-io/commons-io
-	implementation group: 'commons-io', name: 'commons-io', version: '2.6'
+	implementation group: 'commons-io', name: 'commons-io', version: '2.18.0'
 	
 	// https://mvnrepository.com/artifact/org.apache.commons/commons-math3
 	implementation group: 'org.apache.commons', name: 'commons-math3', version: '3.6.1'
@@ -225,10 +211,10 @@ dependencies {
 	//   Apache HTPP Client
 
 	// https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient
-	implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.8' // Was using 4.1.2
+	implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.14' // Was using 4.1.2
 
 	// https://mvnrepository.com/artifact/org.apache.httpcomponents/httpcore
-	implementation group: 'org.apache.httpcomponents', name: 'httpcore', version: '4.4.11' // Was using 4.1.2
+	implementation group: 'org.apache.httpcomponents', name: 'httpcore', version: '4.4.16' // Was using 4.1.2
  	
 	
 	// https://mvnrepository.com/artifact/com.google.guava/guava

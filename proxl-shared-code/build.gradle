@@ -33,10 +33,10 @@ dependencies {
 	compileOnly group: 'joda-time', name: 'joda-time', version: '2.10.2'
 
 	// https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core
-	compileOnly group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.8.11'
+	compileOnly group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.19.1'
 
 	// https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
-	compileOnly group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.9'
+	compileOnly group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.19.1'
 
 	
 	// JAXB dependencies (Required for Java 11+)
