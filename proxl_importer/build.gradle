@@ -128,14 +128,9 @@ dependencies {
 	// https://mvnrepository.com/artifact/org.glassfish.jaxb/jaxb-runtime
 	implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '4.0.5'
 
-	//  javax JAXB 2 (javax.xml.bind) - still required by the bundled spectral-storage accept-import
-	//  client connector jar, which marshals/unmarshals its webservice request/response objects with
-	//  javax JAXB. This is internal importer<->spectral-storage comms (trusted), not the internet-facing
-	//  Proxl XML (which uses jakarta JAXB 4 above). Uses the OLD javax.xml.bind:jaxb-api coordinate and
-	//  the com.sun.xml.bind:jaxb-impl runtime so it coexists with the jakarta jaxb-runtime above
-	//  (distinct Maven coordinates => both runtimes on the classpath, no version collision).
-	implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
-	implementation group: 'com.sun.xml.bind', name: 'jaxb-impl', version: '2.3.1'
+	//  jakarta-only now: the bundled spectral-storage accept-import connector jar went jakarta in
+	//  spectral-storage v2.0.0, so the previous javax JAXB 2 coexistence (javax.xml.bind:jaxb-api +
+	//  com.sun.xml.bind:jaxb-impl) was removed.
 
 	//  Proxl Import API (Proxl XML JAXB classes) - pulled from the published jakarta jar
 	//  instead of a bundled jar under libs_proxl_github_jars.

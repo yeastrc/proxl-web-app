@@ -22,7 +22,7 @@ services:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
       MYSQL_DATABASE: ${PROXL_DATABASE_NAME}
   spectr:
-    image: mriffle/spectr:1
+    image: mriffle/spectr:2
     container_name: proxl-spectr
     restart: always
     volumes:

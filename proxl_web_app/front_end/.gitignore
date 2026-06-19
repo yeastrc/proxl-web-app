@@ -1,3 +1,4 @@
+/build/
 /node_modules/
 /handlebars_templates_precompiled/
 /webpack_build_output/
