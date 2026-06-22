@@ -87,10 +87,6 @@ public class ImporterCoreEntryPoint {
 			Boolean skipPopulatingPathOnSearchLineOptChosen
 			) throws Exception, ProxlImporterProjectNotAllowImportException, ProxlImporterProxlXMLDeserializeFailException {
 		
-		
-		//  Set to remove limits since getting error on this
-		System.setProperty("jdk.xml.maxGeneralEntitySizeLimit", "0");
-		
 		ProxlInput proxlInputForImport = null;
 		if ( proxlInputForImportParam != null ) {
 			proxlInputForImport = proxlInputForImportParam;

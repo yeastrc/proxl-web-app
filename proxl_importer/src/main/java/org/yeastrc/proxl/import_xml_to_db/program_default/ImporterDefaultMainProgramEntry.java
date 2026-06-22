@@ -75,7 +75,14 @@ import org.yeastrc.xlink.exceptions.ProxlBaseDataException;
  *
  */
 public class ImporterDefaultMainProgramEntry {
-	
+
+    //  RIGHT: This block is hit first and forces the JVM setting
+    static {
+        System.setProperty("jdk.xml.maxGeneralEntitySizeLimit", "0");
+        System.setProperty("jdk.xml.totalEntitySizeLimit", "0");
+    }
+
+    
 	private static final Logger log = LoggerFactory.getLogger( ImporterDefaultMainProgramEntry.class);
 	
 	///////  !!!!!!!!!!!!!!!!!!!
