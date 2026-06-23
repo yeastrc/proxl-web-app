@@ -1,0 +1,34 @@
+version: 2
+
+# Dependabot VERSION-UPDATE PRs.
+#
+# Security ALERTS for the Gradle modules come from the dependency graph submitted by
+# .github/workflows/dependency-submission.yml (GitHub does not auto-parse build.gradle).
+# This file additionally opens scheduled PRs to bump DIRECT dependencies that are behind.
+
+updates:
+  # ---- npm: front end ----
+  - package-ecosystem: "npm"
+    directory: "/proxl_web_app/front_end"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+
+  # ---- Gradle: JVM modules with declared dependencies (front_end builds no Java) ----
+  - package-ecosystem: "gradle"
+    directories:
+      - "/proxl_web_app"
+      - "/proxl-shared-code"
+      - "/proxl_importer"
+      - "/proxl_importer_run_importer_shared"
+      - "/proxl_run_importer"
+      - "/proxl_submit_import"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+
+  # ---- GitHub Actions used by the workflows ----
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"

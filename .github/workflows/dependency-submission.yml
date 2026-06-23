@@ -1,0 +1,45 @@
+name: Dependency Submission
+
+# Submits each deployable Gradle build's fully-resolved dependency graph to GitHub's
+# dependency graph, so Dependabot security alerts cover the Gradle modules (including
+# transitive deps).  GitHub auto-detects Maven pom.xml but NOT Gradle build.gradle, so
+# without this the only thing scanned is the npm front_end (package-lock.json).
+#
+# The repo has no single root Gradle build; these 4 leaf builds each include the shared
+# library modules as subprojects, so together they cover all JVM dependencies.
+# (front_end builds no Java and is included by proxl_web_app, so it needs no entry.)
+
+on:
+  push:
+    branches: [ master ]
+  workflow_dispatch:
+
+permissions:
+  contents: write   # required for the action to submit the dependency graph
+
+jobs:
+  dependency-submission:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        module:
+          - proxl_web_app
+          - proxl_importer
+          - proxl_run_importer
+          - proxl_submit_import
+    steps:
+      - uses: actions/checkout@v4
+
+      # Java 21 (LTS) is only used to RUN Gradle for dependency resolution; it does not
+      # need to match the per-module toolchains (Java 8 / 25), which are only required to
+      # compile, not to resolve dependencies.
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Generate and submit dependency graph (${{ matrix.module }})
+        uses: gradle/actions/dependency-submission@v4
+        with:
+          build-root-directory: ${{ matrix.module }}
