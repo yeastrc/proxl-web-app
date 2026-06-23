@@ -19,6 +19,10 @@ updates:
       npm-dependencies:
         patterns:
           - "*"
+      npm-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
 
   # ---- Gradle: JVM modules with declared dependencies (front_end builds no Java) ----
   - package-ecosystem: "gradle"
@@ -38,6 +42,10 @@ updates:
       gradle-dependencies:
         patterns:
           - "*"
+      gradle-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
 
   # ---- GitHub Actions used by the workflows ----
   - package-ecosystem: "github-actions"
@@ -47,5 +55,9 @@ updates:
     open-pull-requests-limit: 5
     groups:
       github-actions:
+        patterns:
+          - "*"
+      github-actions-security:
+        applies-to: security-updates
         patterns:
           - "*"
