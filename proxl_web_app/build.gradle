@@ -221,7 +221,7 @@ dependencies {
 	implementation group: 'com.google.guava', name: 'guava', version: '27.1-jre'
 	
 	// https://mvnrepository.com/artifact/joda-time/joda-time
-	implementation group: 'joda-time', name: 'joda-time', version: '2.10.2'
+	implementation group: 'joda-time', name: 'joda-time', version: '2.14.2'
 	
 	//  Jackson JSON parsing
 	
