@@ -49,7 +49,7 @@ jobs:
           type=semver,pattern={{major}}
     - name: Build and push webapp
       id: docker_build_webapp
-      uses: docker/build-push-action@v2
+      uses: docker/build-push-action@v7
       with:
         context: docker/webapp
         push: true
@@ -65,7 +65,7 @@ jobs:
           type=semver,pattern={{major}}
     - name: Build and push importer
       id: docker_build_importer
-      uses: docker/build-push-action@v2
+      uses: docker/build-push-action@v7
       with:
         context: docker/importer
         push: true
