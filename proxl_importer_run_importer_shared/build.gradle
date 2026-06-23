@@ -41,7 +41,7 @@ dependencies {
 	// JAXB 4.0 (jakarta.xml.bind) - compile-time annotations for the RunImporterToImporterFile
 	// JAXB classes; the runtime is provided by the consuming modules (importer / run_importer).
 	// https://mvnrepository.com/artifact/jakarta.xml.bind/jakarta.xml.bind-api
-	compileOnly group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '4.0.2'
+	compileOnly group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '4.0.5'
 	// https://mvnrepository.com/artifact/org.glassfish.jaxb/jaxb-runtime
 	compileOnly group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '4.0.5'
 	
