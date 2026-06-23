@@ -24,7 +24,7 @@ java {
 dependencies {
 
 	// https://mvnrepository.com/artifact/org.slf4j/slf4j-simple
-	compileOnly group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
+	compileOnly group: 'org.slf4j', name: 'slf4j-api', version: '2.0.18'
 
 	// https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
 	compileOnly group: 'org.apache.commons', name: 'commons-lang3', version: '3.9'
