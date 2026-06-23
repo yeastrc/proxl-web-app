@@ -124,7 +124,7 @@ dependencies {
 	// published proxl-import-api jakarta classes (built at JAXB 3.0) and the local jakarta
 	// RunImporterToImporterFile classes.
 	// https://mvnrepository.com/artifact/jakarta.xml.bind/jakarta.xml.bind-api
-	implementation group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '4.0.2'
+	implementation group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '4.0.5'
 	// https://mvnrepository.com/artifact/org.glassfish.jaxb/jaxb-runtime
 	implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '4.0.5'
 
