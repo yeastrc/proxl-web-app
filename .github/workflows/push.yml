@@ -10,7 +10,7 @@ jobs:
   docker-build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v7
     - name: Verify Gradle sees both JDKs (8 and 25)
       uses: docker://ghcr.io/yeastrc/proxl-build-docker:latest
       with:
