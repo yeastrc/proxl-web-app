@@ -29,17 +29,17 @@ jobs:
           - proxl_run_importer
           - proxl_submit_import
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       # Java 21 (LTS) is only used to RUN Gradle for dependency resolution; it does not
       # need to match the per-module toolchains (Java 8 / 25), which are only required to
       # compile, not to resolve dependencies.
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: '21'
 
       - name: Generate and submit dependency graph (${{ matrix.module }})
-        uses: gradle/actions/dependency-submission@v4
+        uses: gradle/actions/dependency-submission@v6
         with:
           build-root-directory: ${{ matrix.module }}
