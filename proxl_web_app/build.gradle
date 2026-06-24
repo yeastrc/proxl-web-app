@@ -289,7 +289,7 @@ dependencies {
 	
 	
     // https://mvnrepository.com/artifact/org.apache.tomcat.embed/tomcat-embed-core
-    providedCompile group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '11.0.9'
+    providedCompile group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '11.0.22'
 
 	//  
 	// Jakarta Servlet 6.1 (Jakarta EE 11) - provided by the Tomcat 11 container.
