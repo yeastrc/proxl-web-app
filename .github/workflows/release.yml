@@ -19,12 +19,12 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v4
     - name: Verify Gradle sees both JDKs (8 and 25)
-      uses: docker://ghcr.io/yeastrc/proxl-build-docker:latest
+      uses: docker://ghcr.io/yeastrc/proxl-build-docker:3
       with:
         entrypoint: ./proxl_submit_import/gradlew
         args: -p proxl_submit_import -q javaToolchains
     - name: Run build in Docker container	    
-      uses: docker://ghcr.io/yeastrc/proxl-build-docker:latest
+      uses: docker://ghcr.io/yeastrc/proxl-build-docker:3
       with:
         entrypoint: ant
         args: -f ant__build_all_proxl.xml

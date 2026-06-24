@@ -2,12 +2,15 @@
 //  webpack.config.js
 
 const path = require('path');
-
-//  Parallel Webpack from  https://github.com/trivago/parallel-webpack
-
+const webpack = require('webpack');
 
 	//  https://www.npmjs.com/package/case-sensitive-paths-webpack-plugin
 var CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin');
+
+//  Extracts the compiled SCSS into a standalone .css file.
+//  Replaces the old file-loader + extract-loader chain (extract-loader pulled in
+//  the legacy babel-core@6 stack, the source of most npm-audit findings).
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 
 //  No longer used
@@ -16,8 +19,16 @@ var CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin');
      //  Also removed from package.json      "webpack-handlebars-precompiler": "^1.1.0"
 
 
-const mainConfig = {		
-	
+const mainConfig = {
+
+	//  Browser target — ONLY governs the ES level of webpack's own runtime/bootstrap
+	//  code (the chunk-loading / module-wrapper glue webpack generates).
+	//  There is NO transpiler (Babel/swc/esbuild) wired into this build, so application
+	//  source is NOT downleveled — it ships as authored. This just tells webpack it may
+	//  rely on syntax supported by browsers from roughly the last 2 years.
+	//  Inline browserslist query, so no .browserslistrc / package.json "browserslist" is needed.
+	target: 'browserslist:last 2 years, not dead',
+
 	devtool: 'source-map',
 	resolve: {
 	    alias: { // A trailing $ can also be added to the given object's keys to signify an exact match:
@@ -27,10 +38,36 @@ const mainConfig = {
 	    },
 	    modules: [
 	        path.resolve('./src/js'),
-	        path.resolve('./node_modules'),
+	        //  Relative 'node_modules' (not an absolute path) so webpack walks up the
+	        //  tree and can find nested deps (e.g. stream-browserify's readable-stream@3).
+	        'node_modules',
 		],
+		//  webpack 5 no longer auto-polyfills Node core modules.
+		//  pdfkit / blob-stream / fontkit need these provided explicitly.
+		//   https://github.com/foliojs/pdfkit/tree/master/examples/webpack
+		fallback: {
+			fs: require.resolve('pdfkit/js/virtual-fs.js'),
+			assert: require.resolve('assert/'),
+			buffer: require.resolve('buffer/'),
+			events: require.resolve('events/'),
+			stream: require.resolve('stream-browserify'),
+			util: require.resolve('util/'),
+			zlib: require.resolve('browserify-zlib'),
+			crypto: false,
+		},
 	},
 	plugins: [
+		//  webpack 5: Buffer / process are no longer globals
+		new webpack.ProvidePlugin({
+			Buffer: ['buffer', 'Buffer'],
+			process: 'process/browser',
+		}),
+		//  Emit the SCSS as css_generated/global.css (the 'styles' entry == global.scss).
+		//  Keeps the historical filename so JSP <link> references are unchanged.
+		new MiniCssExtractPlugin({
+			filename: (pathData) =>
+				pathData.chunk.name === 'styles' ? 'css_generated/global.css' : 'css_generated/[name].css',
+		}),
 		new CaseSensitivePathsPlugin()
 		//  Removed (both) since doesn't precompile the Handlebars in an output format that can be imported  
 //        new HandlebarsPrecompiler({
@@ -170,21 +207,15 @@ const mainConfig = {
 				test:/\.scss$/,
 				use: [
 					{
-						loader: 'file-loader',
-						options: {
-							name: '[name].css',
-							outputPath: 'css_generated/'
-						}
+						loader: MiniCssExtractPlugin.loader
 					},
 					{
-						loader: 'extract-loader'
+						loader: 'css-loader'
 					},
 					{
-						loader: 'css-loader',
-						options: {} //  WAS   { minimize: true }
-					},
-					{
-						loader: 'sass-loader'
+						loader: 'sass-loader',
+						//  Use dart-sass modern API (legacy JS API is deprecated, removed in Dart Sass 2.0)
+						options: { api: 'modern' }
 					}
 				]
 			}
