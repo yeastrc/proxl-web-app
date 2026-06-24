@@ -1,6 +1,6 @@
 package org.yeastrc.xlink.www.user_web_utils;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.auth.dao.AuthForgotPasswordTrackingDAO;
 import org.yeastrc.auth.dao.AuthUserDAO;

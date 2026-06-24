@@ -193,11 +193,7 @@ dependencies {
 	
 	//   Apache Commons
 	
-	//  Old StringUtils
-	// https://mvnrepository.com/artifact/commons-lang/commons-lang
-	implementation group: 'commons-lang', name: 'commons-lang', version: '2.6'
-	
-	//  New StringUtils
+	//  StringUtils
 	// https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
 	implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.9'
 	

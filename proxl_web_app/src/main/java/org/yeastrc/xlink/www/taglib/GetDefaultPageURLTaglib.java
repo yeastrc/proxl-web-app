@@ -3,7 +3,7 @@ package org.yeastrc.xlink.www.taglib;
 import jakarta.servlet.jsp.JspException;
 import jakarta.servlet.jsp.JspWriter;
 import jakarta.servlet.jsp.tagext.TagSupport;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.www.constants.DefaultPageViewConstants;
 import org.yeastrc.xlink.www.dao.DefaultPageViewGenericDAO;

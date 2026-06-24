@@ -1,6 +1,6 @@
 package org.yeastrc.xlink.www.file_import_proxl_xml_scans.utils;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.xlink.base.config_system_table_common_access.ConfigSystemsKeysSharedConstants;
 import org.yeastrc.xlink.www.config_system_table.ConfigSystemCaching;

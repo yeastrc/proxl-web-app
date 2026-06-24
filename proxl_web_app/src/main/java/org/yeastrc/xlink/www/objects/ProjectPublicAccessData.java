@@ -1,6 +1,6 @@
 package org.yeastrc.xlink.www.objects;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.yeastrc.xlink.www.constants.AuthAccessLevelConstants;
 
 /**
