@@ -60,22 +60,22 @@ dependencies {
 	
 	//  Logging
 	
-	implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.25.4'
-	implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.25.4'	
+	implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.26.0'
+	implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.26.0'	
 	
 	// https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-slf4j-impl
-	implementation group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version: '2.25.4'
+	implementation group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version: '2.26.0'
 	
 	//  Jakarta Commons Logging to SLF4J
-	implementation group: 'org.slf4j', name: 'jcl-over-slf4j', version: '1.7.25'
+	implementation group: 'org.slf4j', name: 'jcl-over-slf4j', version: '2.0.18'
 	
 	//  Log4j 1 to 2 bridge
-	implementation group: 'org.apache.logging.log4j', name: 'log4j-1.2-api', version: '2.25.4'
+	implementation group: 'org.apache.logging.log4j', name: 'log4j-1.2-api', version: '2.26.0'
 	
 	
 	//  New StringUtils
 	// https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
-	implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.18.0'
+	implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.20.0'
 	
 	
 	

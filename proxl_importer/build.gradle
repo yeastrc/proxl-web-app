@@ -89,39 +89,39 @@ dependencies {
 	
 	//  New StringUtils
 	// https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
-	implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.18.0'
+	implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.20.0'
 	
 	// https://mvnrepository.com/artifact/org.apache.commons/commons-dbcp2
-	implementation group: 'org.apache.commons', name: 'commons-dbcp2', version: '2.8.0'
+	implementation group: 'org.apache.commons', name: 'commons-dbcp2', version: '2.14.0'
 	
 	// https://mvnrepository.com/artifact/com.mysql/mysql-connector-j
 	//  Exclude protobuf-java: it is only used by the MySQL X DevAPI (X Protocol),
 	//  which this app does not use (classic JDBC via com.mysql.cj.jdbc.Driver).
 	//  Removing it drops the transitive protobuf-java CVEs. If the X DevAPI is ever
 	//  adopted, this exclude must be removed (it will fail loudly with NoClassDefFoundError).
-	implementation(group: 'com.mysql', name: 'mysql-connector-j', version: '8.4.0') {
+	implementation(group: 'com.mysql', name: 'mysql-connector-j', version: '9.7.0') {
 		exclude group: 'com.google.protobuf', module: 'protobuf-java'
 	}
 	
 	
 	//  Logging
 	
-	implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.25.4'
-	implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.25.4'	
+	implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.26.0'
+	implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.26.0'	
 	
 	// https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-slf4j-impl
-	implementation group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version: '2.25.4'
+	implementation group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version: '2.26.0'
 	
 	//  Jakarta Commons Logging to SLF4J
-	implementation group: 'org.slf4j', name: 'jcl-over-slf4j', version: '1.7.25'
+	implementation group: 'org.slf4j', name: 'jcl-over-slf4j', version: '2.0.18'
 	
 	//  Log4j 1 to 2 bridge
-	implementation group: 'org.apache.logging.log4j', name: 'log4j-1.2-api', version: '2.25.4'
+	implementation group: 'org.apache.logging.log4j', name: 'log4j-1.2-api', version: '2.26.0'
 		
 		
 		
 	// https://mvnrepository.com/artifact/joda-time/joda-time
-	implementation group: 'joda-time', name: 'joda-time', version: '2.10.2'
+	implementation group: 'joda-time', name: 'joda-time', version: '2.14.2'
 	
 	
 	
@@ -130,9 +130,9 @@ dependencies {
 	// published proxl-import-api jakarta classes (built at JAXB 3.0) and the local jakarta
 	// RunImporterToImporterFile classes.
 	// https://mvnrepository.com/artifact/jakarta.xml.bind/jakarta.xml.bind-api
-	implementation group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '4.0.2'
+	implementation group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '4.0.5'
 	// https://mvnrepository.com/artifact/org.glassfish.jaxb/jaxb-runtime
-	implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '4.0.5'
+	implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '4.0.9'
 
 	//  jakarta-only now: the bundled spectral-storage accept-import connector jar went jakarta in
 	//  spectral-storage v2.0.0, so the previous javax JAXB 2 coexistence (javax.xml.bind:jaxb-api +
