@@ -161,18 +161,18 @@ dependencies {
 	
 	//  Logging Log4j Version 2
 	
-	implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.24.3'
-	implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.24.3'
-	implementation group: 'org.apache.logging.log4j', name: 'log4j-web', version: '2.24.3' //  Needed for Web app
+	implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.25.4'
+	implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.25.4'
+	implementation group: 'org.apache.logging.log4j', name: 'log4j-web', version: '2.25.4' //  Needed for Web app
 	
 	// https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-slf4j-impl
-	implementation group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version: '2.24.3'
+	implementation group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version: '2.25.4'
 	
 	//  Jakarta Commons Logging to SLF4J
 	implementation group: 'org.slf4j', name: 'jcl-over-slf4j', version: '1.7.25'
 	
 	//  Log4j 1 to 2 bridge
-	implementation group: 'org.apache.logging.log4j', name: 'log4j-1.2-api', version: '2.24.3'
+	implementation group: 'org.apache.logging.log4j', name: 'log4j-1.2-api', version: '2.25.4'
 		
 	
 	//  redirects log4j to slf4j, the opposite of how logging is set up
@@ -199,7 +199,7 @@ dependencies {
 	
 	//  New StringUtils
 	// https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
-	implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.9'
+	implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.18.0'
 	
 	// https://mvnrepository.com/artifact/commons-io/commons-io
 	implementation group: 'commons-io', name: 'commons-io', version: '2.18.0'
@@ -226,10 +226,10 @@ dependencies {
 	//  Jackson JSON parsing
 	
 	// https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core
-	implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.19.1'
+	implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.21.1'
 	
 	// https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
-	implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.19.1'
+	implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.21.1'
 
 	//  Jackson Joda-Time datatype module. Jackson 2.x (pulled to 2.18.x by Jersey 3.1) does NOT
 	//  serialize org.joda.time types by default; several DTOs expose org.joda.time.DateTime (e.g.
@@ -289,7 +289,7 @@ dependencies {
 	
 	
     // https://mvnrepository.com/artifact/org.apache.tomcat.embed/tomcat-embed-core
-    providedCompile group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '11.0.22'
+    providedCompile group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '11.0.23'
 
 	//  
 	// Jakarta Servlet 6.1 (Jakarta EE 11) - provided by the Tomcat 11 container.
