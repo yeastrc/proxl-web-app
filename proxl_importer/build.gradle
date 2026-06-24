@@ -89,7 +89,7 @@ dependencies {
 	
 	//  New StringUtils
 	// https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
-	implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.9'
+	implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.18.0'
 	
 	// https://mvnrepository.com/artifact/org.apache.commons/commons-dbcp2
 	implementation group: 'org.apache.commons', name: 'commons-dbcp2', version: '2.8.0'

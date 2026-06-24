@@ -195,7 +195,7 @@ dependencies {
 	
 	//  StringUtils
 	// https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
-	implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.9'
+	implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.18.0'
 	
 	// https://mvnrepository.com/artifact/commons-io/commons-io
 	implementation group: 'commons-io', name: 'commons-io', version: '2.18.0'
@@ -222,16 +222,16 @@ dependencies {
 	//  Jackson JSON parsing
 	
 	// https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core
-	implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.19.1'
+	implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.22.0'
 	
 	// https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
-	implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.19.1'
+	implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.22.0'
 
 	//  Jackson Joda-Time datatype module. Jackson 2.x (pulled to 2.18.x by Jersey 3.1) does NOT
 	//  serialize org.joda.time types by default; several DTOs expose org.joda.time.DateTime (e.g.
 	//  PDBFileDTO.uploadDate). Registered with the JAX-RS ObjectMapper via ObjectMapperContextResolver.
 	// https://mvnrepository.com/artifact/com.fasterxml.jackson.datatype/jackson-datatype-joda
-	implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-joda', version: '2.19.1'
+	implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-joda', version: '2.22.0'
 
 	//  BioJava
 	

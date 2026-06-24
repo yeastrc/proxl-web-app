@@ -27,16 +27,16 @@ dependencies {
 	compileOnly group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
 
 	// https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
-	compileOnly group: 'org.apache.commons', name: 'commons-lang3', version: '3.9'
+	compileOnly group: 'org.apache.commons', name: 'commons-lang3', version: '3.18.0'
 
 	// https://mvnrepository.com/artifact/joda-time/joda-time
 	compileOnly group: 'joda-time', name: 'joda-time', version: '2.10.2'
 
 	// https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core
-	compileOnly group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.19.1'
+	compileOnly group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.22.0'
 
 	// https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
-	compileOnly group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.19.1'
+	compileOnly group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.22.0'
 
 	
 	// JAXB dependencies (Required for Java 11+)

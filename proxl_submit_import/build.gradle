@@ -75,7 +75,7 @@ dependencies {
 	
 	//  New StringUtils
 	// https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
-	implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.9'
+	implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.18.0'
 	
 	
 	
@@ -91,10 +91,10 @@ dependencies {
 	//  Jackson JSON parsing
 	
 	// https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core
-	implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.19.1'
+	implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.22.0'
 	
 	// https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
-	implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.19.1'
+	implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.22.0'
 
 
 	//  NOT FOUND  either jcenter() or mavenCentral()
