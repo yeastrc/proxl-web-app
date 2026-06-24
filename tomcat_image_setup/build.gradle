@@ -1,0 +1,50 @@
+/*
+ * tomcat_image_setup
+ *
+ * Standalone helper build (intentionally NOT part of the WAR build) that emits
+ * support files needed only when the webapp Docker image is built by the
+ * GitHub release action.
+ *
+ * Currently: resolves the MySQL JDBC driver and emits it (with its version in
+ * the filename, e.g. mysql-connector-j-8.4.0.jar) into
+ *   build/tomcat_lib_jars/
+ * The root ant build copies that directory into deploy/, the release workflow
+ * copies it into docker/webapp/, and docker/webapp/Dockerfile copies the
+ * directory's contents into Tomcat's lib/. Keeping the version in the filename
+ * makes the connector version visible in the image without inspecting the jar.
+ *
+ * This replaces committing the driver jar to the repo.
+ */
+
+plugins {
+    id 'base'
+}
+
+repositories {
+    mavenCentral()
+}
+
+configurations {
+    mysqlConnector
+}
+
+dependencies {
+    // The JDBC driver jar that goes into Tomcat's lib/ for the webapp image.
+    // transitive = false: only the driver itself is needed for standard JDBC via
+    // the DBCP DataSource (jdbc/proxl). The X DevAPI / protobuf transitive deps
+    // are not used, so they are intentionally excluded.
+    mysqlConnector('com.mysql:mysql-connector-j:8.4.0') { transitive = false }
+}
+
+tasks.register('emitMysqlConnector', Copy) {
+    group = 'build'
+    description = 'Emit the MySQL JDBC driver into build/tomcat_lib_jars/ for the webapp Docker image (Tomcat lib).'
+    from configurations.mysqlConnector
+    // Dedicated dir whose contents are copied wholesale into Tomcat's lib/.
+    // The jar keeps its versioned name (mysql-connector-j-<version>.jar), and the
+    // Dockerfile copies the directory contents so it never needs editing on a bump.
+    into layout.buildDirectory.dir('tomcat_lib_jars')
+}
+
+// Convenience: `./gradlew build` (or assemble) also produces the jar.
+tasks.named('assemble') { dependsOn 'emitMysqlConnector' }

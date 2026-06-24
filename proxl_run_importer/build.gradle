@@ -73,8 +73,8 @@ dependencies {
 	// https://mvnrepository.com/artifact/org.apache.commons/commons-dbcp2
 	implementation group: 'org.apache.commons', name: 'commons-dbcp2', version: '2.8.0'
 	
-	// https://mvnrepository.com/artifact/mysql/mysql-connector-java
-	implementation group: 'mysql', name: 'mysql-connector-java', version: '8.0.26'
+	// https://mvnrepository.com/artifact/com.mysql/mysql-connector-j
+	implementation group: 'com.mysql', name: 'mysql-connector-j', version: '8.4.0'
 	
 	//  Logging
 	

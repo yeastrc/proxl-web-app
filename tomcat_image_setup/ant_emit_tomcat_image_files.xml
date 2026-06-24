@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project default="emit_tomcat_image_files" name="Proxl tomcat_image_setup: emit support files for the webapp Docker image (Tomcat lib)">
+
+	<!--  Runs Gradle (gradlew or gradlew.bat) with task 'emitMysqlConnector'
+	      to emit the MySQL JDBC driver into build/libs/mysql-connector-j.jar -->
+
+	 <!-- Set program to run for Windows, else Non-Windows (Linux/Mac) -->
+	    <condition property="executableToRun_TomcatImageSetup" value="./gradlew.bat" else="./gradlew">
+	        <os family="windows"/>
+	    </condition>
+
+    <target name="emit_tomcat_image_files" description="Emit Tomcat image support files (MySQL JDBC driver)">
+
+		<exec executable="${executableToRun_TomcatImageSetup}" dir="." failonerror="true"
+		    resolveexecutable="true" >
+			<arg value="emitMysqlConnector" />
+		</exec>
+
+    </target>
+
+</project>

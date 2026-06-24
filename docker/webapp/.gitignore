@@ -1,0 +1,3 @@
+# Tomcat lib jars (e.g. MySQL JDBC driver) are emitted into this dir at
+# release time by the build, not committed.
+/tomcat_lib_jars/

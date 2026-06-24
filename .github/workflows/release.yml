@@ -33,6 +33,7 @@ jobs:
         cp deploy/importProxlXML.jar docker/importer/
         cp deploy/runImportProxlXML.jar docker/importer/
         cp deploy/proxl.war docker/webapp/
+        cp -r deploy/tomcat_lib_jars docker/webapp/
     - name: Login to DockerHub
       uses: docker/login-action@v1 
       with:

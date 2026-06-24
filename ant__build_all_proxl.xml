@@ -148,9 +148,12 @@
 		<!-- run importer  -->		
 		<ant antfile="ant__create_runnable_jar_run_importer.xml"  dir="proxl_run_importer" />
 		
-		<!-- submit import  -->		
+		<!-- submit import  -->
 		<ant antfile="ant__create_runnable_jar_submit_import.xml"  dir="proxl_submit_import" />
-		
+
+		<!-- tomcat image setup: emit MySQL JDBC driver for the webapp Docker image (Tomcat lib) -->
+		<ant antfile="ant_emit_tomcat_image_files.xml"  dir="tomcat_image_setup" />
+
 	</target>
 	
 
@@ -164,7 +167,12 @@
 		<copy file="proxl_importer/build/libs/importProxlXML.jar" todir="deploy" />
 		<copy file="proxl_run_importer/build/libs/runImportProxlXML.jar" todir="deploy" />
 		<copy file="proxl_submit_import/build/libs/submitProxlXMLImport.jar" todir="deploy" />
-		
+
+		<!-- jars to drop into the webapp image's Tomcat lib/ (e.g. MySQL JDBC driver) -->
+		<copy todir="deploy/tomcat_lib_jars">
+			<fileset dir="tomcat_image_setup/build/tomcat_lib_jars" />
+		</copy>
+
 	</target>
 	
 </project>

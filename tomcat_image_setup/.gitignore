@@ -1,0 +1,3 @@
+# Build output + gradle cache (wrapper files and build scripts stay tracked)
+/build/
+/.gradle/
