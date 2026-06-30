@@ -254,16 +254,24 @@ dependencies {
 
 
 
-	// JAXB 2 (javax.xml.bind) - kept for the precompiled yeastrc/proxl jars and this app's
-	// own javax.xml.bind code. Uses the OLD 'javax.xml.bind:jaxb-api' coordinate (not the
-	// 'jakarta.xml.bind:jakarta.xml.bind-api' coordinate) so it does NOT collide with the
-	// jakarta.xml.bind-api 4.x that Jersey 3.1 pulls in transitively - both packages
-	// (javax.xml.bind and jakarta.xml.bind) then coexist on the classpath. jaxb-runtime 2.3.1
-	// is the last release that still depends on the old javax coordinate.
+	// JAXB coexistence (javax.xml.bind + jakarta.xml.bind on the same webapp classpath).
+	// BOTH runtimes are needed: javax for the precompiled yeastrc/proxl jars + this app's own
+	// javax.xml.bind code; jakarta for the jakarta client connectors (spectral-storage get-data,
+	// etc.) that call jakarta.xml.bind.JAXBContext.newInstance(...).
+	// They must live on DISTINCT maven coordinates. The javax runtime and the jakarta runtime
+	// BOTH ship as 'org.glassfish.jaxb:jaxb-runtime' (javax = 2.3.x, jakarta = 4.0.x), so using
+	// that coordinate for javax makes Gradle resolve the module to a single version and one side
+	// loses its runtime (here: 2.3.1 won, leaving the jakarta connectors with NO jakarta runtime
+	// -> JAXBContext.newInstance NPEs). Put javax on the com.sun.xml.bind:jaxb-impl coordinate
+	// instead, leaving org.glassfish.jaxb:jaxb-runtime free for the jakarta 4.x runtime:
+	//   javax   = javax.xml.bind:jaxb-api         + com.sun.xml.bind:jaxb-impl    (2.3.x)
+	//   jakarta = jakarta.xml.bind-api (via Jersey) + org.glassfish.jaxb:jaxb-runtime (4.0.x)
 	// https://mvnrepository.com/artifact/javax.xml.bind/jaxb-api
 	implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
-	// https://mvnrepository.com/artifact/org.glassfish.jaxb/jaxb-runtime
-	implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '2.3.1'
+	// https://mvnrepository.com/artifact/com.sun.xml.bind/jaxb-impl  (javax runtime)
+	implementation group: 'com.sun.xml.bind', name: 'jaxb-impl', version: '2.3.1'
+	// https://mvnrepository.com/artifact/org.glassfish.jaxb/jaxb-runtime  (jakarta runtime)
+	implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '4.0.5'
 	
 	
 	
