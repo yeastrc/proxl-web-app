@@ -23,7 +23,7 @@ services:
       - ${SPECTR_STORAGE_DIRECTORY}:/data/storage
       - ${PROXL_UPLOAD_DIRECTORY}:/data/proxl_upload
   importer:
-    image: mriffle/proxl-importer:2
+    image: mriffle/proxl-importer:3
     container_name: proxl-importer
     restart: always
     stop_grace_period: 60s
@@ -40,7 +40,7 @@ services:
       PROXL_JAVA_EXECUTE_PARAMS: ${IMPORTER_JAVA_OPTIONS}
       PROXL_WEB_APP_BASE_URL: ${PROXL_WEB_APP_BASE_URL}
   proxl:
-    image: mriffle/proxl-webapp:2
+    image: mriffle/proxl-webapp:3
     container_name: proxl-webapp
     restart: always
     stop_grace_period: 60s
