@@ -24,26 +24,26 @@ java {
 dependencies {
 
 	// https://mvnrepository.com/artifact/org.slf4j/slf4j-simple
-	compileOnly group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
+	compileOnly group: 'org.slf4j', name: 'slf4j-api', version: '2.0.18'
 
 	// https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
-	compileOnly group: 'org.apache.commons', name: 'commons-lang3', version: '3.18.0'
+	compileOnly group: 'org.apache.commons', name: 'commons-lang3', version: '3.20.0'
 
 	// https://mvnrepository.com/artifact/joda-time/joda-time
-	compileOnly group: 'joda-time', name: 'joda-time', version: '2.10.2'
+	compileOnly group: 'joda-time', name: 'joda-time', version: '2.14.3'
 
 	// https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core
-	compileOnly group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.22.0'
+	compileOnly group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.22.2'
 
 	// https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
-	compileOnly group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.22.0'
+	compileOnly group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.22.2'
 
 	
 	// JAXB dependencies (Required for Java 11+)
 	// https://mvnrepository.com/artifact/jakarta.xml.bind/jakarta.xml.bind-api
-	compileOnly group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '2.3.2'
+	compileOnly group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '4.0.5'
 	// https://mvnrepository.com/artifact/org.glassfish.jaxb/jaxb-runtime
-	compileOnly group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '2.3.2'
+	compileOnly group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '4.0.9'
 	
 	
 }
