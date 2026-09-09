@@ -17,6 +17,12 @@ PROXL_WEB_APP_BASE_URL=http://proxl:8080/proxl/
 IMPORTER_JAVA_OPTIONS=-Xmx3g -Xms500m
 WEBAPP_JAVA_OPTIONS=-Xms2024m -Xmx2024m
 
+# Optional: override the webapp HTTP session inactivity timeout, in MINUTES
+# (positive integer, e.g. 2880 = 48 hours). Leave unset/commented to use the
+# servlet container's built-in default. That default (currently 30 minutes) is
+# the Tomcat/Docker default, NOT a value defined or controlled by Proxl.
+#PROXL_SESSION_TIMEOUT_MINUTES=2880
+
 # This manages optimization settings for MySQL
 MYSQL_OPTIONS=--max-connections=500 --skip-ssl
 

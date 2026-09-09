@@ -141,7 +141,16 @@
 		org.yeastrc.xlink.www.servlet_context.ServletContextAppListener
 		</listener-class>
 	</listener>
-	
+
+	<!-- Optionally overrides the HTTP session inactivity timeout per-deployment via the
+	     env var PROXL_SESSION_TIMEOUT_MINUTES.  If the var is unset/blank/invalid, no
+	     override is applied and the servlet-container default session timeout is used. -->
+	<listener>
+		<listener-class>
+		org.yeastrc.xlink.www.servlet_context.ProxlSessionTimeoutHttpSessionListener
+		</listener-class>
+	</listener>
+
 	<!-- ERROR pages -->
 	
     <error-page>
