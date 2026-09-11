@@ -17,7 +17,7 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v7
     - name: Verify Gradle sees both JDKs (8 and 25)
       uses: docker://ghcr.io/yeastrc/proxl-build-docker:3
       with:
@@ -35,13 +35,13 @@ jobs:
         cp deploy/proxl.war docker/webapp/
         cp -r deploy/tomcat_lib_jars docker/webapp/
     - name: Login to DockerHub
-      uses: docker/login-action@v1 
+      uses: docker/login-action@v4 
       with:
         username: ${{ secrets.DOCKER_USER }}
         password: ${{ secrets.DOCKER_PASSWORD }}
     - name: Docker meta for webapp
       id: meta_webapp
-      uses: docker/metadata-action@v3
+      uses: docker/metadata-action@v6
       with:
         images: |
           ${{ env.DOCKER_REPO_WEBAPP }}
@@ -50,14 +50,14 @@ jobs:
           type=semver,pattern={{major}}
     - name: Build and push webapp
       id: docker_build_webapp
-      uses: docker/build-push-action@v2
+      uses: docker/build-push-action@v7
       with:
         context: docker/webapp
         push: true
         tags: ${{ steps.meta_webapp.outputs.tags }}
     - name: Docker meta for importer
       id: meta_importer
-      uses: docker/metadata-action@v3
+      uses: docker/metadata-action@v6
       with:
         images: |
           ${{ env.DOCKER_REPO_IMPORTER }}
@@ -66,7 +66,7 @@ jobs:
           type=semver,pattern={{major}}
     - name: Build and push importer
       id: docker_build_importer
-      uses: docker/build-push-action@v2
+      uses: docker/build-push-action@v7
       with:
         context: docker/importer
         push: true
@@ -78,7 +78,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
       - name: Create docker-compose archive
         run: |
           tar -cvzf ./docker-compose-files.tgz docker-compose.yml docker-compose-custom-data.yml database_scripts/install/* docker/env-sample docker/env-custom-sample
