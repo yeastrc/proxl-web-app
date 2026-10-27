@@ -54,8 +54,7 @@ public class AuthForgotPasswordTrackingDAO {
 				returnItem.setCodeReplacedByNewer( rs.getBoolean( "code_replaced_by_newer" ));
 			}
 		} catch ( Exception e ) {
-			String msg = "Failed to select AuthForgotPasswordTrackingDTO, forgotPasswordTrackingCode: " + forgotPasswordTrackingCode
-					 + ", sql: " + sql;
+			String msg = "Failed to select AuthForgotPasswordTrackingDTO, sql: " + sql;
 			log.error( msg, e );
 			throw e;
 		} finally {

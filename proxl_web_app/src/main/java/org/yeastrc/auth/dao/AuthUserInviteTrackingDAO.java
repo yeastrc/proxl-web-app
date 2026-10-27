@@ -86,8 +86,7 @@ public class AuthUserInviteTrackingDAO {
 				returnItem = populateFromResultSet(rs);
 			}
 		} catch ( Exception e ) {
-			String msg = "Failed to select AuthUserInviteTrackingDTO, inviteTrackingCode: " + inviteTrackingCode
-					 + ", sql: " + sql;
+			String msg = "Failed to select AuthUserInviteTrackingDTO, sql: " + sql;
 			log.error( msg, e );
 			throw e;
 		} finally {
