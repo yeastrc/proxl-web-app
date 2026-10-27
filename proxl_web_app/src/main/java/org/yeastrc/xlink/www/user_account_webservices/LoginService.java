@@ -102,7 +102,7 @@ public class LoginService {
 					);  //  Early Exit with Data Exception
 		}
 		if ( StringUtils.isEmpty( password ) ) {
-			log.warn( "LoginService:  password empty: " + password );
+			log.warn( "LoginService:  password empty" );
 			throw new WebApplicationException(
 					Response.status( WebServiceErrorMessageConstants.INVALID_PARAMETER_STATUS_CODE )  //  Send HTTP code
 					.entity( WebServiceErrorMessageConstants.INVALID_PARAMETER_TEXT ) // This string will be passed to the client

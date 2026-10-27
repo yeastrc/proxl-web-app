@@ -548,7 +548,7 @@ public class AccountMaintService {
 		
 		AccountMaintResult accountMaintResult = new AccountMaintResult();
 		if ( StringUtils.isEmpty( oldPassword ) ) {
-			log.warn( "AccountMaintService:  old_password empty: " + password );
+			log.warn( "AccountMaintService:  old_password empty" );
 			throw new WebApplicationException(
 					Response.status( WebServiceErrorMessageConstants.INVALID_PARAMETER_STATUS_CODE )  //  Send HTTP code
 					.entity( WebServiceErrorMessageConstants.INVALID_PARAMETER_TEXT ) // This string will be passed to the client
@@ -556,7 +556,7 @@ public class AccountMaintService {
 					);
 		}
 		if ( StringUtils.isEmpty( password ) ) {
-			log.warn( "AccountMaintService:  password empty: " + password );
+			log.warn( "AccountMaintService:  password empty" );
 			throw new WebApplicationException(
 					Response.status( WebServiceErrorMessageConstants.INVALID_PARAMETER_STATUS_CODE )  //  Send HTTP code
 					.entity( WebServiceErrorMessageConstants.INVALID_PARAMETER_TEXT ) // This string will be passed to the client

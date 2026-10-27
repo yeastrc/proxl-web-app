@@ -1,5 +1,6 @@
 package org.yeastrc.xlink.www.user_account_webservices;
 
+import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.Consumes;
@@ -380,7 +381,8 @@ public class UserCreateAccountService {
 					);  //  Early Exit with Data Exception
 		}
 		if ( password.length() > FieldLengthConstants.PASSWORD_MAX_LENGTH ) {
-			log.warn( "AccountMaintService:  password too long: " + password );
+			log.warn( "UserCreateAccountService:  password too long, length (characters): " + password.length()
+					+ ", length (UTF-8 bytes): " + password.getBytes( StandardCharsets.UTF_8 ).length );
 			throw new WebApplicationException(
 					Response.status( WebServiceErrorMessageConstants.INVALID_PARAMETER_STATUS_CODE )  //  Send HTTP code
 					.entity( WebServiceErrorMessageConstants.INVALID_PARAMETER_TEXT ) // This string will be passed to the client
