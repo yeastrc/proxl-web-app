@@ -5,8 +5,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.www.objects.SearchProgramDisplay;
 /**
@@ -15,7 +15,7 @@ import org.yeastrc.xlink.www.objects.SearchProgramDisplay;
  */
 public class SearchProgramDisplaySearcher {
 	
-	private static final Log log = LogFactory.getLog(SearchProgramDisplaySearcher.class);
+	private static final Logger log = LoggerFactory.getLogger( SearchProgramDisplaySearcher.class );
 	private SearchProgramDisplaySearcher() { }
 	private static final SearchProgramDisplaySearcher _INSTANCE = new SearchProgramDisplaySearcher();
 	public static SearchProgramDisplaySearcher getInstance() { return _INSTANCE; }

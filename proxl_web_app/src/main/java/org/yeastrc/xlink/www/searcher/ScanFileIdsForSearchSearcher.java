@@ -5,15 +5,15 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 /**
  *
  */
 public class ScanFileIdsForSearchSearcher {
 	
-	private static final Log log = LogFactory.getLog(ScanFileIdsForSearchSearcher.class);
+	private static final Logger log = LoggerFactory.getLogger( ScanFileIdsForSearchSearcher.class );
 	private ScanFileIdsForSearchSearcher() { }
 	private static final ScanFileIdsForSearchSearcher _INSTANCE = new ScanFileIdsForSearchSearcher();
 	public static ScanFileIdsForSearchSearcher getInstance() { return _INSTANCE; }

@@ -5,8 +5,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.yeastrc.xlink.dao.NoteDAO;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.dto.NoteDTO;
@@ -18,7 +18,7 @@ import org.yeastrc.xlink.dto.NoteDTO;
  */
 public class NoteSearcher {
 	
-	private static final Log log = LogFactory.getLog(NoteSearcher.class);
+	private static final Logger log = LoggerFactory.getLogger( NoteSearcher.class );
 	private NoteSearcher() { }
 	private static final NoteSearcher _INSTANCE = new NoteSearcher();
 	public static NoteSearcher getInstance() { return _INSTANCE; }

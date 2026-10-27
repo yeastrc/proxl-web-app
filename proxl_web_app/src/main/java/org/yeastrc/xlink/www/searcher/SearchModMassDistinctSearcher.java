@@ -5,8 +5,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 
 /**
@@ -15,7 +15,7 @@ import org.yeastrc.xlink.db.DBConnectionFactory;
  */
 public class SearchModMassDistinctSearcher {
 	
-	private static final Log log = LogFactory.getLog(SearchModMassDistinctSearcher.class);
+	private static final Logger log = LoggerFactory.getLogger( SearchModMassDistinctSearcher.class );
 	private SearchModMassDistinctSearcher() { }
 	private static final SearchModMassDistinctSearcher _INSTANCE = new SearchModMassDistinctSearcher();
 	public static SearchModMassDistinctSearcher getInstance() { return _INSTANCE; }

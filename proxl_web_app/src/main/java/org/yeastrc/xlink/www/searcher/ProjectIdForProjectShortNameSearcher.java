@@ -3,8 +3,8 @@ package org.yeastrc.xlink.www.searcher;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 
 /**
@@ -14,7 +14,7 @@ import org.yeastrc.xlink.db.DBConnectionFactory;
  */
 public class ProjectIdForProjectShortNameSearcher {
 	
-	private static final Log log = LogFactory.getLog(ProjectIdForProjectShortNameSearcher.class);
+	private static final Logger log = LoggerFactory.getLogger( ProjectIdForProjectShortNameSearcher.class );
 	private ProjectIdForProjectShortNameSearcher() { }
 	private static final ProjectIdForProjectShortNameSearcher _INSTANCE = new ProjectIdForProjectShortNameSearcher();
 	public static ProjectIdForProjectShortNameSearcher getInstance() { return _INSTANCE; }

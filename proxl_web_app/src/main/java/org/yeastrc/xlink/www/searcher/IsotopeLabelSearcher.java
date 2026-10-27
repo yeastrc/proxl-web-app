@@ -2,8 +2,8 @@ package org.yeastrc.xlink.www.searcher;
 
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.yeastrc.xlink.dto.IsotopeLabelDTO;
 import org.yeastrc.xlink.www.dto.SrchRepPeptPeptideDTO;
 import org.yeastrc.xlink.www.dto.SrchRepPeptPeptideIsotopeLabelDTO;
@@ -15,7 +15,7 @@ import org.yeastrc.xlink.www.searcher_via_cached_data.return_objects_from_search
 
 public class IsotopeLabelSearcher {
 
-	private static final Log log = LogFactory.getLog(IsotopeLabelSearcher.class);
+	private static final Logger log = LoggerFactory.getLogger( IsotopeLabelSearcher.class );
 
 	private IsotopeLabelSearcher() { }
 	private static final IsotopeLabelSearcher _INSTANCE = new IsotopeLabelSearcher();

@@ -6,14 +6,14 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.www.searcher_results.SavedViewListForProjectIdItem;
 
 public class SavedViewListForProjectIdSearcher {
 
-	private static final Log log = LogFactory.getLog(SavedViewListForProjectIdSearcher.class);
+	private static final Logger log = LoggerFactory.getLogger( SavedViewListForProjectIdSearcher.class );
 	private SavedViewListForProjectIdSearcher() { }
 	private static final SavedViewListForProjectIdSearcher _INSTANCE = new SavedViewListForProjectIdSearcher();
 	public static SavedViewListForProjectIdSearcher getInstance() { return _INSTANCE; }

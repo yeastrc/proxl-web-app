@@ -3,13 +3,13 @@ package org.yeastrc.xlink.www.searcher;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 
 public class SavedView_AnyForProjectId_Searcher {
 
-	private static final Log log = LogFactory.getLog(SavedView_AnyForProjectId_Searcher.class);
+	private static final Logger log = LoggerFactory.getLogger( SavedView_AnyForProjectId_Searcher.class );
 	private SavedView_AnyForProjectId_Searcher() { }
 	private static final SavedView_AnyForProjectId_Searcher _INSTANCE = new SavedView_AnyForProjectId_Searcher();
 	public static SavedView_AnyForProjectId_Searcher getInstance() { return _INSTANCE; }

@@ -7,8 +7,8 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.yeastrc.xlink.base.constants.Database_OneTrueZeroFalse_Constants;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.dto.AnnotationTypeDTO;
@@ -26,7 +26,7 @@ import org.yeastrc.xlink.www.constants.PeptideViewLinkTypesConstants;
  */
 public class RetentionTimesForPSMCriteriaSearcher {
 	
-	private static final Log log = LogFactory.getLog(RetentionTimesForPSMCriteriaSearcher.class);
+	private static final Logger log = LoggerFactory.getLogger( RetentionTimesForPSMCriteriaSearcher.class );
 	private RetentionTimesForPSMCriteriaSearcher() { }
 	private static final RetentionTimesForPSMCriteriaSearcher _INSTANCE = new RetentionTimesForPSMCriteriaSearcher();
 	public static RetentionTimesForPSMCriteriaSearcher getInstance() { return _INSTANCE; }
@@ -307,7 +307,7 @@ public class RetentionTimesForPSMCriteriaSearcher {
 						sqlSB.append( "'" );
 					} else {
 						String msg = "linkType is invalid, linkType: " + linkType;
-						log.error( linkType );
+						log.error( msg );
 						throw new Exception( msg );
 					}
 				}
@@ -370,7 +370,7 @@ public class RetentionTimesForPSMCriteriaSearcher {
 					sqlSB.append( "'" );
 				} else {
 					String msg = "linkType is invalid, linkType: " + linkType;
-					log.error( linkType );
+					log.error( msg );
 					throw new Exception( msg );
 				}
 			}
