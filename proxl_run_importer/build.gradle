@@ -87,11 +87,17 @@ dependencies {
 	implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.25.4'
 	implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.25.4'	
 	
-	// https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-slf4j-impl
-	implementation group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version: '2.25.4'
+	// SLF4J 2.x API.  Must be paired with the SLF4J 2.x binding below (log4j-slf4j2-impl).
+	//   SLF4J 2.x with the 1.x binding (log4j-slf4j-impl) silently falls back to NO logging.
+	// https://mvnrepository.com/artifact/org.slf4j/slf4j-api
+	implementation group: 'org.slf4j', name: 'slf4j-api', version: '2.0.18'
+
+	// SLF4J 2.x to Log4j 2 binding
+	// https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-slf4j2-impl
+	implementation group: 'org.apache.logging.log4j', name: 'log4j-slf4j2-impl', version: '2.25.4'
 	
 	//  Jakarta Commons Logging to SLF4J
-	implementation group: 'org.slf4j', name: 'jcl-over-slf4j', version: '1.7.25'
+	implementation group: 'org.slf4j', name: 'jcl-over-slf4j', version: '2.0.18'
 	
 	//  Log4j 1 to 2 bridge
 	implementation group: 'org.apache.logging.log4j', name: 'log4j-1.2-api', version: '2.25.4'
