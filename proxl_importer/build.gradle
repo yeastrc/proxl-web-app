@@ -65,6 +65,9 @@ configurations.all {
    exclude group:"ch.qos.logback", module:"logback-classic"
    	//  Exclude Routing of log4j to slf4j since using opposite (slf4j to log4j) and including this would create a circular reference
    exclude group:'org.apache.logging.log4j', module: 'log4j-to-slf4j'
+   	//  Exclude Apache Commons Logging (from commons-dbcp2 / httpclient).  jcl-over-slf4j provides the commons-logging API instead.
+   	//    Only ONE commons-logging implementation in the jar.
+   exclude group:'commons-logging', module: 'commons-logging'
 //   exclude group:'org.apache.logging.log4j', module: 'log4j-api'
 }
 

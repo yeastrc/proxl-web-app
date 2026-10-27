@@ -56,6 +56,12 @@ repositories {
 //  Set default task for this build.gradle file
 defaultTasks 'shadowJar'
 
+configurations.all {
+   	//  Exclude Apache Commons Logging (from commons-dbcp2 / httpclient).  jcl-over-slf4j provides the commons-logging API instead.
+   	//    Only ONE commons-logging implementation in the jar.
+   exclude group:'commons-logging', module: 'commons-logging'
+}
+
 dependencies {
 	
 	//  Logging
