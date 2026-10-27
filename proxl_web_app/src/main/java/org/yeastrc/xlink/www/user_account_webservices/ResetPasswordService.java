@@ -1,5 +1,7 @@
 package org.yeastrc.xlink.www.user_account_webservices;
 
+import java.nio.charset.StandardCharsets;
+
 import java.util.List;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.Consumes;
@@ -34,6 +36,7 @@ import org.yeastrc.xlink.www.user_mgmt_webapp_access.UserMgmtResetPasswordRespon
 import org.yeastrc.xlink.www.user_mgmt_webapp_access.UserMgmtSearchUserDataRequest;
 import org.yeastrc.xlink.www.user_mgmt_webapp_access.UserMgmtSearchUserDataResponse;
 import org.yeastrc.xlink.www.user_web_utils.ValidateUserResetPasswordCode;
+import org.yeastrc.xlink.www.user_web_utils.PasswordTooLong_Check;
 import org.yeastrc.xlink.www.web_utils.GetMessageTextFromKeyFrom_web_app_application_properties;
 
 @Path("/user")
@@ -217,6 +220,13 @@ public class ResetPasswordService {
 					.build()
 					);
 		}
+		if ( PasswordTooLong_Check.getInstance().isPasswordTooLong( password ) ) {
+			log.warn( "ResetPasswordService: resetPasswordUpdatePassword:  password too long, length (characters): " + password.length()
+					+ ", length (UTF-8 bytes): " + password.getBytes( StandardCharsets.UTF_8 ).length );
+			resetPasswordChangePasswordResult.setPasswordTooLong(true);
+	        resetPasswordChangePasswordResult.setStatus(false);
+			return resetPasswordChangePasswordResult;  //  !!!!!  EARLY EXIT
+		}
 //		if (true)
 //		throw new Exception("Forced Error");
 		try {
@@ -238,14 +248,22 @@ public class ResetPasswordService {
 			UserMgmtResetPasswordResponse userMgmtResetPasswordResponse = 
 					UserMgmtCentralWebappWebserviceAccess.getInstance().resetPassword( userMgmtResetPasswordRequest );
 			if ( ! userMgmtResetPasswordResponse.isSuccess() ) {
+				if ( userMgmtResetPasswordResponse.isPasswordTooLong() ) {
+					resetPasswordChangePasswordResult.setPasswordTooLong(true);
+			        resetPasswordChangePasswordResult.setStatus(false);
+					return resetPasswordChangePasswordResult;  //  !!!!!  EARLY EXIT
+				}
 				if ( userMgmtResetPasswordResponse.isUserIdNotValid() ) {
 					String msg = "Failed to update password in User Mgmt Webapp.  User id not valid for user id: " + userMgmtUserId;
 					log.error( msg );
-					throw new ProxlWebappInternalErrorException(msg);
+				} else {
+					String msg = "Failed to update password in User Mgmt Webapp for user id: " + userMgmtUserId
+							+ ", userMgmtResetPasswordResponse: " + userMgmtResetPasswordResponse;
+					log.error( msg );
 				}
-				String msg = "Failed to update password in User Mgmt Webapp for user id: " + userMgmtUserId;
-				log.error( msg );
-				throw new ProxlWebappInternalErrorException(msg);
+		        resetPasswordChangePasswordResult.setStatus(false);
+		        resetPasswordChangePasswordResult.setErrorMessage( "Unable to change your password. Please try again, or contact the site administrator." );
+				return resetPasswordChangePasswordResult;  //  !!!!!  EARLY EXIT
 			}
 			AuthForgotPasswordTrackingDAO.getInstance().updateUsedDateUseIP( forgotPwdTrk.getId(), submitIP );
 	        resetPasswordChangePasswordResult.setStatus(true);

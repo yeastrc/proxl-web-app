@@ -161,6 +161,13 @@
 				  			<span class="error-message-close-x error_message_close_x_jq">X</span></span>
 				  	</div>
 			  	</div>			
+		  		<div class="error-message-container error_message_container_jq" id="error_message_password_too_long">
+		  			<div class="error-message-inner-container" style="width:500px;" >
+			  			<span class="error-message-text" >Password is too long. Remove <span class="password_too_long_remove_what_jq"></span> and try again.
+				  			<span class="error-message-close-x error_message_close_x_jq">X</span></span>
+				  	</div>
+			  	</div>			
+		  		<input type="hidden" id="password_max_length_utf8_bytes" value="${ configSystemValues.maxPasswordLength_UTF8_Bytes }" >
 			  	Password: 
 			</div>
 			
@@ -170,15 +177,15 @@
 			<div  class="edit-value-container edit_value_container_jq">
 			  <div >
 				<input type="password" value="" placeholder="Old Password" title="Old Password"  
-						class="edit-value-input-field  " id="password-change-old-password-field"  maxlength="40">
+						class="edit-value-input-field  " id="password-change-old-password-field">
 			  </div>
 			  <div style="margin-top: 5px;">
 				<input type="password" value="" placeholder="New Password" title="New Password"  
-						class="edit-value-input-field  " id="password-change-field"  maxlength="40">
+						class="edit-value-input-field  " id="password-change-field">
 			  </div>
 			  <div style="margin-top: 5px; margin-bottom: 6px;">
 				<input type="password" value="" placeholder="Confirm New Password" title="Confirm New Password"  
-						class="edit-value-input-field  " id="password-confirm-field"  maxlength="40"><br>
+						class="edit-value-input-field  " id="password-confirm-field"><br>
 			  </div>
 			  <div >
 				<input type="button" value="Submit" id="submit-password-change-button"> 

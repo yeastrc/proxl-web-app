@@ -12,13 +12,15 @@ public class UserMgmtCreateAccountResponse {
 
 	private boolean duplicateUsername = false;
 	private boolean duplicateEmail = false;
+	private boolean passwordTooLong = false;
 	
 	private String errorMessage;
 
 	@Override
 	public String toString() {
 		return "UserMgmtCreateAccountResponse [success=" + success + ", createdUserId=" + createdUserId
-				+ ", duplicateUsername=" + duplicateUsername + ", duplicateEmail=" + duplicateEmail + ", errorMessage="
+				+ ", duplicateUsername=" + duplicateUsername + ", duplicateEmail=" + duplicateEmail
+				+ ", passwordTooLong=" + passwordTooLong + ", errorMessage="
 				+ errorMessage + "]";
 	}
 
@@ -64,4 +66,11 @@ public class UserMgmtCreateAccountResponse {
 
 
 	
+
+	public boolean isPasswordTooLong() {
+		return passwordTooLong;
+	}
+	public void setPasswordTooLong(boolean passwordTooLong) {
+		this.passwordTooLong = passwordTooLong;
+	}
 }

@@ -10,6 +10,7 @@ public class CreateAccountResult {
 	private boolean duplicateUsername = false;
 	private boolean duplicateEmail = false;
 	private boolean userTestValidated = false;
+	private boolean passwordTooLong = false;
 	
 	private String errorMessage;
 	
@@ -42,5 +43,11 @@ public class CreateAccountResult {
 	}
 	public void setUserTestValidated(boolean userTestValidated) {
 		this.userTestValidated = userTestValidated;
+	}
+	public boolean isPasswordTooLong() {
+		return passwordTooLong;
+	}
+	public void setPasswordTooLong(boolean passwordTooLong) {
+		this.passwordTooLong = passwordTooLong;
 	}
 }

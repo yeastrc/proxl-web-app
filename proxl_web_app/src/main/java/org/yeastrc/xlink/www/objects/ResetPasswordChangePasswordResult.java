@@ -8,6 +8,8 @@ public class ResetPasswordChangePasswordResult {
 
 	private boolean status = false;
 	
+	private boolean passwordTooLong = false;
+	
 	private String errorMessage;
 
 	public String getErrorMessage() {
@@ -24,6 +26,13 @@ public class ResetPasswordChangePasswordResult {
 
 	public void setStatus(boolean status) {
 		this.status = status;
+	}
+
+	public boolean isPasswordTooLong() {
+		return passwordTooLong;
+	}
+	public void setPasswordTooLong(boolean passwordTooLong) {
+		this.passwordTooLong = passwordTooLong;
 	}
 
 }

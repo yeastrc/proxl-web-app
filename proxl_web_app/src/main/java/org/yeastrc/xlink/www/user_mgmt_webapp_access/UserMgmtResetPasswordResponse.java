@@ -7,12 +7,14 @@ package org.yeastrc.xlink.www.user_mgmt_webapp_access;
 public class UserMgmtResetPasswordResponse {
 	private boolean success;
 	private boolean userIdNotValid;
+	private boolean passwordTooLong;
 	private String errorMessage;
 	
 	
 	@Override
 	public String toString() {
 		return "UserMgmtResetPasswordResponse [success=" + success + ", userIdNotValid=" + userIdNotValid
+				+ ", passwordTooLong=" + passwordTooLong
 				+ ", errorMessage=" + errorMessage + "]";
 	}
 	public boolean isSuccess() {
@@ -34,4 +36,11 @@ public class UserMgmtResetPasswordResponse {
 		this.errorMessage = errorMessage;
 	}
 	
+	public boolean isPasswordTooLong() {
+		return passwordTooLong;
+	}
+	public void setPasswordTooLong(boolean passwordTooLong) {
+		this.passwordTooLong = passwordTooLong;
+	}
+
 }

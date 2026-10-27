@@ -131,6 +131,13 @@
 		  			<span class="error-message-close-x error_message_close_x_jq">X</span></span>
 		  	</div>
 	  	</div>
+  		<div class="error-message-container error_message_container_jq" id="error_message_password_too_long">
+  			<div class="error-message-inner-container" >
+	  			<span class="error-message-text" >Password is too long. Remove <span class="password_too_long_remove_what_jq"></span> and try again.
+		  			<span class="error-message-close-x error_message_close_x_jq">X</span></span>
+		  	</div>
+	  	</div>
+  		<input type="hidden" id="password_max_length_utf8_bytes" value="${ configSystemValues.maxPasswordLength_UTF8_Bytes }" >
 
   		<div class="error-message-container error_message_container_jq" id="error_message_username_taken">
   			<div class="error-message-inner-container" >
@@ -196,8 +203,8 @@
 
 		<input type="text" id="username" placeholder="Username" title="Username" class="input-field input_field_jq" maxlength="40" /><br>
 
-		<input type="password" id="password" placeholder="Password" title="Password" class="input-field input_field_jq" maxlength="40" /><br>
-		<input type="password" id="passwordConfirm" placeholder="Confirm Password" title="Confirm Password" class="input-field input_field_jq" maxlength="40" /><br>
+		<input type="password" id="password" placeholder="Password" title="Password" class="input-field input_field_jq" /><br>
+		<input type="password" id="passwordConfirm" placeholder="Confirm Password" title="Confirm Password" class="input-field input_field_jq" /><br>
 		
 		
 		<c:if test="${ configSystemValues.googleRecaptchaConfigured }">

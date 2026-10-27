@@ -18,6 +18,7 @@ const Handlebars = require('handlebars');
 
 
 import { webserviceCallStandardPost } from 'page_js/webservice_call_common/webserviceCallStandardPost.js';
+import { passwordTooLong_CheckBeforeSubmit_ShowErrorMessage, passwordTooLong_ServerReturnedPasswordTooLong_ShowErrorMessage } from 'page_js/user_account_page_js/passwordTooLong_Common.js';
 
 
 var adminGlobals = {
@@ -784,6 +785,9 @@ window.createAccountGetFormDataAndValidate = function() {
 			showErrorMsg( $element );
 			return null;  //  !!!  EARLY EXIT
 		} 
+		if ( passwordTooLong_CheckBeforeSubmit_ShowErrorMessage({ password, showErrorMessage_Function : showErrorMsg }) ) {
+			return null;  //  !!!  EARLY EXIT
+		}
 
 		var formPageData = {
 				accessLevel : accessLevel,
@@ -839,7 +843,9 @@ window.createAccountComplete = function( params ) {
 	var responseData = params.responseData;
 	
 	if ( ! responseData.status ) {
-		if ( responseData.duplicateUsername && responseData.duplicateEmail ) {
+		if ( responseData.passwordTooLong ) {
+			passwordTooLong_ServerReturnedPasswordTooLong_ShowErrorMessage({ password : requestData.password, showErrorMessage_Function : showErrorMsg });
+		} else if ( responseData.duplicateUsername && responseData.duplicateEmail ) {
 			var $element = $("#error_message_username_email_taken");
 			showErrorMsg( $element );
 			var $emailInput = $("#email");

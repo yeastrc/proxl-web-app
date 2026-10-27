@@ -10,6 +10,8 @@
 
 "use strict";
 
+import { passwordTooLong_CheckBeforeSubmit_ShowErrorMessage, passwordTooLong_ServerReturnedPasswordTooLong_ShowErrorMessage } from 'page_js/user_account_page_js/passwordTooLong_Common.js';
+
 
 var PAGE_CONSTANTS = {
 		
@@ -101,6 +103,10 @@ window.resetPasswordChangePassword = function(clickThis, eventObject) {
 		return;  //  !!!  EARLY EXIT
 	}
 
+	if ( passwordTooLong_CheckBeforeSubmit_ShowErrorMessage({ password : password_change_field, showErrorMessage_Function : showMsg }) ) {
+		return;  //  !!!  EARLY EXIT
+	}
+
 	var requestData = {
 			password : password_change_field,
 			resetPasswordTrackingCode : resetPasswordTrackingCode
@@ -155,7 +161,11 @@ window.resetPasswordComplete = function(requestData, responseData) {
 //		private boolean invalidUserOrPassword = false;
 //		private boolean disabledUser = false;
 
-		if ( responseData.errorMessage ) {
+		if ( responseData.passwordTooLong ) {
+
+			passwordTooLong_ServerReturnedPasswordTooLong_ShowErrorMessage({ password : requestData.password, showErrorMessage_Function : showMsg });
+
+		} else if ( responseData.errorMessage ) {
 			
 			var $error_message_from_server_text = $("#error_message_from_server_text");
 			

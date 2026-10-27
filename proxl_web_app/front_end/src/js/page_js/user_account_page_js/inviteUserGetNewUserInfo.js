@@ -8,6 +8,8 @@
 // JavaScript directive:   all variables have to be declared with "var", maybe other things
 "use strict";
 
+import { passwordTooLong_CheckBeforeSubmit_ShowErrorMessage, passwordTooLong_ServerReturnedPasswordTooLong_ShowErrorMessage } from 'page_js/user_account_page_js/passwordTooLong_Common.js';
+
 var PAGE_CONSTANTS = {
 		ERROR_MESSAGE_VERTICAL_MOVEMENT : 50 // number of pixels for moving error message when showing it. 
 };
@@ -111,6 +113,9 @@ window.createAccountGetFormDataAndValidate = function() {
 		showErrorMsg( $element );
 		return null;  //  !!!  EARLY EXIT
 	} 
+	if ( passwordTooLong_CheckBeforeSubmit_ShowErrorMessage({ password, showErrorMessage_Function : showErrorMsg }) ) {
+		return null;  //  !!!  EARLY EXIT
+	}
 	
 	var formPageData = {
 			inviteCode : inviteCode,
@@ -169,7 +174,9 @@ window.createAccountComplete = function( params ) {
 	$("#terms_of_service_overlay_div").hide();
 
 	if ( ! responseData.status ) {
-		if ( responseData.duplicateUsername && responseData.duplicateEmail ) {
+		if ( responseData.passwordTooLong ) {
+			passwordTooLong_ServerReturnedPasswordTooLong_ShowErrorMessage({ password : requestData.password, showErrorMessage_Function : showErrorMsg });
+		} else if ( responseData.duplicateUsername && responseData.duplicateEmail ) {
 			var $element = $("#error_message_username_email_taken");
 			showErrorMsg( $element );
 			var $emailInput = $("#email");

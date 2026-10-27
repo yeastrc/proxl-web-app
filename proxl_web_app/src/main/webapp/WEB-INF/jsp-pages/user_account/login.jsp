@@ -150,7 +150,7 @@
 	    <input type="hidden" id="inviteTrackingCode" value="<c:out value="${ param.inviteTrackingCode }" ></c:out>">
 
 		<input type="text" id="username" placeholder="Username" class="input-field input_field_jq" maxlength="40"/><br> <!--  size="20" size controlled by CSS -->
-		<input type="password" id="password" placeholder="Password" class="input-field input_field_jq" maxlength="40" /><br> <!--  size="20" size controlled by CSS -->
+		<input type="password" id="password" placeholder="Password" class="input-field input_field_jq" /><br> <!--  size="20" size controlled by CSS -->
 		
 	 	<INPUT TYPE="submit" class="submit-button" VALUE="Sign In" id="login_person_button">
 	</form>
@@ -165,7 +165,7 @@
 	    <input type="hidden" id="defaultURL" value="home.do"/>
 
 		<input type="text" id="username" placeholder="Username" class="input-field input_field_jq" maxlength="40"/><br> <!--  size="20" size controlled by CSS -->
-		<input type="password" id="password" placeholder="Password" class="input-field input_field_jq" maxlength="40" /><br> <!--  size="20" size controlled by CSS -->
+		<input type="password" id="password" placeholder="Password" class="input-field input_field_jq" /><br> <!--  size="20" size controlled by CSS -->
 		
 	 	<INPUT TYPE="button" class="submit-button" VALUE="Sign In" id="login_person_button">
 	</form>

@@ -1,5 +1,7 @@
 package org.yeastrc.xlink.www.user_account_webservices;
 
+import java.nio.charset.StandardCharsets;
+
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.FormParam;
@@ -22,6 +24,7 @@ import org.yeastrc.xlink.www.user_session_management.UserSessionManager;
 import org.yeastrc.xlink.www.user_mgmt_webapp_access.UserMgmtCentralWebappWebserviceAccess;
 import org.yeastrc.xlink.www.user_mgmt_webapp_access.UserMgmtChangePasswordRequest;
 import org.yeastrc.xlink.www.user_mgmt_webapp_access.UserMgmtChangePasswordResponse;
+import org.yeastrc.xlink.www.user_web_utils.PasswordTooLong_Check;
 import org.yeastrc.xlink.www.user_mgmt_webapp_access.UserMgmtManageAccountRequest;
 import org.yeastrc.xlink.www.user_mgmt_webapp_access.UserMgmtManageAccountResponse;
 import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result;
@@ -563,13 +566,12 @@ public class AccountMaintService {
 					.build()
 					);
 		}
-		if ( password.length() > FieldLengthConstants.PASSWORD_MAX_LENGTH ) {
-			log.warn( "AccountMaintService:  password too long, length: " + password.length() );
-			throw new WebApplicationException(
-					Response.status( WebServiceErrorMessageConstants.INVALID_PARAMETER_STATUS_CODE )  //  Send HTTP code
-					.entity( WebServiceErrorMessageConstants.INVALID_PARAMETER_TEXT ) // This string will be passed to the client
-					.build()
-					);
+		if ( PasswordTooLong_Check.getInstance().isPasswordTooLong( password ) ) {
+			log.warn( "AccountMaintService:  password too long, length (characters): " + password.length()
+					+ ", length (UTF-8 bytes): " + password.getBytes( StandardCharsets.UTF_8 ).length );
+			accountMaintResult.setPasswordTooLong(true);
+			accountMaintResult.setStatus(false);
+			return accountMaintResult; //  EARLY EXIT
 		}
 		try {
 			GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result accessAndSetupWebSessionResult =
@@ -632,6 +634,11 @@ public class AccountMaintService {
 					accountMaintResult.setOldPasswordInvalid(true);
 					return accountMaintResult; //  EARLY EXIT
 				}
+				if ( userMgmtChangePasswordResponse.isPasswordTooLong() ) {
+					accountMaintResult.setStatus(false);
+					accountMaintResult.setPasswordTooLong(true);
+					return accountMaintResult; //  EARLY EXIT
+				}
 				throw new WebApplicationException(
 						Response.status( WebServiceErrorMessageConstants.INTERNAL_SERVER_ERROR_STATUS_CODE )  //  Send HTTP code
 						.entity( WebServiceErrorMessageConstants.INTERNAL_SERVER_ERROR_TEXT ) // This string will be passed to the client
@@ -665,6 +672,7 @@ public class AccountMaintService {
 
 		private boolean valueAlreadyExists = false;
 		private boolean oldPasswordInvalid = false;
+		private boolean passwordTooLong = false;
 
 		public boolean isOldPasswordInvalid() {
 			return oldPasswordInvalid;
@@ -688,6 +696,13 @@ public class AccountMaintService {
 
 		public void setStatus(boolean status) {
 			this.status = status;
+		}
+
+		public boolean isPasswordTooLong() {
+			return passwordTooLong;
+		}
+		public void setPasswordTooLong(boolean passwordTooLong) {
+			this.passwordTooLong = passwordTooLong;
 		}
 	}
 

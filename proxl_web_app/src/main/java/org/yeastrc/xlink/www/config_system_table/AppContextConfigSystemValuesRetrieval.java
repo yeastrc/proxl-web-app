@@ -5,6 +5,7 @@ import org.yeastrc.xlink.www.captcha_google_api.IsGoogleRecaptchaConfigured;
 import org.yeastrc.xlink.www.constants.ConfigSystemsKeysConstants;
 import org.yeastrc.xlink.www.file_import_proxl_xml_scans.utils.IsProxlXMLFileImportFullyConfigured;
 import org.yeastrc.xlink.www.file_import_proxl_xml_scans.utils.IsScanFileImportAllowedViaWebSubmit;
+import org.yeastrc.xlink.www.user_mgmt_webapp_access.UserMgmtCentralWebappWebserviceAccess;
 import org.yeastrc.xlink.www.web_utils.IsTermsOfServiceEnabled;
 
 /**
@@ -81,5 +82,12 @@ public class AppContextConfigSystemValuesRetrieval {
 	 */
 	public boolean isTermsOfServiceEnabled() {
 		return IsTermsOfServiceEnabled.getInstance().isTermsOfServiceEnabled();
+	}
+	/**
+	 * For pages that set a password.  Value comes from User Mgmt.
+	 * @return Maximum password length in UTF-8 bytes
+	 */
+	public int getMaxPasswordLength_UTF8_Bytes() {
+		return UserMgmtCentralWebappWebserviceAccess.getInstance().getMaxPasswordLength_UTF8_Bytes();
 	}
 }

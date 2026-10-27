@@ -10,6 +10,8 @@
 // JavaScript directive:   all variables have to be declared with "var", maybe other things
 "use strict";
 
+import { passwordTooLong_CheckBeforeSubmit_ShowErrorMessage, passwordTooLong_ServerReturnedPasswordTooLong_ShowErrorMessage } from 'page_js/user_account_page_js/passwordTooLong_Common.js';
+
 ////////////////////////////
 
 window.updateFirstName = function(clickThis, eventObject) {
@@ -375,6 +377,9 @@ window.updatePassword = function(clickThis, eventObject) {
 		showErrorMsg( $element );
 		return;  //  !!!  EARLY EXIT
 	} 
+	if ( passwordTooLong_CheckBeforeSubmit_ShowErrorMessage({ password, showErrorMessage_Function : showErrorMsg }) ) {
+		return;  //  !!!  EARLY EXIT
+	}
 	var requestData = {
 			password : password,
 			old_password : oldPassword
@@ -422,6 +427,10 @@ window.updatePasswordComplete = function( params ) {
 				throw Error( "Unable to find input field for id 'password-change-old-password-field' " );
 			}
 			$oldPassword.focus();
+			return;
+		}
+		if ( responseData.passwordTooLong ) {
+			passwordTooLong_ServerReturnedPasswordTooLong_ShowErrorMessage({ password : requestData.password, showErrorMessage_Function : showErrorMsg });
 			return;
 		}
 		var $element = $("#error_message_system_error");

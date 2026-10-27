@@ -40,6 +40,7 @@ import org.yeastrc.xlink.www.user_session_management.UserSession;
 import org.yeastrc.xlink.www.user_session_management.UserSessionBuilder;
 import org.yeastrc.xlink.www.user_session_management.UserSessionManager;
 import org.yeastrc.xlink.www.user_mgmt_webapp_access.UserMgmtCentralWebappWebserviceAccess;
+import org.yeastrc.xlink.www.user_web_utils.PasswordTooLong_Check;
 import org.yeastrc.xlink.www.user_mgmt_webapp_access.UserMgmtCreateAccountRequest;
 import org.yeastrc.xlink.www.user_mgmt_webapp_access.UserMgmtCreateAccountResponse;
 import org.yeastrc.xlink.www.user_mgmt_webapp_access.UserMgmtLoginRequest;
@@ -380,14 +381,12 @@ public class UserCreateAccountService {
 					.build()
 					);  //  Early Exit with Data Exception
 		}
-		if ( password.length() > FieldLengthConstants.PASSWORD_MAX_LENGTH ) {
+		if ( PasswordTooLong_Check.getInstance().isPasswordTooLong( password ) ) {
 			log.warn( "UserCreateAccountService:  password too long, length (characters): " + password.length()
 					+ ", length (UTF-8 bytes): " + password.getBytes( StandardCharsets.UTF_8 ).length );
-			throw new WebApplicationException(
-					Response.status( WebServiceErrorMessageConstants.INVALID_PARAMETER_STATUS_CODE )  //  Send HTTP code
-					.entity( WebServiceErrorMessageConstants.INVALID_PARAMETER_TEXT ) // This string will be passed to the client
-					.build()
-					);  //  Early Exit with Data Exception
+			createAccountResult.setPasswordTooLong(true);
+			createAccountResult.setStatus(false);
+			return createAccountResult;  //  !!!!!  EARLY EXIT
 		}
 		//  Pre-check for username and email already exist
 		{
@@ -503,6 +502,16 @@ public class UserCreateAccountService {
 					createAccountResult.setStatus(false);
 					return createAccountResult;   //  EARLY EXIT
 				}
+				if ( userMgmtCreateAccountResponse.isPasswordTooLong() ) {
+					createAccountResult.setPasswordTooLong(true);
+					createAccountResult.setStatus(false);
+					return createAccountResult;   //  EARLY EXIT
+				}
+				
+				//  Any other failure:  The account was NOT created in User Mgmt so do NOT continue
+				String msg = "Create account in User Mgmt failed.  userMgmtCreateAccountResponse: " + userMgmtCreateAccountResponse;
+				log.error( msg );
+				throw new ProxlWebappInternalErrorException( msg );  //  Caught below and returned as Internal Server Error
 			}
 			
 			int createdUserMgmtUserId = userMgmtCreateAccountResponse.getCreatedUserId();

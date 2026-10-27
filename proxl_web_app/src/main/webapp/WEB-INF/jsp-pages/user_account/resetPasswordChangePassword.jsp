@@ -64,6 +64,13 @@
 	  			<div class="error-message-text" >Password and Confirm Password must match</div>
 	  		</div>
 	  	</div>
+  		<div class="error-message-container error_message_container_jq" id="error_message_password_too_long">
+  			<div class="error-message-inner-container" >
+  				<div class="error-message-close-x error_message_close_x_jq">X</div>
+	  			<div class="error-message-text" >Password is too long. Remove <span class="password_too_long_remove_what_jq"></span> and try again.</div>
+	  		</div>
+	  	</div>
+  		<input type="hidden" id="password_max_length_utf8_bytes" value="${ configSystemValues.maxPasswordLength_UTF8_Bytes }" >
 
   		<div class="error-message-container error_message_container_jq" id="error_message_from_server">
   			<div class="error-message-inner-container" >
@@ -93,16 +100,16 @@
 
   	
  	<form action="javascript:resetPasswordChangePasswordFormSubmit()" >
- 				<input type="password" value="" placeholder="New Pasword" class="input-field input_field_jq"  id="password_change_field"  maxlength="40"><br>
-				<input type="password" value="" placeholder="Confirm New Pasword" class="input-field input_field_jq"  id="password_confirm_field"  maxlength="40"><br>
+ 				<input type="password" value="" placeholder="New Pasword" class="input-field input_field_jq"  id="password_change_field"><br>
+				<input type="password" value="" placeholder="Confirm New Pasword" class="input-field input_field_jq"  id="password_confirm_field"><br>
 		
 	 	<INPUT TYPE="submit" class="submit-button" VALUE="Change Password" id="change_password_button">
 	</form>
 
 <%-- 
 	<form action="" >
-				<input type="password" value="" placeholder="New Pasword" class="input-field input_field_jq"  id="password_change_field"  maxlength="40"><br>
-				<input type="password" value="" placeholder="Confirm New Pasword" class="input-field input_field_jq"  id="password_confirm_field"  maxlength="40"><br>
+				<input type="password" value="" placeholder="New Pasword" class="input-field input_field_jq"  id="password_change_field"><br>
+				<input type="password" value="" placeholder="Confirm New Pasword" class="input-field input_field_jq"  id="password_confirm_field"><br>
 		
 	 	<INPUT TYPE="button" class="submit-button" VALUE="Change Password" id="change_password_button">
 	</form>

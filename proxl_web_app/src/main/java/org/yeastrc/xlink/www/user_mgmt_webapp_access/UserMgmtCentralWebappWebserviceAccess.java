@@ -71,6 +71,18 @@ public class UserMgmtCentralWebappWebserviceAccess {
 		instanceInitialized = true;
 	}
 	
+	/**
+	 * Only for setting a password (create account, change password, reset password).  NOT for sign in.
+	 * 
+	 * @return Maximum password length in UTF-8 bytes
+	 */
+	public int getMaxPasswordLength_UTF8_Bytes() {
+		if ( ! instanceInitialized ) {
+			throw new IllegalStateException( "Not initialized" );
+		}
+		return userMgmtCentral_Embedded_Facade.getMaxPasswordLength_UTF8_Bytes();
+	}
+	
 
 	/**
 	 * @param userMgmtSessionKeyAliveWebserviceRequest
@@ -116,6 +128,7 @@ public class UserMgmtCentralWebappWebserviceAccess {
 		userMgmtCreateAccountResponse.setCreatedUserId( facadeResponse.getCreatedUserId() );
 		userMgmtCreateAccountResponse.setDuplicateEmail( facadeResponse.isDuplicateEmail() );
 		userMgmtCreateAccountResponse.setDuplicateUsername( facadeResponse.isDuplicateUsername() );
+		userMgmtCreateAccountResponse.setPasswordTooLong( facadeResponse.isPasswordTooLong() );
 		userMgmtCreateAccountResponse.setErrorMessage( facadeResponse.getErrorMessage() );
 		
 		return userMgmtCreateAccountResponse;
@@ -174,6 +187,7 @@ public class UserMgmtCentralWebappWebserviceAccess {
 		userMgmtChangePasswordResponse.setSuccess( facadeResponse.isSuccess() );
 		userMgmtChangePasswordResponse.setSessionKeyNotValid( facadeResponse.isSessionKeyNotValid() );
 		userMgmtChangePasswordResponse.setOldPasswordNotValid( facadeResponse.isOldPasswordNotValid() );
+		userMgmtChangePasswordResponse.setPasswordTooLong( facadeResponse.isPasswordTooLong() );
 		userMgmtChangePasswordResponse.setErrorMessage( facadeResponse.getErrorMessage() );
 
 		return userMgmtChangePasswordResponse;
@@ -200,6 +214,7 @@ public class UserMgmtCentralWebappWebserviceAccess {
 		UserMgmtResetPasswordResponse userMgmtResetPasswordResponse = new UserMgmtResetPasswordResponse();
 		userMgmtResetPasswordResponse.setSuccess( facadeResponse.isSuccess() );
 		userMgmtResetPasswordResponse.setUserIdNotValid( facadeResponse.isUserIdNotValid() );
+		userMgmtResetPasswordResponse.setPasswordTooLong( facadeResponse.isPasswordTooLong() );
 		userMgmtResetPasswordResponse.setErrorMessage( facadeResponse.getErrorMessage() );
 
 		return userMgmtResetPasswordResponse;
