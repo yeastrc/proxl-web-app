@@ -39,7 +39,7 @@ public class AuthGenerateSaveForgotPasswordCode {
 
 			authForgotPasswordTrackingDAO.save( item );
 			
-			authForgotPasswordTrackingDAO.updateCodeReplacedByNewer( item.getId(), true /* codeReplacedByNewer */ );
+			authForgotPasswordTrackingDAO.updateCodeReplacedByNewer( item.getId(), authUserId, true /* codeReplacedByNewer */ );
 
 			return forgotPasswordTrackingCode;
 			

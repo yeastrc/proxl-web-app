@@ -167,16 +167,18 @@ public class AuthForgotPasswordTrackingDAO {
 	}
 	
 	/**
-	 * Update code_replaced_by_newer = ?
+	 * Update code_replaced_by_newer = ? for the given user's records with id < the given id.
+	 * Only the records for authUserId are updated.
 	 * @param id - ID to use in id < ? comparison
+	 * @param authUserId - Only update records for this auth_user_id
 	 * @param codeReplacedByNewer
 	 * @throws Exception
 	 */
-	public void updateCodeReplacedByNewer( int id, boolean codeReplacedByNewer ) throws Exception {
+	public void updateCodeReplacedByNewer( int id, int authUserId, boolean codeReplacedByNewer ) throws Exception {
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
-		final String sql = "UPDATE auth_forgot_password_tracking SET code_replaced_by_newer = ? WHERE id < ?";
+		final String sql = "UPDATE auth_forgot_password_tracking SET code_replaced_by_newer = ? WHERE id < ? AND auth_user_id = ?";
 		try {
 			conn = AuthLibraryDBConnectionFactory.getConnection(  );
 			pstmt = conn.prepareStatement( sql );
@@ -185,6 +187,8 @@ public class AuthForgotPasswordTrackingDAO {
 			pstmt.setBoolean( counter, codeReplacedByNewer );
 			counter++;
 			pstmt.setInt( counter, id );
+			counter++;
+			pstmt.setInt( counter, authUserId );
 			pstmt.executeUpdate();
 		} catch ( Exception e ) {
 			String msg = "Failed to update used_date, sql: " + sql;
