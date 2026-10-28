@@ -263,9 +263,11 @@ dependencies {
 
 
 	// JAXB coexistence (javax.xml.bind + jakarta.xml.bind on the same webapp classpath).
-	// BOTH runtimes are needed: javax for the precompiled yeastrc/proxl jars + this app's own
-	// javax.xml.bind code; jakarta for the jakarta client connectors (spectral-storage get-data,
-	// etc.) that call jakarta.xml.bind.JAXBContext.newInstance(...).
+	// BOTH runtimes are needed:
+	//   javax:   biojava-structure (PDB file reading uses javax.xml.bind.JAXBContext) and this app's
+	//            own javax.xml.bind code (upload temp data file, protein name for tooltip).
+	//   jakarta: the jakarta client connectors (spectral-storage get-data, etc.) and the yeastrc
+	//            user-mgmt jars, which use jakarta.xml.bind.
 	// They must live on DISTINCT maven coordinates. The javax runtime and the jakarta runtime
 	// BOTH ship as 'org.glassfish.jaxb:jaxb-runtime' (javax = 2.3.x, jakarta = 4.0.x), so using
 	// that coordinate for javax makes Gradle resolve the module to a single version and one side
