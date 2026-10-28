@@ -23,7 +23,7 @@ public class IsGoogleRecaptchaConfigured {
 			String siteKey = ConfigSystemCaching.getInstance()
 					.getConfigValueForConfigKey( ConfigSystemsKeysConstants.GOOGLE_RECAPTCHA_SITE_KEY_KEY );
 			String secretKey = ConfigSystemCaching.getInstance()
-					.getConfigValueForConfigKey( ConfigSystemsKeysConstants.GOOGLE_RECAPTCHA_SITE_KEY_KEY );
+					.getConfigValueForConfigKey( ConfigSystemsKeysConstants.GOOGLE_RECAPTCHA_SECRET_KEY_KEY );
 			if ( siteKey != null && secretKey != null ) {
 				if ( StringUtils.isNotEmpty( siteKey.trim() ) && StringUtils.isNotEmpty( secretKey.trim() ) ) {
 					return true;
