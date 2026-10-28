@@ -61,18 +61,6 @@
 	  			<div class="error-message-text" >Cannot populate both Username and Email Address</div>
 		  	</div>
 	  	</div>
-  		<div class="error-message-container error_message_container_jq" id="error_message_username_invalid">
-  			<div class="error-message-inner-container" >
-  				<div class="error-message-close-x error_message_close_x_jq">X</div>
-	  			<div class="error-message-text" >Username provided is invalid</div>
-		  	</div>
-	  	</div>
-  		<div class="error-message-container error_message_container_jq" id="error_message_email_invalid">
-  			<div class="error-message-inner-container" >
-  				<div class="error-message-close-x error_message_close_x_jq">X</div>
-	  			<div class="error-message-text" >Email Address provided is invalid</div>
-		  	</div>
-	  	</div>
   		<div class="error-message-container error_message_container_jq" id="error_message_system_error">
   			<div class="error-message-inner-container" >
   				<div class="error-message-close-x error_message_close_x_jq">X</div>
@@ -83,7 +71,7 @@
   		<div class="success-message-container error_message_container_jq" id="success_message_system_success">
   			<div class="success-message-inner-container" >
   				<div class="success-message-close-x error_message_close_x_jq">X</div>
-	  			<div class="success-message-text" >Email sent</div>
+	  			<div class="success-message-text" >If an account matches what you entered, we've sent an email with a link to reset the password.</div>
 		  	</div>
 	  	</div>	  	
   		Reset your password

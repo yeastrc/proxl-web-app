@@ -133,27 +133,7 @@ window.resetPasswordComplete = function(requestData, responseData) {
 //		private boolean invalidUserOrPassword = false;
 //		private boolean disabledUser = false;
 
-		if ( responseData.invalidUsernameOrEmail ) {
-			
-			var id = null;
-			
-			if ( requestData.username !== ""  ) {
-				
-				id = "error_message_username_invalid";
-			} else {
-				
-				id = "error_message_email_invalid";
-			}
-			
-			var $element = $( "#" + id );
-			
-			
-			
-			
-			showMsg( $element );
-			
-
-		} else if ( responseData.disabledUser ) {
+		if ( responseData.disabledUser ) {
 				
 			var $element = $("#error_message_user_disabled");
 			

@@ -114,10 +114,15 @@ public class ResetPasswordService {
 					throw new ProxlWebappInternalErrorException(msg);
 				}
 			}
+			//  Username or email not found:  Return exactly the same result as a successful request and send no email,
+			//    so the response does not reveal whether an account exists.
+			//    Known limitation:  A found account takes longer to respond (it sends an email),
+			//    so the response time can still hint at whether an account exists.
 			List<Integer> userMgmtUserIdListFromSearch = userMgmtSearchUserDataResponse.getUserIdList();
 			if ( userMgmtUserIdListFromSearch == null || userMgmtUserIdListFromSearch.isEmpty() ) {
 				//  username or email not found
-				resetPasswordGenEmailResult.setInvalidUsernameOrEmail(true);
+				log.info( "ResetPasswordService: resetPasswordGenEmail: No account found for the submitted " + ( StringUtils.isNotEmpty( username ) ? "username" : "email" ) + ".  No email sent." );
+				resetPasswordGenEmailResult.setStatus(true);  //  Same result as success
 				return resetPasswordGenEmailResult;  //  Early Exit
 			}
 			// User Mgmt user Id
@@ -126,7 +131,8 @@ public class ResetPasswordService {
 			Integer authUserId = AuthUserDAO.getInstance().getIdForUserMgmtUserId( userMgmtUserIdFromSearch );
 			if ( authUserId == null ) {
 				//  No Proxl Auth User Id for userMgmtUserIdFromSearch for username or email found
-				resetPasswordGenEmailResult.setInvalidUsernameOrEmail(true);
+				log.info( "ResetPasswordService: resetPasswordGenEmail: No Proxl account for the submitted " + ( StringUtils.isNotEmpty( username ) ? "username" : "email" ) + ".  No email sent." );
+				resetPasswordGenEmailResult.setStatus(true);  //  Same result as success.  See comment above.
 				return resetPasswordGenEmailResult;  //  Early Exit
 			}
 			//  Get full user data
