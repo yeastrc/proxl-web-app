@@ -6,6 +6,14 @@
 	
 	<display-name />
 
+	<!-- Log4j 2 (log4j-jakarta-web): automatic initialization is disabled so the Log4j listener and
+	     filter can be declared explicitly below.  The Log4j listener is declared FIRST so that Log4j is
+	     shut down LAST, after the other listeners (which log during shutdown) have finished. -->
+	<context-param>
+		<param-name>isLog4jAutoInitializationDisabled</param-name>
+		<param-value>true</param-value>
+	</context-param>
+
 	<!-- The Struts ActionServlet (mapped to *.do, config /WEB-INF/struts-config.xml) has been
 	     removed: all actions are migrated to the Spring MVC DispatcherServlet below, no JSP uses
 	     Struts taglibs, and message resources are loaded directly by StrutsActionMessagesResolver.
@@ -85,6 +93,22 @@
   <!-- Filters - run on each request -->
    
 
+    <!-- Log4j 2 filter.  Declared because Log4j automatic initialization is disabled (see context-param above) -->
+    <filter>
+        <filter-name>log4jServletFilter</filter-name>
+        <filter-class>org.apache.logging.log4j.web.Log4jServletFilter</filter-class>
+        <async-supported>true</async-supported>
+    </filter>
+    <filter-mapping>
+        <filter-name>log4jServletFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+        <dispatcher>REQUEST</dispatcher>
+        <dispatcher>FORWARD</dispatcher>
+        <dispatcher>INCLUDE</dispatcher>
+        <dispatcher>ERROR</dispatcher>
+        <dispatcher>ASYNC</dispatcher>
+    </filter-mapping>
+
     <!-- filter to set character encoding on each request -->
     
     <filter>
@@ -136,6 +160,13 @@
 
 
 	<!-- Servlet Context Listeners.  Called on Web app startup and shutdown -->
+
+	<!-- Log4j 2 listener.  MUST be the first listener:  listeners are shut down in reverse order,
+	     so Log4j is shut down after the listeners below, which log during shutdown. -->
+	<listener>
+		<listener-class>org.apache.logging.log4j.web.Log4jServletContextListener</listener-class>
+	</listener>
+
 	<listener>
 		<listener-class>
 		org.yeastrc.xlink.www.servlet_context.ServletContextAppListener
