@@ -32,7 +32,7 @@ buildscript {
 }
 
 plugins {
-	id 'com.gradleup.shadow' version '9.4.2'
+	id 'com.gradleup.shadow' version '9.6.1'
 	//  moved to 'buildscript'. See Notes above	id 'org.ajoberstar.grgit' version '4.1.1'
 }
 
@@ -90,8 +90,8 @@ dependencies {
 	
 	//  Logging
 	
-	implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.25.4'
-	implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.25.4'	
+	implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.25.5'
+	implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.25.5'	
 	
 	// SLF4J 2.x API.  Must be paired with the SLF4J 2.x binding below (log4j-slf4j2-impl).
 	//   SLF4J 2.x with the 1.x binding (log4j-slf4j-impl) silently falls back to NO logging.
@@ -100,13 +100,13 @@ dependencies {
 
 	// SLF4J 2.x to Log4j 2 binding
 	// https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-slf4j2-impl
-	implementation group: 'org.apache.logging.log4j', name: 'log4j-slf4j2-impl', version: '2.25.4'
+	implementation group: 'org.apache.logging.log4j', name: 'log4j-slf4j2-impl', version: '2.25.5'
 	
 	//  Jakarta Commons Logging to SLF4J
 	implementation group: 'org.slf4j', name: 'jcl-over-slf4j', version: '2.0.18'
 	
 	//  Log4j 1 to 2 bridge
-	implementation group: 'org.apache.logging.log4j', name: 'log4j-1.2-api', version: '2.25.4'
+	implementation group: 'org.apache.logging.log4j', name: 'log4j-1.2-api', version: '2.25.5'
 	
 	
 	//   Apache HTPP Client
@@ -121,10 +121,10 @@ dependencies {
 	//  Jackson JSON parsing
 	
 	// https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core
-	implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.22.0'
+	implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.22.3'
 	
 	// https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
-	implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.22.0'
+	implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.22.3'
 
 	
  	
