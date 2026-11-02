@@ -60,8 +60,14 @@ public class AddNewUserUsingDBTransactionService {
 			throw e;
 		} finally {
 			if( dbConnection != null ) {
-				try { dbConnection.close(); } catch( Throwable t ) { ; }
-				dbConnection = null;
+				try {
+					dbConnection.setAutoCommit(true);  /// reset for next user of connection
+				} catch ( Exception e ) {
+					log.error( "dbConnection.setAutoCommit(true); failed: ", e );
+				} finally {
+					try { dbConnection.close(); } catch( Throwable t ) { ; }
+					dbConnection = null;
+				}
 			}
 		}
 	}
@@ -99,8 +105,14 @@ public class AddNewUserUsingDBTransactionService {
 			throw e;
 		} finally {
 			if( dbConnection != null ) {
-				try { dbConnection.close(); } catch( Throwable t ) { ; }
-				dbConnection = null;
+				try {
+					dbConnection.setAutoCommit(true);  /// reset for next user of connection
+				} catch ( Exception e ) {
+					log.error( "dbConnection.setAutoCommit(true); failed: ", e );
+				} finally {
+					try { dbConnection.close(); } catch( Throwable t ) { ; }
+					dbConnection = null;
+				}
 			}
 		}
 	}
