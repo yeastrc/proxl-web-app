@@ -169,6 +169,11 @@
 		</listener-class>
 	</listener>
 
+	<!-- Session id only in the cookie, never in the URL -->
+	<session-config>
+		<tracking-mode>COOKIE</tracking-mode>
+	</session-config>
+
 	<!-- ERROR pages -->
 	
     <error-page>

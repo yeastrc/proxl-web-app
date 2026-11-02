@@ -597,7 +597,7 @@ public class UserCreateAccountService {
 						.setGlobalAdminUser( false )
 						.build();
 				
-				UserSessionManager.getSinglesonInstance().setUserSession( userSession , request );
+				UserSessionManager.getSinglesonInstance().createNewUserSession( userSession, request );  //  New session id, as at sign in
 				
 				//  Account just created in User Mgmt, so enabled
 				UserMgmt_UserEnabled_RecheckCache.getInstance().setUserEnabled_CheckedNow( createdUserMgmtUserId );

@@ -104,6 +104,9 @@ public class UserSessionAlterSession {
 			.addAllowedReadAccessProjectPublicAccessCode( projectPublicAccessCode )
 			.build();
 		
+		if ( httpServletRequest.getSession( false ) != null ) {
+			httpServletRequest.changeSessionId();  //  New session id when access is added
+		}
 		//  Update session
 		UserSessionManager.getSinglesonInstance().setUserSession( userSessionUpdated, httpServletRequest );
 		
