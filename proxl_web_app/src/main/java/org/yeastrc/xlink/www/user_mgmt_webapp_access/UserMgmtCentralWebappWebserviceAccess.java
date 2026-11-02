@@ -17,8 +17,6 @@ import org.yeastrc.user_mgmt_central.shared_server_client.webservice_request_res
 import org.yeastrc.user_mgmt_central.shared_server_client.webservice_request_response.PasswordResetAccountFacadeResponse;
 import org.yeastrc.user_mgmt_central.shared_server_client.webservice_request_response.SearchUserDataAccountFacadeRequest;
 import org.yeastrc.user_mgmt_central.shared_server_client.webservice_request_response.SearchUserDataAccountFacadeResponse;
-import org.yeastrc.user_mgmt_central.shared_server_client.webservice_request_response.SessionKeyAliveFacadeRequest;
-import org.yeastrc.user_mgmt_central.shared_server_client.webservice_request_response.SessionKeyAliveFacadeResponse;
 import org.yeastrc.user_mgmt_central.user_mgmt_central__embed_code.UserMgmtCentral_Embedded_Facade_Builder;
 import org.yeastrc.user_mgmt_central.user_mgmt_central__embed_code.UserMgmtCentral_Embedded_Facade_IF;
 import org.yeastrc.user_mgmt_central.user_mgmt_central__embed_code.UserMgmtEmbed_SQL_Connection_Provider_IF;
@@ -85,26 +83,6 @@ public class UserMgmtCentralWebappWebserviceAccess {
 	
 
 	/**
-	 * @param userMgmtSessionKeyAliveWebserviceRequest
-	 * @return
-	 * @throws Exception
-	 */
-	public UserMgmtSessionKeyAliveWebserviceResponse sessionKeyAlive( UserMgmtSessionKeyAliveWebserviceRequest userMgmtSessionKeyAliveWebserviceRequest ) throws Exception {
-		
-		SessionKeyAliveFacadeRequest facadeRequest = new SessionKeyAliveFacadeRequest();
-		facadeRequest.setSessionKeyFDSJKLUIOEWVCXM( userMgmtSessionKeyAliveWebserviceRequest.getSessionKey() );
-		
-		SessionKeyAliveFacadeResponse sessionKeyAliveWebserviceResponse = userMgmtCentral_Embedded_Facade.sessionKeyIsAlive( facadeRequest );
-		
-		UserMgmtSessionKeyAliveWebserviceResponse userMgmtSessionKeyAliveWebserviceResponse = new UserMgmtSessionKeyAliveWebserviceResponse();
-		userMgmtSessionKeyAliveWebserviceResponse.setSuccess( sessionKeyAliveWebserviceResponse.isSuccess() );
-		userMgmtSessionKeyAliveWebserviceResponse.setSessionKeyNotValid( sessionKeyAliveWebserviceResponse.isSessionKeyNotValid() );
-		userMgmtSessionKeyAliveWebserviceResponse.setErrorMessage( sessionKeyAliveWebserviceResponse.getErrorMessage() );
-
-		return userMgmtSessionKeyAliveWebserviceResponse;
-	}
-	
-	/**
 	 * @param userMgmtCreateAccountRequest
 	 * @return
 	 * @throws Exception
@@ -122,6 +100,7 @@ public class UserMgmtCentralWebappWebserviceAccess {
 		facadeRequest.setUserRemoteIP( userMgmtCreateAccountRequest.getUserRemoteIP() );
 		
 		CreateAccountFacadeResponse facadeResponse = userMgmtCentral_Embedded_Facade.createAccount( facadeRequest );
+		UserMgmt_UserEnabled_RecheckCache.getInstance().receivedIntervalFromUserMgmt( facadeResponse.getUserEnabledRecheckIntervalSeconds() );
 		
 		UserMgmtCreateAccountResponse userMgmtCreateAccountResponse = new UserMgmtCreateAccountResponse();
 		userMgmtCreateAccountResponse.setSuccess( facadeResponse.isSuccess() );
@@ -150,10 +129,10 @@ public class UserMgmtCentralWebappWebserviceAccess {
 		facadeRequest.setRemoteIP( userMgmtLoginRequest.getRemoteIP() );
 		
 		LoginAccountFacadeResponse facadeResponse = userMgmtCentral_Embedded_Facade.loginAccount( facadeRequest );
+		UserMgmt_UserEnabled_RecheckCache.getInstance().receivedIntervalFromUserMgmt( facadeResponse.getUserEnabledRecheckIntervalSeconds() );
 		
 		UserMgmtLoginResponse userMgmtLoginResponse = new UserMgmtLoginResponse();
 		userMgmtLoginResponse.setSuccess( facadeResponse.isSuccess() );
-		userMgmtLoginResponse.setSessionKey( facadeResponse.getSessionKey() );
 		userMgmtLoginResponse.setUsernameNotFound( facadeResponse.isUsernameNotFound() );
 		userMgmtLoginResponse.setPasswordInvalid( facadeResponse.isPasswordInvalid() );
 		userMgmtLoginResponse.setUserDisabled( facadeResponse.isUserDisabled() );
@@ -176,16 +155,18 @@ public class UserMgmtCentralWebappWebserviceAccess {
 		}
 		
 		PasswordChangeAccountFacadeRequest facadeRequest = new PasswordChangeAccountFacadeRequest();
-		facadeRequest.setSessionKeyFDSJKLUIOEWVCXM( userMgmtChangePasswordRequest.getSessionKey());
+		facadeRequest.setUserId( userMgmtChangePasswordRequest.getUserMgmtUserId() );
 		facadeRequest.setOldPasswordFDSJKLIEOW( userMgmtChangePasswordRequest.getOldPassword() );
 		facadeRequest.setNewPasswordVCMVLSJ( userMgmtChangePasswordRequest.getNewPassword() );
 		facadeRequest.setUserRemoteIP( userMgmtChangePasswordRequest.getUserRemoteIP() );
 		
 		PasswordChangeAccountFacadeResponse facadeResponse = userMgmtCentral_Embedded_Facade.passwordChangeAccount( facadeRequest );
+		UserMgmt_UserEnabled_RecheckCache.getInstance().receivedIntervalFromUserMgmt( facadeResponse.getUserEnabledRecheckIntervalSeconds() );
 		
 		UserMgmtChangePasswordResponse userMgmtChangePasswordResponse = new UserMgmtChangePasswordResponse();
 		userMgmtChangePasswordResponse.setSuccess( facadeResponse.isSuccess() );
-		userMgmtChangePasswordResponse.setSessionKeyNotValid( facadeResponse.isSessionKeyNotValid() );
+		userMgmtChangePasswordResponse.setUserIdNotFound( facadeResponse.isUserIdNotFound() );
+		userMgmtChangePasswordResponse.setUserDisabled( facadeResponse.isUserDisabled() );
 		userMgmtChangePasswordResponse.setOldPasswordNotValid( facadeResponse.isOldPasswordNotValid() );
 		userMgmtChangePasswordResponse.setPasswordTooLong( facadeResponse.isPasswordTooLong() );
 		userMgmtChangePasswordResponse.setErrorMessage( facadeResponse.getErrorMessage() );
@@ -210,10 +191,12 @@ public class UserMgmtCentralWebappWebserviceAccess {
 		facadeRequest.setUserRemoteIP( userMgmtResetPasswordRequest.getUserRemoteIP() );
 
 		PasswordResetAccountFacadeResponse facadeResponse = userMgmtCentral_Embedded_Facade.passwordResetAccount( facadeRequest );
+		UserMgmt_UserEnabled_RecheckCache.getInstance().receivedIntervalFromUserMgmt( facadeResponse.getUserEnabledRecheckIntervalSeconds() );
 		
 		UserMgmtResetPasswordResponse userMgmtResetPasswordResponse = new UserMgmtResetPasswordResponse();
 		userMgmtResetPasswordResponse.setSuccess( facadeResponse.isSuccess() );
 		userMgmtResetPasswordResponse.setUserIdNotValid( facadeResponse.isUserIdNotValid() );
+		userMgmtResetPasswordResponse.setUserDisabled( facadeResponse.isUserDisabled() );
 		userMgmtResetPasswordResponse.setPasswordTooLong( facadeResponse.isPasswordTooLong() );
 		userMgmtResetPasswordResponse.setErrorMessage( facadeResponse.getErrorMessage() );
 
@@ -230,14 +213,13 @@ public class UserMgmtCentralWebappWebserviceAccess {
 			throw new IllegalStateException( "Not initialized" );
 		}
 		GetUserDataForIdAccountFacadeRequest facadeRequest = new GetUserDataForIdAccountFacadeRequest();
-		facadeRequest.setSessionKeyFDSJKLUIOEWVCXM( userMgmtGetUserDataRequest.getSessionKey() );
 		facadeRequest.setUserId( userMgmtGetUserDataRequest.getUserId() );
 		
 		GetUserDataForIdAccountFacadeResponse facadeResponse = userMgmtCentral_Embedded_Facade.getUserDataForIdAccount( facadeRequest );
+		UserMgmt_UserEnabled_RecheckCache.getInstance().receivedIntervalFromUserMgmt( facadeResponse.getUserEnabledRecheckIntervalSeconds() );
 				
 		UserMgmtGetUserDataResponse userMgmtGetUserDataResponse = new UserMgmtGetUserDataResponse();
 		userMgmtGetUserDataResponse.setSuccess( facadeResponse.isSuccess() );
-		userMgmtGetUserDataResponse.setSessionKeyNotValid( facadeResponse.isSessionKeyNotValid() );
 		userMgmtGetUserDataResponse.setUserIdNotFound( facadeResponse.isUserIdNotFound() );
 		userMgmtGetUserDataResponse.setUsername( facadeResponse.getUsername() );
 		userMgmtGetUserDataResponse.setEmail( facadeResponse.getEmail() );
@@ -261,14 +243,40 @@ public class UserMgmtCentralWebappWebserviceAccess {
 			throw new IllegalStateException( "Not initialized" );
 		}
 		GetAccountEnabledForIdAccountFacadeRequest facadeRequest = new GetAccountEnabledForIdAccountFacadeRequest();
-		facadeRequest.setSessionKeyFDSJKLUIOEWVCXM( userMgmtGetAccountEnabledRequest.getSessionKey() );
 		facadeRequest.setUserId( userMgmtGetAccountEnabledRequest.getUserId() );
 		
 		GetAccountEnabledForIdAccountFacadeResponse facadeResponse = userMgmtCentral_Embedded_Facade.getAccountEnabledForIdAccount( facadeRequest );
+		UserMgmt_UserEnabled_RecheckCache.getInstance().receivedIntervalFromUserMgmt( facadeResponse.getUserEnabledRecheckIntervalSeconds() );
 				
 		UserMgmtGetAccountEnabledResponse userMgmtGetAccountEnabledResponse = new UserMgmtGetAccountEnabledResponse();
 		userMgmtGetAccountEnabledResponse.setSuccess( facadeResponse.isSuccess() );
-		userMgmtGetAccountEnabledResponse.setSessionKeyNotValid( facadeResponse.isSessionKeyNotValid() );
+		userMgmtGetAccountEnabledResponse.setUserIdNotFound( facadeResponse.isUserIdNotFound() );
+		userMgmtGetAccountEnabledResponse.setEnabled( facadeResponse.isEnabled() );
+		userMgmtGetAccountEnabledResponse.setErrorMessage( facadeResponse.getErrorMessage() );
+		
+		return userMgmtGetAccountEnabledResponse;
+	}
+
+	/**
+	 * Only for the user enabled re-check (UserMgmt_UserEnabled_RecheckCache).  Uses a short timeout when User Mgmt is called over the network.
+	 * 
+	 * @param userMgmtGetAccountEnabledRequest
+	 * @param totalTimeoutMillis
+	 * @return
+	 * @throws Exception
+	 */
+	public UserMgmtGetAccountEnabledResponse getAccountEnabled_ForRecheck( UserMgmtGetAccountEnabledRequest userMgmtGetAccountEnabledRequest, int totalTimeoutMillis ) throws Exception {
+		if ( ! instanceInitialized ) {
+			throw new IllegalStateException( "Not initialized" );
+		}
+		GetAccountEnabledForIdAccountFacadeRequest facadeRequest = new GetAccountEnabledForIdAccountFacadeRequest();
+		facadeRequest.setUserId( userMgmtGetAccountEnabledRequest.getUserId() );
+		
+		GetAccountEnabledForIdAccountFacadeResponse facadeResponse = userMgmtCentral_Embedded_Facade.getAccountEnabledForIdAccount_ShortTimeout( facadeRequest, totalTimeoutMillis );
+		UserMgmt_UserEnabled_RecheckCache.getInstance().receivedIntervalFromUserMgmt( facadeResponse.getUserEnabledRecheckIntervalSeconds() );
+				
+		UserMgmtGetAccountEnabledResponse userMgmtGetAccountEnabledResponse = new UserMgmtGetAccountEnabledResponse();
+		userMgmtGetAccountEnabledResponse.setSuccess( facadeResponse.isSuccess() );
 		userMgmtGetAccountEnabledResponse.setUserIdNotFound( facadeResponse.isUserIdNotFound() );
 		userMgmtGetAccountEnabledResponse.setEnabled( facadeResponse.isEnabled() );
 		userMgmtGetAccountEnabledResponse.setErrorMessage( facadeResponse.getErrorMessage() );
@@ -288,7 +296,8 @@ public class UserMgmtCentralWebappWebserviceAccess {
 			throw new IllegalStateException( "Not initialized" );
 		}
 		ManageAccountFacadeRequest facadeRequest = new ManageAccountFacadeRequest();
-		facadeRequest.setSessionKeyFDSJKLUIOEWVCXM( userMgmtManageAccountRequest.getSessionKey() );
+		facadeRequest.setUserId( userMgmtManageAccountRequest.getUserMgmtUserId() );
+		facadeRequest.setCurrentPasswordQWZNVKSD( userMgmtManageAccountRequest.getCurrentPassword() );
 		facadeRequest.setEmail( userMgmtManageAccountRequest.getEmail() );
 		facadeRequest.setUsername( userMgmtManageAccountRequest.getUsername() );
 		facadeRequest.setFirstName( userMgmtManageAccountRequest.getFirstName() );
@@ -297,10 +306,14 @@ public class UserMgmtCentralWebappWebserviceAccess {
 		facadeRequest.setAssignOrganizationNull( userMgmtManageAccountRequest.isAssignOrganizationNull() );
 		
 		ManageAccountFacadeResponse facadeResponse = userMgmtCentral_Embedded_Facade.manageAccount( facadeRequest );
+		UserMgmt_UserEnabled_RecheckCache.getInstance().receivedIntervalFromUserMgmt( facadeResponse.getUserEnabledRecheckIntervalSeconds() );
 				
 		UserMgmtManageAccountResponse userMgmtManageAccountResponse = new UserMgmtManageAccountResponse();
 		userMgmtManageAccountResponse.setSuccess( facadeResponse.isSuccess() );
-		userMgmtManageAccountResponse.setSessionKeyNotValid( facadeResponse.isSessionKeyNotValid() );
+		userMgmtManageAccountResponse.setUserIdNotFound( facadeResponse.isUserIdNotFound() );
+		userMgmtManageAccountResponse.setUserDisabled( facadeResponse.isUserDisabled() );
+		userMgmtManageAccountResponse.setCurrentPasswordRequired( facadeResponse.isCurrentPasswordRequired() );
+		userMgmtManageAccountResponse.setCurrentPasswordInvalid( facadeResponse.isCurrentPasswordInvalid() );
 		userMgmtManageAccountResponse.setDuplicateEmail( facadeResponse.isDuplicateEmail() );
 		userMgmtManageAccountResponse.setDuplicateUsername( facadeResponse.isDuplicateUsername() );
 		userMgmtManageAccountResponse.setErrorMessage( facadeResponse.getErrorMessage() );
@@ -319,15 +332,14 @@ public class UserMgmtCentralWebappWebserviceAccess {
 			throw new IllegalStateException( "Not initialized" );
 		}
 		SearchUserDataAccountFacadeRequest facadeRequest = new SearchUserDataAccountFacadeRequest();
-		facadeRequest.setNoSessionKeyWURIPOWmvcxuozm(true);
 		facadeRequest.setSearchString( userMgmtSearchUserDataRequest.getSearchString() );
 		facadeRequest.setSearchStringExactMatch( userMgmtSearchUserDataRequest.isSearchStringExactMatch() );
 
 		SearchUserDataAccountFacadeResponse facadeResponse = userMgmtCentral_Embedded_Facade.searchUserDataByLastNameAccount( facadeRequest );
+		UserMgmt_UserEnabled_RecheckCache.getInstance().receivedIntervalFromUserMgmt( facadeResponse.getUserEnabledRecheckIntervalSeconds() );
 		
 		UserMgmtSearchUserDataResponse userMgmtSearchUserDataResponse = new UserMgmtSearchUserDataResponse();
 		userMgmtSearchUserDataResponse.setSuccess( facadeResponse.isSuccess() );
-		userMgmtSearchUserDataResponse.setSessionKeyNotValid( facadeResponse.isSessionKeyNotValid() );
 		userMgmtSearchUserDataResponse.setErrorMessage( facadeResponse.getErrorMessage() );
 		userMgmtSearchUserDataResponse.setUserIdList( facadeResponse.getUserIdList() );
 		return userMgmtSearchUserDataResponse;
@@ -344,15 +356,14 @@ public class UserMgmtCentralWebappWebserviceAccess {
 			throw new IllegalStateException( "Not initialized" );
 		}
 		SearchUserDataAccountFacadeRequest facadeRequest = new SearchUserDataAccountFacadeRequest();
-		facadeRequest.setNoSessionKeyWURIPOWmvcxuozm(true);
 		facadeRequest.setSearchString( userMgmtSearchUserDataRequest.getSearchString() );
 		facadeRequest.setSearchStringExactMatch( userMgmtSearchUserDataRequest.isSearchStringExactMatch() );
 
 		SearchUserDataAccountFacadeResponse facadeResponse = userMgmtCentral_Embedded_Facade.searchUserDataByEmailAccount( facadeRequest );
+		UserMgmt_UserEnabled_RecheckCache.getInstance().receivedIntervalFromUserMgmt( facadeResponse.getUserEnabledRecheckIntervalSeconds() );
 		
 		UserMgmtSearchUserDataResponse userMgmtSearchUserDataResponse = new UserMgmtSearchUserDataResponse();
 		userMgmtSearchUserDataResponse.setSuccess( facadeResponse.isSuccess() );
-		userMgmtSearchUserDataResponse.setSessionKeyNotValid( facadeResponse.isSessionKeyNotValid() );
 		userMgmtSearchUserDataResponse.setErrorMessage( facadeResponse.getErrorMessage() );
 		userMgmtSearchUserDataResponse.setUserIdList( facadeResponse.getUserIdList() );
 		return userMgmtSearchUserDataResponse;
@@ -369,15 +380,14 @@ public class UserMgmtCentralWebappWebserviceAccess {
 			throw new IllegalStateException( "Not initialized" );
 		}
 		SearchUserDataAccountFacadeRequest facadeRequest = new SearchUserDataAccountFacadeRequest();
-		facadeRequest.setNoSessionKeyWURIPOWmvcxuozm(true);
 		facadeRequest.setSearchStringExactMatch(true);
 		facadeRequest.setSearchString( userMgmtSearchUserDataRequest.getSearchString() );
 		
 		SearchUserDataAccountFacadeResponse facadeResponse = userMgmtCentral_Embedded_Facade.searchUserDataByEmailAccount( facadeRequest );
+		UserMgmt_UserEnabled_RecheckCache.getInstance().receivedIntervalFromUserMgmt( facadeResponse.getUserEnabledRecheckIntervalSeconds() );
 		
 		UserMgmtSearchUserDataResponse userMgmtSearchUserDataResponse = new UserMgmtSearchUserDataResponse();
 		userMgmtSearchUserDataResponse.setSuccess( facadeResponse.isSuccess() );
-		userMgmtSearchUserDataResponse.setSessionKeyNotValid( facadeResponse.isSessionKeyNotValid() );
 		userMgmtSearchUserDataResponse.setErrorMessage( facadeResponse.getErrorMessage() );
 		userMgmtSearchUserDataResponse.setUserIdList( facadeResponse.getUserIdList() );
 		return userMgmtSearchUserDataResponse;
@@ -394,15 +404,14 @@ public class UserMgmtCentralWebappWebserviceAccess {
 			throw new IllegalStateException( "Not initialized" );
 		}
 		SearchUserDataAccountFacadeRequest facadeRequest = new SearchUserDataAccountFacadeRequest();
-		facadeRequest.setNoSessionKeyWURIPOWmvcxuozm(true);
 		facadeRequest.setSearchStringExactMatch(true);
 		facadeRequest.setSearchString( userMgmtSearchUserDataRequest.getSearchString() );
 		
 		SearchUserDataAccountFacadeResponse facadeResponse = userMgmtCentral_Embedded_Facade.searchUserDataByUserName( facadeRequest );
+		UserMgmt_UserEnabled_RecheckCache.getInstance().receivedIntervalFromUserMgmt( facadeResponse.getUserEnabledRecheckIntervalSeconds() );
 		
 		UserMgmtSearchUserDataResponse userMgmtSearchUserDataResponse = new UserMgmtSearchUserDataResponse();
 		userMgmtSearchUserDataResponse.setSuccess( facadeResponse.isSuccess() );
-		userMgmtSearchUserDataResponse.setSessionKeyNotValid( facadeResponse.isSessionKeyNotValid() );
 		userMgmtSearchUserDataResponse.setErrorMessage( facadeResponse.getErrorMessage() );
 		userMgmtSearchUserDataResponse.setUserIdList( facadeResponse.getUserIdList() );
 		return userMgmtSearchUserDataResponse;

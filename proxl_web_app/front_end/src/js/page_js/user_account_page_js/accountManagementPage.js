@@ -208,14 +208,22 @@ window.updateEmail = function(clickThis, eventObject) {
 	if ($email.length === 0) {
 		throw Error( "Unable to find input field for id 'email-change-field' " );
 	}
+	var $currentPassword = $("#email-change-current-password-field");
+	if ($currentPassword.length === 0) {
+		throw Error( "Unable to find input field for id 'email-change-current-password-field' " );
+	}
 	var email = $email.val();
 	if ( email === "" ) {
 		var $element = $("#error_message_field_empty");
 		showErrorMsg( $element );
 		return;  //  !!!  EARLY EXIT
 	} 
+	var currentPassword = $currentPassword.val();
+	///  Clear the current password field after each attempt
+	$currentPassword.val("");
 	var requestData = {
-			email : email
+			email : email,
+			current_password : currentPassword
 	};
 	var _URL = "services/user/changeEmail";
 //	var request =
@@ -251,6 +259,18 @@ window.updateEmailComplete = function( params ) {
 	var responseData = params.responseData;
 	var clickThis = params.clickThis; 
 	if ( ! responseData.status ) {
+		if ( responseData.currentPasswordRequired ) {
+			var $element = $("#error_message_email_current_password_required");
+			showErrorMsg( $element );
+			$("#email-change-current-password-field").focus();
+			return;
+		}
+		if ( responseData.currentPasswordInvalid ) {
+			var $element = $("#error_message_email_current_password_invalid");
+			showErrorMsg( $element );
+			$("#email-change-current-password-field").focus();
+			return;
+		}
 		if ( responseData.valueAlreadyExists ) {
 			var $element = $("#error_message_email_already_exists");
 			showErrorMsg( $element );
@@ -276,14 +296,22 @@ window.updateUsername = function(clickThis, eventObject) {
 	if ($username.length === 0) {
 		throw Error( "Unable to find input field for id 'username-change-field' " );
 	}
+	var $currentPassword = $("#username-change-current-password-field");
+	if ($currentPassword.length === 0) {
+		throw Error( "Unable to find input field for id 'username-change-current-password-field' " );
+	}
 	var username = $username.val();
 	if ( username === "" ) {
 		var $element = $("#error_message_field_empty");
 		showErrorMsg( $element );
 		return;  //  !!!  EARLY EXIT
 	} 
+	var currentPassword = $currentPassword.val();
+	///  Clear the current password field after each attempt
+	$currentPassword.val("");
 	var requestData = {
-			username : username
+			username : username,
+			current_password : currentPassword
 	};
 	var _URL = "services/user/changeUsername";
 //	var request =
@@ -320,6 +348,18 @@ window.updateUsernameComplete = function( params ) {
 	var responseData = params.responseData;
 	var clickThis = params.clickThis; 
 	if ( ! responseData.status ) {
+		if ( responseData.currentPasswordRequired ) {
+			var $element = $("#error_message_username_current_password_required");
+			showErrorMsg( $element );
+			$("#username-change-current-password-field").focus();
+			return;
+		}
+		if ( responseData.currentPasswordInvalid ) {
+			var $element = $("#error_message_username_current_password_invalid");
+			showErrorMsg( $element );
+			$("#username-change-current-password-field").focus();
+			return;
+		}
 		if ( responseData.valueAlreadyExists ) {
 			var $element = $("#error_message_username_already_exists");
 			showErrorMsg( $element );

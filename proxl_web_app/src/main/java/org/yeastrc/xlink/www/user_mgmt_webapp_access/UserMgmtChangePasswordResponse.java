@@ -7,8 +7,9 @@ package org.yeastrc.xlink.www.user_mgmt_webapp_access;
 public class UserMgmtChangePasswordResponse {
 	
 	private boolean success;
+	private boolean userIdNotFound;
+	private boolean userDisabled;
 	
-	private boolean sessionKeyNotValid;
 	private boolean oldPasswordNotValid;
 	private boolean passwordTooLong;
 
@@ -17,7 +18,7 @@ public class UserMgmtChangePasswordResponse {
 
 	@Override
 	public String toString() {
-		return "UserMgmtChangePasswordResponse [success=" + success + ", sessionKeyNotValid=" + sessionKeyNotValid
+		return "UserMgmtChangePasswordResponse [success=" + success + ", userIdNotFound=" + userIdNotFound + ", userDisabled=" + userDisabled
 				+ ", oldPasswordNotValid=" + oldPasswordNotValid + ", passwordTooLong=" + passwordTooLong
 				+ ", errorMessage=" + errorMessage + "]";
 	}
@@ -28,14 +29,6 @@ public class UserMgmtChangePasswordResponse {
 
 	public void setSuccess(boolean success) {
 		this.success = success;
-	}
-
-	public boolean isSessionKeyNotValid() {
-		return sessionKeyNotValid;
-	}
-
-	public void setSessionKeyNotValid(boolean sessionKeyNotValid) {
-		this.sessionKeyNotValid = sessionKeyNotValid;
 	}
 
 	public boolean isOldPasswordNotValid() {
@@ -59,5 +52,18 @@ public class UserMgmtChangePasswordResponse {
 	}
 	public void setPasswordTooLong(boolean passwordTooLong) {
 		this.passwordTooLong = passwordTooLong;
+	}
+
+	public boolean isUserIdNotFound() {
+		return userIdNotFound;
+	}
+	public void setUserIdNotFound(boolean userIdNotFound) {
+		this.userIdNotFound = userIdNotFound;
+	}
+	public boolean isUserDisabled() {
+		return userDisabled;
+	}
+	public void setUserDisabled(boolean userDisabled) {
+		this.userDisabled = userDisabled;
 	}
 }

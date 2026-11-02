@@ -8,7 +8,6 @@ public class UserMgmtGetAccountEnabledResponse {
 
 	private boolean success;
 	
-	private boolean sessionKeyNotValid;
 	private boolean userIdNotFound;
 	
 	private boolean enabled;
@@ -17,7 +16,7 @@ public class UserMgmtGetAccountEnabledResponse {
 	
 	@Override
 	public String toString() {
-		return "UserMgmtGetAccountEnabledResponse [success=" + success + ", sessionKeyNotValid=" + sessionKeyNotValid
+		return "UserMgmtGetAccountEnabledResponse [success=" + success
 				+ ", userIdNotFound=" + userIdNotFound + ", enabled=" + enabled + ", errorMessage=" + errorMessage
 				+ "]";
 	}
@@ -28,14 +27,6 @@ public class UserMgmtGetAccountEnabledResponse {
 
 	public void setSuccess(boolean success) {
 		this.success = success;
-	}
-
-	public boolean isSessionKeyNotValid() {
-		return sessionKeyNotValid;
-	}
-
-	public void setSessionKeyNotValid(boolean sessionKeyNotValid) {
-		this.sessionKeyNotValid = sessionKeyNotValid;
 	}
 
 	public boolean isUserIdNotFound() {

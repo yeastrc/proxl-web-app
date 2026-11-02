@@ -43,8 +43,7 @@ import org.yeastrc.xlink.www.user_mgmt_webapp_access.UserMgmtCentralWebappWebser
 import org.yeastrc.xlink.www.user_web_utils.PasswordTooLong_Check;
 import org.yeastrc.xlink.www.user_mgmt_webapp_access.UserMgmtCreateAccountRequest;
 import org.yeastrc.xlink.www.user_mgmt_webapp_access.UserMgmtCreateAccountResponse;
-import org.yeastrc.xlink.www.user_mgmt_webapp_access.UserMgmtLoginRequest;
-import org.yeastrc.xlink.www.user_mgmt_webapp_access.UserMgmtLoginResponse;
+import org.yeastrc.xlink.www.user_mgmt_webapp_access.UserMgmt_UserEnabled_RecheckCache;
 import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId_Result;
 import org.yeastrc.xlink.www.access_control.access_control_main.GetWebSessionAuthAccessLevelForProjectIds_And_NO_ProjectId;
 import org.yeastrc.xlink.www.user_web_utils.ValidateUserInviteTrackingCode;
@@ -582,32 +581,13 @@ public class UserCreateAccountService {
 					TermsOfServiceUserAcceptedVersionHistoryDAO.getInstance().save( tosUserAccepted );
 				}
 
-				UserMgmtLoginRequest userMgmtLoginRequest = new UserMgmtLoginRequest();
-				userMgmtLoginRequest.setUsername( username );
-				userMgmtLoginRequest.setPassword( password );
-				userMgmtLoginRequest.setRemoteIP(  request.getRemoteAddr() );
-
-				UserMgmtLoginResponse userMgmtLoginResponse = 
-						UserMgmtCentralWebappWebserviceAccess.getInstance().userLogin( userMgmtLoginRequest );
-
-				if ( ! userMgmtLoginResponse.isSuccess() ) {
-					String msg = null;
-					if ( userMgmtLoginResponse.isUsernameNotFound() || userMgmtLoginResponse.isPasswordInvalid() ) {
-						msg = "Fail to log into account just created for username not found or password is invalid.  username: " + username;
-					} else if ( userMgmtLoginResponse.isUserDisabled() ) {
-						msg = "Fail to log into account just created for user is disabled.  username: " + username;
-					}
-					msg = "Fail to log into account just created.  username: " + username;
-					log.error( msg );
-					throw new ProxlWebappInternalErrorException( msg );
-				}
+				//  Sign in the user just created, using the User Mgmt user id from create account
 
 				UserSession userSession = UserSessionBuilder.getBuilder()
 						.setAuthUserId( authUserDTO.getId() )
 						.setUserMgmtUserId( createdUserMgmtUserId )
 						.setUserAccessLevel( authUserDTO.getUserAccessLevel() )
 						.setEnabledAppSpecific( true )
-						.setUserMgmtSessionKey( userMgmtLoginResponse.getSessionKey() )
 						.setUsername( username )
 						.setEmail( email )
 						.setFirstName( firstName )
@@ -618,6 +598,9 @@ public class UserCreateAccountService {
 						.build();
 				
 				UserSessionManager.getSinglesonInstance().setUserSession( userSession , request );
+				
+				//  Account just created in User Mgmt, so enabled
+				UserMgmt_UserEnabled_RecheckCache.getInstance().setUserEnabled_CheckedNow( createdUserMgmtUserId );
 			}
 
 			createAccountResult.setStatus(true);

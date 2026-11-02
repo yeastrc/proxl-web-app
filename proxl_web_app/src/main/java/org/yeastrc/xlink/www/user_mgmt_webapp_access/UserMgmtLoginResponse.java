@@ -9,7 +9,6 @@ public class UserMgmtLoginResponse {
 	private boolean success;
 	
 	private int userId;
-	private String sessionKey;
 	
 	private boolean usernameNotFound;
 	private boolean passwordInvalid;
@@ -21,7 +20,7 @@ public class UserMgmtLoginResponse {
 	
 	@Override
 	public String toString() {
-		return "UserMgmtLoginResponse [success=" + success + ", userId=" + userId + ", sessionKey=" + sessionKey
+		return "UserMgmtLoginResponse [success=" + success + ", userId=" + userId
 				+ ", usernameNotFound=" + usernameNotFound + ", passwordInvalid=" + passwordInvalid + ", userDisabled="
 				+ userDisabled + ", errorMessage=" + errorMessage + "]";
 	}
@@ -32,14 +31,6 @@ public class UserMgmtLoginResponse {
 
 	public void setSuccess(boolean success) {
 		this.success = success;
-	}
-
-	public String getSessionKey() {
-		return sessionKey;
-	}
-
-	public void setSessionKey(String sessionKey) {
-		this.sessionKey = sessionKey;
 	}
 
 	public boolean isUsernameNotFound() {

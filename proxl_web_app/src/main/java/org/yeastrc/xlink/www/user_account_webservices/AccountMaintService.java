@@ -84,7 +84,7 @@ public class AccountMaintService {
 						);
 			}
 			UserMgmtManageAccountRequest userMgmtManageAccountRequest = new UserMgmtManageAccountRequest();
-			userMgmtManageAccountRequest.setSessionKey( userSession.getUserMgmtSessionKey() );
+			userMgmtManageAccountRequest.setUserMgmtUserId( userSession.getUserMgmtUserId() );
 			userMgmtManageAccountRequest.setFirstName( firstName );
 			UserMgmtManageAccountResponse userMgmtManageAccountResponse =
 					UserMgmtCentralWebappWebserviceAccess.getInstance().
@@ -93,20 +93,7 @@ public class AccountMaintService {
 
 				accountMaintResult.setStatus(false);
 				
-				if ( userMgmtManageAccountResponse.isSessionKeyNotValid() ) {
-					
-					//  No User session In User Mgmt
-					
-					//  Invalidate session
-					UserSessionManager.getSinglesonInstance().invalidateUserSession( request );
-					
-					//  Return HTTP status so JS reloads page and user logs back in, creating new session in User Mgmt
-					throw new WebApplicationException(
-							Response.status( WebServiceErrorMessageConstants.NO_SESSION_STATUS_CODE )  //  Send HTTP code
-							.entity( WebServiceErrorMessageConstants.NO_SESSION_TEXT ) // This string will be passed to the client
-							.build()
-							);
-				}
+				endSession_IfUserDisabledOrNotFound( userMgmtManageAccountResponse.isUserDisabled(), userMgmtManageAccountResponse.isUserIdNotFound(), userSession, request );
 				return accountMaintResult; // EARLY RETURN
 			}
 
@@ -185,27 +172,14 @@ public class AccountMaintService {
 						);
 			}
 			UserMgmtManageAccountRequest userMgmtManageAccountRequest = new UserMgmtManageAccountRequest();
-			userMgmtManageAccountRequest.setSessionKey( userSession.getUserMgmtSessionKey() );
+			userMgmtManageAccountRequest.setUserMgmtUserId( userSession.getUserMgmtUserId() );
 			userMgmtManageAccountRequest.setLastName( lastName );
 			UserMgmtManageAccountResponse userMgmtManageAccountResponse =
 					UserMgmtCentralWebappWebserviceAccess.getInstance().
 					manageUserData( userMgmtManageAccountRequest );
 			if ( ! userMgmtManageAccountResponse.isSuccess() ) {
 
-				if ( userMgmtManageAccountResponse.isSessionKeyNotValid() ) {
-					
-					//  No User session In User Mgmt
-					
-					//  Invalidate session
-					UserSessionManager.getSinglesonInstance().invalidateUserSession( request );
-					
-					//  Return HTTP status so JS reloads page and user logs back in, creating new session in User Mgmt
-					throw new WebApplicationException(
-							Response.status( WebServiceErrorMessageConstants.NO_SESSION_STATUS_CODE )  //  Send HTTP code
-							.entity( WebServiceErrorMessageConstants.NO_SESSION_TEXT ) // This string will be passed to the client
-							.build()
-							);
-				}
+				endSession_IfUserDisabledOrNotFound( userMgmtManageAccountResponse.isUserDisabled(), userMgmtManageAccountResponse.isUserIdNotFound(), userSession, request );
 				accountMaintResult.setStatus(false);
 				return accountMaintResult; // EARLY RETURN
 			}
@@ -285,27 +259,14 @@ public class AccountMaintService {
 						);
 			}
 			UserMgmtManageAccountRequest userMgmtManageAccountRequest = new UserMgmtManageAccountRequest();
-			userMgmtManageAccountRequest.setSessionKey( userSession.getUserMgmtSessionKey() );
+			userMgmtManageAccountRequest.setUserMgmtUserId( userSession.getUserMgmtUserId() );
 			userMgmtManageAccountRequest.setOrganization( organization );
 			UserMgmtManageAccountResponse userMgmtManageAccountResponse =
 					UserMgmtCentralWebappWebserviceAccess.getInstance().
 					manageUserData( userMgmtManageAccountRequest );
 			if ( ! userMgmtManageAccountResponse.isSuccess() ) {
 
-				if ( userMgmtManageAccountResponse.isSessionKeyNotValid() ) {
-					
-					//  No User session In User Mgmt
-					
-					//  Invalidate session
-					UserSessionManager.getSinglesonInstance().invalidateUserSession( request );
-					
-					//  Return HTTP status so JS reloads page and user logs back in, creating new session in User Mgmt
-					throw new WebApplicationException(
-							Response.status( WebServiceErrorMessageConstants.NO_SESSION_STATUS_CODE )  //  Send HTTP code
-							.entity( WebServiceErrorMessageConstants.NO_SESSION_TEXT ) // This string will be passed to the client
-							.build()
-							);
-				}
+				endSession_IfUserDisabledOrNotFound( userMgmtManageAccountResponse.isUserDisabled(), userMgmtManageAccountResponse.isUserIdNotFound(), userSession, request );
 				accountMaintResult.setStatus(false);
 				return accountMaintResult; // EARLY RETURN
 			}
@@ -345,6 +306,7 @@ public class AccountMaintService {
 	@Path("/changeEmail") 
 	public AccountMaintResult changeEmailService(   
 			@FormParam( "email" ) String email,
+			@FormParam( "current_password" ) String currentPassword,  //  Required by User Mgmt to change the email.  Not length checked.
 			@Context HttpServletRequest request )
 	throws Exception {
 		AccountMaintResult accountMaintResult = new AccountMaintResult();
@@ -385,28 +347,22 @@ public class AccountMaintService {
 						);
 			}
 			UserMgmtManageAccountRequest userMgmtManageAccountRequest = new UserMgmtManageAccountRequest();
-			userMgmtManageAccountRequest.setSessionKey( userSession.getUserMgmtSessionKey() );
+			userMgmtManageAccountRequest.setUserMgmtUserId( userSession.getUserMgmtUserId() );
 			userMgmtManageAccountRequest.setEmail( email );
+			userMgmtManageAccountRequest.setCurrentPassword( currentPassword );
 			UserMgmtManageAccountResponse userMgmtManageAccountResponse =
 					UserMgmtCentralWebappWebserviceAccess.getInstance().
 					manageUserData( userMgmtManageAccountRequest );
 			if ( ! userMgmtManageAccountResponse.isSuccess() ) {
 
-				if ( userMgmtManageAccountResponse.isSessionKeyNotValid() ) {
-					
-					//  No User session In User Mgmt
-					
-					//  Invalidate session
-					UserSessionManager.getSinglesonInstance().invalidateUserSession( request );
-					
-					//  Return HTTP status so JS reloads page and user logs back in, creating new session in User Mgmt
-					throw new WebApplicationException(
-							Response.status( WebServiceErrorMessageConstants.NO_SESSION_STATUS_CODE )  //  Send HTTP code
-							.entity( WebServiceErrorMessageConstants.NO_SESSION_TEXT ) // This string will be passed to the client
-							.build()
-							);
-				}
+				endSession_IfUserDisabledOrNotFound( userMgmtManageAccountResponse.isUserDisabled(), userMgmtManageAccountResponse.isUserIdNotFound(), userSession, request );
 				accountMaintResult.setStatus(false);
+				if ( userMgmtManageAccountResponse.isCurrentPasswordRequired() ) {
+					accountMaintResult.setCurrentPasswordRequired(true);
+				}
+				if ( userMgmtManageAccountResponse.isCurrentPasswordInvalid() ) {
+					accountMaintResult.setCurrentPasswordInvalid(true);
+				}
 				if ( userMgmtManageAccountResponse.isDuplicateEmail() ) {
 					accountMaintResult.setValueAlreadyExists(true);
 				}
@@ -440,6 +396,7 @@ public class AccountMaintService {
 	@Path("/changeUsername") 
 	public AccountMaintResult changeUsernameService(   
 			@FormParam( "username" ) String username,
+			@FormParam( "current_password" ) String currentPassword,  //  Required by User Mgmt to change the username.  Not length checked.
 			@Context HttpServletRequest request )
 	throws Exception {
 		AccountMaintResult accountMaintResult = new AccountMaintResult();
@@ -480,28 +437,22 @@ public class AccountMaintService {
 						);
 			}
 			UserMgmtManageAccountRequest userMgmtManageAccountRequest = new UserMgmtManageAccountRequest();
-			userMgmtManageAccountRequest.setSessionKey( userSession.getUserMgmtSessionKey() );
+			userMgmtManageAccountRequest.setUserMgmtUserId( userSession.getUserMgmtUserId() );
 			userMgmtManageAccountRequest.setUsername( username );
+			userMgmtManageAccountRequest.setCurrentPassword( currentPassword );
 			UserMgmtManageAccountResponse userMgmtManageAccountResponse =
 					UserMgmtCentralWebappWebserviceAccess.getInstance().
 					manageUserData( userMgmtManageAccountRequest );
 			if ( ! userMgmtManageAccountResponse.isSuccess() ) {
 
-				if ( userMgmtManageAccountResponse.isSessionKeyNotValid() ) {
-					
-					//  No User session In User Mgmt
-					
-					//  Invalidate session
-					UserSessionManager.getSinglesonInstance().invalidateUserSession( request );
-					
-					//  Return HTTP status so JS reloads page and user logs back in, creating new session in User Mgmt
-					throw new WebApplicationException(
-							Response.status( WebServiceErrorMessageConstants.NO_SESSION_STATUS_CODE )  //  Send HTTP code
-							.entity( WebServiceErrorMessageConstants.NO_SESSION_TEXT ) // This string will be passed to the client
-							.build()
-							);
-				}
+				endSession_IfUserDisabledOrNotFound( userMgmtManageAccountResponse.isUserDisabled(), userMgmtManageAccountResponse.isUserIdNotFound(), userSession, request );
 				accountMaintResult.setStatus(false);
+				if ( userMgmtManageAccountResponse.isCurrentPasswordRequired() ) {
+					accountMaintResult.setCurrentPasswordRequired(true);
+				}
+				if ( userMgmtManageAccountResponse.isCurrentPasswordInvalid() ) {
+					accountMaintResult.setCurrentPasswordInvalid(true);
+				}
 				if ( userMgmtManageAccountResponse.isDuplicateUsername() ) {
 					accountMaintResult.setValueAlreadyExists(true);
 				}
@@ -595,7 +546,7 @@ public class AccountMaintService {
 			}
 			
 			UserMgmtChangePasswordRequest userMgmtChangePasswordRequest = new UserMgmtChangePasswordRequest();
-			userMgmtChangePasswordRequest.setSessionKey( userSession.getUserMgmtSessionKey() );
+			userMgmtChangePasswordRequest.setUserMgmtUserId( userSession.getUserMgmtUserId() );
 			userMgmtChangePasswordRequest.setOldPassword( oldPassword );
 			userMgmtChangePasswordRequest.setNewPassword( password );
 			userMgmtChangePasswordRequest.setUserRemoteIP( request.getRemoteAddr() );
@@ -605,30 +556,9 @@ public class AccountMaintService {
 			
 			if ( ! userMgmtChangePasswordResponse.isSuccess() ) {
 
-				if ( userMgmtChangePasswordResponse.isSessionKeyNotValid() ) {
-					
-					//  No User session In User Mgmt
-					
-					//  Invalidate session
-					UserSessionManager.getSinglesonInstance().invalidateUserSession( request );
-					
-					//  Return HTTP status so JS reloads page and user logs back in, creating new session in User Mgmt
-					throw new WebApplicationException(
-							Response.status( WebServiceErrorMessageConstants.NO_SESSION_STATUS_CODE )  //  Send HTTP code
-							.entity( WebServiceErrorMessageConstants.NO_SESSION_TEXT ) // This string will be passed to the client
-							.build()
-							);
-				}
+				endSession_IfUserDisabledOrNotFound( userMgmtChangePasswordResponse.isUserDisabled(), userMgmtChangePasswordResponse.isUserIdNotFound(), userSession, request );
 				
 				accountMaintResult.setStatus(false);
-				if ( userMgmtChangePasswordResponse.isSessionKeyNotValid() ) {
-					//  No User session 
-					throw new WebApplicationException(
-							Response.status( WebServiceErrorMessageConstants.NO_SESSION_STATUS_CODE )  //  Send HTTP code
-							.entity( WebServiceErrorMessageConstants.NO_SESSION_TEXT ) // This string will be passed to the client
-							.build()
-							);
-				}
 				if ( userMgmtChangePasswordResponse.isOldPasswordNotValid() ) {
 					accountMaintResult.setStatus(false);
 					accountMaintResult.setOldPasswordInvalid(true);
@@ -663,6 +593,36 @@ public class AccountMaintService {
 
 
 	/**
+	 * If User Mgmt reports the user disabled or the user id not found:  End the session and return HTTP status for no session.
+	 * 
+	 * @param userDisabled
+	 * @param userIdNotFound
+	 * @param userSession
+	 * @param request
+	 */
+	private void endSession_IfUserDisabledOrNotFound( boolean userDisabled, boolean userIdNotFound, UserSession userSession, HttpServletRequest request ) {
+		
+		if ( userDisabled ) {
+			log.info( "User session ended:  User Mgmt reports the user is disabled.  authUserId: " + userSession.getAuthUserId() );
+		} else if ( userIdNotFound ) {
+			log.error( "User session ended:  User Mgmt reports the user id is not found.  authUserId: " + userSession.getAuthUserId()
+					+ ", userMgmtUserId: " + userSession.getUserMgmtUserId() );
+		} else {
+			return; // EARLY RETURN
+		}
+		
+		//  Invalidate session
+		UserSessionManager.getSinglesonInstance().invalidateUserSession( request );
+		
+		//  Return HTTP status so JS reloads page and user is sent to sign in
+		throw new WebApplicationException(
+				Response.status( WebServiceErrorMessageConstants.NO_SESSION_STATUS_CODE )  //  Send HTTP code
+				.entity( WebServiceErrorMessageConstants.NO_SESSION_TEXT ) // This string will be passed to the client
+				.build()
+				);
+	}
+
+	/**
 	 * This is returned from the web service AccountMaintService
 	 *
 	 */
@@ -673,6 +633,8 @@ public class AccountMaintService {
 		private boolean valueAlreadyExists = false;
 		private boolean oldPasswordInvalid = false;
 		private boolean passwordTooLong = false;
+		private boolean currentPasswordRequired = false;
+		private boolean currentPasswordInvalid = false;
 
 		public boolean isOldPasswordInvalid() {
 			return oldPasswordInvalid;
@@ -703,6 +665,18 @@ public class AccountMaintService {
 		}
 		public void setPasswordTooLong(boolean passwordTooLong) {
 			this.passwordTooLong = passwordTooLong;
+		}
+		public boolean isCurrentPasswordRequired() {
+			return currentPasswordRequired;
+		}
+		public void setCurrentPasswordRequired(boolean currentPasswordRequired) {
+			this.currentPasswordRequired = currentPasswordRequired;
+		}
+		public boolean isCurrentPasswordInvalid() {
+			return currentPasswordInvalid;
+		}
+		public void setCurrentPasswordInvalid(boolean currentPasswordInvalid) {
+			this.currentPasswordInvalid = currentPasswordInvalid;
 		}
 	}
 

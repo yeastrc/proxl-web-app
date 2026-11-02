@@ -52,7 +52,7 @@ public class UserSessionAlterSession {
 		//  Update session
 		UserSessionManager.getSinglesonInstance().setUserSession( userSessionUpdated, httpServletRequest );
 		
-		return userSession;
+		return userSessionUpdated;
 	}
 	
 	/**
@@ -76,7 +76,7 @@ public class UserSessionAlterSession {
 		//  Update session
 		UserSessionManager.getSinglesonInstance().setUserSession( userSessionUpdated, httpServletRequest );
 		
-		return userSession;
+		return userSessionUpdated;
 	}
 
 	/**

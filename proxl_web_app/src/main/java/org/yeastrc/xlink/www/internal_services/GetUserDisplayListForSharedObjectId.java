@@ -72,8 +72,6 @@ public class GetUserDisplayListForSharedObjectId {
 		}
 		
 		UserMgmtGetUserDataRequest userMgmtGetUserDataRequest = new UserMgmtGetUserDataRequest();
-		// TODO Session Key check currently Disabled in web service 
-//		userMgmtGetUserDataRequest.setSessionKey( userMgmtLoginResponse.getSessionKey() );
 		userMgmtGetUserDataRequest.setUserId( userMgmtUserId );
 		
 		UserMgmtGetUserDataResponse userMgmtGetUserDataResponse = 

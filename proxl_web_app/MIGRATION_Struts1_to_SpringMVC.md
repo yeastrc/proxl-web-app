@@ -19,7 +19,7 @@ This document is an analysis / plan. No code has been changed.
 | JSP views | total / using Struts taglibs | 123 / 65 |
 | Web services | **Jersey JAX-RS** at `/services/*` (`@Path`) — KEEP | 125 |
 | Plain servlets | `SharePageURLHandlerServlet` (`/go`), `ProjectLabelServlet` (`/p/*`) — KEEP | 2 |
-| Filters | `SetCharacterEncodingFilter`, `SSOSessionKeepAliveServletFilter`, `InitialServletFilter` — KEEP | 3 |
+| Filters | `SetCharacterEncodingFilter`, `SSOSessionKeepAliveServletFilter`, `InitialServletFilter` — KEEP (`SSOSessionKeepAliveServletFilter`, a no-op, was later removed with the unused user-mgmt session key) | 3 |
 | Listener | `ServletContextAppListener` — KEEP | 1 |
 
 Runtime / build:

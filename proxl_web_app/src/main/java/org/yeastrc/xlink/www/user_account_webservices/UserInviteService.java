@@ -226,8 +226,6 @@ public class UserInviteService {
 			//   DONE  validating the request
 			////////////////////////
 
-			String sessionKey = accessAndSetupWebSessionResult.getUserSession().getUserMgmtSessionKey();
-
 			//   Process the request
 			if ( invitedPersonUserId != null ) {
 				//  process the user id
@@ -253,7 +251,6 @@ public class UserInviteService {
 			} else {
 				//  Process the email
 				UserMgmtSearchUserDataRequest userMgmtSearchUserDataRequest = new UserMgmtSearchUserDataRequest();
-				userMgmtSearchUserDataRequest.setSessionKey( sessionKey );
 				userMgmtSearchUserDataRequest.setSearchString( invitedPersonEmail );
 				userMgmtSearchUserDataRequest.setSearchStringExactMatch(true);
 				
@@ -261,11 +258,6 @@ public class UserInviteService {
 						UserMgmtCentralWebappWebserviceAccess.getInstance().searchUserDataByEmail( userMgmtSearchUserDataRequest );
 				
 				if ( ! userMgmtSearchUserDataResponse.isSuccess() ) {
-					if ( userMgmtSearchUserDataResponse.isSessionKeyNotValid() ) {
-						String msg = "Session Key invalid for call to UserMgmtCentralWebappWebserviceAccess.getInstance().searchUserDataByEmail(...)";
-						log.error( msg );
-						throw new ProxlWebappInternalErrorException( msg );
-					}
 					String msg = "call to UserMgmtCentralWebappWebserviceAccess.getInstance().searchUserDataByEmail(...) not successful, invitedPersonEmail: " + invitedPersonEmail;
 					log.error( msg );
 					throw new ProxlWebappInternalErrorException( msg );
@@ -364,7 +356,6 @@ public class UserInviteService {
 		//  Get full user data
 		
 		UserMgmtGetUserDataRequest userMgmtGetUserDataRequest = new UserMgmtGetUserDataRequest();
-//		userMgmtGetUserDataRequest.setSessionKey(  );
 		userMgmtGetUserDataRequest.setUserId( invitedPerson_userMgmtUserId );
 		
 		UserMgmtGetUserDataResponse userMgmtGetUserDataResponse = 

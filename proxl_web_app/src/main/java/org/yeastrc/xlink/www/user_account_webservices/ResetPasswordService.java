@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.auth.dao.AuthForgotPasswordTrackingDAO;
 import org.yeastrc.auth.dao.AuthUserDAO;
 import org.yeastrc.auth.dto.AuthForgotPasswordTrackingDTO;
+import org.yeastrc.auth.dto.AuthUserDTO;
 import org.yeastrc.auth.services.AuthGenerateSaveForgotPasswordCode;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappInternalErrorException;
 import org.yeastrc.xlink.www.constants.SpringMvcActionPathsConstants;
@@ -145,6 +146,23 @@ public class ResetPasswordService {
 				log.error( msg );
 				throw new ProxlWebappInternalErrorException(msg);
 			}
+			//  User disabled in User Mgmt or in Proxl:  Return exactly the same result as a successful request and send no email.
+			{
+				boolean userDisabled = false;
+				if ( ! userMgmtGetUserDataResponse.isEnabled() ) {
+					userDisabled = true;
+				} else {
+					AuthUserDTO authUserDTO = AuthUserDAO.getInstance().getForId( authUserId );
+					if ( authUserDTO == null || ( ! authUserDTO.isEnabledAppSpecific() ) ) {
+						userDisabled = true;
+					}
+				}
+				if ( userDisabled ) {
+					log.info( "ResetPasswordService: resetPasswordGenEmail: User is disabled.  No email sent.  authUserId: " + authUserId );
+					resetPasswordGenEmailResult.setStatus(true);  //  Same result as success.  See comment above.
+					return resetPasswordGenEmailResult;  //  Early Exit
+				}
+			}
 			String authCode = AuthGenerateSaveForgotPasswordCode.getInstance().generateSaveForgotPasswordCode( authUserId, submitIP );
 			// Generate and send the email to the user.
 	        try {
@@ -259,7 +277,10 @@ public class ResetPasswordService {
 			        resetPasswordChangePasswordResult.setStatus(false);
 					return resetPasswordChangePasswordResult;  //  !!!!!  EARLY EXIT
 				}
-				if ( userMgmtResetPasswordResponse.isUserIdNotValid() ) {
+				if ( userMgmtResetPasswordResponse.isUserDisabled() ) {
+					String msg = "ResetPasswordService: resetPasswordUpdatePassword: Password not updated.  User is disabled.  authUserId: " + forgotPwdTrk.getUserId();
+					log.info( msg );
+				} else if ( userMgmtResetPasswordResponse.isUserIdNotValid() ) {
 					String msg = "Failed to update password in User Mgmt Webapp.  User id not valid for user id: " + userMgmtUserId;
 					log.error( msg );
 				} else {

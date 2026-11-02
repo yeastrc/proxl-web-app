@@ -6,7 +6,11 @@ package org.yeastrc.xlink.www.user_mgmt_webapp_access;
  */
 public class UserMgmtManageAccountRequest {
 
-	private String sessionKey;
+	private Integer userMgmtUserId;
+	/**
+	 * Required by User Mgmt when the email or username changes
+	 */
+	private String currentPassword;
 	
 	private String username;
 	private String email;
@@ -19,18 +23,18 @@ public class UserMgmtManageAccountRequest {
 
 	@Override
 	public String toString() {
-		return "UserMgmtManageAccountRequest [sessionKey=" + sessionKey + ", username=" + username + ", email=" + email
+		return "UserMgmtManageAccountRequest [userMgmtUserId=" + userMgmtUserId + ", currentPassword=NOT SHOWN, username=" + username + ", email=" + email
 				+ ", firstName=" + firstName + ", lastName=" + lastName + ", organization=" + organization
 				+ ", assignOrganizationNull=" + assignOrganizationNull + "]";
 	}
 
 
-	public String getSessionKey() {
-		return sessionKey;
+	public Integer getUserMgmtUserId() {
+		return userMgmtUserId;
 	}
 
-	public void setSessionKey(String sessionKey) {
-		this.sessionKey = sessionKey;
+	public void setUserMgmtUserId(Integer userMgmtUserId) {
+		this.userMgmtUserId = userMgmtUserId;
 	}
 
 	public String getUsername() {
@@ -79,5 +83,11 @@ public class UserMgmtManageAccountRequest {
 
 	public void setAssignOrganizationNull(boolean assignOrganizationNull) {
 		this.assignOrganizationNull = assignOrganizationNull;
+	}
+	public String getCurrentPassword() {
+		return currentPassword;
+	}
+	public void setCurrentPassword(String currentPassword) {
+		this.currentPassword = currentPassword;
 	}
 }

@@ -9,7 +9,6 @@ import java.util.List;
 public class UserMgmtSearchUserDataResponse {
 
 	private boolean success;
-	private boolean sessionKeyNotValid;
 	
 	private List<Integer> userIdList;
 
@@ -17,7 +16,7 @@ public class UserMgmtSearchUserDataResponse {
 
 	@Override
 	public String toString() {
-		return "UserMgmtSearchUserDataResponse [success=" + success + ", sessionKeyNotValid=" + sessionKeyNotValid
+		return "UserMgmtSearchUserDataResponse [success=" + success
 				+ ", userIdList=" + userIdList + ", errorMessage=" + errorMessage + "]";
 	}
 
@@ -27,14 +26,6 @@ public class UserMgmtSearchUserDataResponse {
 
 	public void setSuccess(boolean success) {
 		this.success = success;
-	}
-
-	public boolean isSessionKeyNotValid() {
-		return sessionKeyNotValid;
-	}
-
-	public void setSessionKeyNotValid(boolean sessionKeyNotValid) {
-		this.sessionKeyNotValid = sessionKeyNotValid;
 	}
 
 	public List<Integer> getUserIdList() {

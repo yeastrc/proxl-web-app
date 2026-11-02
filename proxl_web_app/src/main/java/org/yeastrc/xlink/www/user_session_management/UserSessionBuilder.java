@@ -125,10 +125,6 @@ public class UserSessionBuilder {
 		userSession.enabledAppSpecific = enabledAppSpecific;
 		return this;
 	}
-	public UserSessionBuilder setUserMgmtSessionKey(String userMgmtSessionKey) {
-		userSession.userMgmtSessionKey = userMgmtSessionKey;
-		return this;
-	}
 	public UserSessionBuilder setUsername(String username) {
 		userSession.username = username;
 		return this;

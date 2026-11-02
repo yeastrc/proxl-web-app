@@ -93,6 +93,18 @@
 				  			<span class="error-message-close-x error_message_close_x_jq">X</span></span>
 				  	</div>
 			  	</div>			
+		  		<div class="error-message-container error_message_container_jq" id="error_message_email_current_password_required">
+		  			<div class="error-message-inner-container" >
+			  			<span class="error-message-text" >Enter your current password
+				  			<span class="error-message-close-x error_message_close_x_jq">X</span></span>
+				  	</div>
+			  	</div>			
+		  		<div class="error-message-container error_message_container_jq" id="error_message_email_current_password_invalid">
+		  			<div class="error-message-inner-container" >
+			  			<span class="error-message-text" >Current password is incorrect
+				  			<span class="error-message-close-x error_message_close_x_jq">X</span></span>
+				  	</div>
+			  	</div>			
 				Email Address: 
 			</div>
 			<div  class="current-value-container current_value_container_jq">
@@ -101,6 +113,8 @@
 			</div>
 			<div  class="edit-value-container edit_value_container_jq">
 				<input type="text" value="" class="edit-value-input-field  edit_value_input_field_jq" id="email-change-field" maxlength="255">
+				<input type="password" value="" placeholder="Current Password" title="Current Password"  
+						class="edit-value-input-field  " id="email-change-current-password-field">
 				<input type="button" value="Submit" id="submit-email-change-button">
 				<input type="button" value="Cancel" class="cancel_button_jq">
 			</div>			
@@ -130,6 +144,18 @@
 				  			<span class="error-message-close-x error_message_close_x_jq">X</span></span>
 				  	</div>
 			  	</div>			
+		  		<div class="error-message-container error_message_container_jq" id="error_message_username_current_password_required">
+		  			<div class="error-message-inner-container" >
+			  			<span class="error-message-text" >Enter your current password
+				  			<span class="error-message-close-x error_message_close_x_jq">X</span></span>
+				  	</div>
+			  	</div>			
+		  		<div class="error-message-container error_message_container_jq" id="error_message_username_current_password_invalid">
+		  			<div class="error-message-inner-container" >
+			  			<span class="error-message-text" >Current password is incorrect
+				  			<span class="error-message-close-x error_message_close_x_jq">X</span></span>
+				  	</div>
+			  	</div>			
 			  	Username: 
 			</div>
 			
@@ -139,6 +165,8 @@
 			</div>
 			<div  class="edit-value-container edit_value_container_jq">
 				<input type="text" value="" class="edit-value-input-field  edit_value_input_field_jq" id="username-change-field"  maxlength="40">
+				<input type="password" value="" placeholder="Current Password" title="Current Password"  
+						class="edit-value-input-field  " id="username-change-current-password-field">
 				<input type="button" value="Submit" id="submit-username-change-button">
 				<input type="button" value="Cancel" class="cancel_button_jq">
 			</div>			

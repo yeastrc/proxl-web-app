@@ -94,20 +94,13 @@ public class UserLookupNotInProjectIdService {
 			///   Auth Check Complete
 			////////////////////////////
 			
-			String sessionKey = accessAndSetupWebSessionResult.getUserSession().getUserMgmtSessionKey();
 			UserMgmtSearchUserDataRequest userMgmtSearchUserDataRequest = new UserMgmtSearchUserDataRequest();
-			userMgmtSearchUserDataRequest.setSessionKey( sessionKey );
 			userMgmtSearchUserDataRequest.setSearchString( query );
 			
 			UserMgmtSearchUserDataResponse userMgmtSearchUserDataResponse = 
 					UserMgmtCentralWebappWebserviceAccess.getInstance().searchUserDataByLastName( userMgmtSearchUserDataRequest );
 			
 			if ( ! userMgmtSearchUserDataResponse.isSuccess() ) {
-				if ( userMgmtSearchUserDataResponse.isSessionKeyNotValid() ) {
-					String msg = "Session Key invalid for call to UserMgmtCentralWebappWebserviceAccess.getInstance().searchUserDataByLastName(...)";
-					log.error( msg );
-					throw new ProxlWebappInternalErrorException( msg );
-				}
 				String msg = "call to UserMgmtCentralWebappWebserviceAccess.getInstance().searchUserDataByLastName(...) not successful, query: " + query;
 				log.error( msg );
 				throw new ProxlWebappInternalErrorException( msg );
@@ -173,20 +166,13 @@ public class UserLookupNotInProjectIdService {
 			///   Auth Check Complete
 			////////////////////////////
 			
-			String sessionKey = accessAndSetupWebSessionResult.getUserSession().getUserMgmtSessionKey();
 			UserMgmtSearchUserDataRequest userMgmtSearchUserDataRequest = new UserMgmtSearchUserDataRequest();
-			userMgmtSearchUserDataRequest.setSessionKey( sessionKey );
 			userMgmtSearchUserDataRequest.setSearchString( query );
 			
 			UserMgmtSearchUserDataResponse userMgmtSearchUserDataResponse = 
 					UserMgmtCentralWebappWebserviceAccess.getInstance().searchUserDataByEmail( userMgmtSearchUserDataRequest );
 			
 			if ( ! userMgmtSearchUserDataResponse.isSuccess() ) {
-				if ( userMgmtSearchUserDataResponse.isSessionKeyNotValid() ) {
-					String msg = "Session Key invalid for call to UserMgmtCentralWebappWebserviceAccess.getInstance().searchUserDataByEmail(...)";
-					log.error( msg );
-					throw new ProxlWebappInternalErrorException( msg );
-				}
 				String msg = "call to UserMgmtCentralWebappWebserviceAccess.getInstance().searchUserDataByEmail(...) not successful, query: " + query;
 				log.error( msg );
 				throw new ProxlWebappInternalErrorException( msg );
@@ -274,7 +260,6 @@ public class UserLookupNotInProjectIdService {
 			
 			//  Get full user data
 			UserMgmtGetUserDataRequest userMgmtGetUserDataRequest = new UserMgmtGetUserDataRequest();
-//				userMgmtGetUserDataRequest.setSessionKey( userMgmtLoginResponse.getSessionKey() );
 			userMgmtGetUserDataRequest.setUserId( userMgmtUserId );
 			
 			UserMgmtGetUserDataResponse userMgmtGetUserDataResponse = 

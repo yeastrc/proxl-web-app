@@ -6,7 +6,6 @@ package org.yeastrc.xlink.www.user_mgmt_webapp_access;
  */
 public class UserMgmtSearchUserDataRequest {
 
-	private String sessionKey;
 	private String searchString;
 	/**
 	 * if false, results start with searchString
@@ -15,7 +14,7 @@ public class UserMgmtSearchUserDataRequest {
 	
 	@Override
 	public String toString() {
-		return "UserMgmtSearchUserDataRequest [sessionKey=" + sessionKey + ", searchString=" + searchString
+		return "UserMgmtSearchUserDataRequest [searchString=" + searchString
 				+ ", searchStringExactMatch=" + searchStringExactMatch + "]";
 	}
 	public boolean isSearchStringExactMatch() {
@@ -23,12 +22,6 @@ public class UserMgmtSearchUserDataRequest {
 	}
 	public void setSearchStringExactMatch(boolean searchStringExactMatch) {
 		this.searchStringExactMatch = searchStringExactMatch;
-	}
-	public String getSessionKey() {
-		return sessionKey;
-	}
-	public void setSessionKey(String sessionKey) {
-		this.sessionKey = sessionKey;
 	}
 	public String getSearchString() {
 		return searchString;

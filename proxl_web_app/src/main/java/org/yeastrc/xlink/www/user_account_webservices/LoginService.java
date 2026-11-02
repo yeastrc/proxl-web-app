@@ -39,6 +39,7 @@ import org.yeastrc.xlink.www.user_mgmt_webapp_access.UserMgmtGetUserDataRequest;
 import org.yeastrc.xlink.www.user_mgmt_webapp_access.UserMgmtGetUserDataResponse;
 import org.yeastrc.xlink.www.user_mgmt_webapp_access.UserMgmtLoginRequest;
 import org.yeastrc.xlink.www.user_mgmt_webapp_access.UserMgmtLoginResponse;
+import org.yeastrc.xlink.www.user_mgmt_webapp_access.UserMgmt_UserEnabled_RecheckCache;
 import org.yeastrc.xlink.www.user_session_management.UserSession;
 import org.yeastrc.xlink.www.user_session_management.UserSessionBuilder;
 import org.yeastrc.xlink.www.user_session_management.UserSessionManager;
@@ -132,7 +133,6 @@ public class LoginService {
 			int userMgmtUserId = userMgmtLoginResponse.getUserId();
 			//  Get full user data
 			UserMgmtGetUserDataRequest userMgmtGetUserDataRequest = new UserMgmtGetUserDataRequest();
-			userMgmtGetUserDataRequest.setSessionKey( userMgmtLoginResponse.getSessionKey() );
 			userMgmtGetUserDataRequest.setUserId( userMgmtUserId );
 			UserMgmtGetUserDataResponse userMgmtGetUserDataResponse = 
 					UserMgmtCentralWebappWebserviceAccess.getInstance().getUserData( userMgmtGetUserDataRequest );
@@ -300,7 +300,6 @@ public class LoginService {
 					.setUserAccessLevel( userAccessLevel )
 					.setEnabledAppSpecific( true )
 					//  From User Mgmt
-					.setUserMgmtSessionKey( userMgmtLoginResponse.getSessionKey() )
 					.setUsername( userMgmtGetUserDataResponse.getUsername() )
 					.setEmail( userMgmtGetUserDataResponse.getEmail() )
 					.setFirstName( userMgmtGetUserDataResponse.getFirstName() )
@@ -311,6 +310,9 @@ public class LoginService {
 					.build();
 			
 			UserSessionManager.getSinglesonInstance().createNewUserSession( userSession, request );
+			
+			//  User Mgmt just reported the user enabled at sign in
+			UserMgmt_UserEnabled_RecheckCache.getInstance().setUserEnabled_CheckedNow( userMgmtUserId );
 					
 			loginResult.setStatus(true);
 			return loginResult;

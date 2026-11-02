@@ -6,7 +6,7 @@ package org.yeastrc.xlink.www.user_mgmt_webapp_access;
  */
 public class UserMgmtChangePasswordRequest {
 
-	private String sessionKey;
+	private Integer userMgmtUserId;
 	
 	private String oldPassword;
 	private String newPassword;
@@ -15,7 +15,7 @@ public class UserMgmtChangePasswordRequest {
 
 	@Override
 	public String toString() {
-		return "UserMgmtChangePasswordRequest [sessionKey=" + sessionKey 
+		return "UserMgmtChangePasswordRequest [userMgmtUserId=" + userMgmtUserId 
 				+ ", userRemoteIP=" + userRemoteIP
 				+ ", oldPassword=NOT SHOWN"
 				+ ", newPassword=NOT SHOWN]";
@@ -26,11 +26,11 @@ public class UserMgmtChangePasswordRequest {
 	public void setUserRemoteIP(String userRemoteIP) {
 		this.userRemoteIP = userRemoteIP;
 	}
-	public String getSessionKey() {
-		return sessionKey;
+	public Integer getUserMgmtUserId() {
+		return userMgmtUserId;
 	}
-	public void setSessionKey(String sessionKey) {
-		this.sessionKey = sessionKey;
+	public void setUserMgmtUserId(Integer userMgmtUserId) {
+		this.userMgmtUserId = userMgmtUserId;
 	}
 	public String getOldPassword() {
 		return oldPassword;

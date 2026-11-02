@@ -21,9 +21,12 @@ import java.sql.SQLException;
 
 import jakarta.servlet.http.HttpServletRequest;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.yeastrc.auth.dao.AuthUserDAO;
 import org.yeastrc.auth.dto.AuthUserDTO;
 import org.yeastrc.xlink.www.exceptions.ProxlWebappDatabaseException;
+import org.yeastrc.xlink.www.user_mgmt_webapp_access.UserMgmt_UserEnabled_RecheckCache;
 import org.yeastrc.xlink.www.user_session_management.UserSession;
 import org.yeastrc.xlink.www.user_session_management.UserSessionAlterSession;
 import org.yeastrc.xlink.www.user_session_management.UserSessionManager;
@@ -35,9 +38,13 @@ import org.yeastrc.xlink.www.user_session_management.UserSessionManager;
  * Get the User Session
  * 
  * Refresh the Access Level and Enabled flag
+ * 
+ * Ends the session (and returns null) if the user is disabled in Proxl or in User Mgmt
  *
  */
 public class AccessControl_GetUserSession_RefreshAccessEnabled {
+
+	private static final Logger log = LoggerFactory.getLogger( AccessControl_GetUserSession_RefreshAccessEnabled.class );
 
 	private AccessControl_GetUserSession_RefreshAccessEnabled() { }
 	private static final AccessControl_GetUserSession_RefreshAccessEnabled _INSTANCE = new AccessControl_GetUserSession_RefreshAccessEnabled();
@@ -71,7 +78,25 @@ public class AccessControl_GetUserSession_RefreshAccessEnabled {
 		
 		if ( authUserDTO == null ) {
 			//  No record for user session user id
+			log.info( "User session ended:  No user record for the user in the session.  authUserId: " + userSession.getAuthUserId() );
+			UserSessionManager.getSinglesonInstance().invalidateUserSession( httpServletRequest );
 			return null;
+		}
+		
+		if ( ! authUserDTO.isEnabledAppSpecific() ) {
+			//  User disabled in Proxl
+			log.info( "User session ended:  User is disabled in Proxl.  authUserId: " + userSession.getAuthUserId() );
+			UserSessionManager.getSinglesonInstance().invalidateUserSession( httpServletRequest );
+			return null;
+		}
+		
+		if ( userSession.getUserMgmtUserId() != null ) {
+			//  Re-check the User Mgmt enabled flag (only makes a call when the user's last check is older than the interval)
+			if ( ! UserMgmt_UserEnabled_RecheckCache.getInstance().isUserEnabled( userSession.getUserMgmtUserId() ) ) {
+				log.info( "User session ended:  User is disabled or not found in User Mgmt.  authUserId: " + userSession.getAuthUserId() );
+				UserSessionManager.getSinglesonInstance().invalidateUserSession( httpServletRequest );
+				return null;
+			}
 		}
 		
 		if ( authUserDTO.isEnabledAppSpecific() != userSession.isEnabledAppSpecific() ) {

@@ -5,7 +5,6 @@ import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.auth.db.AuthLibraryDBConnectionFactory;
-import org.yeastrc.session_mgmt.main.YRCSessionMgmtMain;
 import org.yeastrc.xlink.db.DBConnectionFactory;
 import org.yeastrc.xlink.base.config_system_table_common_access.ConfigSystemTableGetValueCommon;
 import org.yeastrc.xlink.base.config_system_table_common_access.IConfigSystemTableGetValue;
@@ -78,14 +77,6 @@ public class ServletContextAppListener extends HttpServlet implements ServletCon
 		}
 		context.setAttribute( WebConstants.APP_CONTEXT_JS_CSS_CACHE_BUST, jsCssCacheBustString );
 
-		try {
-			YRCSessionMgmtMain.getInstance().init();
-		} catch (Exception e) {
-			//  
-			log.error( "Exception in YRCSessionMgmtMain.init():", e  );
-			throw new RuntimeException( e );
-		} 
-		
 		AuthLibraryDBConnectionFactoryForWeb dbConnectFactory = new AuthLibraryDBConnectionFactoryForWeb();
 		AuthLibraryDBConnectionFactory.setDbConnectionFactoryImpl(dbConnectFactory);
 		
