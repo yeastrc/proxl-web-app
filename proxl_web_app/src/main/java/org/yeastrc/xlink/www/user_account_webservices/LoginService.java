@@ -200,8 +200,7 @@ public class LoginService {
 				throw new ProxlWebappInternalErrorException(msg);
 			}
 			if ( ! userEnabledAppSpecific ) {
-				String msg = "Failed to get userEnabledAppSpecific from proxl auth_user table for user id: " + proxlAuthUserId;
-				log.error( msg );
+				log.info( "Sign-in refused:  User is disabled in Proxl.  authUserId: " + proxlAuthUserId );
 		        loginResult.setDisabledUser(true);
 				return loginResult;  //  Early Exit
 			}
