@@ -125,6 +125,14 @@
 	  			<div class="error-message-text" >User disabled</div>
   			</div>
 	  	</div>
+  		<div class="error-message-container error_message_container_jq" id="error_message_signin_temporarily_unavailable">
+  			<div class="error-message-inner-container" >
+  				<div class="error-message-close-x error_message_close_x_jq">X</div>
+	  			<div class="error-message-text" >Sign-in is temporarily unavailable.  Please try again in <span 
+	  				class="signin_temporarily_unavailable_number_jq"></span> <span 
+	  				class="signin_temporarily_unavailable_unit_jq"></span>.</div>
+  			</div>
+	  	</div>
   		<div class="error-message-container error_message_container_jq" id="error_message_no_proxl_account">
   			<div class="error-message-inner-container" >
   				<div class="error-message-close-x error_message_close_x_jq">X</div>

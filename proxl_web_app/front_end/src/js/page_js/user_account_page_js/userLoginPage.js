@@ -20,12 +20,29 @@ var pageGlobals = {
 };
 
 ///////////////////
+
+//  true while a sign-in request is in progress:  No second submit until the response arrives
+var signInRequestInProgress = false;
+
+/**
+ * Allow a sign-in submit again
+ */
+var signInRequestDone = function() {
+	signInRequestInProgress = false;
+	$("#login_person_button").prop( "disabled", false );
+};
+
+///////////////////
 window.loginPersonFormSubmit = function() {
 	loginPerson();
 };
 
 ////////////////////////////
 window.loginPerson = function( params ) {
+	if ( signInRequestInProgress ) {
+		//  A sign-in request is in progress:  Ignore this submit (button click or Enter)
+		return;  //  !!!  EARLY EXIT
+	}
 	var tosKeyToServer = "";
 	if ( params ) {
 		if ( params.tosKey ) {
@@ -72,6 +89,10 @@ window.loginPerson = function( params ) {
 			inviteTrackingCode : inviteTrackingCode
 	};
 	var _URL = "services/user/login";
+
+	signInRequestInProgress = true;
+	$("#login_person_button").prop( "disabled", true );
+
 	// var request =
 	$.ajax({
 		type : "POST",
@@ -87,11 +108,13 @@ window.loginPerson = function( params ) {
 			}
 		},
 		failure : function(errMsg) {
+			signInRequestDone();
 			var $element = $("#error_message_system_error");
 			showErrorMsg( $element );
 //			alert(errMsg);
 		},
 		error : function(jqXHR, textStatus, errorThrown) {
+			signInRequestDone();
 			var $element = $("#error_message_system_error");
 			showErrorMsg( $element );
 //			handleAJAXError(jqXHR, textStatus, errorThrown);
@@ -105,7 +128,26 @@ window.loginPerson = function( params ) {
 window.loginComplete = function(requestData, responseData) {
 	if ( ! responseData.status ) {
 		//  User not logged in if status not true
-		if ( responseData.termsOfServiceAcceptanceRequired ) {
+
+		signInRequestDone();
+
+		if ( responseData.signInTemporarilyUnavailable ) {
+
+			destroySpinner();  // Destroy Spinner - External Function
+
+			//  Refused by a sign-in limit.  Show when to try again:  seconds below 60, otherwise minutes (rounded up)
+			var seconds = responseData.signInTemporarilyUnavailable_Seconds;
+			var number = seconds;
+			var unit = ( seconds === 1 ) ? "second" : "seconds";
+			if ( seconds >= 60 ) {
+				number = Math.ceil( seconds / 60 );
+				unit = ( number === 1 ) ? "minute" : "minutes";
+			}
+			var $element = $("#error_message_signin_temporarily_unavailable");
+			$element.find(".signin_temporarily_unavailable_number_jq").text( number );
+			$element.find(".signin_temporarily_unavailable_unit_jq").text( unit );
+			showErrorMsg( $element );
+		} else if ( responseData.termsOfServiceAcceptanceRequired ) {
 
 			destroySpinner();  // Destroy Spinner - External Function
 				

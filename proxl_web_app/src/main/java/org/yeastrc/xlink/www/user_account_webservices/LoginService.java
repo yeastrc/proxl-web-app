@@ -10,6 +10,8 @@ import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;  import org.slf4j.Logger;
 import org.yeastrc.auth.dao.AuthUserDAO;
@@ -40,6 +42,7 @@ import org.yeastrc.xlink.www.user_mgmt_webapp_access.UserMgmtGetUserDataResponse
 import org.yeastrc.xlink.www.user_mgmt_webapp_access.UserMgmtLoginRequest;
 import org.yeastrc.xlink.www.user_mgmt_webapp_access.UserMgmtLoginResponse;
 import org.yeastrc.xlink.www.user_mgmt_webapp_access.UserMgmt_UserEnabled_RecheckCache;
+import org.yeastrc.xlink.www.signin_limits.SignIn_Limits;
 import org.yeastrc.xlink.www.user_session_management.UserSession;
 import org.yeastrc.xlink.www.user_session_management.UserSessionBuilder;
 import org.yeastrc.xlink.www.user_session_management.UserSessionManager;
@@ -110,17 +113,81 @@ public class LoginService {
 					.build()
 					);  //  Early Exit with Data Exception
 		}
+		
+		String usernameNormalized = SignIn_Limits.normalizeUsername( username );
+
+		//  Sign-in limit C:  One sign-in at a time per username
+		if ( ! SignIn_Limits.getInstance().signInInProgress_TryAdd( usernameNormalized ) ) {
+			setSignInTemporarilyUnavailable( loginResult, SignIn_Limits.getInstance().getRetrySeconds() );
+			return loginResult;  //  Early Exit
+		}
+		try {
+			return loginServiceLocal_SignInLimit_C_Passed( username, password, returnTOS, tosAcceptedKey, inviteTrackingCode, usernameNormalized, request );
+		} finally {
+			SignIn_Limits.getInstance().signInInProgress_Remove( usernameNormalized );
+		}
+	}
+
+	/**
+	 * Sign in, after the input checks, while this username is marked "sign-in in progress" (sign-in limit C)
+	 * 
+	 * @param username
+	 * @param password
+	 * @param returnTOS
+	 * @param tosAcceptedKey
+	 * @param inviteTrackingCode
+	 * @param usernameNormalized
+	 * @param request
+	 * @return
+	 */
+	private LoginResult loginServiceLocal_SignInLimit_C_Passed(   
+			String username,
+			String password,
+			String returnTOS,
+			String tosAcceptedKey,
+			String inviteTrackingCode,
+			String usernameNormalized,
+			HttpServletRequest request ) {
+		
+		LoginResult loginResult = new LoginResult();
+		
 //		if (true)
 //		throw new Exception("Forced Error");
 		try {
+			//  Sign-in limit A:  Username blocked after too many wrong passwords.  Refuse before the password is checked.
+			Integer userBlocked_RemainingSeconds = SignIn_Limits.getInstance().userBlocked_RemainingSeconds( usernameNormalized );
+			if ( userBlocked_RemainingSeconds != null ) {
+				setSignInTemporarilyUnavailable( loginResult, userBlocked_RemainingSeconds );
+				return loginResult;  //  Early Exit
+			}
+			
 			UserMgmtLoginRequest userMgmtLoginRequest = new UserMgmtLoginRequest();
 			userMgmtLoginRequest.setUsername( username );
 			userMgmtLoginRequest.setPassword( password );
 			userMgmtLoginRequest.setRemoteIP(  request.getRemoteAddr() );
-			UserMgmtLoginResponse userMgmtLoginResponse = 
-					UserMgmtCentralWebappWebserviceAccess.getInstance().userLogin( userMgmtLoginRequest );
+			
+			//  Sign-in limit D:  At most a set number of sign-ins at the same time
+			if ( ! SignIn_Limits.getInstance().concurrentSignIn_TryAcquire() ) {
+				setSignInTemporarilyUnavailable( loginResult, SignIn_Limits.getInstance().getRetrySeconds() );
+				return loginResult;  //  Early Exit
+			}
+			UserMgmtLoginResponse userMgmtLoginResponse;
+			try {
+				userMgmtLoginResponse = 
+						UserMgmtCentralWebappWebserviceAccess.getInstance().userLogin( userMgmtLoginRequest );
+			} finally {
+				SignIn_Limits.getInstance().concurrentSignIn_Release();
+			}
 			if ( ! userMgmtLoginResponse.isSuccess() ) {
-				if ( userMgmtLoginResponse.isUsernameNotFound() || userMgmtLoginResponse.isPasswordInvalid() ) {
+				if ( userMgmtLoginResponse.isPasswordInvalid() ) {
+					//  The account exists:  Counts for the per-username limit (A) and the alert (E)
+					SignIn_Limits.getInstance().recordPasswordInvalid( usernameNormalized );
+			        loginResult.setInvalidUserOrPassword(true);
+					return loginResult;  //  Early Exit
+				}
+				if ( userMgmtLoginResponse.isUsernameNotFound() ) {
+					//  Counts for the alert (E) only
+					SignIn_Limits.getInstance().recordUsernameNotFound();
 			        loginResult.setInvalidUserOrPassword(true);
 					return loginResult;  //  Early Exit
 				}
@@ -128,6 +195,10 @@ public class LoginService {
 			        loginResult.setDisabledUser(true);
 					return loginResult;  //  Early Exit
 				}
+			}
+			if ( userMgmtLoginResponse.isSuccess() ) {
+				//  User Mgmt accepted the password:  Clear the count of wrong passwords for this username (A)
+				SignIn_Limits.getInstance().recordPasswordCorrect( usernameNormalized );
 			}
 			//  Marked as logged in in User Mgmt Web app even if don't accept TOS
 			int userMgmtUserId = userMgmtLoginResponse.getUserId();
@@ -330,6 +401,17 @@ public class LoginService {
 	}
 	
 	/**
+	 * Sign-in refused by a sign-in limit
+	 * 
+	 * @param loginResult
+	 * @param seconds - when to try again
+	 */
+	private void setSignInTemporarilyUnavailable( LoginResult loginResult, int seconds ) {
+		loginResult.setSignInTemporarilyUnavailable( true );
+		loginResult.setSignInTemporarilyUnavailable_Seconds( seconds );
+	}
+	
+	/**
 	 * This is returned from the web service LoginService
 	 *
 	 */
@@ -345,6 +427,17 @@ public class LoginService {
 		private boolean termsOfServiceAcceptanceRequired = false;
 		private String termsOfServiceText;
 		private String termsOfServiceKey;
+		/**
+		 * Only set (not null) when sign-in is refused by a sign-in limit.
+		 * Left out of the JSON when null, so a normal response is unchanged.
+		 */
+		@JsonInclude(JsonInclude.Include.NON_NULL)
+		private Boolean signInTemporarilyUnavailable;
+		/**
+		 * Seconds until sign-in can be tried again.  Only set (not null) with signInTemporarilyUnavailable.
+		 */
+		@JsonInclude(JsonInclude.Include.NON_NULL)
+		private Integer signInTemporarilyUnavailable_Seconds;
 		public boolean isInvalidUserOrPassword() {
 			return invalidUserOrPassword;
 		}
@@ -393,6 +486,20 @@ public class LoginService {
 		}
 		public void setNoProxlAccount(boolean noProxlAccount) {
 			this.noProxlAccount = noProxlAccount;
+		}
+		@JsonInclude(JsonInclude.Include.NON_NULL)
+		public Boolean getSignInTemporarilyUnavailable() {
+			return signInTemporarilyUnavailable;
+		}
+		public void setSignInTemporarilyUnavailable(Boolean signInTemporarilyUnavailable) {
+			this.signInTemporarilyUnavailable = signInTemporarilyUnavailable;
+		}
+		@JsonInclude(JsonInclude.Include.NON_NULL)
+		public Integer getSignInTemporarilyUnavailable_Seconds() {
+			return signInTemporarilyUnavailable_Seconds;
+		}
+		public void setSignInTemporarilyUnavailable_Seconds(Integer signInTemporarilyUnavailable_Seconds) {
+			this.signInTemporarilyUnavailable_Seconds = signInTemporarilyUnavailable_Seconds;
 		}
 	}
 }

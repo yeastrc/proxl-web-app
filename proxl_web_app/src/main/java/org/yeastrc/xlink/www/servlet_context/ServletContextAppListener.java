@@ -23,6 +23,7 @@ import org.yeastrc.xlink.www.log_error_after_webapp_undeploy_started.Log_Info_Er
 import org.yeastrc.xlink.www.user_mgmt_webapp_access.UserMgmtCentralWebappWebserviceAccess;
 import org.yeastrc.xlink.www.no_data_validation.ThrowExceptionOnNoDataConfig;
 import org.yeastrc.xlink.www.user_mgmt_db.UserMgmtCentralMainDBConnectionFactory_For_Proxl;
+import org.yeastrc.xlink.www.signin_limits.SignIn_Limits;
 import org.yeastrc.xlink.www.web_utils.GetJsCssCacheBustString;
 /**
  * This class is loaded and the method "contextInitialized" is called when the web application is first loaded by the container
@@ -100,6 +101,9 @@ public class ServletContextAppListener extends HttpServlet implements ServletCon
 		UserMgmtCentralMainDBConnectionFactory_For_Proxl userMgmtCentralMainDBConnectionFactory_For_Proxl = new UserMgmtCentralMainDBConnectionFactory_For_Proxl();
 
 		UserMgmtCentralWebappWebserviceAccess.getInstance().init( userMgmtCentralMainDBConnectionFactory_For_Proxl );
+		
+		//  Read the sign-in limits configuration now, so its settings are logged at startup
+		SignIn_Limits.getInstance();
 		
 		AppContextConfigSystemValuesRetrieval appContextConfigSystemValuesRetrieval = 
 				new AppContextConfigSystemValuesRetrieval();

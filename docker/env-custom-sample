@@ -23,6 +23,28 @@ WEBAPP_JAVA_OPTIONS=-Xms2024m -Xmx2024m
 # the Tomcat/Docker default, NOT a value defined or controlled by Proxl.
 #PROXL_SESSION_TIMEOUT_MINUTES=2880
 
+# Optional: sign-in limits.  Leave these unset/commented to use the defaults
+# shown.  PROXL_SIGNIN_LIMITS_ENABLED=false turns all of them off.
+# Master on/off switch (true or false):
+#PROXL_SIGNIN_LIMITS_ENABLED=true
+# Wrong passwords for one username that block that username:
+#PROXL_SIGNIN_USER_MAX_FAILURES=7
+# ... counted within this many minutes:
+#PROXL_SIGNIN_USER_WINDOW_MINUTES=15
+# Minutes that username is then blocked:
+#PROXL_SIGNIN_USER_BLOCK_MINUTES=8
+# Seconds shown in "try again" when a sign-in is refused because one is in
+# progress for the same username, or too many are in progress:
+#PROXL_SIGNIN_RETRY_SECONDS=30
+# Most sign-ins in progress at the same time:
+#PROXL_SIGNIN_MAX_CONCURRENT=10
+# Milliseconds a sign-in waits for its turn before it is refused:
+#PROXL_SIGNIN_CONCURRENT_WAIT_MILLIS=2000
+# Failed sign-ins (any usernames) that log an ERROR (no blocking):
+#PROXL_SIGNIN_ALERT_FAILURES=50
+# ... counted within this many minutes:
+#PROXL_SIGNIN_ALERT_WINDOW_MINUTES=5
+
 # This manages optimization settings for MySQL
 MYSQL_OPTIONS=--max-connections=500 --skip-ssl
 
