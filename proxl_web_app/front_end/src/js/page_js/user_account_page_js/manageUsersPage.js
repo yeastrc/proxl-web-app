@@ -19,6 +19,7 @@ const Handlebars = require('handlebars');
 
 import { webserviceCallStandardPost } from 'page_js/webservice_call_common/webserviceCallStandardPost.js';
 import { passwordTooLong_CheckBeforeSubmit_ShowErrorMessage, passwordTooLong_ServerReturnedPasswordTooLong_ShowErrorMessage } from 'page_js/user_account_page_js/passwordTooLong_Common.js';
+import { accountServiceCallFailure_ShowErrorMessage_IfFailure, ACCOUNT_SERVICE_CALL_FAILURE__CREATE_ACCOUNT__ADMIN } from 'page_js/user_account_page_js/accountServiceCallFailure_Common.js';
 
 
 var adminGlobals = {
@@ -831,6 +832,9 @@ window.createAccountFormSubmit = function() {
 			showErrorMsg( $element );
 		},
 		error : function(jqXHR, textStatus, errorThrown) {
+			if ( accountServiceCallFailure_ShowErrorMessage_IfFailure({ jqXHR, createAccount : ACCOUNT_SERVICE_CALL_FAILURE__CREATE_ACCOUNT__ADMIN, showErrorMessage_Function : showErrorMsg }) ) {
+				return;  //  The call from the server to the account service failed:  Message shown
+			}
 			handleAJAXError(jqXHR, textStatus, errorThrown);
 //			alert( "exception: " + errorThrown + ", jqXHR: " + jqXHR + ",
 //			textStatus: " + textStatus );

@@ -1,5 +1,7 @@
 package org.yeastrc.xlink.www.file_import_proxl_xml_scans.webservices;
 
+import org.yeastrc.user_mgmt_central.user_mgmt_central__embed_code.UserMgmtConnectorCallFailure_IF;
+import org.yeastrc.xlink.www.user_mgmt_webapp_access.UserMgmt_ConnectorCallFailure_Util;
 import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -121,6 +123,11 @@ public class ProxlXMLFileImportTrackingDataService {
 		    	        .build()
 		    	        );			
 		} catch ( Exception e ) {
+			UserMgmtConnectorCallFailure_IF userMgmtConnectorCallFailure = UserMgmt_ConnectorCallFailure_Util.find( e );
+			if ( userMgmtConnectorCallFailure != null ) {
+				log.error( UserMgmt_ConnectorCallFailure_Util.logText( userMgmtConnectorCallFailure ), e );
+				throw UserMgmt_ConnectorCallFailure_Util.webApplicationException_ForReadOnly( userMgmtConnectorCallFailure );
+			}
 			String msg = "Exception caught: " + e.toString();
 			log.error( msg, e );
 			throw new WebApplicationException(

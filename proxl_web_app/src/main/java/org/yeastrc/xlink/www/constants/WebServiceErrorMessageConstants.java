@@ -20,6 +20,15 @@ public class WebServiceErrorMessageConstants {
 	
 	public static final String INTERNAL_SERVER_ERROR_TEXT = "INTERNAL_SERVER_ERROR";
 	public static final jakarta.ws.rs.core.Response.Status INTERNAL_SERVER_ERROR_STATUS_CODE = jakarta.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;
-	
+
+	//  The call to the account service (User Mgmt) failed.  Sent with INTERNAL_SERVER_ERROR_STATUS_CODE
+
+	//  A change:  Nothing was saved
+	public static final String USER_MGMT_CHANGE_NOT_SAVED_TEXT = "change_not_saved";
+	//  A change:  Not known whether it was saved
+	public static final String USER_MGMT_CHANGE_OUTCOME_UNKNOWN_TEXT = "change_outcome_unknown";
+	//  Reading user data
+	public static final String USER_MGMT_ACCOUNT_SERVICE_UNAVAILABLE_TEXT = "account_service_unavailable";
+
 	
 }

@@ -1,5 +1,7 @@
 package org.yeastrc.xlink.www.user_account_webservices;
 
+import org.yeastrc.user_mgmt_central.user_mgmt_central__embed_code.UserMgmtConnectorCallFailure_IF;
+import org.yeastrc.xlink.www.user_mgmt_webapp_access.UserMgmt_ConnectorCallFailure_Util;
 import java.nio.charset.StandardCharsets;
 
 import java.util.List;
@@ -178,6 +180,11 @@ public class ResetPasswordService {
 		} catch ( WebApplicationException e ) {
 			throw e;
 		} catch ( Exception e ) {
+			UserMgmtConnectorCallFailure_IF userMgmtConnectorCallFailure = UserMgmt_ConnectorCallFailure_Util.find( e );
+			if ( userMgmtConnectorCallFailure != null ) {
+				log.error( UserMgmt_ConnectorCallFailure_Util.logText( userMgmtConnectorCallFailure ), e );
+				throw UserMgmt_ConnectorCallFailure_Util.webApplicationException_ForReadOnly( userMgmtConnectorCallFailure );
+			}
 			String msg = "Exception caught in resetPasswordGenEmailService(...): " + e.toString();
 			log.error( msg, e );
 			throw new WebApplicationException(
@@ -298,6 +305,11 @@ public class ResetPasswordService {
 		} catch ( WebApplicationException e ) {
 			throw e;
 		} catch ( Exception e ) {
+			UserMgmtConnectorCallFailure_IF userMgmtConnectorCallFailure = UserMgmt_ConnectorCallFailure_Util.find( e );
+			if ( userMgmtConnectorCallFailure != null ) {
+				log.error( UserMgmt_ConnectorCallFailure_Util.logText( userMgmtConnectorCallFailure ), e );
+				throw UserMgmt_ConnectorCallFailure_Util.webApplicationException_ForChange( userMgmtConnectorCallFailure );
+			}
 			String msg = "Exception caught in resetPasswordUpdatePasswordService(...): " + e.toString();
 			log.error( msg, e );
 			throw new WebApplicationException(

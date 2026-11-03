@@ -9,6 +9,7 @@
 "use strict";
 
 import { passwordTooLong_CheckBeforeSubmit_ShowErrorMessage, passwordTooLong_ServerReturnedPasswordTooLong_ShowErrorMessage } from 'page_js/user_account_page_js/passwordTooLong_Common.js';
+import { accountServiceCallFailure_ShowErrorMessage_IfFailure, ACCOUNT_SERVICE_CALL_FAILURE__CREATE_ACCOUNT__SELF } from 'page_js/user_account_page_js/accountServiceCallFailure_Common.js';
 
 var PAGE_CONSTANTS = {
 		ERROR_MESSAGE_VERTICAL_MOVEMENT : 50 // number of pixels for moving error message when showing it. 
@@ -157,6 +158,9 @@ window.createAccount = function() {
 //			alert(errMsg);
 		},
 		error : function(jqXHR, textStatus, errorThrown) {
+			if ( accountServiceCallFailure_ShowErrorMessage_IfFailure({ jqXHR, createAccount : ACCOUNT_SERVICE_CALL_FAILURE__CREATE_ACCOUNT__SELF, showErrorMessage_Function : showErrorMsg }) ) {
+				return;  //  The call from the server to the account service failed:  Message shown
+			}
 			var $element = $("#error_message_system_error");
 			showErrorMsg( $element );
 //			handleAJAXError(jqXHR, textStatus, errorThrown);

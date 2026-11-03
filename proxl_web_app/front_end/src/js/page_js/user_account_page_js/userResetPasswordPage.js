@@ -10,6 +10,8 @@
 
 "use strict";
 
+import { accountServiceCallFailure_ShowErrorMessage_IfFailure } from 'page_js/user_account_page_js/accountServiceCallFailure_Common.js';
+
 
 var PAGE_CONSTANTS = {
 		
@@ -110,6 +112,9 @@ window.resetPassword = function(clickThis, eventObject) {
 			
 		},
 		error : function(jqXHR, textStatus, errorThrown) {
+			if ( accountServiceCallFailure_ShowErrorMessage_IfFailure({ jqXHR, createAccount : undefined, showErrorMessage_Function : showMsg }) ) {
+				return;  //  The call from the server to the account service failed:  Message shown
+			}
 
 			
 			var $element = $("#error_message_system_error");

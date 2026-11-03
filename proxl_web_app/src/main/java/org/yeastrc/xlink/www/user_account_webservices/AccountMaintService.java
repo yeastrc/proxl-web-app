@@ -1,5 +1,7 @@
 package org.yeastrc.xlink.www.user_account_webservices;
 
+import org.yeastrc.user_mgmt_central.user_mgmt_central__embed_code.UserMgmtConnectorCallFailure_IF;
+import org.yeastrc.xlink.www.user_mgmt_webapp_access.UserMgmt_ConnectorCallFailure_Util;
 import java.nio.charset.StandardCharsets;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -116,6 +118,11 @@ public class AccountMaintService {
 		} catch ( WebApplicationException e ) {
 			throw e;
 		} catch ( Exception e ) {
+			UserMgmtConnectorCallFailure_IF userMgmtConnectorCallFailure = UserMgmt_ConnectorCallFailure_Util.find( e );
+			if ( userMgmtConnectorCallFailure != null ) {
+				log.error( UserMgmt_ConnectorCallFailure_Util.logText( userMgmtConnectorCallFailure ), e );
+				throw UserMgmt_ConnectorCallFailure_Util.webApplicationException_ForChange( userMgmtConnectorCallFailure );
+			}
 			String msg = "Exception caught: " + e.toString();
 			log.error( msg, e );
 			throw new WebApplicationException(
@@ -203,6 +210,11 @@ public class AccountMaintService {
 		} catch ( WebApplicationException e ) {
 			throw e;
 		} catch ( Exception e ) {
+			UserMgmtConnectorCallFailure_IF userMgmtConnectorCallFailure = UserMgmt_ConnectorCallFailure_Util.find( e );
+			if ( userMgmtConnectorCallFailure != null ) {
+				log.error( UserMgmt_ConnectorCallFailure_Util.logText( userMgmtConnectorCallFailure ), e );
+				throw UserMgmt_ConnectorCallFailure_Util.webApplicationException_ForChange( userMgmtConnectorCallFailure );
+			}
 			String msg = "Exception caught: " + e.toString();
 			log.error( msg, e );
 			throw new WebApplicationException(
@@ -290,6 +302,11 @@ public class AccountMaintService {
 		} catch ( WebApplicationException e ) {
 			throw e;
 		} catch ( Exception e ) {
+			UserMgmtConnectorCallFailure_IF userMgmtConnectorCallFailure = UserMgmt_ConnectorCallFailure_Util.find( e );
+			if ( userMgmtConnectorCallFailure != null ) {
+				log.error( UserMgmt_ConnectorCallFailure_Util.logText( userMgmtConnectorCallFailure ), e );
+				throw UserMgmt_ConnectorCallFailure_Util.webApplicationException_ForChange( userMgmtConnectorCallFailure );
+			}
 			String msg = "Exception caught: " + e.toString();
 			log.error( msg, e );
 			throw new WebApplicationException(
@@ -380,6 +397,11 @@ public class AccountMaintService {
 		} catch ( WebApplicationException e ) {
 			throw e;
 		} catch ( Exception e ) {
+			UserMgmtConnectorCallFailure_IF userMgmtConnectorCallFailure = UserMgmt_ConnectorCallFailure_Util.find( e );
+			if ( userMgmtConnectorCallFailure != null ) {
+				log.error( UserMgmt_ConnectorCallFailure_Util.logText( userMgmtConnectorCallFailure ), e );
+				throw UserMgmt_ConnectorCallFailure_Util.webApplicationException_ForChange( userMgmtConnectorCallFailure );
+			}
 			String msg = "Exception caught: " + e.toString();
 			log.error( msg, e );
 			throw new WebApplicationException(
@@ -478,6 +500,11 @@ public class AccountMaintService {
 		} catch ( WebApplicationException e ) {
 			throw e;
 		} catch ( Exception e ) {
+			UserMgmtConnectorCallFailure_IF userMgmtConnectorCallFailure = UserMgmt_ConnectorCallFailure_Util.find( e );
+			if ( userMgmtConnectorCallFailure != null ) {
+				log.error( UserMgmt_ConnectorCallFailure_Util.logText( userMgmtConnectorCallFailure ), e );
+				throw UserMgmt_ConnectorCallFailure_Util.webApplicationException_ForChange( userMgmtConnectorCallFailure );
+			}
 			String msg = "Exception caught: " + e.toString();
 			log.error( msg, e );
 			throw new WebApplicationException(
@@ -580,6 +607,11 @@ public class AccountMaintService {
 		} catch ( WebApplicationException e ) {
 			throw e;
 		} catch ( Exception e ) {
+			UserMgmtConnectorCallFailure_IF userMgmtConnectorCallFailure = UserMgmt_ConnectorCallFailure_Util.find( e );
+			if ( userMgmtConnectorCallFailure != null ) {
+				log.error( UserMgmt_ConnectorCallFailure_Util.logText( userMgmtConnectorCallFailure ), e );
+				throw UserMgmt_ConnectorCallFailure_Util.webApplicationException_ForChange( userMgmtConnectorCallFailure );
+			}
 			String msg = "changePasswordService(...) Exception caught: " + e.toString();
 			log.error( msg, e );
 			throw new WebApplicationException(

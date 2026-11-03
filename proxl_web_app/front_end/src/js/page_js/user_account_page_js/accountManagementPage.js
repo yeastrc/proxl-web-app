@@ -11,6 +11,7 @@
 "use strict";
 
 import { passwordTooLong_CheckBeforeSubmit_ShowErrorMessage, passwordTooLong_ServerReturnedPasswordTooLong_ShowErrorMessage } from 'page_js/user_account_page_js/passwordTooLong_Common.js';
+import { accountServiceCallFailure_ShowErrorMessage_IfFailure } from 'page_js/user_account_page_js/accountServiceCallFailure_Common.js';
 
 ////////////////////////////
 
@@ -49,6 +50,9 @@ window.updateFirstName = function(clickThis, eventObject) {
 //			alert(errMsg);
 		},
 		error : function(jqXHR, textStatus, errorThrown) {
+			if ( accountServiceCallFailure_ShowErrorMessage_IfFailure({ jqXHR, createAccount : undefined, showErrorMessage_Function : showErrorMsg }) ) {
+				return;  //  The call from the server to the account service failed:  Message shown
+			}
 //			var $element = $("#error_message_system_error");
 //			showErrorMsg( $element );
 			handleAJAXError(jqXHR, textStatus, errorThrown);
@@ -113,6 +117,9 @@ window.updateLastName = function(clickThis, eventObject) {
 //			alert(errMsg);
 		},
 		error : function(jqXHR, textStatus, errorThrown) {
+			if ( accountServiceCallFailure_ShowErrorMessage_IfFailure({ jqXHR, createAccount : undefined, showErrorMessage_Function : showErrorMsg }) ) {
+				return;  //  The call from the server to the account service failed:  Message shown
+			}
 //			var $element = $("#error_message_system_error");
 //			showErrorMsg( $element );
 			handleAJAXError(jqXHR, textStatus, errorThrown);
@@ -176,6 +183,9 @@ window.updateOrganization = function(clickThis, eventObject) {
 //			alert(errMsg);
 		},
 		error : function(jqXHR, textStatus, errorThrown) {
+			if ( accountServiceCallFailure_ShowErrorMessage_IfFailure({ jqXHR, createAccount : undefined, showErrorMessage_Function : showErrorMsg }) ) {
+				return;  //  The call from the server to the account service failed:  Message shown
+			}
 //			var $element = $("#error_message_system_error");
 //			showErrorMsg( $element );
 			handleAJAXError(jqXHR, textStatus, errorThrown);
@@ -246,6 +256,9 @@ window.updateEmail = function(clickThis, eventObject) {
 //			alert(errMsg);
 		},
 		error : function(jqXHR, textStatus, errorThrown) {
+			if ( accountServiceCallFailure_ShowErrorMessage_IfFailure({ jqXHR, createAccount : undefined, showErrorMessage_Function : showErrorMsg }) ) {
+				return;  //  The call from the server to the account service failed:  Message shown
+			}
 //			var $element = $("#error_message_system_error");
 //			showErrorMsg( $element );
 			handleAJAXError(jqXHR, textStatus, errorThrown);
@@ -334,6 +347,9 @@ window.updateUsername = function(clickThis, eventObject) {
 //			alert(errMsg);
 		},
 		error : function(jqXHR, textStatus, errorThrown) {
+			if ( accountServiceCallFailure_ShowErrorMessage_IfFailure({ jqXHR, createAccount : undefined, showErrorMessage_Function : showErrorMsg }) ) {
+				return;  //  The call from the server to the account service failed:  Message shown
+			}
 //			var $element = $("#error_message_system_error");
 //			showErrorMsg( $element );
 			handleAJAXError(jqXHR, textStatus, errorThrown);
@@ -445,6 +461,9 @@ window.updatePassword = function(clickThis, eventObject) {
 //			alert(errMsg);
 		},
 		error : function(jqXHR, textStatus, errorThrown) {
+			if ( accountServiceCallFailure_ShowErrorMessage_IfFailure({ jqXHR, createAccount : undefined, showErrorMessage_Function : showErrorMsg }) ) {
+				return;  //  The call from the server to the account service failed:  Message shown
+			}
 //			var $element = $("#error_message_system_error");
 //			showErrorMsg( $element );
 			handleAJAXError(jqXHR, textStatus, errorThrown);

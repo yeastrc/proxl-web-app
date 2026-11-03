@@ -67,6 +67,13 @@
 	  			<div class="error-message-text" >System Error</div>
 		  	</div>
 	  	</div>
+
+  		<div class="error-message-container error_message_container_jq" id="error_message_account_service">
+  			<div class="error-message-inner-container" >
+  				<div class="error-message-close-x error_message_close_x_jq">X</div>
+	  			<div class="error-message-text" ><span class="account_service_message_jq"></span></div>
+		  	</div>
+	  	</div>
 	  	
   		<div class="success-message-container error_message_container_jq" id="success_message_system_success">
   			<div class="success-message-inner-container" >

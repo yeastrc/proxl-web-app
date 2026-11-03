@@ -42,6 +42,8 @@ import org.yeastrc.xlink.www.user_mgmt_webapp_access.UserMgmtGetUserDataResponse
 import org.yeastrc.xlink.www.user_mgmt_webapp_access.UserMgmtLoginRequest;
 import org.yeastrc.xlink.www.user_mgmt_webapp_access.UserMgmtLoginResponse;
 import org.yeastrc.xlink.www.user_mgmt_webapp_access.UserMgmt_UserEnabled_RecheckCache;
+import org.yeastrc.xlink.www.user_mgmt_webapp_access.UserMgmt_ConnectorCallFailure_Util;
+import org.yeastrc.user_mgmt_central.user_mgmt_central__embed_code.UserMgmtConnectorCallFailure_IF;
 import org.yeastrc.xlink.www.signin_limits.SignIn_Limits;
 import org.yeastrc.xlink.www.user_session_management.UserSession;
 import org.yeastrc.xlink.www.user_session_management.UserSessionBuilder;
@@ -390,6 +392,14 @@ public class LoginService {
 		} catch ( WebApplicationException e ) {
 			throw e; //  Data exception so just rethrow
 		} catch ( Exception e ) {
+			UserMgmtConnectorCallFailure_IF userMgmtConnectorCallFailure = UserMgmt_ConnectorCallFailure_Util.find( e );
+			if ( userMgmtConnectorCallFailure != null ) {
+				//  The call to User Mgmt failed (sign in or get user data):  Sign-in is temporarily unavailable
+				log.error( "Sign-in: " + UserMgmt_ConnectorCallFailure_Util.logText( userMgmtConnectorCallFailure ), e );
+				LoginResult loginResult_TemporarilyUnavailable = new LoginResult();
+				setSignInTemporarilyUnavailable( loginResult_TemporarilyUnavailable, SignIn_Limits.getInstance().getRetrySeconds() );
+				return loginResult_TemporarilyUnavailable;
+			}
 			String msg = "Exception caught: " + e.toString();
 			log.error( msg, e );
 			throw new WebApplicationException(

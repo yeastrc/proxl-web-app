@@ -2,6 +2,8 @@
 
 //   handleServicesAJAXErrors.js
 
+import { accountServiceCallFailure_GetMessage } from 'page_js/user_account_page_js/accountServiceCallFailure_Common.js';
+
 
 
 
@@ -82,6 +84,13 @@ window.handleAJAXError = function( jqXHR, textStatus, errorThrown ) {
 	var jqXHR_statusCode = jqXHR.status;
 	var jqXHR_responseText = jqXHR.responseText;
 	
+	//  The call from the server to the account service failed
+	var accountServiceCallFailure_Message = accountServiceCallFailure_GetMessage({ jqXHR, createAccount : undefined });
+	if ( accountServiceCallFailure_Message ) {
+		showAccountServiceCallFailureMsg( accountServiceCallFailure_Message );
+		return;
+	}
+	
 
 	
 	if ( jqXHR_statusCode === AJAX_RESPONSE_NO_SESSION_STATUS_CODE &&
@@ -155,6 +164,22 @@ window.handleAJAXError = function( jqXHR, textStatus, errorThrown ) {
 	
 };
 
+
+/**
+ * The call from the server to the account service failed.  message is shown as text.
+ */
+var showAccountServiceCallFailureMsg = function( message ) {
+
+	var $outer = $('<div style="position: absolute; background-color: white; z-index: 10000; top:40px; left:40px; width:500px; padding: 10px; border-width: 5px; border-color: red; border-style: solid;" ></div>');
+	var $close = $('<div style="text-align: right; cursor: pointer; font-weight: bold;" >X</div>');
+	$close.click( function() { $outer.remove(); } );
+	$outer.append( $close );
+	$outer.append( $('<h3 style="color: red;"></h3>').text( message ) );
+
+	$("body").append( $outer );
+
+	window.scroll(0, 0);  // scroll to top left, assuming message is in that corner
+}
 
 window.showAjaxErrorMsg = function( params ) {
 	
