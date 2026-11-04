@@ -221,22 +221,21 @@
 			<div  class="current-value-container current_value_container_jq">
 				<a href="javascript:" class="edit_value_jq" >Change Password</a> 
 			</div>
-			<div  class="edit-value-container edit_value_container_jq">
-			  <div >
+			<div  class="edit-value-container edit-value-container-labeled edit_value_container_jq">
+			  <div class="edit-value-labeled-grid">
+				<label for="password-change-old-password-field">Old Password:</label>
 				<input type="password" value="" placeholder="Old Password" title="Old Password"  
 						class="edit-value-input-field  " id="password-change-old-password-field">
-			  </div>
-			  <div style="margin-top: 5px;">
+				<label for="password-change-field">New Password:</label>
 				<input type="password" value="" placeholder="New Password" title="New Password"  
 						class="edit-value-input-field  " id="password-change-field">
-			  </div>
-			  <div style="margin-top: 5px; margin-bottom: 6px;">
+				<label for="password-confirm-field">Confirm New Password:</label>
 				<input type="password" value="" placeholder="Confirm New Password" title="Confirm New Password"  
-						class="edit-value-input-field  " id="password-confirm-field"><br>
-			  </div>
-			  <div >
-				<input type="button" value="Submit" id="submit-password-change-button"> 
-				<input type="button" value="Cancel" class="cancel_button_jq">
+						class="edit-value-input-field  " id="password-confirm-field">
+				<div class="edit-value-labeled-grid-buttons">
+					<input type="button" value="Submit" id="submit-password-change-button"> 
+					<input type="button" value="Cancel" class="cancel_button_jq">
+				</div>
 			  </div>
 			</div>			
 		</div>
