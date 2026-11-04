@@ -1349,6 +1349,11 @@ body.manage-account-page .edit-value-container { display: none; }
 
 body.manage-account-page  .edit-value-input-field { width: 275px;  }
 
+/*  Edit block with a label to the left of each input (new email / new username, and the current password)  */
+body.manage-account-page .edit-value-container-labeled { border: 2px solid #D3D3D3; padding: 6px 8px; width: fit-content; }
+body.manage-account-page .edit-value-labeled-grid { display: grid; grid-template-columns: max-content max-content; column-gap: 10px; row-gap: 5px; align-items: baseline; }
+body.manage-account-page .edit-value-labeled-grid-buttons { grid-column: 2; }
+
 
 
 body.manage-account-page div.error-message-container { display: none; width: 100%; text-align: center; position: absolute; z-index: 1; }

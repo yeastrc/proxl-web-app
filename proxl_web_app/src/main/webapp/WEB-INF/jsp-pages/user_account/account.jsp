@@ -118,12 +118,18 @@
 				<span class="current_value_span_jq"><c:out value="${ loggedInUser.email }"></c:out></span> 
 				<a href="javascript:" class="edit_value_jq" ><img src="images/icon-edit-small.png" title="Change Email"></a>
 			</div>
-			<div  class="edit-value-container edit_value_container_jq">
+			<div  class="edit-value-container edit-value-container-labeled edit_value_container_jq">
+			  <div class="edit-value-labeled-grid">
+				<label for="email-change-field">New Email:</label>
 				<input type="text" value="" class="edit-value-input-field  edit_value_input_field_jq" id="email-change-field" maxlength="255">
-				<input type="password" value="" placeholder="Current Password" title="Current Password"  
+				<label for="email-change-current-password-field">Password:</label>
+				<input type="password" value="" placeholder="Current Password" title="Current Password" autocomplete="current-password"
 						class="edit-value-input-field  " id="email-change-current-password-field">
-				<input type="button" value="Submit" id="submit-email-change-button">
-				<input type="button" value="Cancel" class="cancel_button_jq">
+				<div class="edit-value-labeled-grid-buttons">
+					<input type="button" value="Submit" id="submit-email-change-button">
+					<input type="button" value="Cancel" class="cancel_button_jq">
+				</div>
+			  </div>
 			</div>			
 		</div>
 
@@ -170,12 +176,18 @@
 				<span class="current_value_span_jq"><c:out value="${ loggedInUser.username }"></c:out></span> 
 				<a href="javascript:" class="edit_value_jq" ><img src="images/icon-edit-small.png" title="Change Username"></a>
 			</div>
-			<div  class="edit-value-container edit_value_container_jq">
+			<div  class="edit-value-container edit-value-container-labeled edit_value_container_jq">
+			  <div class="edit-value-labeled-grid">
+				<label for="username-change-field">New Username:</label>
 				<input type="text" value="" class="edit-value-input-field  edit_value_input_field_jq" id="username-change-field"  maxlength="40">
-				<input type="password" value="" placeholder="Current Password" title="Current Password"  
+				<label for="username-change-current-password-field">Password:</label>
+				<input type="password" value="" placeholder="Current Password" title="Current Password" autocomplete="current-password"
 						class="edit-value-input-field  " id="username-change-current-password-field">
-				<input type="button" value="Submit" id="submit-username-change-button">
-				<input type="button" value="Cancel" class="cancel_button_jq">
+				<div class="edit-value-labeled-grid-buttons">
+					<input type="button" value="Submit" id="submit-username-change-button">
+					<input type="button" value="Cancel" class="cancel_button_jq">
+				</div>
+			  </div>
 			</div>			
 		</div>
 
