@@ -95,19 +95,19 @@
 			<div class="value-label value_label_jq" style="position: relative;" >
 		
 		  		<div class="error-message-container error_message_container_jq" id="error_message_email_already_exists">
-		  			<div class="error-message-inner-container" >
+		  			<div class="error-message-inner-container" style="width:500px;" >
 			  			<span class="error-message-text" >Another acccount already has that email address
 				  			<span class="error-message-close-x error_message_close_x_jq">X</span></span>
 				  	</div>
 			  	</div>			
 		  		<div class="error-message-container error_message_container_jq" id="error_message_email_current_password_required">
-		  			<div class="error-message-inner-container" >
+		  			<div class="error-message-inner-container" style="width:500px;" >
 			  			<span class="error-message-text" >Enter your current password
 				  			<span class="error-message-close-x error_message_close_x_jq">X</span></span>
 				  	</div>
 			  	</div>			
 		  		<div class="error-message-container error_message_container_jq" id="error_message_email_current_password_invalid">
-		  			<div class="error-message-inner-container" >
+		  			<div class="error-message-inner-container" style="width:500px;" >
 			  			<span class="error-message-text" >Current password is incorrect
 				  			<span class="error-message-close-x error_message_close_x_jq">X</span></span>
 				  	</div>
@@ -152,19 +152,19 @@
 			<div class="value-label value_label_jq" style="position: relative;" >
 		
 		  		<div class="error-message-container error_message_container_jq" id="error_message_username_already_exists">
-		  			<div class="error-message-inner-container" >
+		  			<div class="error-message-inner-container" style="width:500px;" >
 			  			<span class="error-message-text" >Another acccount already has that username
 				  			<span class="error-message-close-x error_message_close_x_jq">X</span></span>
 				  	</div>
 			  	</div>			
 		  		<div class="error-message-container error_message_container_jq" id="error_message_username_current_password_required">
-		  			<div class="error-message-inner-container" >
+		  			<div class="error-message-inner-container" style="width:500px;" >
 			  			<span class="error-message-text" >Enter your current password
 				  			<span class="error-message-close-x error_message_close_x_jq">X</span></span>
 				  	</div>
 			  	</div>			
 		  		<div class="error-message-container error_message_container_jq" id="error_message_username_current_password_invalid">
-		  			<div class="error-message-inner-container" >
+		  			<div class="error-message-inner-container" style="width:500px;" >
 			  			<span class="error-message-text" >Current password is incorrect
 				  			<span class="error-message-close-x error_message_close_x_jq">X</span></span>
 				  	</div>
