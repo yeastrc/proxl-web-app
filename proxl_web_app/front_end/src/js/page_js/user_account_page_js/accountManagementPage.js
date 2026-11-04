@@ -555,7 +555,7 @@ window.initPage = function() {
 			var clickThis = this;
 			hideAllErrorMessages();
 			editValue( clickThis );
-			eventObject.preventDefault();  // stop click bubble up.
+			return false;  // stop click bubble up.  preventDefault() alone does not stop it, and the $(document).click handler would hide an error message shown during this click
 		} catch( e ) {
 			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
 			throw e;
@@ -567,7 +567,7 @@ window.initPage = function() {
 			var clickThis = this;
 			hideAllErrorMessages();
 			closeEditValue( clickThis );
-			eventObject.preventDefault();  // stop click bubble up.
+			return false;  // stop click bubble up.  preventDefault() alone does not stop it, and the $(document).click handler would hide an error message shown during this click
 		} catch( e ) {
 			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
 			throw e;
@@ -579,7 +579,7 @@ window.initPage = function() {
 			var clickThis = this;
 			hideAllErrorMessages();
 			updateFirstName(clickThis, eventObject);	
-			eventObject.preventDefault();  // stop click bubble up.
+			return false;  // stop click bubble up.  preventDefault() alone does not stop it, and the $(document).click handler would hide an error message shown during this click
 		} catch( e ) {
 			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
 			throw e;
@@ -591,7 +591,7 @@ window.initPage = function() {
 			var clickThis = this;
 			hideAllErrorMessages();
 			updateLastName(clickThis, eventObject);	
-			eventObject.preventDefault();  // stop click bubble up.
+			return false;  // stop click bubble up.  preventDefault() alone does not stop it, and the $(document).click handler would hide an error message shown during this click
 		} catch( e ) {
 			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
 			throw e;
@@ -603,7 +603,7 @@ window.initPage = function() {
 			var clickThis = this;
 			hideAllErrorMessages();
 			updateOrganization(clickThis, eventObject);	
-			eventObject.preventDefault();  // stop click bubble up.
+			return false;  // stop click bubble up.  preventDefault() alone does not stop it, and the $(document).click handler would hide an error message shown during this click
 		} catch( e ) {
 			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
 			throw e;
@@ -615,7 +615,7 @@ window.initPage = function() {
 			var clickThis = this;
 			hideAllErrorMessages();
 			updateEmail(clickThis, eventObject);	
-			eventObject.preventDefault();  // stop click bubble up.
+			return false;  // stop click bubble up.  preventDefault() alone does not stop it, and the $(document).click handler would hide an error message shown during this click
 		} catch( e ) {
 			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
 			throw e;
@@ -627,7 +627,7 @@ window.initPage = function() {
 			var clickThis = this;
 			hideAllErrorMessages();
 			updateUsername(clickThis, eventObject);	
-			eventObject.preventDefault();  // stop click bubble up.
+			return false;  // stop click bubble up.  preventDefault() alone does not stop it, and the $(document).click handler would hide an error message shown during this click
 		} catch( e ) {
 			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
 			throw e;
@@ -639,7 +639,7 @@ window.initPage = function() {
 			var clickThis = this;
 			hideAllErrorMessages();
 			updatePassword(clickThis, eventObject);	
-			eventObject.preventDefault();  // stop click bubble up.
+			return false;  // stop click bubble up.  preventDefault() alone does not stop it, and the $(document).click handler would hide an error message shown during this click
 		} catch( e ) {
 			reportWebErrorToServer.reportErrorObjectToServer( { errorException : e } );
 			throw e;
